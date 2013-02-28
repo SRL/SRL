@@ -1,0 +1,41 @@
+(*
+Leo the Gravedigger
+===================
+
+Stores all the routines to solve the Leo random.  None of these routines
+should be used throughout scripts.  They only need to be called in SRL's random
+detection methods.
+
+*)
+
+(**
+ * Author:
+ * Description: Detects if a player is in the Leo random.
+ *)
+function Leo_Detect(): boolean;
+begin
+  result := (getNPCChatName() = 'l8o');
+end;
+
+(**
+ * Author:
+ * Description: Solves the random.
+ *)
+function Leo_Solve(): boolean;
+var
+  t: integer;
+begin
+  if (not loggedIn()) then
+    exit;
+
+  t := (getSystemTime + (5 * 60000)); // maximum 5 minutes
+  doConversation('', false);
+
+  repeat
+
+  until(result or (getSystemTime > t));
+
+  if (not result) then
+    addToSRLLog('Leo_Solve: '' solver timed out');
+end;
+
