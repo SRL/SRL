@@ -354,7 +354,6 @@ var
   {$ELSE}
     Smart_ForceNew: Boolean;
     Smart_FixSpeed: Boolean;
-    SRL_SixHourFix: Boolean;
     Smart_CurrentClient: Integer;
   {$ENDIF}
 {$ENDIF}
