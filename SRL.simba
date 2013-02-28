@@ -146,7 +146,7 @@ begin
   WaterColor := 0;
   BankColor := 0;
 
-  // these need to be removed eventually (no longer used)
+  SRL_DisableRandoms := true;
   SRL_OnFindRandomCall := nil;
   LampSkill := 'mining';
 
