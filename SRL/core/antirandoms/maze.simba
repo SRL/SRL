@@ -32,15 +32,14 @@ const
 
 (**
  * Author: DemiseScythe & Coh3n
+ * Last modified 28/02/2013 By Justin
  * Description: Returns true if player is in the random.
  *)
 function Maze_Detect(): boolean;
 begin
-  // WARNING: sometimes magic tab exists, sometimes it doesn't
-
-  if (getNPCChatName() = SRL_NPC_OLDMAN) then
+  if ((getNPCChatName() = SRL_NPC_OLDMAN) or (FindTextTPA(13750737, 3, 417, 290, 476, 311, 'ward', CharsNPC07, Nothing))) then
     // the red maze walls on the minimap
-    result := (countColorTolerance(197614, MMX1, MMY1, MMX2, MMY2, 15) > 1000);
+    result := (countColorTolerance(240, MMX1, MMY1, MMX2, MMY2, 15) > 900);
 end;
 
 (**

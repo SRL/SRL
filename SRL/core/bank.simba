@@ -98,7 +98,7 @@ Returns true if deposit screen is Found.
 .. note::
 
     Author: Shuttleu
-    Last Modified: Unknown
+    Last modified 28/02/2013 By Justin
 
 Example:
 
@@ -110,7 +110,76 @@ function DepositScreen: Boolean;
 var
   X, Y: Integer;
 begin
-  Result := FindText(x, y, 'Deposit Box', UpCharsEx, 92, 29, 396, 54);
+  Result := FindText(x, y, 'Deposit Box', upChars07, 92, 29, 396, 54);
+end;
+
+(*
+PinPending
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function PinPending: Boolean;
+
+Finds the Pin Pending. Returns true if Found.
+
+.. note::
+
+    Author: Justin
+
+Example:
+
+.. code-block:: pascal
+
+    if PinPending then
+    ConfirmPin();
+*)
+function PinPending : Boolean;
+begin
+  Result := FindTextTPA(65535, 10, 114, 135, 204, 158, 'asked', CharsNPC07, Nothing);
+end;
+
+(*
+ConfirmPin
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ConfirmPin: Boolean;
+
+Find and click 'Yes, I asked for this. I want this PIN'.
+
+.. note::
+
+    Author: Justin
+
+Example:
+
+.. code-block:: pascal
+
+    if PinPending then
+    ConfirmPin();
+*)
+function ConfirmPin : Boolean;
+var
+  Timer : Integer;
+begin
+  Result := False;
+  writeln(result);
+  Timer := GetSystemTime + 10000;
+    while PinPending do
+  begin
+  writeln('In loop');
+    if Timer < GetSystemTime then
+      Break;
+      writeln('Moving mouse');
+    MouseBox(115, 137, 387, 158, mouse_Move)
+      if WaitUpText('Ok', 300) then
+        ClickMouse2(mouse_Left);
+        writeln('Finishing');
+        Result := (BankScreen) or (PinScreen);
+    Wait(700+Random(300));
+  end;
 end;
 
 (*
@@ -576,220 +645,6 @@ begin
 end;
 
 (*
-FixBankTab
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure FixBankTab;
-
-Fixes the BankTab to 'View All'
-
-.. note::
-
-    Author: Wizzup?
-    Last Modified: Unknown
-
-Example:
-
-.. code-block:: pascal
-
-    if FixBankTab then
-    SearchForItem;
-*)
-function FixBankTab: Boolean;
-var
-   activeTPA, notactiveTPA: TPointArray;
-   T: Integer;
-begin
-  Result := False;
-  FindColorsTolerance(activeTPA, 2896954, 25, 45, 70, 80, 5);
-  FindColorsTolerance(notactiveTPA, 2437688, 25, 45, 70, 80, 5);
-
-  if Length(activeTPA) > Length(notactiveTPA) then
-  begin
-    Result := True;
-    Exit;
-  end;
-
-  Mouse(40, 60, 10, 10, mouse_left);
-  T := GetSystemTime;
-  while Length(activeTPA) <= Length(notactiveTPA) do
-  begin
-    FindColorsTolerance(activeTPA, 2896954, 25, 45, 70, 80, 5);
-    FindColorsTolerance(notactiveTPA, 2437688, 25, 45, 70, 80, 5);
-    Wait(500);
-    if ((GetSystemTime - T) div 1500) mod 2 = 0 then
-      Mouse(40, 60, 10, 10, mouse_left);
-    if GetSystemTime - T > 10000 then
-      Exit;
-  end;
-end;
-
-(*
-CurrentBankTab
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function CurrentBankTab: Integer;
-
-Returns Current Bank Tab selected
-
-.. note::
-
-    Author: Narcle
-    Last Modified: Unknown
-
-Example:
-
-.. code-block:: pascal
-
-    curTab := GetCurrentBankTab;
-*)
-function CurrentBankTab: Integer;
-begin
-  Result := -1;
-  if not BankScreen then
-    Exit;
-  for Result := 1 to 9 do
-    if GetColor(40 + 48 * (Result - 1), 83) = 2831161 then //Left of the bottom boundary of the tab
-      Exit;
-  Result := 0;
-end;
-
-(*
-ExistsBankTab
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ExistsBankTab(T: Integer): Boolean;
-
-Returns true if Bank Tab Exists
-
-.. note::
-
-    Author: Narcle
-    Last Modified: Unknown
-
-Example:
-
-.. code-block:: pascal
-
-    if ExistsBankTab(2) then
-    BankTab(2);
-*)
-function ExistsBankTab(T: Integer): Boolean;
-var
-  x, y: integer;
-begin
-  Result := False;
-  if not BankScreen then
-  begin
-    srl_Warn('ExistsBankTab', 'Bank not open.', warn_AllVersions);
-    Exit;
-  end;
-  if (not(InRange(T, 1, 9))) then
-  begin
-    srl_Warn('ExistsBankTab', 'Bank Tab: ' + IntToStr(T) + ' is not possible (1..9) only.', warn_AllVersions);
-    Exit;
-  end;
-  if T = 1 then
-    Result := true;
-
-  if FindColor(x, y, srl_outline_black, 27+(T-1)*48, 51, 70+(T-1)*48, 81) then
-    Result := true;
-end;
-
-(*
-BankTab
-~~~~~~~
-
-.. code-block:: pascal
-
-    function BankTab(T: Integer): Boolean;
-
-If Bank Tab is there will switch to it.
-
-.. note::
-
-    Author: Narcle
-    Last Modified: Unknown
-
-Example:
-
-.. code-block:: pascal
-
-    if ExistsBankTab(2) then
-    BankTab(2);
-*)
-function BankTab(T: Integer): Boolean;
-begin
-  result := false;
-  if not BankScreen then
-    Exit;
-
-  if T = CurrentBankTab then
-  Begin
-    Result := true;
-    Exit;
-  end;
-
-  if not ExistsBankTab(T) then
-    srl_Warn('BankTab', 'Bank Tab '+inttostr(T) +' does not Exist.', warn_AllVersions)
-  else
-    Mouse(48 * T, 57, 10, 10, mouse_left);
-
-  Result := T = CurrentBankTab;
-end;
-
-(*
-SearchBank
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SearchBank(Item: string);
-
-Searches for Item in your bank.
-
-.. note::
-
-    Author: ZephyrsFury
-    Last Modified: Unknown
-
-Example:
-
-.. code-block:: pascal
-
-    SearchBank('air rune');
-  if FindDTM(..) then
-*)
-procedure SearchBank(Item: string);
-var
-  T, II: Integer;
-begin
-  if (not(BankScreen)) then Exit;
-  for II := 0 to 2 do
-  begin
-    FixBankTab;
-    Mouse(75, 300, 20, 10, mouse_left);
-    T := GetSystemTime;
-    while (BankScreen) and (GetSystemTime - T < 5000) do
-    begin
-      Wait(500 + Random(500));
-      if (FindTextTpa(0, 0, 350, 392, 399, 410, 'search', UpCharsEx, Nothing)) then
-      begin
-        TypeSend(Item);
-        Exit;
-      end;
-    end;
-    Wait(500 + Random(500));
-  end;
-end;
-
-(*
 MouseBankSlot
 ~~~~~~~~~~~~~
 
@@ -853,27 +708,6 @@ const
   SRL_DEPOSIT_EQUIPMENT = 2;
   SRL_DEPOSIT_FOLLOWER = 3;
 
-procedure QuickDeposit(Which: Integer);
-var
-  StartX: Integer;
-begin
-  if (BankScreen) or (DepositScreen) then
-  begin
-    case Which of
-      SRL_DEPOSIT_ALL:       StartX := 362;
-      SRL_DEPOSIT_EQUIPMENT: StartX := 395;
-      SRL_DEPOSIT_FOLLOWER:  StartX := 431;
-      SRL_DEPOSIT_COINS:     StartX := 467;
-
-      else
-        SRL_Warn('QuickDeposit', 'Invalid deposit method ', WARN_ALLVERSIONS);
-    end;
-
-    Mouse(StartX - 58 * Ord(DepositScreen), 303 - 29 * Ord(DepositScreen), 15, 10, True);
-    Wait(200 + Random(300));
-  end;
-end;
-
 (*
 DepositAll
 ~~~~~~~~~~
@@ -903,7 +737,7 @@ begin
     Exit;
   end;
 
-  QuickDeposit(SRL_DEPOSIT_ALL);
+  //QuickDeposit(SRL_DEPOSIT_ALL);
   Result := WaitFunc(@InvEmpty, 50, 3000);
 end;
 

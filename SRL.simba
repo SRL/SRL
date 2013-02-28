@@ -146,7 +146,7 @@ begin
   WaterColor := 0;
   BankColor := 0;
 
-  SRL_DisableRandoms := true;
+  SRL_DisableRandoms := False;
   SRL_OnFindRandomCall := nil;
   LampSkill := 'mining';
 

@@ -39,7 +39,7 @@ const
   UBx1 = 313; // Username tBox - in use now
   UBy1 = 254;
   UBx2 = 435;
-  UBy2 = 266;
+  UBy2 = 260;
 
   PBx1 = 346; // Password tBox - in use now
   PBy1 = 271;

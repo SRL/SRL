@@ -318,7 +318,7 @@ end;
 
 function GetNPCChatName(): string;
 begin
-  result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, NPCChars);
+  result := getTextAtExWrap(130, 358, 504, 379, 0, 50, 30, 128, 15, CharsNPC07);
 end;
 
 function AreTalking(): boolean;
