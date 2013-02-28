@@ -357,10 +357,6 @@ begin
     if ((SRL_RandomScreenShot) and (not SRL_Randoms[rand].isInvRandom)) then
       takeScreen(SRL_Randoms[rand].name);
 
-    // sometimes it gets in the way of objects we need to find
-    toggleMoneyPouch(false);
-    exitSquealOfFortune();
-
     // if solver isn't disabled, solve it
     if (not SRL_Randoms[rand].disabled) then
     begin
@@ -462,11 +458,6 @@ begin
 
   findDead();
   findMod();
-  findDwarvenPopup();
-  exitSquealOfFortune();
-  closeAdWindow();
-  if checkInv then
-    findSpinTicket();
 
   if SRL_HasProc(SRL_OnRandomCall) then
     SRL_Procs[SRL_OnRandomCall]();

@@ -11,33 +11,27 @@ Smart Params
 {$loadlib libsmartremote}
 
 (*
-GetSmartParams
+GetRS07World
 ~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-  function GetSmartParams: TStringArray;
+  function GetRS07World: String;
 
-Grabs The Correct Parameters For passing to the SmartClient.
+Grabs the 'Best World for me'.
 
 .. note::
 
-  By: Brandon.
-  Modified By: Mormanman, Benland100.
+  By: Justin.
 
 Example:
 
 .. code-block:: pascal
 
 *)
-function GetSmartParams: TStringArray;
-var
-  Params: TStringArray;
-  Page: String;
+function GetRS07World: String;
 begin
-  Page := Between('<iframe id="game" src="', '"', GetPage('http://www.runescape.com/game.ws?j=1'));
-  Params := Explode(',', Page);
-  Result := Params;
+  Result := Between('a href="http://oldschool', '.runescape.com/j1', GetPage('http://oldschool.runescape.com/slu'));
 end;
 
 (*
@@ -147,53 +141,8 @@ begin
       Writeln('Failed To Kill Client: ' + ToStr(IDs[I]));
 end;
 
-(*
-SixHourFix
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SixHourFix;
-
-Kills The Current Smart Client and Restarts it.
-Fixes the 6 hour login.
-
-.. note::
-
-  By: Brandon.
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure FreeSRL; Forward;
 procedure SetupSRL; Forward;
-procedure SixHourFix;
-var
-  Trash: TVariantArray;
-  Refresh: Integer;
-begin
-  FreeSRL;
-  Refresh := SmartGetRefresh;
-  SmartKillClient(SmartCurrentClient);
-  SetupSRL;
-
-  try
-    CallProc('SMART_FreeDebug', Trash);
-    CallProc('SMART_SetupDebug', Trash);
-  except
-  end;
-
-  SmartSetRefresh(Refresh);
-
-  try
-    if (not LoginPlayer) then
-      srl_Warn('SixHourFix', 'Could not log in player', warn_Terminate);
-  except
-    srl_Warn('SixHourFix', 'Players not declared', warn_Terminate);
-  end;
-end;
 
 
 (*
@@ -261,6 +210,7 @@ var
   I, Count: Integer;
   IDs: TIntegerArray;
   Params: TStringArray;
+  World: String;
 begin
   If (Not ForceNew) then
   begin
@@ -279,26 +229,20 @@ begin
       end;
   end;
 
-  Params := GetSmartParams;
-  If (Length(Params) <> 2) then
-  begin
-    Writeln('** Failed To Grab Smart Parameters **');
-    Writeln('** Please check your internet connection/firewall **');
-    TerminateScript;
-    Exit;
-  end;
-  
-  {$IFDEF SMART8}
-  Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
-  {$ELSE}
-  Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '', -1);
-  {$ENDIF}
+  World := GetRS07World;
+
+  //Removal of Smart 7.2?
+  //{$IFDEF SMART8}
+  Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), 'http://oldschool' + World + '.runescape.com/', '/j1', 765, 503, '', '', '');
+  //{$ELSE}
+  //Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
+  //{$ENDIF}
   
   If (Result > 0) Then
   begin
     try
       SetEIOSTarget('libsmartremote', ToStr(Result));
-      Writeln('Loading SMART: ' + Params[0] + Params[1]);
+      Writeln('Loading SMART: http://oldschool' + World + '.runescape.com');
     except
       WriteLn('** Fatal Error: Pairing Clients; Terminating Script **');
       TerminateScript;
@@ -342,9 +286,6 @@ begin
     writeln('*** Smart Failed To Load ***');
     TerminateScript;
   end;
-
-  if (SRL_SixHourFix) then
-    SRL_Procs[SRL_OnRSUpdate]:= @SixHourFix;
 
   While (GetColor(382, 252) <> 0) Do
   begin
