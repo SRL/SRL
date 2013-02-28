@@ -1,15 +1,3 @@
-(*
-
-Mouse
-=====
-
-Mouse routines.
-
-.. contents::
-
-*)
-
-
 // TODO: Constant/Var docs
 var
   MouseSpeed: Integer;
@@ -20,27 +8,7 @@ var
 
 const
   mouse_move = 3;
-(*
-WindMouse
-~~~~~~~~~
 
-.. code-block:: pascal
-
-    procedure WindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, maxStep, targetArea: extended);
-
-Moves the mouse along a spline defined by
-
-.. note::
-
-    by Benland100
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 procedure WindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, maxStep, targetArea: extended);
 var
   veloX, veloY, windX, windY, veloMag, dist, randomDist, lastDist, step: extended;
@@ -98,25 +66,6 @@ begin
   end;
 end;
 
-(*
-MMouse
-~~~~~~
-
-.. code-block:: pascal
-
-    procedure MMouse(x, y, rx, ry: integer);
-
-Moves the mouse.
-
-.. note::
-
-    by Benland100, laptop mouse by Hobbit (and nielsie95)
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure MMouse(x, y, rx, ry: integer);
 var
   cx, cy: integer;
@@ -178,25 +127,6 @@ begin
   {$ENDIF}
 end;
 
-(*
-ClickMouse2
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ClickMouse2(button: variant);
-
-Clicks the mouse in a human way on the current mouse spot.
-
-.. note::
-
-    by SRL Community
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure ClickMouse2(button: variant);
 var
   a,b,c : integer;
@@ -226,25 +156,6 @@ begin
   Wait(50+Random(50));
 end;
 
-(*
-Mouse
-~~~~~
-
-.. code-block:: pascal
-
-    procedure Mouse(mousex, mousey, ranx, rany: Integer; button: variant);
-
-Moves then clicks mouse (will only move if 'mouse_move' passed). 
-
-.. note::
-
-    by Mutant Squirrle, Harry
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure Mouse(mousex, mousey, ranx, rany: Integer; button: variant);
 begin
   MMouse(mousex, mousey, ranx, rany);
@@ -253,25 +164,6 @@ begin
   Wait(50 + Random(50));
 end;
 
-(*
-MouseBox
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure MouseBox(x1, y1, x2, y2: Integer; ClickType: Integer);
-
-Moves mouse into a random position in the box. Clicks if told to.
-
-.. note::
-
-    by Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure MouseBox(x1, y1, x2, y2: Integer; ClickType: Integer);
 var
   fx, fy: Integer;
@@ -284,25 +176,6 @@ begin
     srl_Warn('MouseBox', 'ClickType is NOT a valid number!', warn_AllVersions);
 end;
 
-(*
-MouseTBox
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure MouseTBox(Box: TBox; ClickType: variant);
-
-Moves the mouse to the Indicated Box, and performs the ClickType
-
-.. note::
-
-    by PhaseCode
-
-Example:
-    Mouse(InvBox(1),1);
-.. code-block:: pascal
-
-*)
 procedure MouseTBox(Box: TBox; ClickType: variant);
 begin
   MouseBox(Box.X1, Box.Y1, Box.X2, Box.Y2, ClickType)
@@ -318,25 +191,6 @@ begin
     end;
 end;
 
-(*
-SleepAndMoveMouse
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SleepAndMoveMouse(Time: Integer);
-
-Waits for specified time and moves mouse around like bored human would.
-
-.. note::
-
-    by RsN
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure SleepAndMoveMouse(Time: Integer);
 var
   Moving: Boolean;
@@ -381,25 +235,6 @@ begin
   until (Abs(GetTickCount - T) >= Time);
 end;
 
-(*
-IdleTime
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure IdleTime(Time, Rand: integer; Gravity: extended);
-
-Randomly moves the mouse (Rand, and Gravity) for Time milliseconds
-
-.. note::
-
-    by BenLand100
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure IdleTime(Time, Rand: Integer; Gravity: Extended);
 var
   H, W, Cx, Cy, i, n, St: Integer;
@@ -445,32 +280,6 @@ end;
 
 function WaitUpTextMulti(S: TStringArray; Time: Integer): Boolean; Forward;
 
-(*
-SpiralMouseMulti
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function SpiralMouseMulti(var fx, fy: Integer; x1, y1, x2, y2: Integer; UpText: TStringArray; PpC, aInc: Integer): Boolean;
-
-Spirals the mouse in a circle from the center of the defined box.
-It will continue to spiral until it finds a spiral completely outside
-the box, always skipping points outside.
-Returns the occurance of the first occurance of UpText into fx, fy.
-Takes multiple UpTexts as a TStringArray.
-PpC: The number of pixels to increase per spiral.
-aInc: The number of stops to make around each spiral.
-Takes some testing to get the right combination of PpC and aInc.
-
-.. note::
-
-    by Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function SpiralMouseMulti(var fx, fy: Integer; x1, y1, x2, y2: Integer; UpText: TStringArray; PpC, aInc: Integer): Boolean;
 var
   aStep, a, rStep, rV, oB: Extended;
@@ -510,55 +319,11 @@ begin
   MouseSpeed := ms;
 end;
 
-(*
-SpiralMouse
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function SpiralMouse(var fx, fy: Integer; x1, y1, x2, y2: Integer; UpText: String; PpC, aInc: Integer): Boolean;
-
-Spirals the mouse in a circle from the center of the defined box.
-It will continue to spiral until it finds a spiral completely outside
-the box, always skipping points outside.
-Returns the occurance of the UpText into fx, fy.
-See `SpiralMouseMulti` for more information
-.. note::
-
-    by Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function SpiralMouse(var fx, fy: Integer; x1, y1, x2, y2: Integer; UpText: String; PpC, aInc: Integer): Boolean;
 begin
   Result := SpiralMouseMulti(fx, fy, x1, y1, x2, y2, [UpText], PpC, aInc);
 end;
 
-
-(*
-DidClick
-~~~~~~~~
-
-.. code-block:: pascal
-
-    function DidClick(Red: Boolean; Time: integer): boolean;
-
-Checks for the X after a click, Times Out after Time.
-DidClick Time must be at LEAST 200 now.
-
-.. note::
-
-    by Rasta Magician
-    Modded by Narcle on Feb. 4th, 2012
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function DidClick(Red: Boolean; Time: integer): boolean;
 var
   TimeOut, x, y, w, h, R, G: integer;
@@ -592,78 +357,16 @@ begin
   end;
 end;
 
-(*
-DidRedClick
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function DidRedClick: Boolean;
-
-Checks for the Red X after a Click, Times out after 500 ms
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function DidRedClick: Boolean;
 begin
   Result := DidClick(true, 1000);
 end;
 
-(*
-DidYellowClick
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-
-    function DidYellowClick: Boolean;
-
-Checks for the Yellow X after a Click, Times out after 500 ms
-
-.. note::
-
-    by Rasta Magician
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function DidYellowClick: Boolean;
 begin
   Result := DidClick(false, 1000);
 end;
 
-(*
-MouseOval
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure MouseOval(cx, cy, mx, my, clickType: Integer);
-
-Clicks a random point within an oval shape.
-    * cx, cy: The center point of the oval.
-    * rx, ry: X and Y radius of the oval.
-    * clickType: mouse_Move, mouse_Left, mouse_Right, or mouse_Middle.
-
-.. note::
-
-    by mixster
-    Last Updated: Unknown.
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure MouseOval(cx, cy, rx, ry, clickType: Integer);
 var
   o: TPoint;
@@ -683,51 +386,11 @@ begin
   end;
 end;
 
-(*
-MouseCircle
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure MouseCircle(MidX, MidY, Radius, clickType: Integer);
-
-Same as MouseOval, but clicks within a circle instead.
-
-.. note::
-
-    by mixster
-    Last Updated: Mar. 21st, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure MouseCircle(MidX, MidY, Radius, clickType: Integer);
 begin
   MouseOval(MidX, MidY, Radius, Radius, clickType);
 end;
 
-(*
-MouseBoxEx
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure MouseBoxEx(x1, y1, x2, y2: Integer; Dist,ClickType: Integer);
-
-Does mouse stuff (ClickType), and uses a point that is within Dist from
-the closest point between mouse and the box.
-
-.. note::
-
-    by Raymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure MouseBoxEx(x1, y1, x2, y2: Integer; Dist,ClickType: Integer);
 var
   PT : TPoint;
@@ -742,25 +405,6 @@ begin
   end;
 end;
 
-(*
-DragMouse
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DragMouse(StartX, StartY, SRandX, SRandY, EndX, EndY, ERandX, ERandY: Integer);
-
-Leftclicks StartX, StartY and drags mouse to EndX, EndY.
-
-.. note::
-
-    by NaumanAkhlaQ
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure DragMouse(StartX, StartY, SRandX, SRandY, EndX, EndY, ERandX, ERandY: Integer);
 begin
   MMouse(StartX, StartY, SRandX, SRandY);
@@ -774,27 +418,6 @@ begin
   ReleaseMouse(EndX, EndY, mouse_left);
 end;
 
-(*
-DragMouseTBox
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure DragMouseTBox(StartBox, EndBox: TBox);
-
-Left clicks a point within StartBox and drags mouse to a point within EndBox,
-of which the points selected follows a normal distribution from the centre of the box.
-
-
-.. note::
-
-    by riwu, modelled after DragMouse by NaumanAkhlaQ
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure DragMouseTBox(StartBox, EndBox: TBox);
 var
   StartX, StartY, EndX, EndY: Integer;

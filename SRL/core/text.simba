@@ -1,14 +1,3 @@
-(*
-Text
-====
-
-The Text include contains all sorts of functions used for finding, analysing and
-using text in RS. It also contains a few useful input routines
-
-.. contents::
-
-*)
-
 { const VK_ENTER
   Description: Platform independent virtual enter key. }
 const
@@ -39,73 +28,16 @@ Type
 function CloseBank: Boolean; Forward;
 function PlayerChatActive: Boolean; Forward;
 
-(*
-srl_Explode
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function srl_Explode(str, del: string): TStringArray;
-
-Explodes a string into TStringArray, seperated by del.
-
-.. note::
-
-    by mixster
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function srl_Explode(str, del: string): TStringArray;
 begin
   Result := Explode(del, str);
 end;
 
-(*
-srl_Implode
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function srl_Implode(Pieces: TStringArray; Glue: string): string;
-
-Combines Pieces in a single string seperated by Seperator
-
-.. note::
-
-    by ZephyrsFury & mixster
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function srl_Implode(Pieces: TStringArray; Glue: string): string;
 begin
   Result := Implode(glue, pieces);
 end;
 
-(*
-InStrArrEx
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function InStrArrEx(S: string; StrArr: TStringArray; var Where: Integer): Boolean;
-
-Returns true if the string S was found in the StrArr, and if so stores the index into Where.
-
-.. note::
-
-    by n3ss3s
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function InStrArrEx(S: string; StrArr: TStringArray; var Where: Integer): Boolean;
 var
    I, H: Integer;
@@ -120,25 +52,6 @@ begin
     end;
 end;
 
-(*
-StrInArr
-~~~~~~~~
-
-
-
-    function StrInArr(str: string; arrS: TStringArray): Boolean;
-
-Returns True if str is found in the Array. Case sensitive.
-
-.. note::
-
-    by Narcle & Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function StrInArr(str: string; arrS: TStringArray): Boolean;
 var
   I, L, H: Integer;
@@ -151,25 +64,6 @@ begin
   Result := False;
 end;
 
-(*
-ArrInStr
-~~~~~~~~
-
-.. code-block:: pascal
-
-    function ArrInStr(arrS: TStringArray; str: string): Boolean;
-
-Returns True if the Array is found in the str. Case sensitive.
-
-.. note::
-
-    by Narcle & Nava2
-
-Example:
-
-.. code-block::pascal
-
-*)
 function ArrInStr(arrS: TStringArray; str: string): Boolean;
 var
   I, L, H: Integer;
@@ -182,25 +76,6 @@ begin
   Result := False;
 end;
 
-(*
-TypeByte
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TypeByte(k: Byte);
-
-Types one character k.
-
-.. note::
-
-    by Mutant Squirrle
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure TypeByte(k: Byte);
 begin
   {$IFDEF SMART}
@@ -212,25 +87,6 @@ begin
   KeyUp(k);
 end;
 
-(*
-TypeSendEx
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TypeSendEx(Text : string; PressEnter : Boolean);
-
-Types text in a human-like way.
-
-.. note::
-
-    by SKy Scripter
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure TypeSendEx(Text: string; PressEnter: Boolean);
 var
   I: Integer;
@@ -252,54 +108,11 @@ begin
     TypeByte(VK_ENTER);
 end;
 
-(*
-TypeSend
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TypeSend(Text : string);
-
-Types Text in a human-like way and presses enter. Wrapper function for TypeSendEx
-for compatibility purposes.
-
-.. note::
-
-    by N1ke!
-
-Example:
-
-.. code-block::pascal
-
-*)
 procedure TypeSend(Text: string);
 begin
   TypeSendEx(Text, True);
 end;
 
-(*
-AddMistakes
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function AddMistakes(Orig: string; Chance: Integer): string;
-
-Adds human mistakes to Orig such as mistypes, missing letters,
-wrong cases. Probability that a character is typed wrong is 1 / Chance. ie.
-Higher 'Chance' = less mistakes (I know thats stupid but oh well...).
-Probability is the chance that an individual character is typed incorrectly.
-That is if you have more characters in a string you will get more mistakes overall.
-20 - 30 is usually good but it varies depending on your string so experiment!
-
-.. note::
-    by Zephyrsfury
-
-Example
-
-.. code-block:: pascal
-
-*)
 function AddMistakes(Orig: string; Chance: Integer): string;
 var
   Line1, Line2, Line: array [0..3] of string;
@@ -389,124 +202,46 @@ begin
   end;
 end;
 
-(*
-GetUpText
-~~~~~~~~~
+Function P07_GetUpText: String;
+Var
+  WhiteT,BlueT,YellowT,OrangeT,FoundText: String;
+Begin
+  WhiteT:=GetTextAtExWrap(8, 8, 80, 21, 0, 5, 1, 14541281, 55, 'UpChars07');
+  BlueT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 13423640, 65, 'UpChars07');
+  YellowT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 1235160, 40, 'UpChars07');
+  OrangeT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 4687583, 53, 'UpChars07');
+  FoundText:=WhiteT + ' ' + BlueT + YellowT + OrangeT;
+  FoundText:= ReplaceWrap(FoundText, '.', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '/', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '\', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, ',', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '*', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '^', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '"', '',[rfReplaceAll]);
+  Result:=FoundText;
+End;
 
-.. code-block:: pascal
-
-    function GetUpText : string;
-
-Returns the text in the upperleft corner (often referred to as UpText).
-
-.. note::
-
-    by Simba Development Team.
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function GetUpText: string;
 begin
-  Result := rs_GetUpText
+  Result := P07_GetUpText;
 end;
 
-(*
-IsUpTextEx
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsUpTextEx(Text: String): Boolean;
-
-Checking uptext using wildcards
-
-.. note::
-
-    by Frement
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function IsUpTextEx(Text: String): Boolean;
 begin
   Text := Replace(Text, '?', '.');
   Result := ExecRegExpr('.*'+Text+'.*', GetUpText);
 end;
 
-(*
-IsUpTextRe
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsUpTextRe(RegEx: String): Boolean;
-
-Checking uptext using regex
-
-.. note::
-
-    by Frement
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function IsUpTextRe(RegEx: String): Boolean;
 begin
   Result := ExecRegExpr(RegEx, GetUpText);
 end;
 
-(*
-IsUpText
-~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsUpText(UpText : string) : Boolean;
-
-Returns True if there is currently Uptext on the screen
-
-.. note::
-
-    by Simba Development Team.
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function IsUpText(UpText: string): Boolean;
 begin
   Result := (Pos(UpText, GetUpText) > 0);
 end;
 
-(*
-IsUpTextMultiCustom
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsUpTextMultiCustom(Text: TStringArray): Boolean;
-
-Checks for the occurance of any of the strings in the array.
-
-.. note::
-
-    by Starblaster100 & Nielsie95 & Freddy1990
-
-Example:
-
-.. code-block:: pascal
-
-    IsUpTextMultiCustom(['Att', 'ttac', 'ack', 'monst', 'ster'])
-
-*)
 function IsUpTextMultiCustom(Text: TStringArray): Boolean;
 var
   TheText: string;
@@ -522,67 +257,12 @@ begin
     end;
 end;
 
-(*
-GetLevelAtPos
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetLevelAtPos(x, y : integer) : integer;
-
-Returns the level of the characater found at (x, y), uses uptext. Returns -1 if
-none are found.
-
-.. note::
-
-    by marpis and Nava2
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function GetLevelAtPos(x, y: Integer): integer;
 begin
   MMouse(x, y, 0, 0);
   Wait(RandomRange(80, 150));
   Result := StrToIntDef(Between('l: ', ')', GetUpText), -1);
 end;
-
-(*
-FindTextEx
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindTextEx(var cx, cy: Integer; txt,font: TStringArray; xs, ys, xe, ye: Integer): Boolean;
-
-Searches for text or texts in specified box with specified font or fonts returns
-true on first find of one of the texts with one of the fonts in the specified
-box, returns x, y values aswell.
-
-.. note::
-
-    by Stupid3ooo, modified by LordJashin
-
-Example:
-
-.. code-block:: pascal
-
-    var
-      x, y, w, h: Integer;
-      fonts, txts: TStringArray;
-    begin
-      fonts := ['MyOwnFontSet', 'SmallCharacters'];
-      txts := ['Simba', 'HakunaMatata'];
-
-      SetDesktopAsClient;
-      GetClientDimensions(w, h);
-
-      if FindTextEx(x, y, txts, fonts, 0, 0, w - 1, h - 1) then
-        MoveMouse(x, y);
-    end.
-*)
 
 function FindTextEx(var cx, cy: Integer; txt, fonts: TStringArray; xs, ys, xe, ye: Integer): Boolean;
 var
@@ -604,50 +284,11 @@ begin
     end;
 end;
 
-(*
-FindText
-~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindText(var cx, cy: Integer; txt,font: string; xs, ys, xe, ye: Integer): Boolean;
-
-Searches for text in specified box with specified font.
-
-.. note::
-
-    by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function FindText(var cx, cy: integer; txt, font: string; xs, ys, xe, ye: integer): boolean;
 begin
   result := findTextEx(cx, cy, [txt], [font], xs, ys, xe, ye);
 end;
 
-(*
-ClickText
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ClickText(text, chars: string; x1, y1, x2, y2: integer; button: variant): boolean;
-
-Clicks text if found in the specified box.
-
-.. note::
-
-    by Coh3n
-    Last Updated: Mar. 5th, 2012 by Coh3n
-
-Example
-
-.. code-block:: pascal
-
-*)
 function ClickText(text, chars: string; x1, y1, x2, y2: integer; button: variant): boolean;
 var
   x, y: integer;
@@ -659,25 +300,6 @@ begin
   end;
 end;
 
-(*
-LoadTextTPA
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    Function LoadTextTPA(Text : String; Chars : Integer;var height : integer) : TPointArray;
-
-Loads a TPA of the text.. It also returns the real height of the Text. Used in FindTextTPAinTPA.
-
-.. note::
-
-    by Raymond
-
-Example
-
-.. code-block:: pascal
-
-*)
 function LoadTextTPA(Text, Chars: string; var height: integer): TPointArray;
 var
   w: integer;
@@ -686,30 +308,6 @@ begin
   dec(height);
 end;
 
-(*
-FindTextTpaEx
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindTextTpaEx(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt : string; Chars : Integer; Action  : (ClickLeft,ClickRight,Move,Nothing)) : Boolean;
-
-Uses TPA's to find text..Returns the found pos in x and y (if not found both are 0)
-In action you can put what you want to do after its found..
-Nothing - Just return wether its found
-Move - Just move the mouse to it
-Clickleft - Movemouse & Clickmouse left
-Clickright - MoveMouse & Clickmouse right
-
-.. note::
-
-    by Raymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function FindTextTPAEx(Color,Tol,xs,ys,xe,ye : integer;var x,y : integer; Txt, Chars : string; Action  :fnct_ActionOptions ) : Boolean;
 var
   TextTPA,SearchTPA, Matches: TPointArray;
@@ -739,25 +337,6 @@ begin
   MouseAction(xx, yy, 0, 0, Action);
 end;
 
-(*
-FindTextTPA
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindTextTpa(Color,Tol,xs,ys,xe,ye : integer; Txt : string; Chars : Integer; Action  : (ClickLeft,ClickRight,Move,Nothing)) : Boolean;
-
-Just like FindTextTpaEx, but without the x and y pos returning.
-
-.. note::
-
-    by Raymond
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function FindTextTPA(Color, Tol, xs, ys, xe, ye: integer; Txt, Chars: string; Action: fnct_ActionOptions): Boolean;
 var
   x,y : integer;
@@ -765,26 +344,8 @@ begin
   Result := FindTextTPAEx(Color,Tol,xs,ys,xe,ye,x,y,Txt,chars,action);
 end;
 
-(*
-FindTextTPAMulti
-~~~~~~~~~~~~~~~~
 
-.. code-block:: pascal
-
-    function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer; Texts: TStringArray; Chars: string;/integer; Action: fnct_ActionOptions): Boolean;
-
-Just like FindTextTPA, only that it takes an array of strings as text to search for.
-
-.. note::
-
-    by Cigue and EvilChicken!
-
-Example:
-
-.. code-block:: pascal
-
-*)
-  function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer;
+function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer;
     Texts: TStringArray; Chars: string; Action: fnct_ActionOptions): Boolean;
 
 var
@@ -798,31 +359,6 @@ begin
     end;
 end;
 
-(*
-FindNPCChatTextMulti
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindNPCChatTextMulti(txt: TStringArray; action: fnct_ActionOptions): boolean;
-
-Finds a text said by a NPC in chat. If found it'll perform action,
-where action can be:
-Nothing - Just return wether its found
-Move - Just move the mouse to it
-Clickleft - Movemouse & Clickmouse left
-Clickright - MoveMouse & Clickmouse right
-
-.. note::
-
-    by Kernel Klink, Nielsie95 & Narcle
-    Last Modified: January 31st, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function FindNPCChatTextMulti(txt: TStringArray; action: fnct_ActionOptions): boolean;
 var
   x, y: integer;
@@ -843,54 +379,11 @@ begin
   end;
 end;
 
-(*
-FindNPCChatText
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindNPCChatText(txt: string; Action: fnct_ActionOptions): Boolean;
-
-Finds a text said by a NPC in chat. If found it'll perform action,
-where action can be:
-Nothing - Just return wether its found
-Move - Just move the mouse to it
-Clickleft - Movemouse & Clickmouse left
-Clickright - MoveMouse & Clickmouse right
-
-.. note::
-
-    by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function FindNPCChatText(txt: string; action: fnct_ActionOptions): boolean;
 begin
   result := findNPCChatTextMulti([txt], action);
 end;
 
-(*
-SortATPAFromFirstPointY
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
-
-Sorts the Y coords of the ATPA.
-
-.. note::
-
-    by Wizzup? & Narcle
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure SortATPAFromFirstPointY(var a: T2DPointArray; const From: TPoint);
 var
    i, l: Integer;
@@ -912,25 +405,6 @@ begin
   QuickATPASort(DistArr, a, 0, l, True);
 end;
 
-(*
-SortATPAFromFirstPointX
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SortATPAFromFirstPointX(var a: T2DPointArray; const From: TPoint);
-
-Sorts the X coords of the ATPA.
-
-.. note::
-
-    by Wizzup? & Narcle
-
-Example:
-
-.. code-block:: pascal
-
-*)
 procedure SortATPAFromFirstPointX(var a: T2DPointArray; const From: TPoint);
 var
    i, l: Integer;
@@ -952,52 +426,27 @@ begin
   QuickATPASort(DistArr, a, 0, l, True);
 end;
 
-(*
-GetChooseOptions
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetChooseOptions(TextType: string): Array of TOptions;
-
-Gets the texe from the options menu.
-
-.. note::
-
-    by Wizzup? & Narcle
-
-Example:
-
-.. code-block:: pascal
-
-*)
-Function GetChooseOptions(TextType: string): Array of TOptions;
+Function GetChooseOptions(): Array of TOptions;
 var
-   B, BB, sB, BigBox: TBox;
-   TPA, TPA1, TPA2: TPointArray;
-   ATPA, tempatpa: T2DPointArray;
-   I, L, target, bmp,w,h, cts: Integer;
-   BoxColors: TIntegerArray;
+  I, L, target, bmp, w, h, cts, n, m : Integer;
+  B, BB, BigBox : TBox;
+  TPA, TPA1 : TPointArray;
+  ATPA, tempatpa : T2DPointArray;
 begin
   target := GetImageTarget;
   GetClientDimensions(B.X2, B.Y2);
   B := IntToBox(0, 0, B.X2-1, B.Y2-1);
   cts := GetColorToleranceSpeed;
   ColorToleranceSpeed(1);
-  //            Black, Top Blue, grey
-  BoxColors := [131843, 3682593, 3552822];
-  SetLength(ATPA, Length(BoxColors));
-  for i := 0 to High(BoxColors) do
-    FindColorsTolerance(ATPA[i], BoxColors[i], B.X1, B.Y1, B.X2, B.Y2, 0);
-  TPA := MergeATPA(ATPA);
-  If Length(TPA) < 100 Then
+
+  FindColorsTolerance(TPA, 4674653, B.X1, B.Y1, B.X2, B.Y2, 0);
+  if (Length(TPA) < 100) then
   begin
     ColorToleranceSpeed(cts);
     Exit;
   end;
-
   ATPA := SplitTPA(TPA, 4);
-  For i := 0 to High(ATPA) do
+  for i := 0 to High(ATPA) do
   begin
     B := GetTPABounds(ATPA[i]);
     if ((B.x2-B.x1) > 90) and ((B.y2-B.y1) > 18) then
@@ -1005,45 +454,52 @@ begin
     else
       B := IntToBox(0, 0, 0, 0);
   end;
-
   If (B.x2 = 0) then
   begin
     ColorToleranceSpeed(cts);
     Exit;
   end;
-
   BigBox := B;
-
   SetColorToleranceSpeed(3);
-  FindColorsTolerance(TPA1, 4996381, B.X1, B.Y1, B.X2, B.Y2, 18);//One color covers both Highlighted and non
-  sB := GetTPABounds(TPA1);
-  ReturnPointsNotInTPAWrap(TPA1, sB, TPA);
-  FindColorsTolerance(TPA2, 460291, B.X1, B.Y1, B.X2, B.Y2, 6);//shadow
+
+  B := GetATPABounds(ATPA);
+
+  FindColorsTolerance(TPA1, 0, B.X1, B.Y1, B.X2, B.Y2, 0);
+  CombineTPAWrap(TPA, TPA1, TPA);
+
+  ReturnPointsNotInTPAWrap(TPA, B, TPA);
+
   SetColorToleranceSpeed(cts);
 
-  bmp := CreateBitmap(B.X2-B.X1+2, B.Y2-B.Y1+2);
-  OffsetTPA(TPA, Point(-B.X1, -B.Y1));
-  OffsetTPA(TPA2, Point(-B.X1, -B.Y1));
-  FastDrawClear(bmp, 0);
-  DrawTPABitmap(bmp, TPA, clRed);//Text
-  DrawTPABitmap(bmp, TPA2, clPurple);//Shadow
-  ocr_FilterUpTextByCharacteristics(GetMufasaBitmap(bmp));
-  GetbitmapSize(bmp,w,h);
-  SetTargetBitmap(bmp);  // new target for findcolorstolerance.
-  SetLength(ATPA, H div 16);
+  B := GetTPABounds(TPA);
+
+  n := B.Y2 - B.Y1;
+  m := 15 - n mod 15;
+  n := n + m;
+  bmp := CreateBitmap(B.X2 - B.X1 + 3, n + 1);
+
+  OffSetTPA(TPA, Point(-B.X1, -B.Y1));
+
+  DrawTPABitmap(bmp, TPA, clRed);
+
+  GetbitmapSize(bmp, w, h);
+
+  SetTargetBitmap(bmp);
+  SetLength(ATPA, h div 15);
   for i := 0 to High(ATPA) do
-    FindColorsTolerance(ATPA[i], clRed, 0, 2+i*16,  W-1, 18+i*16, 0);//+2 to y to line it up
+    FindColorsTolerance(ATPA[i], clRed, 0, i*15,  w-1, 15+i*15, 0);
+
   L := High(ATPA);
-  SortATPAFromFirstPointY(ATPA, Point(w div 2,0));
+  SortATPAFromFirstPointY(ATPA, Point(w div 2, 0));
 
   SetArrayLength(Result, Length(ATPA));
   Result[0].BigBox := BigBox;
   for i := 0 to high(ATPA) do
   begin
     TPA := ATPA[i];
-    tempatpa := SplitTPAEx(TPA, 1, 10); // Split one into characters
+    tempatpa := SplitTPAEx(TPA, 1, 10);
     SortATPAFromFirstPointX(tempatpa, Point(0, 0));
-    Result[i].Str := GetTextATPA(tempatpa, 5, 'UpCharsEx'); //Writeln(Result[i].Str);
+    Result[i].Str := GetTextATPA(tempatpa, 5, 'UpChars07');
     BB := GetTPABounds(ATPA[i]);
     Result[i].Bounds := IntToBox(BB.X1+B.X1, BB.Y1+B.Y1, BB.X2+B.X1, BB.Y2+B.Y1);
     setlength(tempatpa,0);
@@ -1054,34 +510,6 @@ begin
   FreeBitmap(bmp);
 end;
 
-
-(*
-ChooseOptionMultiEx
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOptionMultiEx(Texts: TStringArray; TextType: String; Action: fnct_ActionOptions): Boolean;
-
-Finds Popup menu, then clicks on it.
-Will look for the first string first and so on.
-It will search for the Text Type you input valid arguments are
-'action', 'player': The white text
-'npc': The yellow text
-'object': The cyan text
-'all': Searches for all colors of text.
-Will default to 'all'.
-
-.. note::
-
-    by Wizzup? & Nava2 & N1ke!
-    Last Modified: 22/12/12 by riwu
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function ChooseOptionMultiEx(Texts: TStringArray; TextType: String; Action: fnct_ActionOptions): Boolean;
 var
    B: TBox;
@@ -1090,7 +518,7 @@ var
    Options: array of TOptions;
 begin
   Result := False;
-  Options := GetChooseOptions(TextType);
+  Options := GetChooseOptions();
   if (Length(Options) < 1) then
     Exit;
   H := High(Options);
@@ -1135,100 +563,21 @@ begin
   end;
 end;
 
-(*
-ChooseOptionMulti
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOptionMulti(Txt: TStringArray): Boolean;
-
-Finds Popup menu, then clicks on it. Will look for the first string first and so on.
-
-.. note::
-
-    by Wizzup? & N1ke!
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function ChooseOptionMulti(Txt: TStringArray): Boolean;
 begin
   Result := ChooseOptionMultiEx(Txt, 'All', ClickLeft);
 end;
 
-(*
-ChooseOptionEx
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOptionEx(Txt, TextType: string): Boolean;
-
-Finds an option in a popup menu, then clicks on it. Searches for TextType.
-See ChooseOptionMultiEx for valid options.
-Default is 'all'.
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function ChooseOptionEx(Txt, TextType: string): Boolean;
 begin
   Result := ChooseOptionMultiEx([Txt], TextType, ClickLeft);
 end;
 
-(*
-ChooseOption
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChooseOption(txt: String): Boolean;
-
-Finds an option in a popup menu, then clicks on it.
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function ChooseOption(Txt: String): Boolean;
 begin
   Result := ChooseOptionMultiEx([Txt], 'All', ClickLeft);
 end;
 
-(*
-OptionsExist
-~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function OptionsExist(txt: TStringArray; Move: boolean): boolean;
-
-Returns true if an Option in txt is found in the RS Option Menu, will move or do
-nothing according to the boolean Move.
-
-.. note::
-
-    by Rasta Magician
-
-Example
-
-.. code-block:: pascal
-
-*)
 function OptionsExist(txt: TStringArray; MoveMouse: boolean): boolean;
 begin
   if MoveMouse then
@@ -1237,28 +586,6 @@ begin
     Result := ChooseOptionMultiEx(Txt, 'All', Nothing);
 end;
 
-(*
-CloseWindow
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function CloseWindow: Boolean;
-
-Closes any open windows. (In RS not your pc roflmaololz, j/k)
-
-.. note::
-
-    by NaumanAkhlaQ, Narcle, and Nava2
-    Updated: 12 December 2011 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-  if (BankScreen) then
-    CloseWindow();
-*)
 function CloseWindow: Boolean;
 var
   Col: TIntegerArray;
@@ -1320,30 +647,3 @@ begin
     end;
   end;
 end;
-
-{*******************************************************************************
-procedure SetDebugColors(Text, Back: Integer);
-By: Nava2
-Description: Sets the next WriteLn's colours to Text and Back respectively.
-*******************************************************************************}
-{procedure SetDebugColors(txtCol, BackCol: Integer);
-begin
-end;       }
-
-{*******************************************************************************
-procedure WriteArrayCols(Lines: TStringArray; Text, Back: Integer);
-By: Nava2
-Description: Writes a TStringArray with Text and Back colours. If not using
-             3.20, it will just writeln the array.
-*******************************************************************************}
-{procedure WriteArrayCols(Lines: TStringArray; Text, Back: Integer);
-var
-  i, h: Integer;
-begin
-  h := High(Lines);
-  for i := 0 to h do
-  begin
-    SetDebugColors(Text, Back);
-    Writeln(Lines[i]);
-  end;
-end;         }

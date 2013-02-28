@@ -82,7 +82,7 @@ Example:
 *)
 function BankScreen: Boolean;
 begin
-  result := findTextTPA(4106994, 20, 20, 22, 400, 45, 'Bank', upCharsEx, nothing);
+  result := findTextTPA(2070783, 20, 204, 31, 245, 49, 'Bank', upChars07, nothing);
 end;
 
 (*
@@ -395,8 +395,8 @@ Example:
 *)
 function BankIndexToMSPoint(Index: Integer): TPoint;
 begin
-  Index := Index - 1;
-  Result := Point(38 + (Index mod 10) * 44, 90 + Floor(Index div 10) * 45);
+  Index := Index ;
+  Result := Point(38 + (Index mod 9) * 44, 60 + Floor(Index div 9) * 45);
 end;
 
 (*
@@ -427,8 +427,8 @@ begin
   P := BankIndexToMSPoint(Index);
   Result.X1 := P.X;
   Result.Y1 := P.Y;
-  Result.X2 := Result.X1 + 31;
-  Result.Y2 := Result.Y1 + 32;
+  Result.X2 := Result.X1 + 35;
+  Result.Y2 := Result.Y1 + 40;
 end;
 
 (*

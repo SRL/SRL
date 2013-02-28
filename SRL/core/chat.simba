@@ -1,12 +1,4 @@
-(*
-Chat
-====
-
-The Chat include contains all chat-related functions
-
-.. contents::
-
-*)
+{}
 
 const
   CHAT_GAME    = 0;
@@ -18,39 +10,9 @@ const
   CHAT_ASSIST  = 6;
 
 (*
-.. code-block:: pascal
-
-    const
-  CHAT_GAME    = 0;
-  CHAT_PUBLIC  = 1;
-  CHAT_PRIVATE = 2;
-  CHAT_CLAN    = 3;
-  CHAT_TRADE   = 4;
-  CHAT_ASSIST  = 5;
-*)
-
-(*
-SetChat
-~~~~~~~
-
-.. code-block:: pascal
-
-    function SetChat(state: string; chat: Integer): Boolean;
-
 Sets Chat to desired state
 Game  Public  Private  Clan  Trade  Assist
 0       1       2       3     4       5
-
-
-.. note::
-
-    by Wizzup?, WT-Fakawi, Starblaster100, N1ke! & Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-
 *)
 function SetChat(state: string; chat: Integer): Boolean;
 var
@@ -94,25 +56,11 @@ begin
 end;
 
 (*
-SetAllChats
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SetAllChats(Game, Pub, Priv, Clan, Trade, Assist: string);
 
 Sets all the chats to a particular state in one simple procedure.
 Leave the parameter as '' if you wish to leave the chat as it is.
 
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-    SetAlChats('all', 'Hide', '', 'Off', '', 'Friend');
+SetAlChats('all', 'Hide', '', 'Off', '', 'Friend');
 
 *)
 procedure SetAllChats(Game, Pub, Priv, Friends, Clan, Trade, Assist: string);
@@ -129,28 +77,6 @@ begin
   end
 end;
 
-(*
-ChatsOff
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ChatsOff;
-
-
-Sets all Chats to off.
-
-.. note::
-
-    by Starblaster100
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 procedure ChatsOff;
 var
   i: Integer;
@@ -159,56 +85,11 @@ begin
     SetChat('off', i);
 end;
 
-
-(*
-ChatWait
-~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ChatWait;
-
-Waits while there's Please Wait in the chatbox.
-
-.. note::
-
-    by Nielsie95
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 procedure ChatWait;
 begin
   Wait(400 + Random(500));
 end;
 
-(*
-ClickContinueEx
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ClickContinueEx(Click, Wait: Boolean): Boolean;
-
-
-Returns true if the blue 'Click To Continue' text in the chat box is found.
-If will click if Click = True, calls ChatWait if Wait = True.
-
-.. note::
-
-    by _ChArMz & Narcle (Original by EvilChicken!)
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 function ClickContinueEx(Click, Wait: Boolean): Boolean;
 var
   bTxt, wTxt, SearchTPA, TextTPA, Matches : TPointArray;
@@ -247,30 +128,6 @@ begin
   end;
 end;
 
-(*
-ClickContinue
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ClickContinue(SpaceBar, DoWait: Boolean): Boolean;
-
-
-Returns true if the green button in the chat box is found.
-It will SpaceBar if true otherwise will mouse it.  If DoWait = true
-will wait until color count changes.
-
-.. note::
-
-    by _ChArMz & Narcle (Original by EvilChicken!)
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 Function ClickContinue(SpaceBar, DoWait: Boolean): Boolean;
 var
   TPA: TPointArray;
@@ -311,89 +168,17 @@ begin
   end;
 end;
 
-(*
-ClickToContinue
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ClickToContinue: Boolean;
-
-Click the blue 'Click To Continue' text in the chat box.
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 function ClickToContinue: Boolean;
 begin
   Result := ClickContinue(True, False);
 end;
 
-(*
-TextCoords
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    Function TextCoords(textn: Integer): TPoint;
-
-Returns x, y for text. (1 to 8)
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 function TextCoords(textn: Integer): TPoint;
 begin
   Result.X := 10;
   Result.Y := 346 + (14 * (textn - 1));
 end;
 
-(*
-GetChatBoxText
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetChatBoxText(Line, TextCol: Integer): string;
-
-Gets text on the line Line with colour TextCol.
-(Line 1 is the top, Line 8 is the bottom line).
-Colours:
-
-    - clMessage/clBlack - Black text messages ("Oh Dear you are dead", etc).
-    - clChat/clBlue     - Chat messages from you and other players.
-    - clTrade/clPurple  - Colour of trade request text.
-    - clFriend          - Colour of friend and clan chat.
-
-Works with other colours too.
-
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function GetChatBoxText(Line, TextCol: Integer): string;
 var
   P: TPoint;
@@ -409,53 +194,11 @@ begin
   end;
 end;
 
-(*
-FindChatBoxText
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindChatBoxText(Text: string; Line: Integer; TextCol: Integer): Boolean;
-
-Searches for Text on Line with colour TextCol. True if found.
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-
-*)
 function FindChatBoxText(Text: string; Line: Integer; TextCol: Integer): Boolean;
 begin
   Result := (Pos(Text, GetChatBoxText(Line, TextCol)) > 0);
 end;
 
-(*
-IsChatBoxTextBetween
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsChatBoxTextBetween(Text: string; TextCol, StartLine, EndLine: Integer): Boolean;
-
-Returns true if Text with colour TextCol is found anywhere in the chat box.
-
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function IsChatBoxTextBetween(Text: string; TextCol, StartLine, EndLine: Integer): Boolean;
 var
   II: Integer;
@@ -467,63 +210,11 @@ begin
   Result := False;
 end;
 
-(*
-IsChatBoxTextAnyLine
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function IsChatBoxTextAnyLine(Text: string; TextCol: Integer): Boolean;
-
-Returns true if Text with colour TextCol is found anywhere in the chat box.
-
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function IsChatBoxTextAnyLine(Text: string; TextCol: Integer): Boolean;
 begin
   Result := IsChatBoxTextBetween(Text, TextCol, 1, 8);
 end;
 
-(*
-ChatBoxTextArray
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ChatBoxTextArray(TextCol: Integer): TStringArray;
-
- Gets and return a TStringArray with the contents of each line
- with the colour TextCol (see GetChatBoxText for list of colours).
-
- Gets and return a TStringArray with the contents of each line
- with the colour TextCol (see GetChatBoxText for list of colours).
-    - Line 1 is Result[1]
-    - Line 2 is Result[2]
-    - Line 3 is Result[3]
-    - Line 4 is Result[4]
-    - Line 5 is Result[5]
-    - Line 6 is Result[6]
-    - Line 7 is Result[7]
-    - Line 8 is Result[8]
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function ChatBoxTextArray(TextCol: Integer): TStringArray;
 var
   II: Integer;
@@ -533,75 +224,16 @@ begin
     Result[II] := GetChatBoxText(II, TextCol);
 end;
 
-(*
-GetBlackChatMessage
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetBlackChatMessage: String;
-
-Gets text with color 0 in last chat line.
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function GetBlackChatMessage: string;
 begin
   Result := GetChatBoxText(8, clMessage);
 end;
 
-(*
-FindBlackChatMessage
-~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindBlackChatMessage(ChatMsg: String): Boolean;
-
-Returns True if text with color 0 in last chat line is found.
-
-.. note::
-
-    by Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function FindBlackChatMessage(ChatMsg: string): Boolean;
 begin
   Result := (Pos(ChatMsg, GetChatBoxText(8, clMessage)) > 0);
 end;
 
-(*
-LastChatter
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function LastChatter(var name: String): Boolean;
-
-Returns name and true if a person was talking, or false and the text
-
-.. note::
-
-    by masquerader
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function LastChatter(var name: string): Boolean;
 var
   i: Integer;
@@ -616,53 +248,12 @@ begin
   end;
 end;
 
-(*
-GetLastChatText
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetLastChatText(var chat: String): Boolean;
-
-Returns true if blue chat text was found
-
-.. note::
-
-    by masquerader / Wizzup?
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function GetLastChatText(var chat: string): Boolean;
 begin
   Chat := GetChatBoxText(8, clChat);
   Result := (Chat <> '');
 end;
 
-(*
-InChat
-~~~~~~
-
-.. code-block:: pascal
-
-    function InChat(Text: String): Boolean;
-
-Grabs Last Chat Line and performs checks on occurence of text
-
-
-.. note::
-
-    by WT-Fakawi
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function InChat(Text: string): Boolean;
 var
   s: string;
@@ -673,26 +264,6 @@ begin
   Result := (Pos(LowerCase(Text), Lowercase(s)) > 0);
 end;
 
-(*
-FixChat
-~~~~~~~
-
-.. code-block:: pascal
-
-    procedure FixChat;
-
-Scrolls ChatText scrollbar down.
-
-.. note::
-
-    by WT-Fakawi
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 procedure FixChat;
 var
   ScrollX, ScrollY: Integer;
@@ -711,27 +282,6 @@ begin
   end;
 end;
 
-
-(*
-SaveToChatLog
-~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SaveToChatLog;
-
-Saves chat to log file.
-
-.. note::
-
-    by WT-Fakawi & masquerader
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 procedure SaveToChatLog;
 begin
   FixChat;
@@ -751,26 +301,6 @@ begin
   end;
 end;
 
-(*
-ColorEffectAdd
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ColorEffectAdd(Color, Effect: Boolean): string;
-
-Returns a RS chat effect based on 'Color' and 'Effect' booleans.
-
-.. note::
-
-    by NiCbaZ
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
 function ColorEffectAdd(Color, Effect: Boolean): string;
 var
   Str : TStringArray;
@@ -786,85 +316,16 @@ begin
     Result := Result + Str[11 + Random(5)];
 end;
 
-(*
-GetNPCChatName
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function GetNPCChatName(): string;
-
-Gets the name of the random event NPC from the top of the chat box.  The proper
-font doesn't exist yet, so it returns a random string of characters.
-
-.. note::
-
-    Author: DemiseSythe
-    Last Modified: Jan. 22nd, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    writeln(getNPCChatName());
-*)
 function GetNPCChatName(): string;
 begin
   result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, NPCChars);
 end;
 
-(*
-AreTalking
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function AreTalking(): boolean;
-
-Returns true if player is talking to an NPC.
-
-.. note::
-
-    Author: Wizzup?
-    Last Modified: Jan. 22nd, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    while (areTalking()) do
-      clickContinue(true, true);
-*)
 function AreTalking(): boolean;
 begin
   result := (getNPCChatName <> '');
 end;
 
-(*
-DoConversation
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function DoConversation(resultText: string; clickresult: boolean): boolean;
-
-Goes through the initial dialog of a random.  Will keep clicking to continue
-until the conversation's 'resultText' is found.  Will click to continue when
-'resultText' is found if 'clickresult' is set to true.  Set 'resultText' to ''
-to click continue until conversation is over.
-
-.. note::
-
-    Author: Coh3n
-    Last Modified: Jan. 22nd, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    if (DoConversation('thank', true)) then
-      writeln('Finished conversation');
-*)
 function DoConversation(resultText: string; clickResult: boolean): boolean;
 var
   t: integer;
@@ -890,25 +351,6 @@ begin
   end;
 end;
 
-(*
-PlayerChatActive
-~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function PlayerChatActive: Boolean;
-
-Return true if player chat is active.
-
-.. note::
-
-    by riwu
-
-Example:
-
-.. code-block:: pascal
-
-*)
 function PlayerChatActive: Boolean;
 begin
   Result:= not FindChatBoxText('Press Enter to Chat', 9, clBlack);

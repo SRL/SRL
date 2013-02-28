@@ -1,8 +1,3 @@
-//-----------------------------------------------------------------//
-//--               Scar Standard Resource Library                --//
-//--                        Simba.simba                          --//
-//-----------------------------------------------------------------//
-
 function VariantIsInteger(const v: Variant): Boolean;
 begin
   case VarType(v) of
@@ -46,28 +41,6 @@ begin
   Result := VarType(v) = varBoolean;
 end;
 
-(*
-tmp_TPAFromLine
-~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function tmp_TPAFromLine(const x1, y1, x2, y2: Integer): TPointArray;
-
-Returns a TPA of the points that make up a line connecting the points (x1, y1)
-and (x2, y2) and most closely follow the slope of that line.
-
-.. note::
-
-    by euphemism
-    Last modified: Jan. 31st, 2013 by euphemism
-
-Example:
-
-.. code-block:: pascal
-
-    TPA := TPAFromLine(10, 10, 30, 20);
-*)
 function tmp_TPAFromLine(const x1, y1, x2, y2: Integer): TPointArray;
 var
   Dx, Dy, CurrentX, CurrentY, Len, TwoDx, TwoDy, Xinc, YInc: Integer;
@@ -133,24 +106,11 @@ begin
   end
 end;
 
-(*
-tmp_TPAFromLineWrap
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure tmp_TPAFromLineWrap(const x1, y1, x2, y2: Integer; var Res: TPointArray);
-
-Wrapper function for TPAFromLine.
-
-.. note::
-
-    Last modified: Jan. 31st, 2013 by euphemism
-*)
 procedure tmp_TPAFromLineWrap(const x1, y1, x2, y2: Integer; var Res: TPointArray);
 begin
   Res := tmp_TPAFromLine(x1, y1, x2, y2);
 end;
+
 {$ifdef Simba}
 
 //{$define SimbaDebug}
@@ -158,6 +118,7 @@ type
   TDTMPointDef = TSDTMPointDef;
   TDTMPointDefArray = TSDTMPointDefArray;
   TDTM = TSDTM;
+
 function AddDTM(DTM : TDTM) : integer;
 begin
   Result := AddSDTM(dtm);
@@ -482,6 +443,7 @@ function Readln(Question : string ) : string;
 begin
   InputQuery('Question box',Question,result);
 end;
+
 const
   NPCChars = CharsNPC;
 {$endif}

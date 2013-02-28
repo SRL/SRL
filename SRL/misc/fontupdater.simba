@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               SRL Resource Library                          --//
-//--               » Font updating routines                      --//
+//--               ? Font updating routines                      --//
 //-----------------------------------------------------------------//
 // * function srl_FontsUp2date: array of Boolean;                 // by Markus
 // * procedure srl_UpdateFonts(Fonts: array of Boolean);          // by Markus
@@ -33,6 +33,7 @@ begin
       FreeBitmap(B);
     except
       Result[i] := True;
+      RaiseException(erCustomError, 'Could not complete srl_FontsUp2date, in srl/srl/misc/fontupdate.simba');
     end;
   end;
   SetTargetDc(Hoi);

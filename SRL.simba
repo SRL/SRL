@@ -78,7 +78,7 @@
 
 {$include SRL-007/SRL/core/animation.simba}
 {$include SRL-007/SRL/core/flag.simba}
-{$include SRL-007/SRL/core/worldswitcher.simba}
+//{$include SRL-007/SRL/core/worldswitcher.simba}
 {$include SRL-007/SRL/core/login.simba}
 {$include SRL-007/SRL/core/autocolor.simba}
 {$include SRL-007/SRL/core/mapwalk.simba}
@@ -164,8 +164,6 @@ begin
   LogoutOnMod := True;
   UseFindTrade := True;
   UseAutoResponder := True;
-  GraphicsSet := False;
-  AllowPVP    := False;
   SRL_DisableIPLog := false;
   SRL_SavePath := includePath + 'SRL/logs/';
   SRL_StartTime := theDate(DATE_MONTH)+' at '+theTime;
