@@ -1,4 +1,13 @@
-{}
+(*
+Login
+=====
+
+The Login include contains all the functions to succesfully log you in and out
+of the game.
+
+.. contents::
+
+*)
 
 const
   SM_Color = 8115338;
@@ -61,13 +70,59 @@ const                       //GetScreen
 
   LOGIN_TEXTCOLOUR = 16777215; //Colour of text
 
+
+(*
+LobbyScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LobbyScreen: Boolean;
+
+Returns true if we are at the Lobby Screen
+
+.. note::
+
+    by IceFire908 & Bionicle1800
+    Last modified 28/02/2013 By Ashaman88/Le Jingle
+
+Example:
+
+.. code-block:: pascal
+
+    // wait for the Lobby Screen to appear!
+    while (not LobbyScreen) do
+      Wait(100 + Random(400));
+
+*)
 function LobbyScreen: Boolean;
 begin
   Result := (GetColor(400, 335) = 16777215); // 'H' click Here to Play
 end;
 
-// Turns offs the music on the login screen.
-//  Should default turn off, upon loading old school RS.
+(*
+SetAudioOff
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SetAudioOff(): boolean;
+
+Turns offs the music on the login screen.
+Should default turn off, upon loading old school RS.
+
+.. note::
+
+    by Ashaman88/Le Jingle
+
+Example:
+
+.. code-block:: pascal
+
+    SetAudioOff;
+
+*)
+
 function SetAudioOff(): boolean;
 var
   c : integer;
@@ -83,6 +138,26 @@ begin
     Mouse(742, 481, 10, 10, mouse_left);
 end;
 
+(*
+TakeIPScreen
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TakeIPScreen();
+
+Saves a screenshot of the last logged in IP address to the SRL logs folder.
+
+.. note::
+
+    by Harry & Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+    TakeIPScreen();
+*)
 procedure TakeIPScreen();
 var
   tmpPath: string;
@@ -98,6 +173,31 @@ begin
   SRL_SavePath := tmpPath; // reset
 end;
 
+(*
+RSReady
+~~~~~~~
+
+.. code-block:: pascal
+
+    function RSReady: Boolean;
+
+Returns true if we are ready to auto (on loginscreen or logged in).
+Useful for waiting until RS has fully loaded.
+
+.. note::
+
+    by ZephyrsFury
+    Last modified 28/02/2013 By Ashaman88/Le Jingle/Justin
+
+Example:
+
+.. code-block:: pascal
+
+    while (not RSReady) do
+      SleepAndMoveMouse(100 + Random(500));
+
+*)
+
 function RSReady: boolean;
 var
   t : integer;
@@ -111,9 +211,6 @@ begin
     t := GetSystemTime() + 120000;
     while GetSystemTime < t do
     begin
-      ImageResetClientArea;
-      // RSReady scren, bottom left corner, white text, Click here to switch
-      //   the 'l' in click.
       Result := (GetColor(31, 488) = 16777215);
       if result then
       begin
@@ -124,17 +221,62 @@ begin
     end;
   end;
 
-  Writeln('Could not start up Old School RS. Aborting/Ciao');
+  Writeln('Could not start up Old School RuneScape or RSReady was not detected!');
   TerminateScript;
-  // no resizeable client to account for here.
 end;
 
+(*
+Logout
+~~~~~~
+
+.. code-block:: pascal
+
+    function Logout: Boolean;
+
+Logs you all the way out from ingame.
+
+.. note::
+
+    by Ashaman88/Justin/Le Jingle
+
+Example:
+
+.. code-block:: pascal
+
+    if (not FindTree()) then
+      Logout();
+
+*)
 function Logout: Boolean;
 begin
+  writeln('TODO: function Logout: Boolean; login.simba');
   result := false;
 end;
 
-function LoginPlayerToLob: Boolean;
+(*
+LoginPlayerToLob
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoginPlayerToLob: Boolean;
+
+Like LoginPlayer but only to the lobbyscreen.
+
+.. note::
+
+    by SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+    LoginPlayerToLob();
+    if (not LobbyScreen()) then
+      LoginPlayerToLob(); // try again!
+
+*)
+function LoginPlayerToLob: Boolean;  //TODO: Make this function check for "Error Messages" (Acc Disabled/Error connecting)
 var
   c, t, w, typtmp : integer;
   foundLogin : boolean;
@@ -190,7 +332,7 @@ begin
   end;
   if not FoundLogin then
   begin
-    writeln('could not reach the login interface.');
+    writeln('Unable to detect login interface!');
     exit;
   end;
 
@@ -234,9 +376,8 @@ begin
       WriteLn(Capitalize(Players[CurrentPlayer].Name));
       TypeSend(Players[CurrentPlayer].Name);
     end else
-      TypeSend(Players[CurrentPlayer].Pass);
+      TypeSendEx(Players[CurrentPlayer].Pass, False);
 
-    Wait(800 + Random(50));	//Should fix the Login -> Spam Recoveries bug
   end;
 
   MouseBox(GBx1, GBy1, GBx2, GBy2, mouse_left);
@@ -267,6 +408,31 @@ begin
   TakeIPScreen();
 end;
 
+(*
+LoginPlayer
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function LoginPlayer: Boolean;
+
+Logs in the Player[CurrentPlayer].
+
+.. note::
+
+    by SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+    if (not LoggedIn()) then
+    begin
+      WriteLn('Error: Not Logged In! Fixing');
+      LoginPlayer();
+    end;
+
+*)
 function LoginPlayer : boolean;
 var
   t : integer;
@@ -300,6 +466,28 @@ begin
   end;
 end;
 
+(*
+NextPlayerIndex
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function NextPlayerIndex: Integer;
+
+Returns the player number of the next active player.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+    if (NextPlayerIndex() != -1) then
+      WriteLn('We still have active players!');
+
+*)
 function NextPlayerIndex: Integer;
 begin
   if (AllPlayersInactive) then
@@ -312,6 +500,36 @@ begin
     Result := (Result + 1) mod Length(Players);
 end;
 
+(*
+RandomPlayerIndex
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function RandomPlayerIndex: Integer;
+
+Returns the player number of a random active player.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+    procedure NextPlayerRandom(Active: Boolean);
+    begin
+      Players[CurrentPlayer].Active := Active;
+      CurrentPlayer := RandomPlayerIndex();
+      if (CurrentPlayer = -1) then
+      begin
+        WriteLn('All players inactive..');
+        TerminateScript();
+      end;
+    end;
+
+*)
 function RandomPlayerIndex: Integer;
 var
   N: Integer;
@@ -330,6 +548,27 @@ begin
   Result := N;
 end;
 
+(*
+SwitchToPlayer
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SwitchToPlayer(PlayerNo: Integer; Active: Boolean): Boolean;
+
+Switches to a specific player, setting the current player's activity to True or False.
+
+.. note::
+
+    by Dankness, Ron, Raymond & ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+    SwitchToPlayer(1, True);
+
+*)
 function SwitchToPlayer(PlayerNo: Integer; Active: Boolean): Boolean;
 begin
   WriteLn('SwitchToPlayer(PlayerNo: ' + IntToStr(PlayerNo) + ', Active: ' + BoolToStr(Active)+ ');');
@@ -345,6 +584,28 @@ begin
   Result := LoggedIn;
 end;
 
+(*
+NextPlayer
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure NextPlayer(Active: Boolean);
+
+Logs in the next player that isn't inactive.
+Boolean: True - Current player is ok. False - Current player is false.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+    NextPlayer(True);
+
+*)
 procedure NextPlayer(Active: Boolean);
 var
   srl_PlayerIndexFunc: function: Integer;
@@ -369,6 +630,28 @@ begin
   SwitchToPlayer(cP, Active);
 end;
 
+(*
+RandomNextPlayer
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure RandomNextPlayer(Active: Boolean);
+
+Logs in a random player that isn't inactive.
+Boolean: True - Current player is ok. False - Current player is false.
+
+.. note::
+
+    by ZephyrsFury
+
+Example:
+
+.. code-block:: pascal
+
+    RandomNextPlayer(True);
+
+*)
 procedure RandomNextPlayer(Active: Boolean);
 var
   tmpBool: Boolean;
@@ -379,6 +662,28 @@ begin
   RandomPlayer := tmpBool;
 end;
 
+(*
+CheckUserNicks
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure CheckUserNicks;
+
+Checks if all nicks are set correct.
+
+.. note::
+
+    by Sumilion, Raymond, and Nava2
+
+Example:
+
+.. code-block:: pascal
+
+    // make sure the user setup their nicks right..
+    CheckUserNicks();
+
+*)
 procedure CheckUserNicks;
 var
   I, II: Integer;
