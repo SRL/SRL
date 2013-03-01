@@ -462,7 +462,7 @@ begin
     result := loggedin;
     if result then
       break;
-    wait(100+random(5000));
+    wait(100+random(300));
   end;
 end;
 

@@ -1,3 +1,51 @@
+(*
+
+Object Finding
+==============
+
+.. contents::
+
+.. note::
+    Remove?:
+
+        -   Several FindObj*() functions?
+
+*)
+//-----------------------------------------------------------------//
+//--               SRL Resource Library                          --//
+//--               � ObjectFinding Routines                      --//
+//-----------------------------------------------------------------//
+// * function FindAllObjsRecord(var Objects: TPointArray; AutoInfo: TAutoColorInfo; x1, y1, x2, y2: Integer; QuickSorting, RGBXYZCheck: Boolean): Boolean; // By Sumilion
+// * function FindObjRecordEx(var fx, fy: Integer; AutoInfo: TAutoColorInfo; QuickSorting, RGBXYZCheck: Boolean): Boolean; // By Sumilion
+// * function FindObjRecord(var fx, fy: Integer; AutoInfo: TAutoColorInfo): Boolean; // By Sumilion
+// * function FindObjEx(var cx, cy: Integer; Text: TStringArray; Color: TIntegerArray; Tol, CenterX, CenterY: Integer; Step: Extended; xs, ys, xe, ye: Integer): Boolean; // By Starblaster100
+// * function FindObj(var cx, cy: Integer; Text: string; Color, Tol: Integer): Boolean; // By Starblaster100
+// * function FindObjCustom(var cx, cy: Integer; Text: TStringArray; Color: TIntegerArray; Tol: Integer): Boolean; // By Starblaster100
+// * function FindObjectDeformed(var ObjX, ObjY :integer; UpText1, UpText2: String; BMP, a, b, c, d: integer): Boolean; // By WT-Fakawi
+// * function FindObjTPA(Var x, y: Integer; color, tol, cts, ObjWidth, ObjHeight, minCount: Integer; UpText: string): Boolean; // By Wizzup
+// * function FindObjTPAMulti(var X, Y: integer; Color: TIntegerArray; Tol, CTS, ObjWidth, ObjHeight, minCount :Integer; UpText: TStringArray): Boolean; // By: Torrent of Flame based on FindObjTPA
+// * Function FindObjThroughMM(var x, y: Integer; Kind: String; Colors, Tol: TIntegerArray; UpText: TStringArray; Width, Height: Integer): boolean; // By N1ke!
+
+(*
+FindAllObjsRecord
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindAllObjsRecord(var Objects: TPointArray; AutoInfo: TAutoColorInfo; x1, y1, x2, y2: Integer; QuickSorting, RGBXYZCheck: Boolean): Boolean;
+
+Finds an Object using a TAutoColorInfo record, returns the center of the found
+objects.
+
+.. note::
+
+    by Sumilion
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function FindAllObjsRecord(var Objects: TPointArray; AutoInfo: TAutoColorInfo; x1, y1, x2, y2: Integer; QuickSorting, RGBXYZCheck: Boolean): Boolean;
 var
   arP, arAP: TPointArray;

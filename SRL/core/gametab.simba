@@ -24,6 +24,29 @@ const
 
 function ExistsItem(I: Integer): Boolean; forward;
 
+(*
+GetCurrentTab
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetCurrentTab: Integer;
+
+Returns current tab.
+
+.. note::
+
+    by Zephyrsfury
+
+Example:
+
+.. code-block:: pascal
+
+    if (not tabExists(TAB_MAGIC)) then
+      writeln('We may be in a random event!');
+
+
+*)
 function GetCurrentTab: Integer;
 var
   tP: TPoint;
@@ -86,6 +109,51 @@ begin
   colorToleranceSpeed(tmpCTS);
 end;
 
+(*
+
+GameTab
+~~~~~~~
+
+.. code-block:: pascal
+
+    function GameTab(Tab: Integer): Boolean;
+
+Returns True if the Tab exists.
+
+.. note::
+
+    by Zephyrsfury
+
+.. code-block:: pascal
+
+    const
+      tab_Combat = 21;
+      tab_Stats = 22;
+      tab_Quest = 23;
+      tab_Diary = 24;
+      tab_Inv = 25;
+      tab_Equip = 26;
+      tab_Prayer = 27;
+      tab_Magic = 28;
+      tab_Objectives = 29;
+      tab_Friends = 30;
+      tab_Ignore = 31;
+      tab_Clan = 32;
+      tab_Options = 33;
+      tab_Emotes = 34;
+      tab_Music = 35;
+      tab_Notes = 36;
+      tab_LogOut = 37;
+
+.. note::
+    Please use the constants and not the numbers! They may change any interface update.
+
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function GameTab(Tab: Integer): Boolean;
 var
   tP: TPoint;
@@ -134,6 +202,42 @@ begin
     SRL_Warn('GameTab', 'GameTab ' + IntToStr(Tab) + ' is not a valid tab number.', warn_Notice);
 end;
 
+(*
+
+FTab
+~~~~
+
+.. code-block:: pascal
+
+    function FTab(Tab: Integer): Boolean;
+
+Instead of clicking the Tab this uses the F keys to instantly switch to the tab.
+Only works with Inv, Equip, Prayer, Magic and Combat tabs (F1-F5).
+Returns True if the Tab exists.
+
+.. note::
+
+    by Narcle
+    Last Modified: 22/12/12 by riwu
+
+.. code-block:: pascal
+
+    const
+      tab_Combat = 21;
+      tab_Inv = 25;
+      tab_Equip = 26;
+      tab_Prayer = 27;
+      tab_Magic = 28;
+
+.. note::
+    Please use the constants and not the numbers! They may change any interface update.
+
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function FTab(Tab: integer): boolean;
 var
   T, F: integer;
@@ -164,6 +268,26 @@ begin
     Result:= GameTab(Tab);   //nevertheless this is a good failsafe
 end;
 
+(*
+
+SetFightMode
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SetFightMode(oFightMode: Integer): Boolean;
+
+Sets fight mode.  Returns false if failed to set desired mode.
+
+.. note::
+
+    by Nielsie95 & Nava2, fixed by Quickmarch
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function SetFightMode(oFightMode: Integer): Boolean;
 var
   i, x, y: Integer;
@@ -193,12 +317,56 @@ begin
   end;
 end;
 
+(*
+
+GetWeaponName
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    Function GetWeaponName: String;
+
+Returns the name of the weapon your currently using.
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
 Function GetWeaponName: String;
 begin
   if GameTab(tab_Combat) then
     Result := GetTextAtExWrap(584, 208, 734, 226, 0, 3, 4, 3907053, 0, UpChars);
 end;
 
+(*
+
+GetWeaponData
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function GetWeaponData(var WArr: array of TStringArray): Boolean;
+
+Grabs weapon data and puts it into T2DStringArray.  The data is the
+information you get when you mouse over the attack styles of the weapon.  This
+then sets it into a array that can be used to set the fight mode of the weapon.
+It even gets info like 'Crush' or 'Slash' can be useful if the NPC is weak to
+that type of attack.
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function GetWeaponData(var WArr: array of TStringArray): Boolean;
 var
   x, y, i, ii, H, L: integer;
@@ -2049,6 +2217,28 @@ end;
 
 function PinScreen: boolean; forward;
 
+(*
+CloseAllScreens
+~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CloseAllScreens: boolean;
+
+Close BankScreen, DepositScreen, ShopScreen, ToolBeltScreen and the PinScreen.
+Returns true if any of them is closed.
+
+.. note::
+
+    by Tickyy
+
+Example:
+
+.. code-block:: pascal
+
+    CloseAllScreens();
+
+*)
 function CloseAllScreens: boolean;
 var
   I: Integer;

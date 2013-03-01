@@ -1,4 +1,11 @@
-{}
+(*
+Globals
+=======
+
+
+.. contents::
+
+*)
 
 type
   TBooleanArray = array of Boolean;
@@ -29,7 +36,7 @@ var
 { var bmpAdmin, bmpMod, Lamp, BoxMask: Integer;
   Description: Global Bitmaps. Need to be Global because of SCAR Memory leaks. }
 var
-  bmpAdmin, bmpMod, bmpFlag, Lamp, BookOfKnowledge, SRL_OPTIONS_BITMAP : Integer;
+  bmpAdmin, bmpMod, bmpFlag, Lamp, BookOfKnowledge : Integer;
 
 { var RoadColor, WaterColor, BankColor: Integer;
   Description: Three variables you will almost always use. :) }
@@ -272,13 +279,50 @@ const
 var
   SRLBitmapsLoaded : boolean;
 
+(*
+SRL_HasProc
+~~~~~~~~~~~
 
+.. code-block:: pascal
+
+    procedure SRL_HasProc;
+
+Checks if userproc is defined at index.
+
+.. note::
+
+    by SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function SRL_HasProc(Index: Integer): Boolean;
 begin
   if (Index >= Low(SRL_Procs)) and (Index <= High(SRL_Procs)) then
     Result := {$IFDEF LAPE}@{$ENDIF}SRL_Procs[Index] <> nil;
 end;
 
+(*
+LoadSRLBitmaps
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure LoadSRLBitMaps;
+
+Loads SRL Bitmaps into memory.
+
+.. note::
+
+    by SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+*)
 procedure LoadSRLBitMaps;
 begin
   bmpMod := BitmapFromString(9, 6, 'beNqbPn0RWeDBgwdAkgEMkBnTp0+HS6GR+KVwAgAGXFQr');
@@ -288,7 +332,6 @@ begin
   Lamp := DTMFromString('mggAAAHicY2NgYMhhYmDIAOIyIK4A4kIgTgPip0C5B0D8kAHCfgXEz4F46hRRIMkExn29ImB6zSoJBn4GBOBHohlxYAgAACyDDBw=');
   BookOfKnowledge := DTMFromString('78DA63CC65626078C480028A7273183480342310FF0702C64CA09AAB0C6880094C3242798CE540FE2D026ACA80FC1704D4E401F99F08A84900F2DF12509304E43FC0AF0600CF790EC3');
 
-  SRL_OPTIONS_BITMAP := BitmapFromString(67, 19, 'meJy1VjFywzAM80M8aPT/5zymez+RXHXmMQAIUU3Ly+CQEAWQlOwxhJ3nGc/XdYHHWIadP9ZZVWWoPGCTYYUESlW0Q/Xx9f36VdFmqs5GGTM3jd9yYV/IcRxLZJ+nIRPkj9vCAxm4hvFQyZ8Jl2SahP3yrIKdy909/hdHzMOqwwgqeNimM57l7MFYRtQj2b8EmMmXlcwj9wqFkJkhZk+Cwzh5xgAfyA8ATs5azAixkJkkM2chUt1QA5yPYRWVBZlLgPOukEhVVXvcowsYk4GzSSHN0eIb1dBg5vB3N4OPbmmJQsleNzcy7f5QyLjPThyf3Fx4j4z32TaT40dakslX326hHuoGAyFxcKBx+fIZqrM5yhh5AwDG10EWodo9hIScbDkK6vL1lS1Hs8djPFIuBBWD3pVsfP9Ahg9t68PVg1kLdGq8X24dSlsad8HyCxDkGHXR0KqJ/9cgBgBVCctmAH0mfyXQM5cwf3w6x6rp7BuriIcntCCj4Q==');
 
   SRLBitmapsLoaded := True;
   SetBitmapName(bmpMod,'SRL - Mod bitmap');
@@ -296,9 +339,27 @@ begin
   SetBitmapName(bmpFlag, 'SRL - Flag bitmap');
   SetDTMName(Lamp,'SRL - Lamp bitmap');
 
-  SetBitmapName(SRL_OPTIONS_BITMAP, 'SRL - Options Bitmap');
 end;
 
+(*
+FreeSRLBitmaps
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure FreeSRLBitMaps;
+
+Frees SRL Bitmaps from memory.
+
+.. note::
+
+    by Ron
+
+Example:
+
+.. code-block:: pascal
+
+*)
 procedure FreeSRLBitmaps;
 begin
   if SRLBitmapsLoaded then
@@ -307,12 +368,30 @@ begin
     FreeBitmap(bmpAdmin);
     FreeBitmap(bmpFlag);
     FreeDTM(Lamp);
-    FreeDTM(BookOfKnowledge);
-    FreeBitmap(SRL_OPTIONS_BITMAP);
+    FreeDTM(BookOfKnowledge);;
     SRLBitmapsLoaded := False;
   end;
 end;
 
+(*
+LoadSRLFonts
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure LoadSRLFonts;
+
+Loads SRL Fonts into memory.
+
+.. note::
+
+    by Markus
+
+Example:
+
+.. code-block:: pascal
+
+*)
 procedure LoadSRLFonts;
 begin
 {$IFDEF LoadExtraFonts}
@@ -321,6 +400,25 @@ begin
 {$ENDIF}
 end;
 
+(*
+FreeSRLFonts
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure FreeSRLFonts;
+
+Frees SRL Fonts from memory.
+
+.. note::
+
+    by Markus
+
+Example:
+
+.. code-block:: pascal
+
+*)
 procedure FreeSRLFonts;
 begin
 {$IFDEF LoadExtraFonts}
@@ -329,6 +427,31 @@ begin
 {$ENDIF}
 end;
 
+(*
+srl_Warn
+~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure srl_Warn(ProcName, ErrorMessage: String; wVersion: Integer);
+
+WriteLn's a warning message.
+
+.. note::
+
+    by SRL Dev Team
+
+Example:
+
+.. code-block:: pascal
+
+    try
+      FindTree;
+    except
+      srl_Warn('FindTree', 'Through an error', warn_AllVersions);
+    end;
+
+*)
 procedure srl_Warn(ProcName, ErrorMessage: String; wVersion: Integer);
 begin
   if (wVersion >= WarnSensitivity) then
@@ -344,6 +467,25 @@ end;
 var
   MSBox, MMBox, MIBox, MCBox, MBBox, MFBox: TBox;
 
+  (*
+SetupBoxes
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    Procedure SetupBoxes;
+
+Sets up Box variables
+
+.. note::
+
+    by SRL Dev Team & MylesMadness
+
+Example:
+
+.. code-block:: pascal
+
+*)
 Procedure SetupBoxes;
 begin
   MSBox := IntToBox(MSX1, MSY1, MSX2, MSY2);
@@ -364,7 +506,26 @@ const
   HP_BAR_COLOR1 = 9728;//Green
   HP_BAR_COLOR2 = 132923;//Red
 
+(*
+GetFightBarTPA
+~~~~~~~~~~~~~~
 
+.. code-block:: pascal
+
+    Function GetFightBarTPA(SearchArea: TBox): TPointArray;
+
+Used in various fighting functions, including srl_InFight
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
 Function GetFightBarTPA(SearchArea: TBox): TPointArray;
 var
   T: TPoint;
@@ -382,6 +543,34 @@ begin
   Result := MergeATPA(ATPA);
 end;
 
+(*
+srl_InFight
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function srl_InFight: Boolean;
+
+Checks whether player currently is in a fight, using mainscreen
+HP bar presence detection. Returns True if Player's HP bar is detected.
+Idea for improvement: Also check using PixelShift(); to see whether Player
+is performing fighting animations to further improve the certainty of results.
+
+.. note::
+
+    by Narcle
+
+Example:
+
+.. code-block:: pascal
+
+    while srl_InFight do
+    begin
+      CheckHP;
+      EatFood;
+    end;
+
+*)
 Function srl_InFight: Boolean;
 begin
   Result := InRange(Length(GetFightBarTPA(MFBox)), 30, 240);
