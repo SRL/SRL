@@ -552,7 +552,7 @@ DidClick Time must be at LEAST 200 now.
 .. note::
 
     by Rasta Magician
-    Modded by Narcle on Feb. 4th, 2012
+    Modded by Justin on 1/03/2013
 
 Example:
 
@@ -574,8 +574,8 @@ begin
   TimeOut := GetSystemTime + Time;
   while (GetSystemTime < TimeOut) do
   begin
-    R := CountColorTolerance(395675, B.x1, B.y1, B.x2, B.y2, 15);
-    G := CountColorTolerance(1695663, B.x1, B.y1, B.x2, B.y2, 15);
+    R := CountColorTolerance(255, B.x1, B.y1, B.x2, B.y2, 15);
+    G := CountColorTolerance(65535, B.x1, B.y1, B.x2, B.y2, 15);
     if Red then
     begin
       if (G > 8) then
