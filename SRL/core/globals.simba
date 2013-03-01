@@ -61,15 +61,15 @@ const
   Description: MiniMap Edge Points. }
 const
   MMX1 = 570;
-  MMY1 = 5;
-  MMX2 = 715;
-  MMY2 = 160;
+  MMY1 = 9;
+  MMX2 = 714;
+  MMY2 = 159;
 
 { const MMCX, MMCY;
   Description: MiniMap Centre Point. }
 const
-  MMCX = 627;
-  MMCY = 85;
+  MMCX = 648;
+  MMCY = 83;
 
 { const MSX1, MSY1, MSX2, MSY2;
   Description: Main Screen EdgePoints. }
