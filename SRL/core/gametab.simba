@@ -1835,7 +1835,7 @@ begin
   CloseWindow;
 
   if (not FindColor(x, y, ClBlack, 7, 460, 69, 474)) then   {if you're in chat}
-    if (not ClickContinue(True, True)) then
+    if (not ClickContinue(True)) then
     begin
       Mouse(MMCX, MMCY, 2, 2, mouse_left);
       Wait(RandomRange(3000, 4000));
@@ -1946,7 +1946,7 @@ begin
   CloseWindow;
 
   if (not FindColor(Tx, Ty, 0, 7, 460, 69, 474)) then
-    if (not ClickContinue(True, True)) then
+    if (not ClickContinue(True)) then
       Mouse(MMCX, MMCY, 2, 2, mouse_left);
 
   II := 0;
@@ -2056,7 +2056,7 @@ begin
   C := 0;
   CloseWindow;
   if (not FindColor(Tx, Ty, 0, 7, 460, 69, 474)) then
-    if (not ClickContinue(True, True)) then
+    if (not ClickContinue(True)) then
       Mouse(MMCX, MMCY, 2, 2, mouse_left);
 
   while (not FindTextTPA(2070753, 0, MSX1, MSY1, MSX2, MSY2, 'Audio Options', UpCharsEx, Nothing)) and (LoggedIn) do
