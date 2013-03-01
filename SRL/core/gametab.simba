@@ -36,7 +36,7 @@ GetCurrentTab
 
     function GetCurrentTab: Integer;
 
-Returns current tab as int 1-14.
+Returns current tab as int constant, see globals for full constant list.
 
 .. note::
 
@@ -485,7 +485,7 @@ begin
     SetArrayLength(WArr[i], H+1);
     for ii := 0 to H do
     begin
-      WArr[i][ii] := GetTextAtExWrap(TB.x1+1, TB.y1+3, TB.x2, TB.y1+12, 0, 5, 4, 0, 0, 'StatChars07');
+      WArr[i][ii] := GetTextAtExWrap(TB.x1+1, TB.y1+3, TB.x2, TB.y1+12, 0, 5, 4, 0, 0, 'SmallChars07');
       Debugln(WArr[i][ii]);
       case (WArr[i][ii]) of
         '(Aooressive)':(WArr[i][ii]):='(Aggressive)';
@@ -591,7 +591,7 @@ Example:
 function GetCombatLevel: Integer;
 begin
   Result := -1;
-  if not FTab(1) then
+  if not FTab(tab_Combat) then
     exit;
 
   Result := StrToIntDef(ExtractFromStr(GetTextAtExWrap(662, 230, 700, 240, 0,
@@ -622,7 +622,7 @@ Example:
 *)
 procedure Retaliate(RetTrue: Boolean);
 begin
-  if not FTab(1) then
+  if not FTab(tab_Combat) then
     Exit;
 
   if (RetTrue) xor (GetTextAtExWrap(644, 379, 667, 392, 0, 5, 1, 2070783, 20, 'UpChars07') ='(On)') then
@@ -1040,16 +1040,20 @@ switch the tab back after check
 Example:
 
 .. code-block:: pascal
+
+   if IsRunOn(True) then writeln('my run is on');
+
 *)
 function IsRunOn(SwapGTabBack: Boolean): Boolean;
 var
-  X,Y,OrigTab: Integer;
+  CCount,OrigTab: Integer;
 begin
   Result := False;
   if (SwapGTabBack) then OrigTab := GetCurrentTab;
   if (GameTab(tab_Options)) then
   begin
-    Result := (FindColorTolerance(X,Y,1908610, 626, 415, 657, 446, 20));
+    CCount := CountColorTolerance(2369440, 626, 412, 657, 413, 20);
+    Result := (CCount>1);
     if (SwapGTabBack) then GameTab(OrigTab);
   end;
 end;
@@ -1702,19 +1706,20 @@ Example:
 
 function SetRun(Run: Boolean): Boolean;
 var
-  X,Y: Integer;
+  CCount: Integer;
 begin
-  Result := false;                                                                  //Color near center of Run icon
+  Result := False;
   if (GameTab(tab_Options)) then
   begin
+    CCount := CountColorTolerance(2369440, 626, 412, 657, 413, 20);
     if (Run) then
     begin
-      if (not FindColorTolerance(X,Y,1908610, 626, 415, 657, 446, 20)) then
+      if (CCount<1) then
         MouseBox(626, 415, 657, 446, mouse_left);
       Result := True;
     end else
     begin
-      if (FindColorTolerance(X,Y,1908610, 626, 415, 657, 446, 20)) then
+      if (CCount>1) then
         MouseBox(626, 415, 657, 446, mouse_left);
       Result := True;
     end;
