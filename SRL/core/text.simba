@@ -1204,11 +1204,50 @@ begin
   Result := ChooseOptionMultiEx([Txt], TextType, ClickLeft);
 end;
 
+(*
+ChooseOption
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ChooseOption(txt: String): Boolean;
+
+Finds an option in a popup menu, then clicks on it.
+
+.. note::
+
+    by Wizzup?
+
+Example:
+
+.. code-block:: pascal
+
+*)
 function ChooseOption(Txt: String): Boolean;
 begin
   Result := ChooseOptionMultiEx([Txt], 'All', ClickLeft);
 end;
 
+(*
+OptionsExist
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function OptionsExist(txt: TStringArray; Move: boolean): boolean;
+
+Returns true if an Option in txt is found in the RS Option Menu, will move or do
+nothing according to the boolean Move.
+
+.. note::
+
+    by Rasta Magician
+
+Example
+
+.. code-block:: pascal
+
+*)
 function OptionsExist(txt: TStringArray; MoveMouse: boolean): boolean;
 begin
   if MoveMouse then
@@ -1217,6 +1256,28 @@ begin
     Result := ChooseOptionMultiEx(Txt, 'All', Nothing);
 end;
 
+(*
+CloseWindow
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CloseWindow: Boolean;
+
+Closes any open windows. (In RS not your pc roflmaololz, j/k)
+
+.. note::
+
+    by NaumanAkhlaQ, Narcle, and Nava2
+    Updated: 12 December 2011 by Coh3n
+
+Example:
+
+.. code-block:: pascal
+
+  if (BankScreen) then
+    CloseWindow();
+*)
 function CloseWindow: Boolean;
 var
   Col: TIntegerArray;
