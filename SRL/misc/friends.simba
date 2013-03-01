@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               SRL Resource Library                          --//
-//--               » Friends Routines                            --//
+//--               ? Friends Routines                            --//
 //-----------------------------------------------------------------//
 // * function NumberOfOnlineFriends: Integer;                      // by Wizzup?
 // * procedure AddFriend(Friend: string);                          // by Wizzup?

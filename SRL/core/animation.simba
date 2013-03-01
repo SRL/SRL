@@ -380,7 +380,6 @@ Example:
 
   PlayerMoving := IsMoving;
 *)
-
 function IsMoving: Boolean;
 begin
   Result := PixelShift(IntToBox(MMCX-30, MMCY-30, MMCX+30, MMCY+30), 500) > 200;

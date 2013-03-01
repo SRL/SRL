@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               SRL Resource Library                          --//
-//--               » Debug Routines                              --//
+//--               ? Debug Routines                              --//
 //-----------------------------------------------------------------//
 // * procedure TakeScreenshotEx(Path: string; X1, Y1, X2, Y2: Integer); // by lordsaturn, Cazax, & EvilChickcen!
 // * procedure TakeScreenshot(Path: String);                       // by Nava2

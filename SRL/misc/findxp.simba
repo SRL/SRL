@@ -1,6 +1,6 @@
 // -------------------------------------------------------------------------- //
 //--                 SRL Resource Library                        ------------ //
-//--                     » XP Routines                           ------------ //
+//--                     ? XP Routines                           ------------ //
 //--------------------------------------------------------------------------- //
 // * function ConvertXpToLvl(xp:integer):integer;        // by Brak, Flyboy
 // * function ConvertLvlToXP(Level:Integer):Integer;     // by Ron

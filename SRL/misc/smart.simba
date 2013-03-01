@@ -2,17 +2,17 @@
 {$DEFINE SMART}
 {$loadlib libsmart}
 
-function IsKeyDown(C: Word): Boolean; {$IFDEF Lape}override;{$ENDIF}
+function IsKeyDown(C: Word): Boolean;
 begin
   Result := SmartIsKeyDown(C);
 end;
 
-procedure MoveMouse(x, y: Integer); {$IFDEF Lape}override;{$ENDIF}
+procedure MoveMouse(x, y: Integer);
 begin
   SmartMoveMouse(x, y);
 end;
 
-procedure HoldMouse(x, y: Integer; button : integer); {$IFDEF Lape}override;{$ENDIF}
+procedure HoldMouse(x, y: Integer; button : integer);
 begin
   if button = mouse_left then
     SmartHoldMousePlus(x,y,1)
@@ -24,7 +24,7 @@ begin
     raiseexception(ercustomerror,'Unknown mouse button in SmartHoldMousePlus');
 end;
 
-procedure ReleaseMouse(x, y: Integer; button : integer); {$IFDEF Lape}override;{$ENDIF}
+procedure ReleaseMouse(x, y: Integer; button : integer);
 begin
   if button = mouse_left then
     SmartReleaseMousePlus(x,y,1)
@@ -36,21 +36,21 @@ begin
     raiseexception(ercustomerror,'Unknown mouse button in SmartReleaseMousePlus');
 end;
 
-procedure KeyUp(key: Word); {$IFDEF Lape}override;{$ENDIF}
+procedure KeyUp(key: Word);
 begin
   If Key = 13 Then
     Key := 10;
   SmartReleaseKey(key);
 end;
 
-procedure KeyDown(key: Word); {$IFDEF Lape}override;{$ENDIF}
+procedure KeyDown(key: Word);
 begin
   If Key = 13 Then
     Key := 10;
   SmartHoldKey(key);
 end;
 
-procedure SendKeys(const S: String; keywait{$IFNDEF SIMBAMAJOR980}, keymodwait{$ENDIF}: integer); {$IFDEF Lape}override;{$ENDIF}
+procedure SendKeys(const S: String; keywait{$IFNDEF SIMBAMAJOR980}, keymodwait{$ENDIF}: integer);
 begin
   SmartSendKeys(S);
 end;
@@ -93,7 +93,7 @@ begin
   {$ENDIF}
 end;
 
-procedure GetMousePos(var x, y: Integer); {$IFDEF Lape}override;{$ENDIF}
+procedure GetMousePos(var x, y: Integer);
 begin
   SmartGetMousePos(x, y);
 end;
@@ -106,14 +106,14 @@ begin
   Result := PointInBox(P, B);
 end;
 
-function GetColor(x, y: Integer): Integer; {$IFDEF Lape}override;{$ENDIF}
+function GetColor(x, y: Integer): Integer;
 begin
   result:= SmartGetColor(x, y);
 end;
 
 procedure SmartSetTarget;
 begin
-  SetTargetArray(SmartImageArray, 765,503);
+  SetTargetArray(SmartImageArray, 765, 503);
 end;
 
 function FindWindow(Title: String): Boolean;
@@ -121,7 +121,7 @@ begin
   result:= true;
 end;
 
-procedure ActivateClient; {$IFDEF Lape}override;{$ENDIF}
+procedure ActivateClient;
 begin
 end;
 
@@ -129,16 +129,6 @@ function FindWindowBySize(Width, Height: Integer): Boolean;
 begin
   result:= true;
 end;
-
-{procedure SmartSaveSettings(v: TVariantArray);
-var
-  i: Integer;
-  ts: TStringArray;
-begin
-  ts := ['server', 'members', 'signed', 'sd', 'DC', IncludePath + 'SRL/SRL/misc/smartINI.ini'];
-  for i := 0 to 4 do
-    WriteINI('SMART', ts[i], v[i], ts[5]);
-end;   }
 
 procedure SmartSetupEx(Server: integer; members, signed, superdetail: boolean);
 var
@@ -151,17 +141,4 @@ begin
     TerminateScript;
   end;
   SmartSetup('http://'+prefix+'.runescape.com/', 'plugin.js?param=o0,a' + IntToStr((Byte(not(Signed)) + 1) * Byte(not((SuperDetail and Signed)))) + ',m' + IntToStr(Byte(Members)), 765, 553, 's');
-  //SmartSaveSettings([Server, Members, Signed, SuperDetail, SmartGetDC]);
 end;
-
-{function SmartLastSettings: TStringArray;
-var
-  i: Integer;
-  ts: TStringArray;
-begin
-  ts := ['server', 'members', 'signed', 'sd', 'DC', IncludePath + 'SRL/SRL/Misc/smartINI.ini'];
-  SetLength(Result, 5);
-  for i := 0 to 4 do
-    Result[i] := ReadINI('SMART', ts[i], ts[5]);
-end; }
-

@@ -115,8 +115,7 @@ var
   LogoutOnMod: Boolean;
   
 var
-   PlayerCurTime, PlayerStartTime: LongInt;
-
+   PlayerStartTime: LongInt;
 
 (*
 LoggedIn
@@ -140,7 +139,7 @@ Example:
 function LoggedIn: Boolean;
 begin
   //White text on Report Abuse Button
-  Result := (GetColor(472, 490) = 16777215);
+  Result := (GetColor(427, 489) = 16777215);
 end;
 
 (*

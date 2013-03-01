@@ -209,7 +209,6 @@ function InitSmart(ForceNew: Boolean): Integer;
 var
   I, Count: Integer;
   IDs: TIntegerArray;
-  Params: TStringArray;
   World: String;
 begin
   If (Not ForceNew) then
@@ -237,7 +236,7 @@ begin
   //{$ELSE}
   //Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
   //{$ENDIF}
-  
+
   If (Result > 0) Then
   begin
     try

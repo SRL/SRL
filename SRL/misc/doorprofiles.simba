@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               SRL Resource Library                          --//
-//--               » Door Routines                               --//
+//--               ? Door Routines                               --//
 //-----------------------------------------------------------------//
 // * function IsDropDot(Pt: TPoint): Boolean;                      // * by lordsaturn
 // * function FilterDropDots(P: TPointArray): TPointArray;         // * by lordsaturn

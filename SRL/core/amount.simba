@@ -221,6 +221,10 @@ begin
    end;
 end;
 
+
+function InvBox(i: integer): TBox; forward;
+function CoordsToItem(x, y: integer): integer; forward;
+
 (*
 GetAmount
 ~~~~~~~~~
@@ -250,8 +254,6 @@ Example:
       end;
     end;
 *)
-function InvBox(i: integer): TBox; forward;
-function CoordsToItem(x, y: integer): integer; forward;
 function GetAmount(x, y: integer): integer;
 begin
   result := getAmountBox(invBox(coordsToItem(x, y)));
@@ -666,42 +668,6 @@ var
 begin
   if (FindCoins(X, Y, Area)) then
     Result := GetAmount(X, Y);
-end;
-
-(*
-RuneAmount
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function RuneAmount(area, runetype: String): Integer;
-
-Returns the amount of a certain rune in the specified area.
-
-.. note::
-
-    Author: masquerader
-    Last Modified: Unknown by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-    WriteLn('Air runes found: '+toStr(RuneAmount('inv', 'air')));
-*)
-function RuneAmount(Area, RuneType: string): Integer;
-var
-  RuneBmp, II: Integer;
-  RuneNames: TStringArray;
-begin
-  RuneNames := ['air', 'mind', 'water', 'fire', 'earth', 'law', 'nature', 'chaos', 'death', 'body', 'cosmic', 'soul', 'blood'];
-  if (InStrArrEx(Lowercase(RuneType), RuneNames, II)) then
-  begin
-    RuneBmp := srl_GetBitmap(18 + II);
-    Result := ItemAmount(Area, 'bmp', RuneBmp, [20]);
-    FreeBitmap(RuneBmp);
-  end else
-    srl_Warn('RuneAmount', 'Invalid RuneType: ''' + RuneType + '''', warn_AllVersions);
 end;
 
 (*

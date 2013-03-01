@@ -279,7 +279,7 @@ begin
     if VariantIsString(CameraAngle) then
     begin
         if CameraAngle = '' then
-    	  SetCamera := False
+          SetCamera := False
     	else
         CameraAngle := StrToInt(CameraAngle);
     end;
@@ -958,27 +958,6 @@ begin
   GameTab(t);
 end;
 
-(*
-HoverMovingObject
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure HoverMovingObject;
-
-Splits the screen up into boxes and hovers the one with the most pixel shift in.
-
-.. note::
-
-    Author: Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-  HoverMovingObject;
-
-*)
 procedure HoverMovingObject;
 var
   TBA: TBoxArray;
@@ -991,7 +970,7 @@ begin
   if not (LoggedIn) then
     Exit;
 
-    Rows := 16;
+  Rows := 16;
 
   TBA := Grid(27, Rows, 19, 20, 19, 20, Point(13, 14));
   TIA := PixelShiftMulti(TBA, 100 + Random(100));
@@ -1298,7 +1277,7 @@ begin
         Writeln('******** FOUND MOD ********');
         Writeln('Logging out, waiting 1-2 minutes until mod leaves');
 
-        WaitFunc(@ExitToLobby, 500, 1500);
+        WaitFunc(@Logout, 500, 1500);
         Wait(60000 + Random(60000));
         LoginPlayer;
       end;
@@ -1344,4 +1323,84 @@ begin
       Players[CurrentPlayer].Rand := 'Dead';
       Players[CurrentPlayer].Active := False;
     end;
+end;
+
+(*
+FindDwarvenPopup
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindDwarvenPopup: Boolean;
+
+A simple functinds and closes the "please buy RS Members" popup that happens
+when you reach lvl 10 in any skill.
+
+.. note::
+
+    Author: Harry
+
+Example:
+
+.. code-block:: pascal
+
+  FindDwarvenPopup();
+*)
+function FindDwarvenPopup: Boolean;
+begin
+  Result := False;
+  // Parts of red X, checked in two different spots to reduce false-positives
+  if (GetColor(485, 40) = 2569093) then
+    if (GetColor(488, 40) = 11189720) then
+    begin
+      Result := True;
+
+      // Box around the X, to close it.
+      MouseBox(482, 35, 492, 44, mouse_left);
+      Wait(1000+Random(3000));
+    end;
+end;
+
+(*
+CloseAdWindow
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CloseAdWindow(): Boolean;
+
+Finds and exits the wicked hood and dwarven army axe pop up ads.
+
+.. note::
+
+    Author: litoris
+    Last Modified: September 2nd, 2012 by litoris
+
+Example:
+
+.. code-block:: pascal
+
+  CloseAdWindow();
+*)
+function CloseAdWindow(): Boolean;
+var
+Cross, x, y: Integer;
+begin
+  Cross := BitmapFromString(10, 9, 'meJzT1jbX0HDWzp6jYxipqOwNRDI' +
+          'yXkoq3lKRfSIiKjo6FiCpDX+0pj/QMshQUgqVVE4AsoEikpG9ioqW' +
+          'QF0QLpBUMKvRmgFiq02+yyHiJCVlLy3tpaiSDhGEILUpd3nEAtnYj' +
+          'GVkDYEKpKSCRLVL4LJi2iU8PE4cnMYiIlpCwpbCUpFA9Zh6ublVOE' +
+          'WdIFJAEqgLygbaK2zNzCwlGdkHVS8eCDQQSEIUAN3MyMgNUcApYg0' +
+          '0CoKAbKAUE5MQAMPoVvw=');
+  if  FindBitmapTolerancein(Cross, x, y, MSCX, MSY1, MSX2, MSCY, 5) then
+  begin
+    MMouse(x, y, 2, 2);
+    if (WaitUptext('lose', 300)) then
+    begin
+      ClickMouse2(mouse_Left);
+      Wait(RandomRange(100, 200));
+      Result := True;
+    end;
+  end;
+  FreeBitmap(Cross);
 end;

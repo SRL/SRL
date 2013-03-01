@@ -8,7 +8,7 @@ several random event solvers.
 *)
 
 const
-  SRL_NPC_OLDMAN = 'Dygt8!loqgGlgD50'; // chat name for Mysterious Old Man
+  SRL_NPC_OLDMAN = 'MysteriousOldMan'; // chat name for Mysterious Old Man
 
 (**
  * Author: Wizzup? & Coh3n

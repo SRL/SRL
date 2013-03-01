@@ -100,6 +100,49 @@ begin
       Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][4]) + STA[TheType][i];
 end;
 
+procedure ConvertTime64(timeMS: int64; var YEAR, MONTH, WEEK, DAY, HOUR, MINUTE, SECOND:integer);
+var
+  x: int64;
+begin
+  x := timeMS;
+  YEAR   := x div (31536000000); // 1000 * 60 * 60 * 24 * 365 (1 year or 365 days)
+  x      := x mod (31536000000);
+  MONTH  := x div (2592000000); // 1000 * 60 * 60 * 24 * 30 (1 month or 30 days)
+  x      := x mod (2592000000);
+  WEEK   := x div (604800000); // 1000 * 60 * 60 * 24 * 7 (1 week or 7 days)
+  x      := x mod (604800000);
+  DAY    := x div (86400000); // 1000 * 60 * 60 * 24 (1 day or 24 hours)
+  x      := x mod (86400000);
+  HOUR   := x div (3600000); // 1000 * 60 * 60 (1 hour or 60 minutes)
+  x      := x mod (3600000);
+  MINUTE := x div (60000); // 1000 * 60 (1 minute or 60 seconds)
+  x      := x mod (60000);
+  SECOND := x div (1000); // 1000 (1 second, is in MS format now)
+  x      := x mod (1000);
+end;
+
+(*******************************************************************************
+** An edited version of the MsToTime include function.  This redone version of
+**   the method has the following changes:
+**      - single arg of an int64 type
+**      - removed a boolean element in the STA : TVariantArray;
+**      - removed the multiple output formats (array of STA, to simly one STA
+*******************************************************************************)
+function MsToTime64(MS: int64): string;
+var
+  STA: TVariantArray;
+  Time: array [0..6] of Integer;
+  i: Integer;
+begin
+  Result := '';
+  STA := [' Years, ', ' Months, ', ' Weeks, ', ' Days, ', ' Hours, ',
+          ' Minutes and ', ' Seconds', 0];
+  ConvertTime64(MS, Time[0], Time[1], Time[2], Time[3], Time[4], Time[5], Time[6]);
+  for i := 0 to 6 do
+    if (Time[i] > 0) or (STA[7]) or (i = 6) then
+      Result := Result + PadZ(IntToStr(Time[i]), STA[7]) + STA[i];
+end;
+
 (*
 TimeRunning
 ~~~~~~~~~~~
@@ -171,7 +214,6 @@ function TimeFromMark(TimeMarker: Integer): Integer;
 begin
   Result := GetSystemTime - TimeMarker;
 end;
-
 
 (*
 TheTime
@@ -521,6 +563,8 @@ begin
   Result := WaitUptextMulti([S], Time);
 end;
 
+function BankScreen: Boolean; forward;
+
 (*
 WaitInvCount
 ~~~~~~~~~~~~
@@ -540,7 +584,6 @@ Example:
 .. code-block:: pascal
 
 *)
-function BankScreen: Boolean; forward;
 function WaitInvCount(Count, MaxTime: Integer; CountType: (MaxCT, MinCT, ExactCT)): boolean;
 var
   T: integer;
@@ -561,7 +604,6 @@ begin
     end;
 
     if Result then break;
-
   end;
 end;
 

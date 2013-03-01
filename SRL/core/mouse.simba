@@ -20,6 +20,7 @@ var
 
 const
   mouse_move = 3;
+
 (*
 WindMouse
 ~~~~~~~~~
@@ -234,7 +235,7 @@ Mouse
 
     procedure Mouse(mousex, mousey, ranx, rany: Integer; button: variant);
 
-Moves then clicks mouse (will only move if 'mouse_move' passed). 
+Moves then clicks mouse (will only move if 'mouse_move' passed).
 
 .. note::
 
@@ -536,7 +537,6 @@ function SpiralMouse(var fx, fy: Integer; x1, y1, x2, y2: Integer; UpText: Strin
 begin
   Result := SpiralMouseMulti(fx, fy, x1, y1, x2, y2, [UpText], PpC, aInc);
 end;
-
 
 (*
 DidClick

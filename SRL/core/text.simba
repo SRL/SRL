@@ -389,6 +389,26 @@ begin
   end;
 end;
 
+//TODO: Lets do this correctly, just how srl-5 does it.
+Function P07_GetUpText: String;
+Var
+  WhiteT,BlueT,YellowT,OrangeT,FoundText: String;
+Begin
+  WhiteT:=GetTextAtExWrap(8, 8, 80, 21, 0, 5, 1, 14541281, 55, 'UpChars07');
+  BlueT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 13423640, 65, 'UpChars07');
+  YellowT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 1235160, 40, 'UpChars07');
+  OrangeT:=GetTextAtExWrap(35, 8, 150, 21, 0, 5, 1, 4687583, 53, 'UpChars07');
+  FoundText:=WhiteT + ' ' + BlueT + YellowT + OrangeT;
+  FoundText:= ReplaceWrap(FoundText, '.', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '/', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '\', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, ',', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '*', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '^', '',[rfReplaceAll]);
+  FoundText:= ReplaceWrap(FoundText, '"', '',[rfReplaceAll]);
+  Result:=FoundText;
+End;
+
 (*
 GetUpText
 ~~~~~~~~~
@@ -410,7 +430,7 @@ Example:
 *)
 function GetUpText: string;
 begin
-  Result := rs_GetUpText
+  Result := P07_GetUpText;
 end;
 
 (*
@@ -583,7 +603,6 @@ Example:
         MoveMouse(x, y);
     end.
 *)
-
 function FindTextEx(var cx, cy: Integer; txt, fonts: TStringArray; xs, ys, xe, ye: Integer): Boolean;
 var
   s, j, i: Integer;
@@ -784,7 +803,7 @@ Example:
 .. code-block:: pascal
 
 *)
-  function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer;
+function FindTextTPAMulti(Color, tol, xs, ys, xe, ye: integer;
     Texts: TStringArray; Chars: string; Action: fnct_ActionOptions): Boolean;
 
 var
@@ -971,33 +990,27 @@ Example:
 .. code-block:: pascal
 
 *)
-Function GetChooseOptions(TextType: string): Array of TOptions;
+Function GetChooseOptions(): Array of TOptions;
 var
-   B, BB, sB, BigBox: TBox;
-   TPA, TPA1, TPA2: TPointArray;
-   ATPA, tempatpa: T2DPointArray;
-   I, L, target, bmp,w,h, cts: Integer;
-   BoxColors: TIntegerArray;
+  I, L, target, bmp, w, h, cts, n, m : Integer;
+  B, BB, BigBox : TBox;
+  TPA, TPA1 : TPointArray;
+  ATPA, tempatpa : T2DPointArray;
 begin
   target := GetImageTarget;
   GetClientDimensions(B.X2, B.Y2);
   B := IntToBox(0, 0, B.X2-1, B.Y2-1);
   cts := GetColorToleranceSpeed;
   ColorToleranceSpeed(1);
-  //            Black, Top Blue, grey
-  BoxColors := [131843, 3682593, 3552822];
-  SetLength(ATPA, Length(BoxColors));
-  for i := 0 to High(BoxColors) do
-    FindColorsTolerance(ATPA[i], BoxColors[i], B.X1, B.Y1, B.X2, B.Y2, 0);
-  TPA := MergeATPA(ATPA);
-  If Length(TPA) < 100 Then
+
+  FindColorsTolerance(TPA, 4674653, B.X1, B.Y1, B.X2, B.Y2, 0);
+  if (Length(TPA) < 100) then
   begin
     ColorToleranceSpeed(cts);
     Exit;
   end;
-
   ATPA := SplitTPA(TPA, 4);
-  For i := 0 to High(ATPA) do
+  for i := 0 to High(ATPA) do
   begin
     B := GetTPABounds(ATPA[i]);
     if ((B.x2-B.x1) > 90) and ((B.y2-B.y1) > 18) then
@@ -1005,45 +1018,52 @@ begin
     else
       B := IntToBox(0, 0, 0, 0);
   end;
-
   If (B.x2 = 0) then
   begin
     ColorToleranceSpeed(cts);
     Exit;
   end;
-
   BigBox := B;
-
   SetColorToleranceSpeed(3);
-  FindColorsTolerance(TPA1, 4996381, B.X1, B.Y1, B.X2, B.Y2, 18);//One color covers both Highlighted and non
-  sB := GetTPABounds(TPA1);
-  ReturnPointsNotInTPAWrap(TPA1, sB, TPA);
-  FindColorsTolerance(TPA2, 460291, B.X1, B.Y1, B.X2, B.Y2, 6);//shadow
+
+  B := GetATPABounds(ATPA);
+
+  FindColorsTolerance(TPA1, 0, B.X1, B.Y1, B.X2, B.Y2, 0);
+  CombineTPAWrap(TPA, TPA1, TPA);
+
+  ReturnPointsNotInTPAWrap(TPA, B, TPA);
+
   SetColorToleranceSpeed(cts);
 
-  bmp := CreateBitmap(B.X2-B.X1+2, B.Y2-B.Y1+2);
-  OffsetTPA(TPA, Point(-B.X1, -B.Y1));
-  OffsetTPA(TPA2, Point(-B.X1, -B.Y1));
-  FastDrawClear(bmp, 0);
-  DrawTPABitmap(bmp, TPA, clRed);//Text
-  DrawTPABitmap(bmp, TPA2, clPurple);//Shadow
-  ocr_FilterUpTextByCharacteristics(GetMufasaBitmap(bmp));
-  GetbitmapSize(bmp,w,h);
-  SetTargetBitmap(bmp);  // new target for findcolorstolerance.
-  SetLength(ATPA, H div 16);
+  B := GetTPABounds(TPA);
+
+  n := B.Y2 - B.Y1;
+  m := 15 - n mod 15;
+  n := n + m;
+  bmp := CreateBitmap(B.X2 - B.X1 + 3, n + 1);
+
+  OffSetTPA(TPA, Point(-B.X1, -B.Y1));
+
+  DrawTPABitmap(bmp, TPA, clRed);
+
+  GetbitmapSize(bmp, w, h);
+
+  SetTargetBitmap(bmp);
+  SetLength(ATPA, h div 15);
   for i := 0 to High(ATPA) do
-    FindColorsTolerance(ATPA[i], clRed, 0, 2+i*16,  W-1, 18+i*16, 0);//+2 to y to line it up
+    FindColorsTolerance(ATPA[i], clRed, 0, i*15,  w-1, 15+i*15, 0);
+
   L := High(ATPA);
-  SortATPAFromFirstPointY(ATPA, Point(w div 2,0));
+  SortATPAFromFirstPointY(ATPA, Point(w div 2, 0));
 
   SetArrayLength(Result, Length(ATPA));
   Result[0].BigBox := BigBox;
   for i := 0 to high(ATPA) do
   begin
     TPA := ATPA[i];
-    tempatpa := SplitTPAEx(TPA, 1, 10); // Split one into characters
+    tempatpa := SplitTPAEx(TPA, 1, 10);
     SortATPAFromFirstPointX(tempatpa, Point(0, 0));
-    Result[i].Str := GetTextATPA(tempatpa, 5, 'UpCharsEx'); //Writeln(Result[i].Str);
+    Result[i].Str := GetTextATPA(tempatpa, 5, 'UpChars07');
     BB := GetTPABounds(ATPA[i]);
     Result[i].Bounds := IntToBox(BB.X1+B.X1, BB.Y1+B.Y1, BB.X2+B.X1, BB.Y2+B.Y1);
     setlength(tempatpa,0);
@@ -1053,7 +1073,6 @@ begin
   SetImageTarget(target);
   FreeBitmap(bmp);
 end;
-
 
 (*
 ChooseOptionMultiEx
@@ -1090,7 +1109,7 @@ var
    Options: array of TOptions;
 begin
   Result := False;
-  Options := GetChooseOptions(TextType);
+  Options := GetChooseOptions();
   if (Length(Options) < 1) then
     Exit;
   H := High(Options);
@@ -1320,30 +1339,3 @@ begin
     end;
   end;
 end;
-
-{*******************************************************************************
-procedure SetDebugColors(Text, Back: Integer);
-By: Nava2
-Description: Sets the next WriteLn's colours to Text and Back respectively.
-*******************************************************************************}
-{procedure SetDebugColors(txtCol, BackCol: Integer);
-begin
-end;       }
-
-{*******************************************************************************
-procedure WriteArrayCols(Lines: TStringArray; Text, Back: Integer);
-By: Nava2
-Description: Writes a TStringArray with Text and Back colours. If not using
-             3.20, it will just writeln the array.
-*******************************************************************************}
-{procedure WriteArrayCols(Lines: TStringArray; Text, Back: Integer);
-var
-  i, h: Integer;
-begin
-  h := High(Lines);
-  for i := 0 to h do
-  begin
-    SetDebugColors(Text, Back);
-    Writeln(Lines[i]);
-  end;
-end;         }

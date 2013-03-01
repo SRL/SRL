@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------//
 //--                  SRL Resource Library                                  --//
-//--                   » Remote Control Routines Beta                       --//
+//--                   ? Remote Control Routines Beta                       --//
 //----------------------------------------------------------------------------//
 // * procedure RC_SetStandards;                                               // * by N1ke!
 // * function RCReadCommand: String;                                          // * by WT-Fakawi

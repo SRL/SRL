@@ -18,18 +18,6 @@ const
   CHAT_ASSIST  = 6;
 
 (*
-.. code-block:: pascal
-
-    const
-  CHAT_GAME    = 0;
-  CHAT_PUBLIC  = 1;
-  CHAT_PRIVATE = 2;
-  CHAT_CLAN    = 3;
-  CHAT_TRADE   = 4;
-  CHAT_ASSIST  = 5;
-*)
-
-(*
 SetChat
 ~~~~~~~
 
@@ -148,7 +136,7 @@ Example:
 
 .. code-block:: pascal
 
-
+    ChatsOff;
 
 *)
 procedure ChatsOff;
@@ -158,7 +146,6 @@ begin
   for i := 1 to 6 do
     SetChat('off', i);
 end;
-
 
 (*
 ChatWait
@@ -178,7 +165,7 @@ Example:
 
 .. code-block:: pascal
 
-
+    ChatWait;
 
 *)
 procedure ChatWait;
@@ -711,7 +698,6 @@ begin
   end;
 end;
 
-
 (*
 SaveToChatLog
 ~~~~~~~~~~~~~
@@ -800,7 +786,7 @@ font doesn't exist yet, so it returns a random string of characters.
 .. note::
 
     Author: DemiseSythe
-    Last Modified: Jan. 22nd, 2012 by Coh3n
+    Last Modified: 1/03/2013 2012 by Justin
 
 Example:
 
@@ -810,7 +796,7 @@ Example:
 *)
 function GetNPCChatName(): string;
 begin
-  result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, NPCChars);
+  result := getTextAtExWrap(130, 358, 504, 379, 0, 50, 30, 128, 15, CharsNPC07);
 end;
 
 (*

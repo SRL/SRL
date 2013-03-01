@@ -3,12 +3,11 @@ Login
 =====
 
 The Login include contains all the functions to succesfully log you in and out
-of the game and/or the lobby.
+of the game.
 
 .. contents::
 
 *)
-
 
 const
   SM_Color = 8115338;
@@ -17,32 +16,45 @@ const
   var RandomPlayer, GraphicsSet: Boolean;
   Description: Variables needed for some login functions. }
 var
-  SRL_Logs: Integer;
-  RandomPlayer, GraphicsSet, AllowPVP: Boolean;
+  PlayerCurTime, SRL_Logs : integer;
+  RandomPlayer : Boolean;
 
 procedure NextPlayer(Active: Boolean); forward;
 procedure RandomNextPlayer(Active: Boolean); forward;
 
 const
-  UBx1 = 314; // Username tBox - in use now
-  UBy1 = 255;
-  UBx2 = 431;
-  UBy2 = 263;
+  // Existing User - box
+  EUX1 = 389;
+  EUY1 = 271;
+  EUX2 = 535;
+  EUY2 = 311;
 
-  PBx1 = 342; // Password tBox - in use now
-  PBy1 = 269;
-  PBx2 = 515;
-  PBy2 = 285;
+  // Current World / click to switch - box
+  CWX1 = 5;
+  CWY1 = 463;
+  CWX2 = 104;
+  CWY2 = 497;
 
-  GBx1 = 230; // greeting box in final screen
-  GBy1 = 330;
-  GBx2 = 660;
-  GBy2 = 400;
+const
+  UBx1 = 313; // Username tBox - in use now
+  UBy1 = 254;
+  UBx2 = 435;
+  UBy2 = 260;
 
-  WDx1 = 88;  // window box (to enter game) "click here to play"
-  WDy1 = 450;
-  WDx2 = 545;
-  WDy2 = 473;
+  PBx1 = 346; // Password tBox - in use now
+  PBy1 = 271;
+  PBx2 = 435;
+  PBy2 = 281;
+
+  GBx1 = 229; // Login Box, after entering username / password
+  GBy1 = 301;
+  GBx2 = 375;
+  GBy2 = 341;
+
+  WDx1 = 276; // window box (to enter game) "click here to play"
+  WDy1 = 298;
+  WDx2 = 499;
+  WDy2 = 381;
 
   WHITE_TEXT    = 16777215; // white text color
   MESSAGE_BOX   = 11452366; // The "helpful message" box color
@@ -57,8 +69,6 @@ const                       //GetScreen
   LOGIN_TA_Y2 = 228;
 
   LOGIN_TEXTCOLOUR = 16777215; //Colour of text
-  LOGIN_STATUSCOLOUR = 65535; //Colour of text
-
 
 
 (*
@@ -74,7 +84,7 @@ Returns true if we are at the Lobby Screen
 .. note::
 
     by IceFire908 & Bionicle1800
-    Last modified 28/02/2013 By Justin
+    Last modified 28/02/2013 By Ashaman88/Le Jingle
 
 Example:
 
@@ -87,7 +97,45 @@ Example:
 *)
 function LobbyScreen: Boolean;
 begin
-  Result := (GetColor(308, 21) = 255); // 'W' Welcome to RuneScape'.
+  Result := (GetColor(400, 335) = 16777215); // 'H' click Here to Play
+end;
+
+(*
+SetAudioOff
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SetAudioOff(): boolean;
+
+Turns offs the music on the login screen.
+Should default turn off, upon loading old school RS.
+
+.. note::
+
+    by Ashaman88/Le Jingle
+
+Example:
+
+.. code-block:: pascal
+
+    SetAudioOff;
+
+*)
+
+function SetAudioOff(): boolean;
+var
+  c : integer;
+begin
+  c := CountColor(65536, 725, 463, 760, 498);
+  // 346 = Turned Off Already
+  // 284 = Turned On...
+
+  result := inrange(c, 340, 350);
+  if result then
+    exit
+  else
+    Mouse(742, 481, 10, 10, mouse_left);
 end;
 
 (*
@@ -139,7 +187,7 @@ Useful for waiting until RS has fully loaded.
 .. note::
 
     by ZephyrsFury
-    Last modified 28/02/2013 By Justin
+    Last modified 28/02/2013 By Ashaman88/Le Jingle/Justin
 
 Example:
 
@@ -149,369 +197,32 @@ Example:
       SleepAndMoveMouse(100 + Random(500));
 
 *)
-function RSReady: Boolean;
-begin
-  Result := (LoggedIn) or (LobbyScreen);
-  if (not Result) then
-    Result := (GetColor(21, 486) = 16777215); // 'C' in 'Click to switch'.
-end;
 
-(*
-Login_SetAudio
-~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure Login_SetAudio(Volume, SFX, Area: Integer; SMSetting: TSMSetting);
-
-Sets audio options through the login screen.
-Use: Enter the desired Setting for the desired Option. Make option 0 for no change.
-
-.. note::
-
-    by ZephyrsFury, fixed by Markus
-
-Example:
-
-.. code-block:: pascal
-
-    Login_SetAudio(1, 5, 2, NoChange);
-
-*)
-procedure Login_SetAudio(Volume, SFX, Area: Integer; SMSetting: TSMSetting);
+function RSReady: boolean;
 var
-  II, Tx, Ty, T, AudioMask,x,y: Integer;
-  Pts: TIntegerArray;
+  t : integer;
 begin
-  if (LoggedIn) then Exit;
-  AudioMask := BitmapFromString(28, 3, 'beNrLyMAKGBgYJ85Y' +       //gfx slice but too lazy
-       'dOfmw4VrdgPZaFJAdOniSSDacug8miwuAFSWWVAJVL9kzWqgsUA2X' +   // to fuck this entire function around
-       'CPENKBUZXs3BBFjJsRAoPPguoAOhhsLJCEGerjZQRxsbaaFbgQAUH' +
-       'JlGA==');
-  TypeByte(vk_Escape);
-  T := GetSystemTime;
-  while (not(FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10))) and (GetSystemTime - T < 5000) do
-    Wait(100);
-  if (FindBitmapToleranceIn(AudioMask, X, Y, 717, 458, 760, 498, 10)) then
-    Mouse(X, Y, 20, 20, mouse_left)
-  else
+  Result := (LoggedIn);
+  if result then
+    exit;
+
+  if not Result then
   begin
-    FreeBitmap(AudioMask);
-    Exit;
-  end;
-  Wait(100);
-  Pts := [Volume, SFX, Area];
-  for II := 0 to 2 do
-  begin
-    if (Pts[II] = 0) then Continue;
-    if (not(InRange(Pts[II], 0, 5))) then
+    t := GetSystemTime() + 120000;
+    while GetSystemTime < t do
     begin
-      srl_Warn('Login_SetAudio', 'Points must be between 0 and 5', warn_AllVersions);
-      Continue;
-    end;
-    if Pts[II] = 1 then Tx:=32 else
-    //Tx := 337 + Round((425 - 337) * (Pts[II] - 1) / 4);
-    Tx := 319 * (PTS[II] - 1) * 32; //why do hard if we can do easy -.-
-    Ty := round(II * 22.5) + 397; { I THINK this is the formula, but I don't care. }
-    { Ty := //Round(3.5 * II * II + 46.5 * II + 245);}
-    if (GetColor(Tx, Ty) = 1315860) then
-      Mouse(Tx - 10, Ty - 0, 10, 5, mouse_left);    {bit of randomness never hurts }
-    Wait(50);
-  end;
-  if (GetColor(527, 433) = 4473924) and (SMSetting = Mono) then   //if set at stereomode
-    Mouse(527, 433, 10, 10, mouse_left)
-  else
-  if (GetColor(527, 411) = 499676) and (SMSetting = Stereo) then
-    Mouse(527, 411, 10, 10, mouse_left);
-  Wait(100);
-  TypeByte(vk_Escape);
-  FreeBitmap(AudioMask);
-end;
-
-(*
-Login_SetGraphics
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure Login_SetGraphics(Brightness: Integer);
-
-Sets graphic options in the login screen.
-
-.. note::
-
-    by ZephyrsFury, fixed by Markus
-
-Example:
-
-.. code-block:: pascal
-
-    Login_SetGraphics(4);
-
-*)
-procedure Login_SetGraphics(Brightness: Integer);
-var
-  T, x, y, tx, ty, graphicsslice, i: Integer;
-  P: TPoint;
-begin
-  if (LoggedIn) then Exit;
-  graphicsslice := BitmapFromString(28, 3, 'beNrLyMAKGBgYJ85Y' +
-       'dOfmw4VrdgPZaFJAdOniSSDacug8miwuAFSWWVAJVL9kzWqgsUA2X' +
-       'CPENKBUZXs3BBFjJsRAoPPguoAOhhsLJCEGerjZQRxsbaaFbgQAUH' +
-       'JlGA==');
-  TypeByte(vk_Escape);
-  T := GetSystemTime;
-  while (not(FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498,10))) and (GetSystemTime - T < 5000) do
-    Wait(100);
-  if (FindBitmapToleranceIn(graphicsslice, X, Y, 717, 458, 760, 498, 10)) then
-    Mouse(X, Y, 20, 20, mouse_left)
-  else
-  begin
-    FreeBitmap(graphicsslice);
-    Exit;
-  end;
-  Wait(100);
-  if not (GetColor(340, 115) = SM_Color) then
-  for i := 0 to 2 do
-  begin
-    //Checks for the green arrow, clicks middle of box
-    Mouse(260, 162, 5, 5, mouse_left);
-    if WaitColor(340, 115, SM_Color, 0, 2000) then
-      Break;
-    if i = 2 then
-    begin
-      srl_Warn('SetGraphics', 'Failed to select Safe Mode', warn_Warning);
-      Exit;
-    end;
-  end;
-  if (Brightness > 4) then
-    srl_Warn('Login_SetGraphics', 'Brightness must be between 0 and 4', warn_AllVersions)
-  else
-  if (Brightness <> 0) then
-  begin
-    x := 0;
-    repeat
-      P := Point(328 + (Brightness-1) * 32, 222);//coords of some thing
-      if (GetColor(P.x, P.y) = 1315860) then
+      Result := (GetColor(31, 488) = 16777215);
+      if result then
       begin
-        Mouse(P.x, P.y, 3, 3, mouse_left);
-        if WaitColor(P.x, P.Y, 3976149, 1, 1000) then
-          break;
-        Inc(x);
-      end else
-        break;
-    until(x >= 5)
-  end;
-  repeat
-    if FindColor(x, y, 14790912, 361,234, 673,373) then  //wtf is this
-    begin
-      Mouse(x + 10, y + 3, 10, 7, mouse_left);
-      getmousepos(tx, ty);
-      Mouse(tx, ty + 10, 4, 4, mouse_left);
-      wait(300);
-    end;
-  until(not(FindColor(x, y, 14790912, 361,234, 673,373)));
-  Wait(100);
-  TypeByte(vk_Escape);
-  FreeBitmap(graphicsslice);
-end;
-
-(*
-SetAudioOff
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SetAudioOff;
-
-Sets the Audio to off (1 for each bar). Works logged in and out.
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-    // sounds are annoying, let's turn them off
-    setAudioOff();
-*)
-procedure SetAudioOff;
-begin
-  if (LoggedIn) then
-    SetAudio(1, 1, 1, NoChange)
-  else
-    Login_SetAudio(1, 1, 1, NoChange);
-end;
-
-(*
-SetAutoingDefaults
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure SetAutoingDefaults;
-
-Sets the graphic options for best SRL compatibility. Works both logged in and out.
-
-.. note::
-
-    by ZephyrsFury
-
-Example:
-
-.. code-block:: pascal
-
-    procedure SetupScript();
-    begin
-      SetAutoingDefaults(); // set the graphics options appropriately
-    end;
-
-*)
-procedure SetAutoingDefaults;
-begin
-  if (LoggedIn) then
-    FixGraphics
-  else
-    Login_SetGraphics(4);
-end;
-
-(*
-ValidEmail
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ValidEmail: Boolean;
-
-Recognizes and handles the "Validate Email" screen in RS.
-
-.. note::
-
-    by NCDS
-
-Example:
-
-.. code-block:: pascal
-
-    if not ValidEmial then
-      writeLn('Failed to get past verification screen');
-
-*)
-function ValidEmail: Boolean;
-begin
-  while (getColor(473, 418) = 1001495) do
-  begin
-    //writeln('found email screen');
-    MouseBox(502, 424, 548, 435, mouse_left);
-    waitFunc(@lobbyScreen, 75, 3000);
-  end;
-  result := lobbyScreen;
-end;
-
-(*
-ExitToLobby
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ExitToLobby: Boolean;
-
-Exits to the Lobby (for breaks?)
-
-.. note::
-
-    by Starblaster100, Raymond, IceFire908, & Tarajunky
-
-Example:
-
-.. code-block:: pascal
-
-    // world switch!
-    if (ExitToLobby()) then
-      SelectWorld(20); // parameters here may be inaccurate
-
-*)
-function ExitToLobby: Boolean;
-var
-  x, y, c, i: Integer;
-begin
-  Result := LobbyScreen;
-  if Result = True then
-    Exit;
-  if SRL_HasProc(srl_OnExitToLobby) then
-    SRL_Procs[srl_OnExitToLobby]();
-  if (not (GameTab(tab_LogOut))) then
-    Exit;
-  Wait(200 + Random(100));
-  while (LoggedIn) and (c < 10) do
-  begin
-    Inc(c);
-    if(FindText(x, y, 'obb', UpCharsEx, MIX1, MIY1, MIX2, MIY2))then
-    begin
-      MouseBox(566, 346, 715, 373, mouse_left);
-      for i := 0 to 10 do
-      begin
-        Wait(1000);
-        if (not LobbyScreen) then
-          if validEmail then
-          begin
-            Result := True;
-            Exit;
-          end;
+        SetAudioOff();
+        exit;
       end;
-    end else
-    if(FindText(x, y, 'lick', UpCharsEx, MIX1, MIY1, MIX2, MIY2))then
-    begin
-      MouseBox(579, 367, 699, 386, mouse_left);
-      for i := 0 to 10 do
-      begin
-        Wait(1000);
-        if not(LoggedIn) then
-        begin
-          Result := True;
-          Exit;
-        end;
-      end;
-    end
+      wait(20+random(10));
+    end;
   end;
-end;
 
-(*
-LeaveLobby
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function LeaveLobby: Boolean;
-
-Logs you out from lobby screen.
-
-.. note::
-
-    by IceFire908
-
-Example:
-
-.. code-block:: pascal
-
-    if (LobbyScreen()) then
-      if (not LeaveLobby()) then
-        WriteLn('Oh no, we didn''t make it out of the Lobby Screen.');
-
-*)
-function LeaveLobby: Boolean;
-var
-  T: LongInt;
-begin
-  T := GetSystemTime;
-  while ((not (Result)) and ((GetSystemTime - T) < 30000)) do
-  begin
-    MouseBox(678, 24, 699, 43, mouse_left);
-    Wait(RandomRange(1000, 2000));
-    Result := (not (LobbyScreen));
-  end;
+  Writeln('Could not start up Old School RuneScape or RSReady was not detected!');
+  TerminateScript;
 end;
 
 (*
@@ -526,7 +237,7 @@ Logs you all the way out from ingame.
 
 .. note::
 
-    by Starblaster100, Raymond, IceFire908, Tarajunky & NCDS
+    by Ashaman88/Justin/Le Jingle
 
 Example:
 
@@ -537,42 +248,9 @@ Example:
 
 *)
 function Logout: Boolean;
-var
-  x, y, c, i: Integer;
 begin
-  SRL_ExitedSquealOfFortune := false;
-
-  Result := (not (LoggedIn));
-  if (Result) then
-    Exit;
-  if SRL_HasProc(srl_OnLogOut) then
-    SRL_Procs[srl_OnLogOut]();
-  if (not (GameTab(tab_LogOut))) then
-  begin
-    CloseWindow();
-    if (not (GameTab(tab_LogOut))) then
-      Exit;
-  end;
-  Wait(200 + Random(100));
-  while (LoggedIn) and (c < 10) do
-  begin
-    Inc(c);
-    if(FindText(x, y, 'ogin', UpCharsEx, MIX1, MIY1, MIX2, MIY2))then
-      MouseBox(569, 393, 713, 418, mouse_left)
-    else
-      if(FindText(x, y, 'lick', UpCharsEx, MIX1, MIY1, MIX2, MIY2))then
-        MouseBox(569, 349, 713, 375, mouse_left);
-
-    for i := 0 to 10 do
-    begin
-      Wait(1000);
-      if not(LoggedIn) then
-      begin
-        Result := True;
-        Exit;
-      end;
-    end;
-  end;
+  writeln('TODO: function Logout: Boolean; login.simba');
+  result := false;
 end;
 
 (*
@@ -598,32 +276,18 @@ Example:
       LoginPlayerToLob(); // try again!
 
 *)
-function LoginPlayerToLob: Boolean;
+function LoginPlayerToLob: Boolean;  //TODO: Make this function check for "Error Messages" (Acc Disabled/Error connecting)
 var
-  RetryLogin: Boolean;
-  typtmp, t, w: integer;
-  Actions: TVariantArray;
-  Attempts: LongInt;
-  p: TPoint;
-  //ATPA: T2dPointArray;
+  c, t, w, typtmp : integer;
+  foundLogin : boolean;
+  p : TPoint;
   TPA: TPointArray;
   Boxes : TIntegerArray;
-  //B: TBox;
-label
-  ProcStart;
 begin
   ActivateClient;
-  Wait(100);
-  TypeByte(vk_Escape);
-  Wait(500);
-
-         {Check for lobby screen already open/ already logged in}
-
   Result := ((LobbyScreen) or (LoggedIn));
   if (Result) then
     Exit;
-
-                       {Check for active player.}
 
   if (not (Players[CurrentPlayer].Active)) then
   begin
@@ -636,8 +300,6 @@ begin
     NextPlayer(False);
     Exit;
   end;
-
-               {Wait for the client to finish loading.}
 
   T := GetSystemTime;
   repeat
@@ -652,74 +314,39 @@ begin
   until (False);
   WriteLn('Welcome to Runescape.');
 
-
-                   {New graphics have changed box}
-  Case CountColor(LOGIN_TEXTCOLOUR, 198, 192, 567, 259) of
-    1079: MouseBox(347, 295, 414, 303, mouse_left);
-    1745: MouseBox(347, 305, 414, 312, mouse_left); { "Available graphics options have been changed..." }
-    1801: MouseBox(347, 305, 414, 312, mouse_left); { "There was a problem with your current graphics settings..." }
-  end;
-
-                   {Click less info if needed.}
-  {
-  if (not (SimilarColors(GetColor(382, 11), 14285562, 20))) then //Runescae sword green bead
-  begin
-    MouseBox(212, 479, 550, 495, 1); //Less info button
-    Wait(RandomRange(1000, 2000));
-  end;
-  }
-                      {Click Members/free.}
-
-  {Members := Players[CurrentPlayer].Member;
-  if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
-    Members := Players[CurrentPlayer].WorldInfo[0];  }
-
-  ProcStart:
-
-  {if (Members) then
-    I := 1;
-
-  if (GetColor(248, 359) <> 1381653) then //Black outline on forgotten pwd button.
-  begin
-    FindColors(TPA, 9291999, 10, 370, 675, 475);
-    ATPA := SplitTPA(TPA, 4);
-    if (Length(ATPA) > 2) then
-    begin
-      if (I = 1) then
-        I := 0
-      else
-        I := 1;
-      B := GetTPABounds(ATPA[1 + I]); //If demo mode is still up
-    end
-    else
-      if (Length(ATPA) = 2) then
-        B := GetTPABounds(ATPA[0 + I]) //When there's no demo mode
-      else
-        B := IntToBox(210, 424, 367, 446);
-
-    with B do
-      MouseBox(X1 + 20, Y1 + 10, X2 - 20, Y2 + 8, 1);
-
-    T := GetSystemTime;                  //Black outline on forgotten pwd button.
-    while ((GetSystemTime - T < 3000) and (GetColor(248, 359) <> 1381653)) do
-      Wait(RandomRange(100, 200));
-
-  end;    }
-
-                       {Type in username and pass}
-
   if (loggedIn) then
     exit;
 
-  for W:= 0 to 1 do
+  // click 'Existing User'
+  MouseBox(EUX1, EUY1, EUX2, EUY2, mouse_left);
+  t := GetSystemTime() + 60000;
+  while GetSystemTime < t do
+  begin
+    c := CountColor(65535, 238, 215, 526, 230);
+    if c > 1 then
+    begin
+      foundLogin := true;
+      break;
+    end;
+    wait(500 + random(500));
+  end;
+  if not FoundLogin then
+  begin
+    writeln('Unable to detect login interface!');
+    exit;
+  end;
+
+  for W := 0 to 1 do
   begin
     if W = 0 then
-      Boxes:= [UBX1, UBY1, UBX2, UBY2]
+      Boxes := [UBX1, UBY1, UBX2, UBY2]
     else
-      Boxes:= [PBX1, PBY1, PBX2, PBY2];
+      Boxes := [PBX1, PBY1, PBX2, PBY2];
 
     t := (getSystemTime + (60000 * 2));
+
     FindColors(TPA, LOGIN_TEXTCOLOUR, Boxes[0], Boxes[1], Boxes[2], Boxes[3]);
+
     repeat
       if (Length(TPA) > 0) then
       begin
@@ -743,124 +370,42 @@ begin
     until(not FindColors(TPA, LOGIN_TEXTCOLOUR, Boxes[0], Boxes[1], Boxes[2], Boxes[3]) or (getSystemTime > t));
 
     Wait(100 + Random(200));
+
     if W = 0 then
     begin
       WriteLn(Capitalize(Players[CurrentPlayer].Name));
       TypeSend(Players[CurrentPlayer].Name);
     end else
-      TypeSend(Players[CurrentPlayer].Pass);
-    Wait(800 + Random(50));	//Should fix the Login -> Spam Recoveries bug
+      TypeSendEx(Players[CurrentPlayer].Pass, False);
+
   end;
+
+  MouseBox(GBx1, GBy1, GBx2, GBy2, mouse_left);
 
                         {Check responses}
 
   T := GetSystemTime;
   repeat
-    // so the lobby appears (gets rid of black screen)
-    if (countColorTolerance(clBlack, 0, 0, 500, 500, 20) > 245000) then
-    begin
-      wait(2000 + random(1500));
-      mouseBox(0, 0, 750, 490, mouse_Move);
-    end;
-    result := validEmail;  // To handle "Validate Email" screen
+    result := lobbyScreen or loggedin;
     if result then
       break;
 
-    SetLength(Actions, 0);
-
-    if ((GetSystemTime - T) > 60000) then
-      Actions :=       ['One minute has passed... Debug: ' + ToStr(CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)),              0,    5,    'PlayerFalse',   'Login Failed']
-    else
-    case (CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)) of //text colour points
-                        // WriteLn Error                  Wait for   Retrys     Action      Player[CurrentPlayer].Loc
-      763, 2348, 2299:
-            Actions := ['Invalid Username / Password',           0,    2,    'PlayerFalse',   'Wrong User/Pass'];
-      1088: Actions := ['Your account has been disabled',        0,    0,    'PlayerFalse',   'Acc Disabled'];
-       951: Actions := ['Your account is already logged in',  5000,    5,    'PlayerTrue',    'Already logged in'];
-      1239: Actions := ['Not a Members Account',                 0,    1,    'PlayerTrue',    ''];
-       364: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];
-      1057: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',   'Too many logins'];
-       732: Actions := ['Runescape has been updated.',           0,    0,    'RSUpdate',      'RS Updated'];
-       591: Actions := ['Client token changed.',                 0,    0,    'RSUpdate',      'Client Token Changed'];
-      1606: Actions := ['Game session expired.',                 0,    0,    'RSUpdate',      'Session Expired'];
-       777: Actions := ['Login limit exceeded.',             20000,   10,    '',              'Waiting for login.'];
-    end;
-                             {Respond}
-
-    if (Length(Actions) > 0) then
+    if (GetSystemTime - t > 60000) then
     begin
-      WriteLn(Actions[0]);
-      if (Actions[0] <> 'Not a Members Account') then
-      begin
-        Wait(1000 + Random(500));
-        TypeByte(vk_Escape);
-      end;
-      Wait(Actions[1] + Random(100));
-      if (Actions[2] <> 0) then
-        if (Attempts < Actions[2]) or (Actions[2] = -1) then
-        begin
-          if (Actions[0] = 'Not a Members Account') then
-          begin
-            Players[CurrentPlayer].Member := False;
-            if (Length(Players[CurrentPlayer].WorldInfo) > 0) then
-              Players[CurrentPlayer].WorldInfo[0] := False;
-            MouseBox(267, 321, 496, 350, mouse_left); //Play free game instead button
-            Wait(3000 + Random(2000));
-            Result := True;
-            Exit;
-          end;
-          RetryLogin := True;
-          Wait(2000 + Random(1000));
-          Break;
-        end;
-      if (Actions[4] <> '') then
-        Players[CurrentPlayer].Loc := Actions[4];
-      case Actions[3] of
-        'PlayerFalse': NextPlayer(False);
-
-        'PlayerTrue':
-          begin
-            LeaveLobby();
-            NextPlayer(True);
-          end;
-
-        'Terminate': TerminateScript;
-
-        'RSUpdate':
-          begin
-            if SRL_HasProc(srl_OnRSUpdate) then
-            begin
-              case actions[0] of
-                'Runescape has been updated.':
-                  begin
-                    Writeln('Runescape has been updated! Waiting 5 minutes to restart SMART!');
-                    Wait(300000);
-                  end;
-              end;
-              SRL_Procs[srl_OnRSUpdate]();
-              Exit;
-            end;
-            Writeln('Runescape has been updated! Please restart Simba.');
-            TerminateScript;
-          end;
-      end;
-      Exit;
+      result := false;
+      writeln('failed logging into lobby');
+      exit;
     end;
-    Wait(100);
-    Result := (LobbyScreen) or (LoggedIn);
+
+    // so the lobby appears (gets rid of black screen)
+    if not lobbyScreen then
+    begin
+      wait(1000+random(1000));
+      continue;
+    end;
   until (Result);
 
   TakeIPScreen();
-
-                     {Back to main screen if needed}
-
-  if (RetryLogin) then
-  begin
-    RetryLogin := False;
-    Inc(Attempts);
-    goto ProcStart;
-  end;
-
 end;
 
 (*
@@ -871,7 +416,7 @@ LoginPlayer
 
     function LoginPlayer: Boolean;
 
-Logs in the Player[CurrentPlayer]. Detects most Client Login Errors
+Logs in the Player[CurrentPlayer].
 
 .. note::
 
@@ -888,181 +433,37 @@ Example:
     end;
 
 *)
-function LoginPlayer: Boolean;
+function LoginPlayer : boolean;
 var
-  RetryLogin: Boolean;
-  Actions: TVariantArray;
-  T, Attempts: LongInt;
-label
-  ProcStart;
+  t : integer;
 begin
-  ProcStart:
+  result := LoggedIn;
 
-  if (not (Result)) then    {Check if Logged in}
-    Result := LoggedIn;
-
-  if (Result) then
+  if result then
   begin
-    Result := True;
     AddToSRLLog('Current player: ' + Capitalize(Players[CurrentPlayer].Name));
-    SRL_ExitedSquealOfFortune := false;
     PlayerStartTime := GetSystemTime; // PlayerStartTime
     if SRL_HasProc(srl_OnLogIn) then
       SRL_Procs[srl_OnLogIn]();
 
     Exit;
   end;
-
-  if (not (LoginPlayerToLob)) then    {Get to lobby screen}
-    Exit;
-
   Wait(500 + Random(500));
-                           {World switching}
 
-  if Length(Players[CurrentPlayer].WorldInfo) > 0 then
-    if VariantIsBoolean(Players[CurrentPlayer].WorldInfo[0]) then
-      Players[CurrentPlayer].Member:= Players[CurrentPlayer].WorldInfo[0];
+  LoginPlayerToLob;
 
-  case Length(Players[CurrentPlayer].WorldInfo) of
-    1:
-      if VariantIsInteger(Players[CurrentPlayer].WorldInfo[0]) then
-        SelectWorld(Players[CurrentPlayer].WorldInfo[0]);
-
-    2:
-      SelectWorld(Players[CurrentPlayer].WorldInfo[1]);
-
-    3:
-      if (Players[CurrentPlayer].WorldInfo[1] = 0) then
-        SelectWorld(RandomWorld(Players[CurrentPlayer].WorldInfo[0], Players[CurrentPlayer].WorldInfo[2]))
-      else
-        SelectWorld(Players[CurrentPlayer].WorldInfo[1]);
-  end;
                           {Click Here to Play}
-
   if (LobbyScreen) then
-    MouseBox(270, 450, 490, 470, mouse_left);
+    MouseBox(WDx1, WDy1, WDx2, WDy2, mouse_left);
 
-                            {Check responses}
-
-  T := GetSystemTime;
-  repeat
-
-    SetLength(Actions, 0);
-    if ((GetSystemTime - T) > 60000) then
-      Actions :=       ['One minute has passed...  Debug: ' + ToStr(CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)),                    0,     0,  'NextPlayer',   'Login Failed']
-    else
-    case (CountColor(LOGIN_TEXTCOLOUR, 260, 140, 510, 400)) of //text colour points
-                        // WriteLn Error                          Wait for   Retrys  Action     Player[CurrentPlayer].Loc
-       364: Actions := ['Error Connecting.',                       20000,     9,  'Terminate',    'Error Connecting'];
-       850: Actions := ['You need skill total of 1000.',               0,     9,  'PlayerTrue',   '1000 skill club'];
-      1028: Actions := ['You are standing in a members-only area.',    0,     1,  'PlayerFalse',  'In Mems-Only Area'];
-      1239: Actions := ['Not a Members Account',                       0,     1,  'PlayerFalse',  'Non-member'];
-	     777: Actions := ['Login limit exceeded.',                       0,     10, '',             'Waiting for login.'];
-       951: Actions := ['Your account is already logged in',        5000,     5,  'PlayerTrue',   'Already logged in'];
-       591: Actions := ['Client token changed.',                       0,     0,    'RSUpdate',   'Client Token Changed'];
-      1606: Actions := ['Game session expired.',                       0,     0,    'RSUpdate',   'Session Expired'];
-        -1: Actions := ['You need skill total of 1500.',               0,     9,  'PlayerTrue',   '1500 skill club'];
-        -1: Actions := ['You need 20 combat for PvP',                  0,     1,  'PlayerFalse',  'PvP warning'];
-    end;
-
-    if (CountColor(clWhite, 415, 336, 476, 356) = 82) then // HRW login button white colour points
-    begin
-      Wait(RandomRange(500, 1000));
-      if (Length(Players[CurrentPlayer].WorldInfo) > 2) then
-      begin
-        if (Players[CurrentPlayer].WorldInfo[2]) then
-          MouseBox(391, 361, 498, 383, mouse_left)
-        else begin
-          MouseBox(263, 362, 372, 383, mouse_left);
-          Players[CurrentPlayer].WorldInfo := [False, 0, AllowPVP];
-          RetryLogin := True;
-          Break;
-        end;
-      end
-      else
-        if (AllowPVP) then
-          MouseBox(391, 361, 498, 383, mouse_left)
-        else
-          MouseBox(263, 362, 372, 383, mouse_left);
-      Wait(3000 + Random(2000));
-      RetryLogin := true;
-    end;
-
-                             {Respond}
-
-    if (Length(Actions) > 0) then
-    begin
-      WriteLn(Actions[0]);
-      Wait(Actions[1] + Random(100));
-      if (Actions[2] <> 0) then
-        if (Attempts < Actions[2]) or (Actions[2] = -1) then
-        begin
-          case Actions[0] of
-            'You are standing in a members-only area.': begin
-                                                          Players[CurrentPlayer].Member := True;
-                                                          Players[CurrentPlayer].WorldInfo := [True, 0, AllowPVP];
-                                                        end;
-            'You need 20 combat for PvP': Players[CurrentPlayer].WorldInfo := [Players[CurrentPlayer].Member, 0, False];
-            'Not a Members Account': begin
-                                       Players[CurrentPlayer].Member := False;
-                                       Players[CurrentPlayer].WorldInfo := [False, 0, AllowPVP];
-                                     end;
-		       	'Login limit exceeded.': begin
-											                 Writeln('Runescape is lagging or we''re logged in too many times.  Keep trying!');
-                                       Players[CurrentPlayer].WorldInfo := [players[currentPlayer].member, 0, AllowPVP];
-                                       Wait(5000+Random(10000));
-											               end;
-            'You need skill total of 1000.': players[currentPlayer].worldInfo := [players[currentPlayer].member, 0, allowPVP];
-          end;
-          RetryLogin := True;
-          Wait(2000 + Random(1000));
-          Break;
-        end;
-      if (Actions[4] <> '') then
-        Players[CurrentPlayer].Loc := Actions[4];
-      case Actions[3] of
-        'PlayerFalse': NextPlayer(False);
-        'PlayerTrue':
-          begin
-            LeaveLobby();
-            NextPlayer(True);
-          end;
-        'Terminate': TerminateScript;
-        'RSUpdate':
-          begin
-            wait(randomRange(1000, 1500));
-            typeByte(VK_ESCAPE);
-            leaveLobby();
-
-            if SRL_HasProc(srl_OnRSUpdate) then
-            begin
-              SRL_Procs[srl_OnRSUpdate]();
-              Exit;
-            end;
-            Writeln('Runescape has been updated! Please restart Simba.');
-            TerminateScript;
-          end;
-      end;
-      Exit;
-    end;
-    Wait(100);
-    Result := (LoggedIn);
-  until (Result);
-
-                     {Back to lobby screen if needed}
-
-  if (RetryLogin) then
+  T := GetSystemTime + 60000;
+  while GetSystemTime < t do
   begin
-    RetryLogin := False;
-    Inc(Attempts);
-    goto ProcStart;
+    result := loggedin;
+    if result then
+      break;
+    wait(100+random(300));
   end;
-
-                      {Set player start time ect...}
-
-  if (Result) then
-    goto ProcStart;
-
 end;
 
 (*
@@ -1283,8 +684,6 @@ Example:
     CheckUserNicks();
 
 *)
-
-
 procedure CheckUserNicks;
 var
   I, II: Integer;

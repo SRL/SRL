@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------//
 //--               SRL Resource Library                          --//
-//--               » arrayLoader                                 --//
+//--               ? arrayLoader                                 --//
 //-----------------------------------------------------------------//
 // * function strToTPtArrayEx(tPtStr, Separater: string): TPointArray; // by moparisthebest, modified by Ron
 // * function strToTPtArray(tPtStr: string): TPointArray;          // by moparisthebest, modified by Ron

@@ -151,6 +151,7 @@ procedure tmp_TPAFromLineWrap(const x1, y1, x2, y2: Integer; var Res: TPointArra
 begin
   Res := tmp_TPAFromLine(x1, y1, x2, y2);
 end;
+
 {$ifdef Simba}
 
 //{$define SimbaDebug}
@@ -158,6 +159,7 @@ type
   TDTMPointDef = TSDTMPointDef;
   TDTMPointDefArray = TSDTMPointDefArray;
   TDTM = TSDTM;
+
 function AddDTM(DTM : TDTM) : integer;
 begin
   Result := AddSDTM(dtm);
@@ -482,6 +484,7 @@ function Readln(Question : string ) : string;
 begin
   InputQuery('Question box',Question,result);
 end;
+
 const
   NPCChars = CharsNPC;
 {$endif}
