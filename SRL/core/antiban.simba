@@ -895,7 +895,8 @@ Hovers a random online friend (if any are online)
 
 .. note::
 
-    Author: Ollybest
+    by DannyRS, for oldschool
+    based off original by Ollybest
 
 Example:
 
@@ -906,47 +907,45 @@ Example:
 *)
 procedure HoverOnlineFriend;
 var
-  x, y, i, S, L, clOffline, t: Integer;
+  X, Y, I, S, L, LastTab: Integer;
   OnlineSlots: TIntegerArray;
   Slots: TBoxArray;
-  TPA: TPointArray;
-  B: TBox;
 begin
-  if not (LoggedIn) then
-    Exit;
+  if not (LoggedIn) then Exit;
 
-  // color of offline friend - could change oneday
-  clOffline := 4087005;
-  t := GetCurrentTab;
-  Gametab(Tab_Friends);
+  LastTab := GetCurrentTab;
+  if not (Gametab(Tab_Friends)) then Exit;
 
-  // scrolling back to the top if needed
-  if GetColor(728, 311 - 50) <> 3646433 then
+  // clicking scroll bar back to the top if needed
+  if (not (GetColor(718, 246) = 65536)) then
   begin
-    if FindColorsTolerance(TPA, 3845615, 723, 306-50, 734, 478-50, 6) then
-      B := GetTPABounds(TPA)
-    else  //failsafe incase color oneday changes
-      Exit;
-    DragMouseTBox(B, IntToBox(724, 280-50, 734, 304-50));
+    MouseBox(720,248,730,264,mouse_left);
+    Wait(150 + Random(200));
   end;
 
   //possible slots
-  Slots := Grid(1, 13, 166, 9, 5, 15, Point(633, 305 - 50));
+  SetLength(Slots,12);
+  for I:=0 to 11 do
+    Slots[I] := IntToBox(556, 231+(I*15), 711, 246+(I*15));
 
-  for i := 0 to High(Slots) do
-    if not FindColor(X, Y, clOffline, Slots[i].X1, Slots[i].Y1, Slots[i].X2, Slots[i].Y2) then
-      begin
-        SetLength(OnlineSlots, Length(OnlineSlots) + 1);
-        OnlineSlots[L] := i;
-        Inc(L);
-      end;
+  for I := 0 to 11 do
+    if FindColor(X, Y, 65535, Slots[i].X1, Slots[I].Y1, Slots[I].X2, Slots[I].Y2) then
+    begin
+      SetLength(OnlineSlots, Length(OnlineSlots) + 1);
+      OnlineSlots[L] := I;
+      Inc(L);
+    end;
 
   if Length(OnlineSlots) < 1 then
+  begin
+    Wait(150 + Random(200));
+    GameTab(LastTab);
     Exit;
+  end;
 
   S := OnlineSlots[Random(Length(OnlineSlots))];
-  MMouse(RandomRange(Slots[S].X1, Slots[S].X2),
-         RandomRange(Slots[S].Y1, Slots[S].Y2), 0, 0);
+  MMouse(RandomRange(Slots[S].X1+2, Slots[S].X2-84),
+         RandomRange(Slots[S].Y1+2, Slots[S].Y2-2), 0, 0);
 
   if (RBool) then
     if WaitUpText('essage', 200 + Random (100)) then
@@ -954,8 +953,8 @@ begin
       ClickMouse2(Mouse_Right);
       WaitOption('ancel', 400 + Random(100));
     end;
-  Wait(RandomRange(300, 900));
-  GameTab(t);
+  Wait(RandomRange(700, 1500));
+  GameTab(LastTab);
 end;
 
 procedure HoverMovingObject;
