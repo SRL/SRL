@@ -679,7 +679,7 @@ const
 (*
 
 SkillBoxCoords
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -705,7 +705,7 @@ end;
 (*
 
 SkillBoxCoords
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -859,7 +859,7 @@ end;
 (*
 
 SkillToPoint
-~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1249,7 +1249,7 @@ Gametab 5 related functions
 
 (*
 GetEquippedItemBounds
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1559,7 +1559,7 @@ Gametab 7 related functions
 
 (*
 CastSpellByNumber
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1723,7 +1723,7 @@ end;
 
 (*
 GetRunEnergy
-~~~~~~~~~
+~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1790,7 +1790,7 @@ Const
 
 (*
 SetBrightness
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1828,7 +1828,7 @@ end;
 
 (*
 SetVolumeMusic
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1866,7 +1866,7 @@ end;
 
 (*
 SetVolumeSoundEffect
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1904,7 +1904,7 @@ end;
 
 (*
 SetVolumeAreaSoundEffect
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1942,7 +1942,7 @@ end;
 
 (*
 ToggleNumberOfMouseButtons
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -1984,7 +1984,7 @@ end;
 
 (*
 ToggleChatEffects
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -2026,7 +2026,7 @@ end;
 
 (*
 ToggleSplitPrivateChat
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -2068,7 +2068,7 @@ end;
 
 (*
 ToggleAcceptAid
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
