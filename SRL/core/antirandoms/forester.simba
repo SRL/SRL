@@ -120,7 +120,7 @@ begin
       end;
 
     wait(500 + random(300));
-    clickContinue(true, true);
+    clickContinue(true);
   end;
 
   // simply for debugging purposes

@@ -196,7 +196,7 @@ begin
     if (waitFunc(@areTalking, 50, 4000)) then
       for i := 1 to 4 do // click through 4 dialogs
       begin
-        clickContinue(true, true);
+        clickContinue(true);
         wait(300 + random(200));
         result := true;
       end;
@@ -243,7 +243,7 @@ begin
     addToSRLLog('DB_GetStatue: Didn''t identify statue');
 
   wait(1500 + random(500));
-  clickContinue(true, true); // need to do this whether or not it fails
+  clickContinue(true); // need to do this whether or not it fails
 end;
 
 function _Callback_EB_GetFish: Boolean;

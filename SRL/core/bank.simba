@@ -340,7 +340,7 @@ begin
 
     WaitFunc(@BankScreen, 50, 300);
 
-    ClickContinue(True, True);
+    ClickContinue(True);
     while not FindColor(Tx, Ty, 0, 7, 460, 69, 474) do
     begin
       Wait(500);

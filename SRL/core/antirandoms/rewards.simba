@@ -137,7 +137,7 @@ begin
 
     addToSRLLog('RD_SolveXP: Solved experience reward');
     wait(2000 + random(500));
-    clickContinue(true, true);
+    clickContinue(true);
     result := true;
   end;
 end;

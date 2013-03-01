@@ -418,7 +418,7 @@ begin
 
   // handle the GE update message
   if (findNPCChatText('exchan', nothing)) then
-    clickContinue(true, true);
+    clickContinue(true);
 
   for i := 0 to high(SRL_Randoms) do
   begin

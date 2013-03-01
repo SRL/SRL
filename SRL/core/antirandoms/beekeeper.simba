@@ -122,7 +122,7 @@ begin
   // keep clicking continue until the puzzle screen appears
   while (getSystemTime < t) and (not result) do
   begin
-    clickContinue(true, true);
+    clickContinue(true);
 
     // appears if failed or exited screen
     if (findNPCChatText('let', nothing)) then
