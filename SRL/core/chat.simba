@@ -248,12 +248,12 @@ ClickContinue
 
 .. code-block:: pascal
 
-    function ClickContinue(SpaceBar, DoWait: Boolean): Boolean;
+    function ClickContinue(DoWait: Boolean): Boolean;
 
 
 Returns true if the green button in the chat box is found.
-It will SpaceBar if true otherwise will mouse it.  If DoWait = true
-will wait until color count changes.
+It will click with mouse to continue.
+If DoWait = true will wait until color count changes.
 
 .. note::
 
@@ -272,7 +272,7 @@ var
   B: TBox;
   ATPA: T2DPointArray;
 begin
-  if ClickContinueEx(SpaceBar, DoWait) then
+  if ClickContinueEx(true, DoWait) then
   begin
     Result := true;
     Exit;
@@ -323,7 +323,7 @@ Example:
 *)
 function ClickToContinue: Boolean;
 begin
-  Result := ClickContinue(True, False);
+  Result := ClickContinue(False);
 end;
 
 (*
@@ -800,7 +800,7 @@ Example:
 *)
 function GetNPCChatName(): string;
 begin
-  result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, NPCChars07);
+  result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, CharsNPC07);
 end;
 
 (*
@@ -865,14 +865,14 @@ begin
       if (findNPCChatText(resultText, nothing)) then
       begin
         if (clickResult) then
-          clickContinue(true, true);
+          clickContinue(true);
 
         result := true;
         break;
       end;
 
     // break if there's no more conversation
-    if (not clickContinue(true, true)) then
+    if (not clickContinue(true)) then
       break;
 
     wait(100 + random(200));
