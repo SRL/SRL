@@ -48,7 +48,7 @@ begin
   if (not loggedIn()) then
     exit;
 
-  for i := TAB_COMBAT to TAB_OBJECTIVES do
+  for i := TAB_COMBAT to TAB_MUSIC do
     if (tabExists(i)) then
       exit;
 
