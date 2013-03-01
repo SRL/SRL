@@ -72,7 +72,7 @@ Finds Bankscreen. Returns true if Found.
 .. note::
 
     Author: SRL Dev Team
-    Last Modified: Feb. 14th, 2012 by Coh3n
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -97,8 +97,7 @@ Returns true if deposit screen is Found.
 
 .. note::
 
-    Author: Shuttleu
-    Last modified 28/02/2013 By Justin
+    Author: Ashaman88 -07
 
 Example:
 
@@ -374,7 +373,7 @@ Converts a point on the Mainscreen to the point in the Bank.
 .. note::
 
     Author: Wizzup
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -401,7 +400,7 @@ Converts a Bank Point (Row,Col) to Bank Index (spot in bank). (0, 0) = 1
 .. note::
 
     Author: Wizzup?
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -411,7 +410,9 @@ Example:
 *)
 function BankPointToBankIndex(P: TPoint): Integer;
 begin
-  Result := P.Y * 10 + P.X + 1;
+  if p.y=1 then
+    Result := P.X else
+    Result := ((P.Y-1) * 9) + P.X - 1;
 end;
 
 (*
@@ -427,7 +428,7 @@ Converts the Bank Index (spot in bank) to a Bank Point (Row,Col). 1 = (0, 0)
 .. note::
 
     Author: Wizzup?
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -438,7 +439,7 @@ Example:
 function BankIndexToBankPoint(Index: Integer): TPoint;
 begin
   Index := Index - 1;
-  Result := Point((Index mod 10), Floor(Index div 10));
+  Result := Point((Index mod 8), Floor(Index div 9));
 end;
 
 (*
@@ -454,7 +455,7 @@ Converts the Bank Index (spot in bank) to a Mainscreen TPoint of the Index. (Top
 .. note::
 
     Author: Wizzup?
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -464,8 +465,8 @@ Example:
 *)
 function BankIndexToMSPoint(Index: Integer): TPoint;
 begin
-  Index := Index ;
-  Result := Point(38 + (Index mod 9) * 44, 60 + Floor(Index div 9) * 45);
+  Index := Index -1;
+  Result := Point(72 + (Index mod 8) * 48, 54 + Floor(Index div 9) * 44);
 end;
 
 (*
@@ -481,7 +482,7 @@ Converts the Bank Index (spot in bank) to a Mainscreen TBox of the Index.
 .. note::
 
     Author: Wizzup?
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -496,8 +497,8 @@ begin
   P := BankIndexToMSPoint(Index);
   Result.X1 := P.X;
   Result.Y1 := P.Y;
-  Result.X2 := Result.X1 + 35;
-  Result.Y2 := Result.Y1 + 40;
+  Result.X2 := Result.X1 + 38;
+  Result.Y2 := Result.Y1 + 39;
 end;
 
 (*
@@ -539,7 +540,7 @@ Returns the amount of an item in the bank at bank screen coordinates (Row, Col).
 .. note::
 
     Author: Daniel
-    Last Modified: Jan. 03, 2012 by Daniel
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -565,7 +566,7 @@ Returns the amount of an item in the bank at main screen coordinates x, y.
 .. note::
 
     Author: Daniel
-    Last Modified: Jan. 03, 2012 by Daniel
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -591,7 +592,7 @@ Returns a TBox surround Item (1 to 28) in the Deposit Box screen.
 .. note::
 
     Author: ZephyrsFury
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -655,7 +656,7 @@ MouseBankSlot
 .. note::
 
     by Fwd Motion
-    Last Modified: Feb. 09, 2012 by Fwd Motion
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -756,7 +757,7 @@ Deposit
 .. note::
 
     Author: WT-Fakawi/PPLSUQBAWLZ/Stupid3ooo/Town
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -811,16 +812,16 @@ begin
     end;
     if DepositX then
     begin
-      WaitOptionMulti(['Deposit-X', 'Deposit'], 200);
+      WaitOptionMulti(['Store X', 'Store'], 200);
       T := GetSystemTime;
-      while (not FindColor(x, y, 8388608, MCX1, MCY1, MCX2, MCY2)) and (GetSystemTime - T < 3000) do
+      while (not (InRange(CountColor(0, 211, 394, 308, 411), 200, 300))) and (GetSystemTime - T < 3000) do
         Wait(100);
       TypeSend(vType);
     end else if VariantIsInteger(vType) then
-      WaitOptionMulti(['Deposit-' + IntToStr(Integer(vType)), 'Deposit'], 200)
+      WaitOptionMulti(['Store ' + IntToStr(Integer(vType)), 'Store'], 200)
     else
-      if not WaitOptionMulti(['Deposit-All', 'All'], 200) then
-        ChooseOptionMulti(['Deposit' , 'osit']);
+      if not WaitOptionMulti(['Store All', 'All'], 200) then
+        ChooseOptionMulti(['Store' , 'tore']);
     T := GetSystemTime;
     Wait(RandomRange(200, 300));
     repeat
@@ -846,7 +847,7 @@ Withdraws Amount at Column/Row.
 .. note::
 
     Author: Starblaster100, Town, Wizzup? and Narcle, small fixes by r!ch!e & EvilChicken!
-    Last Modified: riwu (19 Jan 2013)
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -861,6 +862,8 @@ var
 begin
   Result := False;
   FixBank;
+  if not bankscreen then
+    exit;
 
   BBox := BankIndexToMSBox(BankPointToBankIndex(Point(Col, Row)));
   GetMousePos(X, Y);
@@ -882,28 +885,23 @@ begin
     Exit;
   end;
 
-  if (Amount = -1) then
+  if (Amount = 0) then
   begin
-    if (WaitOptionMultiEx(['Withdraw-All but', 'l b'], 'All', Nothing, 300)) then
-      Result := ChooseOptionMulti(['Withdraw-All but', 'l b']);
+    if (WaitOptionMultiEx(['Withdraw All', 'w A','All','ll '], 'All', Nothing, 600)) then
+      Result := ChooseOptionMulti(['Withdraw All', 'w A','All','ll ']);
   end else
-    if (Amount = 0) then
-    begin
-      if (WaitOptionMultiEx(['Withdraw-All', 'w-A'], 'All', Nothing, 300)) then
-        Result := ChooseOptionMulti(['Withdraw-All', 'w-A']);
-    end else
-      if (WaitOptionMultiEx(['Withdraw-' + IntToStr(Amount) + ' ', 'w-' + IntToStr(Amount) + ' '], 'All', Nothing, 300)) then
-        Result := ChooseOptionMulti(['Withdraw-' + IntToStr(Amount) + ' ', 'w-' + IntToStr(Amount) + ' ']);
+    if (WaitOptionMultiEx(['Withdraw ' + IntToStr(Amount) + ' ', 'w ' + IntToStr(Amount) + ' '], 'All', Nothing, 300)) then
+      Result := ChooseOptionMulti(['Withdraw ' + IntToStr(Amount) + ' ', 'w ' + IntToStr(Amount) + ' ']);
 
   if (not (Result)) and (Amount > 0) then
   begin
     if (not OptionsExist(['Withdraw', 'ithdraw', 'draw'], False)) then
       MouseBox(BBox.X1 + 5, BBox.Y1 + 5, BBox.X2 - 5, BBox.Y2 - 5, mouse_right);
 
-    if WaitOptionMulti(['Withdraw-X', 'w-X'], 500) then
+    if WaitOptionMulti(['Withdraw X', 'w X', 'X'], 500) then
     begin
        X := GetSystemTime + 10000;
-       while (X >= GetSystemTime) and (not (InRange(CountColor(0, 250, 396, 307, 410), 155, 165))) do
+       while (X >= GetSystemTime) and (not (InRange(CountColor(0, 211, 394, 308, 411), 200, 300))) do
          Wait(50);
        Wait(RandomRange(75, 400));
        TypeSend(IntToStr(Amount));
@@ -925,7 +923,7 @@ Withdraws Amount at Column/Row. Column/Row start at 0. Columns are left/right - 
 .. note::
 
     Author: Starblaster100, Town, Wizzup? and Narcle
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -968,7 +966,7 @@ UpText:
 .. note::
 
     Author: Nava2
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -1050,7 +1048,7 @@ Withdraws an item using WithdrawItemEx, but removes the Index check.
 .. note::
 
     Author: Nava2
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -1079,7 +1077,7 @@ Toggles note withdrawal on or off.
 .. note::
 
     Author: lordsaturn, idea by R1ch
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -1091,8 +1089,8 @@ Example:
 procedure Notes(SwitchOn: Boolean);
 begin
   if BankScreen then
-    if (getColor(225, 302) = 0) xor switchOn then
-      Mouse(228, 306, 10, 10, mouse_left);
+    if (getColor(430, 310) <> 5067345) xor switchOn then
+      MouseBox(385, 307, 437, 318, mouse_left);
 end;
 
 (*
@@ -1108,7 +1106,7 @@ Closes the bank window - Tries twice before exiting
 .. note::
 
     Author: Starblaster100
-    Last Modified: Unknown
+    Last Modified: Ashaman88 -07
 
 Example:
 
@@ -1126,7 +1124,7 @@ begin
   begin
     Timer := GetTimeRunning + 8000;
     repeat
-      Mouse(483, 28, 10, 12, mouse_left);
+      MouseBox(479, 36, 489, 45, mouse_left);
       for i := 0 to 30 do
       begin
         if not BankScreen then
@@ -1504,16 +1502,16 @@ begin
     Result := True;
     Exit;
   end;
-  UpText := ['Bank booth', 'ank boo'];
+  UpText := ['Bank booth', 'ank boo', 'anker', 'ank'];
 
   case LowerCase(Location) of {            Sort X     Sort Y     Color    Tol   Hue   Sat   Count  SplitTPA?  W   H }
-    'cg', 'cooking guild':        Info := [MSCX,      MSCY,      5666708,  17,   0.06, 0.77, 100,   False,   10, 10];
-    'akb', 'al kharid':           Info := [MSCX - 50, MSCY,      5002594, 20,   0.02, 0.61, 100,   False,   10, 10]; // Fixed 1/5, #40
-    'lb', 'lumbridge':            Info := [MSCX,      MSCY - 50, 6780805,  10,   0.19, 0.27, 100,   False,   10, 10]; // Fixed 12/7, #40
-    'veb', 'varrock east':        Info := [MSCX,      MSCY + 50, 3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
-    'vwb', 'varrock west':        Info := [MSCX,      MSCY,      3037545,  5,    0.41, 1.32, 100,   False,   10, 10]; // Fixed 12/7, #40
-    'feb', 'falador east':        Info := [MSCX,      MSCY + 50, 5008519,  10,   0.22, 0.67, 100,   False,   10, 10]; // Fixed 12/7, #40
-    'fwb', 'falador west':        Info := [MSCX,      MSCY + 50, 5074569,  15,   0.22, 0.67, 50,    False,   10, 10]; // Fixed 12/7, #40
+    'cg', 'cooking guild':        Info := [MSCX,      MSCY,      5666708,  17,  0.06, 0.77,  100,   False,   10, 10];
+    'akb', 'al kharid':           Info := [MSCX - 50, MSCY,      5002594,  20,  0.02, 0.61,  100,   False,   10, 10]; // Fixed 1/5, #40
+    'lb', 'lumbridge':            Info := [MSCX,      MSCY,      12370116, 13,  0.65, 0.10,  30,    True,    5, 5]; // 07 fixed
+    'veb', 'varrock east':        Info := [MSCX,      MSCY + 50, 3037545,  5,   0.41, 1.32,  100,   False,   10, 10]; // Fixed 12/7, #40
+    'vwb', 'varrock west':        Info := [MSCX,      MSCY,      3037545,  5,   0.41, 1.32,  100,   False,   10, 10]; // Fixed 12/7, #40
+    'feb', 'falador east':        Info := [MSCX,      MSCY + 50, 5008519,  10,  0.22, 0.67,  100,   False,   10, 10]; // Fixed 12/7, #40
+    'fwb', 'falador west':        Info := [MSCX,      MSCY + 50, 5074569,  15,  0.22, 0.67,  50,    False,   10, 10]; // Fixed 12/7, #40
     'db', 'draynor': begin UpText := ['ount', 'unte', 'oun', 'unter'];
                                   Info := [MSCX - 50, MSCY,      5136741,  5,    0.73, 0.49, 15,    False,   10, 10]; // Fixed 12/7, #40
                      end;
@@ -1548,7 +1546,7 @@ begin
 
   { Split to ATPA. }
   if Info[7] then
-    ABooths := SplitTPA(Booths, 1)
+    ABooths := SplitTPA(Booths, 10)
   else
     ABooths := TPAtoATPA(Booths, 10);
 
@@ -1583,18 +1581,20 @@ begin
     if WaitUpTextMulti(UpText, 1000) Then
     begin
       GetMousePos(Booths[i].X, Booths[i].Y);
-      Mouse(Booths[i].X, Booths[i].Y, 0, 0, mouse_left);
-      FFLag(0);
-      MarkTime(c);
-      repeat
-        Wait(100);
-      until (BankScreen) or (PinScreen) or (TimeFromMark(c) > 10000);
-      Wait(Random(300));
-      if (HowManyPlayers > 0) then
-        if (Players[CurrentPlayer].Pin <> '') then
-          InPin(Players[CurrentPlayer].Pin);
-      Result := (BankScreen) or (PinScreen);
-      if (Result) then Exit;
+      Mouse(Booths[i].X, Booths[i].Y, 0, 0, mouse_right);
+      if waitoptionmulti(['ank ' ,'nk ', 'B@'],400) then
+      begin
+        MarkTime(c);
+        repeat
+          Wait(100);
+        until (BankScreen) or (PinScreen) or (TimeFromMark(c) > 10000);
+        Wait(Random(300));
+        if (HowManyPlayers > 0) then
+          if (Players[CurrentPlayer].Pin <> '') then
+            InPin(Players[CurrentPlayer].Pin);
+        Result := (BankScreen) or (PinScreen);
+        if (Result) then Exit;
+      end;
     end;
   end;
 end;
@@ -2084,38 +2084,4 @@ begin
     Result := OpenBank(TheBank, False, False);
   end;
   FreeDTM(TheDTM);
-end;
-
-(*
-WithdrawFromPouch
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function WithdrawFromPouch(Amount :Integer) :Boolean;
-
-Withdraws amount from pouch.
-
-.. note ::
-
-    by Home
-
-*)
-function WithdrawFromPouch(Amount :Integer) :Boolean;
-var
-  T :Integer;
-begin
-  Result := False;
-  MouseBox(528, 94, 533, 107, mouse_Right);
-  If WaitOption('draw', 500) then
-  begin
-    T := GetSystemTime + 10000;
-    repeat
-      wait(50);
-      InPin(Players[CurrentPlayer].Pin);
-    until (T <= GetSystemTime) or (InRange(CountColor(0, 250, 396, 307, 410), 160, 175));
-    Wait(RandomRange(75, 400));
-    TypeSend(IntToStr(Amount));
-    Result := True;
-  end;
 end;
