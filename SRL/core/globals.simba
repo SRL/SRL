@@ -158,24 +158,19 @@ var
   Description: Constants representing gametab numbers. }
 const
   tab_Combat = 21;
-  tab_Diary = 22;
-  tab_Task = 22;
-  tab_Stats = 23;
-  tab_Quest = 24;
-  tab_Inv = 25;
-  tab_Equip = 26;
-  tab_Prayer = 27;
-  tab_Magic = 28;
-  tab_Objectives = 29;
-  tab_Friends = 30;
+  tab_Stats = 22;
+  tab_Quest = 23;
+  tab_Inv = 24;
+  tab_Equip = 25;
+  tab_Prayer = 26;
+  tab_Magic = 27;
+  tab_Clan = 28;
+  tab_Friends = 29;
   tab_Ignore = 30;
-  tab_FriendChat = 31;
-  tab_Clan = 32;
-  tab_Options = 33;
-  tab_Emotes = 34;
-  tab_Music = 35;
-  tab_Notes = 36;
-  tab_LogOut = 37;
+  tab_LogOut = 31;
+  tab_Options = 32;
+  tab_Emotes = 33;
+  tab_Music = 34;
 
 { const Antirandoms Constants;
   Description: Constants representing randoms index. }
