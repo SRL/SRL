@@ -36,7 +36,7 @@ var
 begin
   if (FindNPCChatText('erous', Nothing)) then // Only if total level < 60
   begin
-    ClickContinue(True, True);
+    ClickContinue(True);
 
     t := GetSystemTime + 5000;
     while (GetSystemTime < t) do
@@ -1170,14 +1170,14 @@ Example:
   if (LevelUpEx(false, true)) then
     inc(Players[CurrentPlayer].Integers[10]);
 *)
-function LevelUpEx(ClickCont, ClickSkill: Boolean): Boolean;
+function LevelUpEx(ClickSkill: Boolean): Boolean;
 var
   i: Integer;
   Skills: TStringArray;
 begin
   if (FindNPCChatText('gratu', Nothing) or FindBlackChatMessage('just adva')) then
   begin
-    ClickContinue(ClickCont, True);
+    ClickContinue(True);
 
     if (ClickSkill) then
     begin
@@ -1228,7 +1228,7 @@ Example:
 *)
 function LevelUp: Boolean;
 begin
-  Result := LevelUpEx(True, False);
+  Result := LevelUpEx(False);
 end;
 
 (*

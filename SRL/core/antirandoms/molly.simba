@@ -74,7 +74,7 @@ begin
   begin
     AddToSRLLog('We are talking, finishing conversation');
     repeat
-      if not(ClickContinue(True, True)) then
+      if not(ClickContinue(True)) then
         TypeSendEx('1', False);
       Wait(750 + Random(750));
     until not(AreTalking);
@@ -787,7 +787,7 @@ begin
     end;
   end;
 
-  ClickContinue(True, True);
+  ClickContinue(True);
 end;
 
 {*******************************************************************************

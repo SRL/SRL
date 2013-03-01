@@ -383,7 +383,7 @@ begin
           else
             addToSRLLog('Quiz_Solve: Answered question wrong');
 
-    clickContinue(true, true); // to go through all the dialogue
+    clickContinue(true); // to go through all the dialogue
     result := tabExists(TAB_MAGIC);
 
   until(result or (getSystemTime > t));

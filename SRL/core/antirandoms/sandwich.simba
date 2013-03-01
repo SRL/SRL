@@ -121,7 +121,7 @@ begin
       if (SL_ClickFood(DTMs)) then
         wait(2000 + random(500));
     end else
-      clickContinue(true, true); // in case there are extra messages (GE) or we get one wrong
+      clickContinue(true); // in case there are extra messages (GE) or we get one wrong
 
   until(result or (getSystemTime > t));
 

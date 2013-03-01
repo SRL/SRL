@@ -28,7 +28,7 @@ function PL_DoneLocks(): boolean;
 begin
   if (not PL_LockScreen) then
     if (findNPCChatText('spinning lock', nothing)) then
-      if (clickContinue(true, true)) then
+      if (clickContinue(true)) then
       begin
         result := true;
         wait(2000 + random(1000));

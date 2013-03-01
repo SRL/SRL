@@ -65,7 +65,7 @@ begin
 
     if (FindNPCChatText('ologise', Nothing)) then
     begin
-      clickContinue(true, true);
+      clickContinue(true);
       result := true;
     end else
       result := tabExists(TAB_MAGIC);

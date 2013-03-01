@@ -244,7 +244,7 @@ begin
     // checks if we have sucessfully completed the Demon's requests
     if (findNPCChatText('actual', nothing)) then
     begin
-      clickContinue(true, true);
+      clickContinue(true);
 
       if (waitTabExists(TAB_MAGIC, 10000)) then
       begin
