@@ -790,7 +790,7 @@ font doesn't exist yet, so it returns a random string of characters.
 .. note::
 
     Author: DemiseSythe
-    Last Modified: Jan. 22nd, 2012 by Coh3n
+    Last Modified: 1/03/2013 By Justin.
 
 Example:
 
@@ -800,7 +800,7 @@ Example:
 *)
 function GetNPCChatName(): string;
 begin
-  result := getTextAtExWrap(152, 345, 366, 370, 0, 50, 30, 7913190, 15, CharsNPC07);
+  result := getTextAtExWrap(116, 358, 498, 377, 0, 50, 30, 128, 15, CharsNPC07);
 end;
 
 (*
