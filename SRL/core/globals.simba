@@ -62,13 +62,13 @@ const
 const
   MMX1 = 570;
   MMY1 = 9;
-  MMX2 = 714;
-  MMY2 = 159;
+  MMX2 = 716;
+  MMY2 = 155;
 
 { const MMCX, MMCY;
   Description: MiniMap Centre Point. }
 const
-  MMCX = 648;
+  MMCX = 643;
   MMCY = 83;
 
 { const MSX1, MSY1, MSX2, MSY2;
@@ -89,37 +89,43 @@ const
   Description: Inventory EdgePoints. }
 const
   MIX1 = 547;
-  MIY1 = 202;
-  MIX2 = 737;
-  MIY2 = 466;
+  MIY1 = 204;
+  MIX2 = 736;
+  MIY2 = 465;
 
 { const MICX, MICY;
   Description: Inventory Centre Points. }
 const
-  MICX = 642;
-  MICY = 334;
+  MICX = 641;
+  MICY = 335;
 
 { const MCX1, MCY1, MCX2, MCY2;
   Description: Chat Screen EdgePoints. }
 const
-  MCX1 = 4;
-  MCY1 = 342;
-  MCX2 = 514;
-  MCY2 = 475;
+  MCX1 = 7;
+  MCY1 = 345;
+  MCX2 = 512;
+  MCY2 = 473;
 
 { const MCCX, MCCY;
   Description: Chat Screen Centre Points. }
 const
-  MCCX = 250;
-  MCCY = 401;
+  MCCX = 259;
+  MCCY = 409;
 
 { const MBX1, MBY1, MBX2, MBY2;
   Description: BankScreen EdgePoints (where you click the items, does not include tabs). }
 const
-  MBX1 = 22;
-  MBY1 = 57;
-  MBX2 = 466;
-  MBY2 = 290;
+  MBX1 = 76;
+  MBY1 = 59;
+  MBX2 = 442;
+  MBY2 = 289;
+
+{ const MBCX, MBCY;
+  Description: Bank Screen Centre Points. }
+const
+  MBCX = 259;
+  MBCY = 409;
 
 { const DBX1, DBY1, DBX2, DBY2;
   Description: Deposit box edgepoints (only where the item appear) }

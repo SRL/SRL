@@ -14,33 +14,53 @@ rs_GetCompassAngleRadians
 
 .. code-block:: pascal
 
-    function rs_GetCompassAngleRadians: Extended;
+    function rs_GetCompassAngleRadians(): Extended;
 
 Returns the compass angle in radians.
 
 .. note::
 
-    by Narcle & Flight
+    by ReadySteadyGo, changes by euphemism
 
 Example:
 
 .. code-block:: pascal
 
 *)
-Function rs_GetCompassAngleRadians: Extended;
+function rs_GetCompassAngleRadians(): Extended;
 var
+  Angles: Array [0..2] of Extended;
+  Vectors: Array [0..2] of TVector;
+  I: Integer;
+  SouthPoint: TPoint;
   TPA: TPointArray;
-  T: TPoint;
-  B: TBox;
 begin
-  B := IntToBox(524, 5, 562, 43);
-  with B do
-    FindColorsSpiralTolerance(T.x, T.y, TPA, 65536, x1, y1, x2, y2, 0);
-  if Length(TPA) < 1 then
-   Exit;
-  T := MiddleTPA(TPA);
-  Result := ArcTan2(-(T.Y - 24), T.X - 543) + Radians(90);
-  Result := fixRad(Result - Pi);
+  Result := -1;
+  FindColors(TPA, 920735, 545, 4, 576, 36); //Searches for red of South, East, and West points on compass.
+  RAaSTPA(TPA, 7); // the point are small clusters of pixels, so by doing this, we are left with four points: the three cardinal points, and the center of the red arrow on the compass.
+  SortTPAFrom(TPA, Point(560, 20)); //Sort from center of the compass, so the first point in the array is the point that is the center of the red arrow.
+  InvertTPA(TPA); //Invert the array so that the arrow's center point is now at the end of the array and out of the way.
+  if (Length(TPA) <> 4) then //If we don't have four points, something has gone wrong.
+    Exit;
+  for I := 0 to 2 do //Creates normalized vectors from center of compass to three cardinal points.
+    Vectors[i] := CreateVector(Point(560, 20), TPA[i], True); //Creates normalized vectors from center of compass out to the cardinal points.
+  Angles[0] := AngleBetween(Vectors[0], Vectors[1]); //Stores the angle between vectors 0 and 1 in Angles[0].
+  Angles[1] := AngleBetween(Vectors[0], Vectors[2]); //Stores the angle between vectors 0 and 2 in Angles[1].
+  Angles[2] := AngleBetween(Vectors[1], Vectors[2]); //Stores the angle between vectors 1 and 2 in Angles[2].
+  for I := 0 to 2 do //This loop determines which point is the southern point of the compass.
+  begin
+    if (Angles[i] > pi) then //If the angle is greater than pi radians (180 degrees),
+      Angles[i] := MATH_2PI - Angles[i]; //We subtract it from 2pi radians (360 degrees) to get something like a reference angle.
+    if (Angles[i] >= 2) then //If the angle is greater than 2 radians, then we know that the two vectors this angle is between
+    begin //are the East and West point vectors.
+      case I of //The vector that is not those two is the South point vector.
+        0: SouthPoint := TPA[2];
+        1: SouthPoint := TPA[1];
+        2: SouthPoint := TPA[0];
+      end;
+    end;
+  end;
+  Result := FixRad((ArcTan2(-(SouthPoint.y - 20), SouthPoint.x - 560) + MATH_PIOVER2));
 end;
 
 (*
@@ -49,7 +69,7 @@ rs_GetCompassAngleDegrees
 
 .. code-block:: pascal
 
-    function rs_GetCompassAngleDegrees: Extended;
+    function rs_GetCompassAngleDegrees(): Extended;
 
 Returns the compass angle in degrees.
 
@@ -62,9 +82,9 @@ Example:
 .. code-block:: pascal
 
 *)
-function rs_GetCompassAngleDegrees: Extended;
+function rs_GetCompassAngleDegrees(): Extended;
 begin
-  Result := Degrees(rs_GetCompassAngleRadians());
+  Result := Degrees(FixD(rs_GetCompassAngleRadians()));
 end;
 
 
@@ -74,7 +94,7 @@ rs_OnMinimap
 
 .. code-block:: pascal
 
-    function rs_OnMinimap(x, y: Integer): Boolean;
+    function rs_OnMinimap(P: TPoint): Boolean;
 
 Checks wether the specified point is on the minimap.
 
@@ -87,9 +107,9 @@ Example:
 .. code-block:: pascal
 
 *)
-function rs_OnMinimap(x, y: Integer): Boolean;
+function rs_OnMinimap(P: TPoint): Boolean;
 begin
-  Result := InCircle(x, y, MMCX, MMCY, 75);
+  Result := InCircle(P.x, P.y, MMCX, MMCY, 75);
 end;
 
 (*
@@ -98,89 +118,57 @@ FindFlag
 
 .. code-block:: pascal
 
-    function FindFlag(var X, Y: Integer): Boolean;
+    function FindFlag(var P: TPoint): Boolean;
 
 Returns true if the flag is found on the minimap.
 
 .. note::
 
-    by Narcle
+    by euphemism
 
 Example:
 
 .. code-block:: pascal
 
-  if (FindFlag(x, y)) then
+  if (FindFlag(P)) then
   begin
     writeln('Flag found');
-    mouse(x, y, 3, 3, true);
+    mouse(P.x, P.y, 3, 3, true);
   end;
 *)
-Function FindFlag(var X, Y: integer): Boolean;
-begin
-  Result := False;
-  if FindBitmapToleranceIn(bmpFlag, X, Y, MMX1, MMY1, MMX2, MMY2, 75) then
-  begin
-    Result := True;
-    X := X+7;
-    Y := Y+14;
-   end;
-end;
-
-(*
-FindFlag2
-~~~~~~~~~
-
-.. code-block:: pascal
-
-    function FindFlag2(var X, Y: Integer): Boolean;
-
-Returns true if the flag is found on the minimap.
-
-.. note::
-
-    by Home
-
-Example:
-
-.. code-block:: pascal
-
-  if (FindFlag2(x, y)) then
-  begin
-    writeln('Flag found');
-    mouse(x, y, 3, 3, true);
-  end;
-*)
-function FindFlag2(var X, Y: Integer): Boolean;
+Function FindFlag(var P: TPoint): Boolean;
 var
-  KMTarget, ITarget, I, Hi, Map, W, H, t: Integer;
-  TPA: TPointArray;
+  I: Integer;
+  ColorsArray: TIntegerArray;
+  StaffColors: TPointArray;
 begin
   Result := False;
-  Map := BitmapFromString(MMX2 - MMX1, MMY2 - MMY1, '');
-  CopyClientToBitmap(Map, MMX1, MMY1, MMX2, MMY2);
-  KMTarget := GetKeyMouseTarget;
-  ITarget := GetImageTarget;
-  SetTargetBitmap(Map);
-  GetBitmapSize(Map, W, H);
-  FindColors(TPA, 65536, 0, 0, W - 1, H -1);
-  FilterPointsDist(TPA, 0, 75.5, W div 2, H div 2);
-  Hi := Length(TPA);
-  for I := 0 to Hi - 1 do
-    if ((FastGetPixel(Map, TPA[I].X - 1, TPA[I].Y - 1) - FastGetPixel(Map, TPA[I].X, TPA[I].Y - 1)) = 6381921) then
+  ColorsArray := [1127261, 284358, 255]; //Brown of the flag staff, Orange of the flag staff, Red of the flag.
+  for I := 0 to 2 do
+  begin
+    if (not FindColors(StaffColors, ColorsArray[i], MMX1, MMY1, MMX2, MMY2)) then
     begin
-      Result := True;
-      X := TPA[I].X + MMX1;
-      Y := TPA[I].Y + MMY1;
+      if (I < 2) then
+        Continue
+      else
+        Exit;
+    end else
       Break;
-    end;
-
-  t := GetImageTarget;
-  SetKeyMouseTarget(KMTarget);
-  SetImageTarget(ITarget);
-  FreeTarget(t);
-  FreeBitmap(Map);
+  end;
+  Result := True;
+  if (I <> 3) then //Keeps track of whether we ended up having to search for the red of the flag or not.
+  begin //The first two colors checks are for the staff of the flag, which means we sort by Y to get the bottom of the staff.
+    SortTPAByY(StaffColors, False);
+    P := StaffColors[0];
+    Exit;
+  end else //The last color check is for the red of the flag, so if the first two colors were not found:
+  begin
+    SortTPAByX(StaffColors, True);
+    P := Point(StaffColors[0].x + 7, StaffColors[0].y + 8); //Somewhat rough approximation of where the base of the staff is in relation to the tip of the flag.
+    Exit;
+  end;
 end;
+
 (*
 FlagPresent
 ~~~~~~~~~~~
@@ -194,7 +182,7 @@ T/F depending on flag exist.
 
 .. note::
 
-    by weequ
+    by weequ, edited by euphemism.
 
 Example:
 
@@ -204,9 +192,9 @@ Example:
 *)
 function FlagPresent: Boolean;
 var
-  X, Y: Integer;
+  P: TPoint;
 begin
-  Result := FindFlag(X, Y) or FindFlag2(X, Y);
+  Result := FindFlag(P);
 end;
 
 (*
@@ -222,7 +210,7 @@ Returns distance in pixels your char dot is from flag on mini-map
 
 .. note::
 
-    by weequ
+    by weequ, edited by euphemism.
 
 Example:
 
@@ -232,11 +220,11 @@ Example:
 *)
 function FlagDistance: Integer;
 var
-  X, Y: Integer;
+  P: TPoint;
 begin
   Result := -1;
-  if (FindFlag(X, Y)) or (FindFlag2(X, Y)) then
-    Result := Distance(MMCX, MMCY, X, Y);
+  if (FindFlag(P)) then
+    Result := Distance(MMCX, MMCY, P.x, P.y);
 end;
 
 (*
@@ -286,7 +274,7 @@ Waits until Flag is within "Distance" distance.
 
 .. note::
 
-    by Wizzup? / WT-Fakawi / ZephyrsFury / N1ke! / weequ
+    by Wizzup? / WT-Fakawi / ZephyrsFury / N1ke! / weequ, edited by euphemism.
 
 Example:
 
@@ -296,18 +284,19 @@ Example:
 *)
 function FlagEx(Dist: Integer; RoadColorCheck: Boolean): Boolean;
 var
-  Tx, Ty, M, D1, D2: Integer;
+  M, D1, D2: Integer;
+  P: TPoint;
 begin
   Wait(randomRange(400, 600));
   Result := False;
   M := GetSystemTime;
   repeat
-    if (not FindFlag(Tx, Ty)) and (not FindFlag2(Tx, Ty)) then
+    if (not FindFlag(P)) then
     begin
       Result := true;
       Exit;
     end;
-    D1 := Distance(Tx, Ty, MMCX, MMCY);
+    D1 := Distance(P.x, P.y, MMCX, MMCY);
     if (D1 <= Dist) then
     begin
       Result := True;
@@ -374,7 +363,7 @@ begin
   begin
     IncEx(P.X, Xmod + Random(rX));
     IncEx(P.Y, Ymod + Random(rY));
-    if not rs_OnMiniMap(P.X, P.Y) then Continue;
+    if not rs_OnMiniMap(P) then Continue;
     Mouse(P.X, P.Y, 0, 0, mouse_left);
     Result := WaitFunc(@FlagPresent, 50, 3000);
     if (Result) then break;

@@ -208,43 +208,6 @@ begin
   Wait(500 + Random(100));
 end;
 
-(*
-ClickNorth
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ClickNorth(AngleHigh: Integer);
-
-Clicks the compass to make it perfect North. Will set angle at highest depending
-on AngleHigh. See `SetAngle` for more information on the Angle parameter.
-
-.. note::
-
-    by R1ch
-
-Example:
-
-.. code-block:: pascal
-
-    procedure MapWalk();
-    begin
-      ClickNorth(SRL_ANGLE_NONE);
-      //...
-
-*)
-procedure ClickNorth(AngleHigh: Integer);
-begin
-  if (Random(4) = 1) then
-  begin
-    Mouse(542, 24, 15, 15, mouse_right);
-    WaitOptionMulti(['ace', 'orth'], 1200);
-  end else
-    Mouse(542, 24, 15, 15, mouse_left);
-
-  SetAngle(AngleHigh);
-end;
-
 {$DEFINE WALL_ANGLELEFT}
 
 (*
