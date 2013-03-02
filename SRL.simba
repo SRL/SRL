@@ -78,7 +78,7 @@
 
 {$include SRL-007/SRL/core/animation.simba}
 {$include SRL-007/SRL/core/flag.simba}
-//{$include SRL-007/SRL/core/worldswitcher.simba}
+{$include SRL-007/SRL/core/worldswitcher.simba}
 {$include SRL-007/SRL/core/login.simba}
 {$include SRL-007/SRL/core/autocolor.simba}
 {$include SRL-007/SRL/core/mapwalk.simba}
