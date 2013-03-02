@@ -18,7 +18,7 @@ GetRS07World
 
   function GetRS07World: String;
 
-Grabs the 'Best World for me'.
+Grabs the 'Best World for me' or returns the user's prefered world
 
 .. note::
 
@@ -31,7 +31,12 @@ Example:
 *)
 function GetRS07World: String;
 begin
+  if (Smart_World = 0) then
+  begin
   Result := Between('a href="http://oldschool', '.runescape.com/j1', GetPage('http://oldschool.runescape.com/slu'));
+  exit;
+  end else
+  Result := IntToStr(Smart_World);
 end;
 
 (*
