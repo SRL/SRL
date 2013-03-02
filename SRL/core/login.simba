@@ -261,12 +261,12 @@ begin
   mousebox(596,367,689,386,mouse_left);
   marktime(t);
   repeat
-    wait(RandomRange(1000,2000));
+    wait(RandomRange(400,500));
     if timefrommark(t)>5000 then
       exit;
   until not loggedin;
   result := true;
-end;  
+end;
 
 (*
 LoginPlayerToLob
@@ -331,6 +331,9 @@ begin
 
   if (loggedIn) then
     exit;
+
+  if Length(Players[CurrentPlayer].WorldInfo) > 0 then
+    SelectWorld(Players[CurrentPlayer].WorldInfo[0]);
 
   // click 'Existing User'
   MouseBox(EUX1, EUY1, EUX2, EUY2, mouse_left);
