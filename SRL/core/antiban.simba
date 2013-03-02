@@ -116,55 +116,30 @@ and Click = False will 'Hover'. Won't "check" skills where your level is 1.
 
 .. note::
 
-    Author: Dankness/Cheesehunk/Ron/Raymond/ZephyrsFury
-    Last Modified: December 09 by Coh3n
+    by DannyRS for oldschool
+    Last Modified: March 2nd by DannyRS
 
 Example:
 
 .. code-block:: pascal
 
-    HoverSkill(skill_Atack, False);
+    HoverSkill(skill_Attack, False);
 *)
 procedure HoverSkill(Skill: variant; Click: Boolean);
 var
   TP: TPoint;
-  Skills: TStringArray;
-  TheSkill: string;
 begin
   if(not(GameTab(tab_Stats))) then exit;
 
-  if VariantIsInteger(Skill) then
-  begin
-
-    if Skill >= 0 then
-      TP := SkillToCoords(Skill)
-    else
-      repeat
-        Skill := RandomRange(skill_Attack, skill_Summoning);
-        TP := SkillToCoords(Skill);
-      until(GetSkillLevel(TheSkill) > 1)
-
-  end else begin
-    if(Lowercase(Skill) <> 'random')then
-      TP := SkillToCoords(Skill)
-    else
-    repeat
-      Skills := ['attack','defence','strength','hitpoints','mining','smithing','woodcutting','firemaking','magic',
-                 'fletching','hunter', 'summoning','fishing','construction','herblore','agility','thieving','crafting',
-                 'ranged','slayer','farming', 'prayer', 'runecrafting', 'cooking', 'dungeoneering'];
-      TheSkill := Skills[Random(Length(Skills))];
-      TP := SkillToCoords(TheSkill);
-    until (TP.x > 0) and (GetSkillLevel(TheSkill) > 1);
-
-  end;
+  TP := SkillToCoords(Skill);
 
   if(Click)then
   begin
-    Mouse(TP.X, TP.Y, 10, 10, mouse_left);
+    MouseBox(TP.X-15, TP.Y-10, TP.X+15, TP.Y-10, mouse_left);
     Wait(3000+Random(3000));
     CloseWindow;
   end else begin
-    MMouse(TP.x, TP.y, 10, 10);
+    MMouse(TP.X-15, TP.Y-10, 30, 20);
     Wait(1000 + Random(500));
   end;
 end;
