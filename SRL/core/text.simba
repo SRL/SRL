@@ -979,17 +979,17 @@ Gets the texe from the options menu.
 
 .. note::
 
-    by Wizzup? & Narcle
+    by Le Jingle (based off of Wizzup? & Narcle's original code)
 
 Example:
 
 .. code-block:: pascal
 
 *)
-Function GetChooseOptions(): Array of TOptions;
+Function GetChooseOptions(): Array of TOptions; // args weren't used.. thus removed
 var
-  I, L, target, bmp, w, h, cts, n, m : Integer;
-  B, BB, BigBox : TBox;
+  I, w, h, cts, bmp, target : Integer;
+  B, BB, BigBox, OffSetYBox, TextSearchBox : TBox;
   TPA, TPA1 : TPointArray;
   ATPA, tempatpa : T2DPointArray;
 begin
@@ -998,60 +998,34 @@ begin
   B := IntToBox(0, 0, B.X2-1, B.Y2-1);
   cts := GetColorToleranceSpeed;
   ColorToleranceSpeed(1);
-
   FindColorsTolerance(TPA, 4674653, B.X1, B.Y1, B.X2, B.Y2, 0);
   if (Length(TPA) < 100) then
   begin
     ColorToleranceSpeed(cts);
     Exit;
   end;
-  ATPA := SplitTPA(TPA, 4);
-  for i := 0 to High(ATPA) do
-  begin
-    B := GetTPABounds(ATPA[i]);
-    if ((B.x2-B.x1) > 90) and ((B.y2-B.y1) > 18) then
-      Break
-    else
-      B := IntToBox(0, 0, 0, 0);
-  end;
-  If (B.x2 = 0) then
-  begin
-    ColorToleranceSpeed(cts);
-    Exit;
-  end;
+  B := GetTPABounds(TPA);
   BigBox := B;
   SetColorToleranceSpeed(3);
-
-  B := GetATPABounds(ATPA);
-
-  FindColorsTolerance(TPA1, 0, B.X1, B.Y1, B.X2, B.Y2, 0);
-  CombineTPAWrap(TPA, TPA1, TPA);
-
-  ReturnPointsNotInTPAWrap(TPA, B, TPA);
-
+  OffSetYBox := IntToBox(B.X1, B.Y1 + 18, B.X2, B.Y2);
+  FindColorsTolerance(TPA1, 0, OffSetYBox.X1, OffSetYBox.Y1, OffSetYBox.X2, OffSetYBox.Y2, 0);
+  SplitTPAExWrap(TPA1, 1, 1, ATPA);
+  SortATPASize(ATPA, true);
+  TextSearchBox := GetTPABounds(ATPA[0]);
+  ComBineTPAWrap(TPA, TPA1, TPA); // TPA = grey, TPA1 = black
+  ReturnPointsNotInTPAWrap(TPA, TextSearchBox, TPA1);
   SetColorToleranceSpeed(cts);
-
-  B := GetTPABounds(TPA);
-
-  n := B.Y2 - B.Y1;
-  m := 15 - n mod 15;
-  n := n + m;
-  bmp := CreateBitmap(B.X2 - B.X1 + 3, n + 1);
-
-  OffSetTPA(TPA, Point(-B.X1, -B.Y1));
-
-  DrawTPABitmap(bmp, TPA, clRed);
-
+  bmp := CreateBitmap(TextSearchBox.X2 - TextSearchBox.X1, TextSearchBox.Y2 - TextSearchBox.Y1);
+  OffSetTPA(TPA1, Point(-TextSearchBox.X1, -TextSearchBox.Y1));
+  DrawTPABitmap(bmp, TPA1, clRed);
   GetbitmapSize(bmp, w, h);
-
   SetTargetBitmap(bmp);
+
   SetLength(ATPA, h div 15);
   for i := 0 to High(ATPA) do
-    FindColorsTolerance(ATPA[i], clRed, 0, i*15,  w-1, 15+i*15, 0);
+    FindColorsTolerance(ATPA[i], clRed, 0, 2+(i*15), w-1, 16+(i*15), 0);
 
-  L := High(ATPA);
   SortATPAFromFirstPointY(ATPA, Point(w div 2, 0));
-
   SetArrayLength(Result, Length(ATPA));
   Result[0].BigBox := BigBox;
   for i := 0 to high(ATPA) do
@@ -1061,14 +1035,14 @@ begin
     SortATPAFromFirstPointX(tempatpa, Point(0, 0));
     Result[i].Str := GetTextATPA(tempatpa, 5, 'UpChars07');
     BB := GetTPABounds(ATPA[i]);
-    Result[i].Bounds := IntToBox(BB.X1+B.X1, BB.Y1+B.Y1, BB.X2+B.X1, BB.Y2+B.Y1);
+    Result[i].Bounds := BB;
     setlength(tempatpa,0);
     setlength(TPA,0);
   end;
   ColorToleranceSpeed(cts);
   SetImageTarget(target);
   FreeBitmap(bmp);
-end;
+end; 
 
 (*
 ChooseOptionMultiEx
