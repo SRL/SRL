@@ -710,39 +710,6 @@ const
   SRL_DEPOSIT_FOLLOWER = 3;
 
 (*
-DepositAll
-~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function DepositAll: Boolean;
-
-Deposits all items in your inventory.
-
-.. note::
-
-    Author: Shuttleu
-    Last Modified: January 08, 2012 by Coh3n
-
-Example:
-
-.. code-block:: pascal
-
-    DepositAll();
-*)
-function DepositAll: Boolean;
-begin
-  if (InvEmpty) then
-  begin
-    Result := True;
-    Exit;
-  end;
-
-  //QuickDeposit(SRL_DEPOSIT_ALL);
-  Result := WaitFunc(@InvEmpty, 50, 3000);
-end;
-
-(*
 Deposit
 ~~~~~~~
 
@@ -787,9 +754,6 @@ begin
   end
   else if VariantIsBoolean(vType) then
     All := vType;
-  if (SlotFrom = 1) and (SlotTo = 28) and (All = true) then
-    if DepositAll then
-      exit;
   for I := SlotFrom to SlotTo do
   begin
     if (BScreen) then
@@ -812,7 +776,7 @@ begin
     end;
     if DepositX then
     begin
-      WaitOptionMulti(['Store X', 'Store'], 200);
+      WaitOptionMulti(['Store X', 'X'], 200);
       T := GetSystemTime;
       while (not (InRange(CountColor(0, 211, 394, 308, 411), 200, 300))) and (GetSystemTime - T < 3000) do
         Wait(100);
@@ -820,7 +784,7 @@ begin
     end else if VariantIsInteger(vType) then
       WaitOptionMulti(['Store ' + IntToStr(Integer(vType)), 'Store'], 200)
     else
-      if not WaitOptionMulti(['Store All', 'All'], 200) then
+      if not WaitOptionMulti(['Store All', 'All', 'll ','A1','e A'], 200) then
         ChooseOptionMulti(['Store' , 'tore']);
     T := GetSystemTime;
     Wait(RandomRange(200, 300));
@@ -833,6 +797,42 @@ begin
     until(GetSystemTime - T > 2000);
   end;
 end;
+
+(*
+DepositAll
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function DepositAll: Boolean;
+
+Deposits all items in your inventory.
+
+.. note::
+
+    Author: Shuttleu
+    Last Modified: Ashaman88 07
+
+Example:
+
+.. code-block:: pascal
+
+    DepositAll();
+*)
+function DepositAll: Boolean;
+var
+  i: integer;
+begin
+  if (InvEmpty) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  for i:=1 to 3 do
+    deposit(1,28,true);
+  Result := WaitFunc(@InvEmpty, 50, 3000);
+end;    
 
 (*
 WithdrawEx
