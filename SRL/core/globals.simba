@@ -54,8 +54,8 @@ var
 { const srl_outline_black
   Description: Black Color outline}
 const
-  srl_outline_black = 131072;
-  srl_outline_white = clWhite;
+  srl_outline_black = 65536;
+  srl_outline_white = 16777215; 
 
 { const MMX1, MMY1, MMX2, MMY2;
   Description: MiniMap Edge Points. }
