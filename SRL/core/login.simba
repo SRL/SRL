@@ -249,10 +249,24 @@ Example:
 
 *)
 function Logout: Boolean;
+var
+  t: integer;
 begin
-  writeln('TODO: function Logout: Boolean; login.simba');
-  result := false;
-end;
+  result := not loggedin;
+  if result then
+    exit;
+  if not gametab(tab_logout) then
+    exit;
+
+  mousebox(596,367,689,386,mouse_left);
+  marktime(t);
+  repeat
+    wait(RandomRange(1000,2000));
+    if timefrommark(t)>5000 then
+      exit;
+  until not loggedin;
+  result := true;
+end;  
 
 (*
 LoginPlayerToLob
