@@ -41,7 +41,7 @@ end;
 
 (*
 ExitWorldScreen
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -70,7 +70,7 @@ end;
 
 (*
 CurrentWorldLS
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -134,7 +134,7 @@ end;
 
 (*
 WorldIndexToMSPoint
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -160,7 +160,7 @@ end;
 
 (*
 WorldIndexToMSBox
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
@@ -191,7 +191,7 @@ end;
 
 (*
 WorldsOrdered
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
