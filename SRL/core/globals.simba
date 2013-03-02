@@ -252,6 +252,7 @@ var
     Smart_ForceNew: Boolean;
     Smart_FixSpeed: Boolean;
     Smart_CurrentClient: Integer;
+    Smart_World : Integer;
   {$ENDIF}
 {$ENDIF}
 
