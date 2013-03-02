@@ -40,6 +40,35 @@ begin
 end;
 
 (*
+ExitWorldScreen
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function ExitWorldscreen: boolean;
+
+Returns true if the Worldswitcher screen is closed
+
+.. note::
+
+  by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function ExitWorldScreen: Boolean;
+begin
+  result := not worldscreen;
+  if result then
+    exit;
+
+  mousebox(719,6,750,15,mouse_left);
+  result:=true;
+end;
+
+(*
 CurrentWorldLS
 ~~~~~~~~~~~
 
@@ -213,6 +242,36 @@ begin
   result:=true;
 end;
 
+(*
+FullWorld
+~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindWorld(W: integer): Boolean;
+
+returns true if world is full
+
+..note::
+
+    by Ashaman88
+
+Example:
+
+.. code-block:: pascal
+
+*)
+function FullWorld(World: Integer): boolean;
+var
+  txt: string;
+  checkbox: tbox;
+begin
+  checkbox := WorldIndexToMSBox(World);
+  txt := GetTextAtExWrap(checkbox.x1+44, checkbox.y1, checkbox.x2-10, checkbox.y2, 0, 4, 2, 16777215, 0, 'StatChars07');
+  txt := Copy(txt, 0, High(txt));
+  result:= arrinstr(['FULL','ENLL','FNLL','EULL'],txt);
+end;
+
 
 (*
 FindWorld
@@ -235,6 +294,7 @@ Example:
 *)
 function FindWorld(W: integer): TBox;
 begin
+  result:=inttobox(0,0,0,0);
   if not WorldScreen then
     Exit;
 
@@ -243,9 +303,17 @@ begin
     if not OrderWorlds then
     begin
       Writeln('FindWorld: Could not order worlds properly.');
+      ExitWorldScreen;
       Exit;
     end;
     wait(400+random(200));
+  end;
+
+  if fullworld(W) then
+  begin
+    Writeln('World selected is full, sorry.');
+    ExitWorldScreen;
+    exit;
   end;
 
   result := WorldIndexToMSBox(W);
@@ -310,12 +378,18 @@ begin
   if not validworld then
   begin
     srl_Warn('SelectWorld', 'Invalid World', warn_AllVersions);
+    ExitWorldScreen;
     Exit;
   end;
 
   if OpenWorldScreen then
   begin
     worldbox:= FindWorld(I);
+    if worldbox.x1 = 0 then
+    begin
+      ExitWorldScreen;
+      exit;
+    end;
     mousebox(worldbox.x1,worldbox.y1,worldbox.x2,worldbox.y2,mouse_left);
     result:=true;
   end;
@@ -324,7 +398,10 @@ begin
   repeat
     wait(randomrange(400,500));
     if timefrommark(t)>6000 then
+    begin
+      ExitWorldScreen;
       exit;
+    end;
   until not worldscreen;
 
   wait(randomrange(400,500));
