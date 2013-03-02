@@ -270,6 +270,7 @@ Checks if item in inventory at specified position exists
 .. note::
 
     by WT-Fakawi
+    07 by Ashaman88
 
 Example:
 
@@ -440,6 +441,7 @@ Drags Item from first position Inv1 to Inv2 (Inventory Slots)
 .. note::
 
     by Naum
+    updated Ashaman88 07
 
 Example:
 
@@ -452,6 +454,8 @@ procedure DragItem(Inv1, Inv2: Integer);
 var
   InvAr: array [0..1] of TBox;
 begin
+  if not existsitem(Inv1) then
+    exit;
   InvAr[0] := InvBox(Inv1);
   InvAr[1] := InvBox(Inv2);
   DragMouse(InvAr[0].x1, InvAr[0].y1, InvAr[0].x2 - InvAr[0].x1, InvAr[0].y2 - InvAr[0].y1,
