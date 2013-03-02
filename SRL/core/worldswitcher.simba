@@ -373,9 +373,9 @@ begin
    318,337,358,377,+
    319,338,359,378];
   H := Random(High(WorldArray));
-  ArrayNumber := H;
+  ArrayNumber := H-1;
 
-  Result := worldarray[H];
+  Result := worldarray[H-1];
 end;
 
 (*
@@ -404,6 +404,7 @@ begin
   result := currentworldls = w;
   if not result then
     Result := SelectWorld(W);
-  Players[CurrentPlayer].WorldInfo[0]:=W;
+  if Length(Players[CurrentPlayer].WorldInfo) > 0 then
+    Players[CurrentPlayer].WorldInfo[0]:=W;
   LoginPlayer;
 end;
