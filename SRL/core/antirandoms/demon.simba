@@ -76,7 +76,6 @@ begin
   if (not loggedIn()) then
     exit;
 
-  clickNorth(SRL_ANGLE_LOW); // Takes care of MakeCompass & SetAngle
   if (findNPCChatText('minute', Nothing)) then
     clickToContinue;
 end;

@@ -232,7 +232,6 @@ begin
   t := (getSystemTime + (6 * 60000));
   DTMs := CA_GetDTMs();
   dtmPortal := DTMFromString('mbQAAAHicY2VgYPgHxOyMDAz/gfQPIGYFsoOBtB8QewGxPxBHAPGuB/0M+19OAWMQe8eHXgZ+oDg6BmpnYELDYAAAF5wP7g==');
-  clickNorth(SRL_ANGLE_HIGH);
 
   repeat
     if (not CA_LockScreen) then

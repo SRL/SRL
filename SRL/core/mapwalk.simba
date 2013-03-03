@@ -1098,6 +1098,7 @@ function TPAWalk(color, tol, offsetX, offsetY: integer; sortFrom: TPoint): boole
 var
   i, x, y: integer;
   TPA: TPointArray;
+  P: TPoint;
 begin
   result := false;
 
@@ -1109,8 +1110,9 @@ begin
     begin
       x := TPA[i].x;
       y := TPA[i].y;
+      P := Point(x, y);
 
-      if (not rs_OnMinimap(x, y)) then
+      if (not rs_OnMinimap(P)) then
         continue;
 
       mouse(x + offsetX, y + offsetY, 3, 3, mouse_left);
@@ -1340,9 +1342,10 @@ Example:
 *)
 procedure MouseMM(x, y, randX, randY: Integer);
 var
-  p: TPoint;
+  p, PP: TPoint;
 begin
-  if not rs_OnMinimap(x, y) then
+  PP := Point(x, y);
+  if not rs_OnMinimap(PP) then
     exit;
 
   p := RotatePoint(Point(x, y), rs_GetCompassAngleRadians, MMCX, MMCY);

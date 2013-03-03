@@ -1460,7 +1460,6 @@ begin
   t := (getSystemTime + (15 * 60000));
 
   MD_DeclareGlobals();
-  clickNorth(SRL_ANGLE_HIGH);
 
   bigPuzzles := MD_GetBigPuzzles();
   smallPuzzles := MD_GetSmallPuzzles();

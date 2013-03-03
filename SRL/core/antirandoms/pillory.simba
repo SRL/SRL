@@ -289,7 +289,6 @@ begin
     exit;
 
   t := (getSystemTime + (2 * 60000)); // maximum 2 minutes
-  clickNorth(SRL_ANGLE_HIGH);
 
   if (not PL_ClickCage()) then
   begin
