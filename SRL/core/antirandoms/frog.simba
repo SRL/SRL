@@ -45,7 +45,6 @@ begin
 
   // Setting the mousespeed higher to avoid misclicking on the quickly moving frogs
   MouseSpeed := 30;
-  clickNorth(SRL_ANGLE_HIGH);
   doConversation('', false);
 end;
 

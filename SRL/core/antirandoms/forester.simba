@@ -315,7 +315,6 @@ begin
     exit;
 
   t := (getSystemTime + (5 * 60000)); // maximum 5 minutes
-  clickNorth(SRL_ANGLE_HIGH);
 
   repeat
     if (FF_TalkTo()) then

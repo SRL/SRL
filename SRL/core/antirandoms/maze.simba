@@ -120,7 +120,6 @@ begin
   if (not loggedIn()) then
     exit;
 
-  clickNorth(SRL_ANGLE_HIGH); // REQUIRED!
 
   for i := 0 to high(paths) do
     with paths[i] do

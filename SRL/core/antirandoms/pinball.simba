@@ -194,7 +194,6 @@ begin
    exit;
  addToSRLLog('PB_Exit: Exiting cave');
  t := (getSystemTime + 20000);
- clickNorth(SRL_ANGLE_HIGH);
  repeat
    // the green path color
    if (findColorsTolerance(tpa, 9283213, MSX1, MMCY, MSX2, MSY2, 15)) then

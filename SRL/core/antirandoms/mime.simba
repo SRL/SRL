@@ -159,7 +159,6 @@ begin
   if (not loggedIn()) then
     exit;
 
-  clickNorth(SRL_ANGLE_LOW); // REQUIRED. Data was gathered at this angle
   doConversation('', false); // get past GE messages
 
   // click front of stage & move the mouse away from chat box so text can be recognized

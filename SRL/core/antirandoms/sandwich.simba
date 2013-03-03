@@ -106,7 +106,6 @@ begin
   t := (getSystemTime + (5 * 60000)); // maximum 5 minutes
   dtmPortal := DTMFromString('mggAAAHicY2NgYNBjZGDQBmJVINYAYhMgtgDibUC5tUC8GYh3Q/FGIJ5zsp5h7qkGhvlnmhhmH61lmHagkmHmsRoGfqAcNsyIA0MAAArzEPs=');
   DTMs := SL_GetDTMs();
-  clickNorth(SRL_ANGLE_HIGH);
 
   repeat
     if (findNPCChatTextMulti(['exit', 'ight'], nothing)) then

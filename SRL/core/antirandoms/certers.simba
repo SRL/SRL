@@ -163,7 +163,6 @@ begin
   if (not loggedIn()) then
     exit;
 
-  clickNorth(SRL_ANGLE_HIGH);
 end;
 
 (**

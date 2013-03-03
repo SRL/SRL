@@ -34,7 +34,6 @@ begin
   if (not loggedIn()) then
     exit;
 
-  clickNorth(SRL_ANGLE_HIGH);
   mouse(MMCX, MMY1 + 60, 3, 3, true); // walks north, clicks the same appendage
   wait(2000 + random(500));
 end;

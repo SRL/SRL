@@ -801,7 +801,6 @@ Description: Handles the Molly random event
  *)
 function Molly_Solve(): Boolean;
 begin
-  ClickNorth(SRL_Angle_High);
   MarkTime(MaxMollyTime); // Max 10 mins
   MarkTime(MollyTime);
 
