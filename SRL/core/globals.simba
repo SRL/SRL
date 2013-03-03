@@ -33,10 +33,10 @@ var
   FriendChars, LoginChars: Integer;
 {$ENDIF}
 
-{ var bmpAdmin, bmpMod, Lamp, BoxMask: Integer;
-  Description: Global Bitmaps. Need to be Global because of SCAR Memory leaks. }
+{ var bmpAdmin, bmpMod, bmpMinimapMask, Lamp, BookOfKnowledge, SRL_OPTIONS_BITMAP: Integer;
+  Description: Global Bitmaps and DTMs.}
 var
-  bmpAdmin, bmpMod, bmpFlag, Lamp, BookOfKnowledge : Integer;
+  bmpAdmin, bmpMod, bmpMinimapMask, Lamp, BookOfKnowledge: Integer;
 
 { var RoadColor, WaterColor, BankColor: Integer;
   Description: Three variables you will almost always use. :) }
@@ -55,7 +55,7 @@ var
   Description: Black Color outline}
 const
   srl_outline_black = 65536;
-  srl_outline_white = 16777215; 
+  srl_outline_white = clWhite;
 
 { const MMX1, MMY1, MMX2, MMY2;
   Description: MiniMap Edge Points. }
@@ -116,24 +116,30 @@ const
 { const MBX1, MBY1, MBX2, MBY2;
   Description: BankScreen EdgePoints (where you click the items, does not include tabs). }
 const
-  MBX1 = 76;
-  MBY1 = 59;
-  MBX2 = 442;
-  MBY2 = 289;
+  MBX1 = 79;
+  MBY1 = 62;
+  MBX2 = 439;
+  MBY2 = 283;
 
 { const MBCX, MBCY;
   Description: Bank Screen Centre Points. }
 const
   MBCX = 259;
-  MBCY = 409;
+  MBCY = 172;
 
 { const DBX1, DBY1, DBX2, DBY2;
   Description: Deposit box edgepoints (only where the item appear) }
 const
-  DBX1 = 91;
-  DBY1 = 57;
-  DBX2 = 443;
-  DBY2 = 262;
+  DBX1 = 131;
+  DBY1 = 75;
+  DBX2 = 402;
+  DBY2 = 232;
+
+{ const DBCX, DBCY;
+  Description: Deposit Box Screen Centre Points. }
+const
+  DBCX = 266;
+  DBCY = 153;
 
 { const SRL_Procs Constants;
   Description: Constants for SRL_Procs. }
@@ -284,7 +290,7 @@ var
 
 (*
 SRL_HasProc
-~~~~~~~~~~~
+~~~~~~~~FreeSRLBitmaps;~~~
 
 .. code-block:: pascal
 
@@ -313,7 +319,7 @@ LoadSRLBitmaps
 
 .. code-block:: pascal
 
-    procedure LoadSRLBitMaps;
+    procedure LoadSRLBitmaps;
 
 Loads SRL Bitmaps into memory.
 
@@ -326,22 +332,41 @@ Example:
 .. code-block:: pascal
 
 *)
-procedure LoadSRLBitMaps;
+procedure LoadSRLBitmaps;
 begin
-  bmpMod := BitmapFromString(9, 6, 'beNqbPn0RWeDBgwdAkgEMkBnTp0+HS6GR+KVwAgAGXFQr');
-  bmpAdmin := BitmapFromString(9, 6, 'beNqbp/j9PwcZ6P//FiDJAAbIjGvzFOFSaCR+KZwIALniVEk=');
-  bmpFlag := BitmapFromString(8, 15, 'meJxjYEAHIpr/F8yYgSkozPfE3tycGHGgIKY4RBBNHC6ILI4sAkYngOIwNhQJ8bUBBYEIyEBGQO37tm3DdCcdxIGBhlUcCBgZGAA27Tt3');
-  SetTransparentColor(bmpFlag, 0);
-  Lamp := DTMFromString('mggAAAHicY2NgYMhhYmDIAOIyIK4A4kIgTgPip0C5B0D8kAHCfgXEz4F46hRRIMkExn29ImB6zSoJBn4GBOBHohlxYAgAACyDDBw=');
-  BookOfKnowledge := DTMFromString('78DA63CC65626078C480028A7273183480342310FF0702C64CA09AAB0C6880094C3242798CE540FE2D026ACA80FC1704D4E401F99F08A84900F2DF12509304E43FC0AF0600CF790EC3');
+  bmpMod := BitmapFromString(9, 6, 'beNqbPn0RWeDBgwdAkgEMkBnT' +
+       'p0+HS6GR+KVwAgAGXFQr');
+  bmpAdmin := BitmapFromString(9, 6, 'beNqbp/j9PwcZ6P//FiDJAA' +
+       'bIjGvzFOFSaCR+KZwIALniVEk=');
 
+  bmpMinimapMask := BitmapFromString(147, 147, 'meJzt3V1u01AYBuHsf8kQCqqQ' +
+        'UmiC4/jnzJkyzwo+v3PhG0u+XL6On4vo6/5ry2n2oJ/sazqvVwXPM' +
+        'LJXBfdje92j95gd3ec5eqG50DW2oDeD0fPvRe8HoCc/Er3lOPTSx6' +
+        'MXPR098LnodU9BjzoOvfRh6CEZ9Op70fuR6O23o5fj0QVeRg82F7r' +
+        'GWvROM6KbPEcvNC+6zBJ6m9nRfR6gJzGhW32gl/Chi72jN7CqmlfV' +
+        'vKrmVTWvwklVzatqXlXzqppX4aSq5lU1r6p5FU6qal6Fk6qaV+Gkq' +
+        'uZVNa/CSVXNq3BSVfMqnFThpKrmVTipwklVzatwUoWTKpxU1bwKJ1' +
+        'U4qapJFU6qcEa94KQKJ1U4qcJJFU6qcFKFkyqcVOGkCidVOKnCSRV' +
+        'Oqk8XjC5/o8/JWoWTKpxU4aQKJ1U4qcsd+qI8d1+tcAqFkyqcVOGk' +
+        'CidVOKmH4Wo3uX9VK9zkCie1EK5201quVrhpFU7qabjaTWhNtcJNq' +
+        'HBbvL3RF/TfgS1+XK/sAeurFe5P12/f2QNeCle7Gzbcq9UKd6MLVz' +
+        'vctmqFw20OVzvQnmq1o+yvVrvxjqpWuMEODFe7YY6tVrsxzqhWu7O' +
+        'dV618JxmQrHaHG1mtdkcZX618O4HJbugNfOhin9F7zI7u8wQ9z4zo' +
+        'JmvRO82FrvEyejAeXWA7ejkSvf0B6AlHo/c+Er3lOPTSp6BHPRe97' +
+        'unogY9HLzoOvfSR6C0B9OR70fuR6O23o5ebAh3hNfRac6FrrEXvNC' +
+        'O6yXP0QvOiyyyht5kd3ecxehUHutJn9B4mdKsP9BI+dLF39AZWVfO' +
+        'qmlfVpAonVTivqkkVTqpwXlXzqppaybyq9tsv47Li7Q==');
+
+  Lamp := DTMFromString('mggAAAHicY2NgYMhhYmDIAOIyIK4A4kIgTgPip0C5B0D8kAHCfgXEz4F46hRRIMkExn29ImB6zSoJBn4GBOBHohlxYAgAACyDDBw=');
+  BookOfKnowledge := DTMFromString('mbQAAAHicY2VgYMhmYmAoAOJYIM4A4mogfgwU/wTE' +
+    'r4H4KhDfBuL81BQgyYiGMQG6CrgqAHffB9w=');
 
   SRLBitmapsLoaded := True;
   SetBitmapName(bmpMod,'SRL - Mod bitmap');
   SetBitmapName(bmpAdmin,'SRL - Admin bitmap');
-  SetBitmapName(bmpFlag, 'SRL - Flag bitmap');
+  SetBitmapName(bmpMinimapMask, 'SRL - Minimap Mask bitmap');
   SetDTMName(Lamp,'SRL - Lamp bitmap');
-
+  SetDTMName(BookOfKnowledge, 'SRL - Book of Knowledge');
 end;
 
 (*
@@ -369,7 +394,7 @@ begin
   begin
     FreeBitmap(bmpMod);
     FreeBitmap(bmpAdmin);
-    FreeBitmap(bmpFlag);
+    FreeBitmap(bmpMinimapMask);
     FreeDTM(Lamp);
     FreeDTM(BookOfKnowledge);;
     SRLBitmapsLoaded := False;

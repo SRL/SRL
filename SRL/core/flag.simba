@@ -100,7 +100,7 @@ Checks wether the specified point is on the minimap.
 
 .. note::
 
-    by Raymond
+    by euphemism
 
 Example:
 
@@ -109,7 +109,12 @@ Example:
 *)
 function rs_OnMinimap(P: TPoint): Boolean;
 begin
-  Result := InCircle(P.x, P.y, MMCX, MMCY, 75);
+  Result := False;
+  if (not PointInBox(P, MMBox)) then
+    Exit;
+  if (FastGetPixel(bmpMinimapMask, (P.x - MMX1), (P.y - MMY1)) <> clWhite) then
+    Exit;
+  Result := True;
 end;
 
 (*
