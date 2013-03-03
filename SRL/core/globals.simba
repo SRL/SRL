@@ -263,7 +263,6 @@ var
   {$ELSE}
     Smart_ForceNew: Boolean;
     Smart_FixSpeed: Boolean;
-    SRL_SixHourFix: Boolean;//Placeholder
     Smart_CurrentClient: Integer;
     Smart_World: Integer;
   {$ENDIF}

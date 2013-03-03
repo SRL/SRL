@@ -1065,6 +1065,7 @@ Will default to 'all'.
 
     by Wizzup? & Nava2 & N1ke!
     Last Modified: 22/12/12 by riwu
+                   Slushpuppy - 03 march 13
 
 Example:
 
@@ -1090,15 +1091,15 @@ begin
       Result := True;
       B := Options[i].Bounds;
       GetMousePos(T.x, T.y);
-
       R:= Min(((B.X2 - B.X1) shr 1), 5); //Prevents x2 passed to MouseBoxEx being smaller than x1
       case Action of
         ClickLeft:
+           begin
           if PointInBox(T, B) then
             ClickMouse2(true)
           else
-            MouseBoxEx(B.x1 + R, B.Y1, B.x2 - R, B.Y1 + 5, R, mouse_Left);
-
+            MouseBoxEx(T.x+ B.x1 + R,  T.y+B.Y1 + 20, T.x+B.x2 - R, T.y+B.Y1 + 40, R, mouse_left);
+          end;
         Move:
           if not PointInBox(T, B) then
             MouseBoxEx(B.x1 + R, B.Y1, B.x2 - R, B.Y1 + 5, R, mouse_move);
