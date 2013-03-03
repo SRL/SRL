@@ -725,6 +725,7 @@ Deposit
 
     Author: WT-Fakawi/PPLSUQBAWLZ/Stupid3ooo/Town
     Last Modified: Ashaman88 -07
+                   Slushpuppy - 03 March 13
 
 Example:
 
@@ -776,16 +777,17 @@ begin
     end;
     if DepositX then
     begin
-      WaitOptionMulti(['Store X', 'X'], 200);
+      WaitOptionMulti(['tore X','Store X', 'X'], 200);
       T := GetSystemTime;
       while (not (InRange(CountColor(0, 211, 394, 308, 411), 200, 300))) and (GetSystemTime - T < 3000) do
         Wait(100);
       TypeSend(vType);
     end else if VariantIsInteger(vType) then
-      WaitOptionMulti(['Store ' + IntToStr(Integer(vType)), 'Store'], 200)
+      WaitOptionMulti(['Store ' + IntToStr(Integer(vType)), 'tore ' + IntToStr(Integer(vType))], 200)
     else
-      if not WaitOptionMulti(['Store All', 'All', 'll ','A1','e A'], 200) then
-        ChooseOptionMulti(['Store' , 'tore']);
+      if not WaitOptionMulti(['tore a','Store All', 'All', 'll ','A1','e A'], 200) then
+        ChooseOptionMulti(['tore','Store']);
+
     T := GetSystemTime;
     Wait(RandomRange(200, 300));
     repeat
