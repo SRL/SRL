@@ -36,7 +36,7 @@ var
 { var bmpAdmin, bmpMod, bmpMinimapMask, Lamp, BookOfKnowledge, SRL_OPTIONS_BITMAP: Integer;
   Description: Global Bitmaps and DTMs.}
 var
-  bmpAdmin, bmpMod, bmpMinimapMask, Lamp, BookOfKnowledge, SRL_OPTIONS_BITMAP : Integer;
+  bmpAdmin, bmpMod, bmpMinimapMask, Lamp, BookOfKnowledge: Integer;
 
 { var RoadColor, WaterColor, BankColor: Integer;
   Description: Three variables you will almost always use. :) }
@@ -361,15 +361,12 @@ begin
   BookOfKnowledge := DTMFromString('mbQAAAHicY2VgYMhmYmAoAOJYIM4A4mogfgwU/wTE' +
     'r4H4KhDfBuL81BQgyYiGMQG6CrgqAHffB9w=');
 
-  SRL_OPTIONS_BITMAP := BitmapFromString(67, 19, 'meJy1VjFywzAM80M8aPT/5zymez+RXHXmMQAIUU3Ly+CQEAWQlOwxhJ3nGc/XdYHHWIadP9ZZVWWoPGCTYYUESlW0Q/Xx9f36VdFmqs5GGTM3jd9yYV/IcRxLZJ+nIRPkj9vCAxm4hvFQyZ8Jl2SahP3yrIKdy909/hdHzMOqwwgqeNimM57l7MFYRtQj2b8EmMmXlcwj9wqFkJkhZk+Cwzh5xgAfyA8ATs5azAixkJkkM2chUt1QA5yPYRWVBZlLgPOukEhVVXvcowsYk4GzSSHN0eIb1dBg5vB3N4OPbmmJQsleNzcy7f5QyLjPThyf3Fx4j4z32TaT40dakslX326hHuoGAyFxcKBx+fIZqrM5yhh5AwDG10EWodo9hIScbDkK6vL1lS1Hs8djPFIuBBWD3pVsfP9Ahg9t68PVg1kLdGq8X24dSlsad8HyCxDkGHXR0KqJ/9cgBgBVCctmAH0mfyXQM5cwf3w6x6rp7BuriIcntCCj4Q==');
-
   SRLBitmapsLoaded := True;
   SetBitmapName(bmpMod,'SRL - Mod bitmap');
   SetBitmapName(bmpAdmin,'SRL - Admin bitmap');
   SetBitmapName(bmpMinimapMask, 'SRL - Minimap Mask bitmap');
   SetDTMName(Lamp,'SRL - Lamp bitmap');
   SetDTMName(BookOfKnowledge, 'SRL - Book of Knowledge');
-  SetBitmapName(SRL_OPTIONS_BITMAP, 'SRL - Options Bitmap');
 end;
 
 (*
