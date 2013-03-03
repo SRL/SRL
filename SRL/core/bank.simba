@@ -372,8 +372,8 @@ Converts a point on the Mainscreen to the point in the Bank.
 
 .. note::
 
-    Author: Wizzup
-    Last Modified: Ashaman88 -07
+    Author: euphemism
+    Last Modified: March 2013
 
 Example:
 
@@ -382,9 +382,22 @@ Example:
     ItemSlot := MSTPointToBankPoint(Point);
 *)
 function MSTPointToBankPoint(MSP: TPoint): TPoint;
+var
+  H, I: Integer;
+  BetweenRowsAndColumns: Array of TBoxArray; //The rows and columns of empty space between the item slots.
 begin
-  Result.X := (MSP.X - 38) div 44;
-  Result.Y := (MSP.Y - 90) div 45;
+  SetLength(BetweenRowsAndColumns, 2);
+  BetweenRowsAndColumns[0] := Grid(1, 5, (MBX2 - MBX1), 5, 0, 38, Point(259, 96));
+  BetweenRowsAndColumns[1] := Grid(7, 1, 14, (MBY2 - MBY1), 47, 0, Point(118, 172));
+  for H := 0 to 1 do
+    for I := 0 to High(BetweenRowsAndColumns[h]) do
+      if PointInBox(MSP, BetweenRowsAndColumns[h][i]) then
+      begin
+        srl_Warn('MSTPointToBankPoint', 'Point not in any bank slot, returning first slot.', warn_AllVersions);
+        Result := Point(0, 0);
+        Exit;
+      end;
+  Result := Point((((MSP.x - MBX1)) div 48), ((MSP.y - MBY1) div 39));
 end;
 
 (*
@@ -400,7 +413,7 @@ Converts a Bank Point (Row,Col) to Bank Index (spot in bank). (0, 0) = 1
 .. note::
 
     Author: Wizzup?
-    Last Modified: Ashaman88 -07
+    Last Modified: March 2013
 
 Example:
 
@@ -410,9 +423,7 @@ Example:
 *)
 function BankPointToBankIndex(P: TPoint): Integer;
 begin
-  if p.y=1 then
-    Result := P.X else
-    Result := ((P.Y-1) * 9) + P.X - 1;
+  Result := P.Y * 8 + P.X + 1;
 end;
 
 (*
@@ -428,7 +439,7 @@ Converts the Bank Index (spot in bank) to a Bank Point (Row,Col). 1 = (0, 0)
 .. note::
 
     Author: Wizzup?
-    Last Modified: Ashaman88 -07
+    Last Modified: March 2013
 
 Example:
 
@@ -438,8 +449,14 @@ Example:
 *)
 function BankIndexToBankPoint(Index: Integer): TPoint;
 begin
+  if (not InRange(Index, 1, 48)) then
+  begin
+    srl_Warn('BankIndexToBankPoint', 'Specified index is not a visible bank slot.  Returning first slot''s bank point.', warn_AllVersions);
+    Result := Point(0, 0);
+    Exit;
+  end;
   Index := Index - 1;
-  Result := Point((Index mod 8), Floor(Index div 9));
+  Result := Point((Index mod 8), (Index div 8));
 end;
 
 (*
@@ -454,8 +471,8 @@ Converts the Bank Index (spot in bank) to a Mainscreen TPoint of the Index. (Top
 
 .. note::
 
-    Author: Wizzup?
-    Last Modified: Ashaman88 -07
+    Author: euphemism
+    Last Modified: March 2013
 
 Example:
 
@@ -465,8 +482,14 @@ Example:
 *)
 function BankIndexToMSPoint(Index: Integer): TPoint;
 begin
-  Index := Index -1;
-  Result := Point(72 + (Index mod 8) * 48, 54 + Floor(Index div 9) * 44);
+  if (not InRange(Index, 1, 48)) then
+  begin
+    srl_Warn('BankIndexToMSPoint', 'Specified index is not a visible bank slot.  Returning first slot''s bank point.', warn_AllVersions);
+    Result := Point(MBX1, MBY1);
+    Exit;
+  end;
+  Index := Index - 1;
+  Result := Point(MBX1 + ((Index mod 8) * 47), MBY1 + (38 * (Index div 8)));
 end;
 
 (*
@@ -475,14 +498,14 @@ BankIndexToMSBox
 
 .. code-block:: pascal
 
-    function BankIndexToMSBox(Ind: Integer): TBox;
+    function BankIndexToMSBox(Index: Integer): TBox;
 
 Converts the Bank Index (spot in bank) to a Mainscreen TBox of the Index.
 
 .. note::
 
-    Author: Wizzup?
-    Last Modified: Ashaman88 -07
+    Author: Wizzup
+    Last Modified: March 2013
 
 Example:
 
@@ -495,10 +518,7 @@ var
    P: TPoint;
 begin
   P := BankIndexToMSPoint(Index);
-  Result.X1 := P.X;
-  Result.Y1 := P.Y;
-  Result.X2 := Result.X1 + 38;
-  Result.Y2 := Result.Y1 + 39;
+  Result := IntToBox(P.x, P.y, P.x + 31, P.y + 31);
 end;
 
 (*
