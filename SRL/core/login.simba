@@ -552,7 +552,7 @@ begin
       TypeSend(Players[CurrentPlayer].Name);
     end else
     begin
-      TypeSend(Players[CurrentPlayer].Pass);
+      TypeSendEx(Players[CurrentPlayer].Pass, False);
       MouseBox(234, 304, 369, 338, mouse_Left); //Login
       end;
   end;
@@ -570,7 +570,7 @@ begin
 
     SetLength(Actions, 0);
 
-    if ((GetSystemTime - T) > 120000) then
+    if ((GetSystemTime - T) > 60000) then
       Actions :=       ['One minute has passed... Debug: ' + ToStr(CountColor(LOGIN_STATUSCOLOUR, 224, 190, 532, 250)),              0,    5,    'PlayerFalse',   'Login Failed']
     else
 //    writeln(CountColor(LOGIN_STATUSCOLOUR, 224, 190, 532, 250));
@@ -582,6 +582,7 @@ begin
       1573: Actions := ['Not a Members Account',                 0,    1,    'PlayerTrue',    ''];                  //Updated
        492: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];  //Updated
       1721: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',   'Too many logins'];   //Updated
+       906: Actions := ['This world is full.',                5000,   10,    'PlayerFalse',   'World is full'];     //Updated
        732: Actions := ['Runescape has been updated.',           0,    0,    'RSUpdate',      'RS Updated'];
        777: Actions := ['Login limit exceeded.',             20000,   10,    '',              'Waiting for login.'];
     end;
