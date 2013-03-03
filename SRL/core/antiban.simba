@@ -904,7 +904,8 @@ begin
     Slots[I] := IntToBox(556, 231+(I*15), 711, 246+(I*15));
 
   for I := 0 to 11 do
-    if FindColor(X, Y, 65535, Slots[i].X1, Slots[I].Y1, Slots[I].X2, Slots[I].Y2) then
+    if FindColor(X, Y, 65535, Slots[i].X1, Slots[I].Y1, Slots[I].X2, Slots[I].Y2) or
+       FindColor(X, Y, 65280, Slots[i].X1, Slots[I].Y1, Slots[I].X2, Slots[I].Y2) then
     begin
       SetLength(OnlineSlots, Length(OnlineSlots) + 1);
       OnlineSlots[L] := I;
