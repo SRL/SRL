@@ -55,33 +55,28 @@ function ShopItemBoxCoords(I: Integer): TBox;
 var
   row, col: Integer;
 begin
-  row := i div 10;
-  col := i - (row * 9) - 1;
+  row := i div 9;
+  col := i - (row * 8) - 1;
   if (col < 0) then
   begin
-    col := 9;
+    col := 8;
     row := row - 1;
   end;
-  Result := IntToBox(81+(col*57),69+(row*47),81+(col*57)+32,69+(row*47)+30);
+  Result := IntToBox(81+(col*47),69+(row*47),81+(col*47)+30,69+(row*47)+30);
 end;
 
 {*******************************************************************************
 function ShopItemCoords(I: Integer): TPoint;
-By: N1ke! Fixed for Oldschool by DannyRS
+By: DannyRS for Oldschool
 Description: Results the coords for shop item. (Left to right).
 *******************************************************************************}
 function ShopItemCoords(I: Integer): TPoint;
 var
-  row, col: Integer;
+  ShopItemBox: TBox;
 begin
-  row := i div 10;
-  col := i - (row * 9) - 1;
-  if (col < 0) then
-  begin
-    col := 9;
-    row := row - 1;
-  end;
-  Result := Point(80+(col * 57), 68+(row * 47));
+  ShopItemBox := ShopItemBoxCoords(I);
+  Result.X := Round(((ShopItemBox.X2-ShopItemBox.X1)/2)+ShopItemBox.X1);
+  Result.Y := Round(((ShopItemBox.Y2-ShopItemBox.Y1)/2)+ShopItemBox.Y1);
 end;
 
 {*******************************************************************************
@@ -91,15 +86,41 @@ Description: Checks if the shop item exists. (Left to right).
 *******************************************************************************}
 function ExistsShopItem(i: Integer): Boolean;
 var
-  Cords: TPoint;
+  SBox: TBox;
   X, Y: Integer;
 begin
   Result := False;
   if not Shop_Screen then
     Exit;
-  Cords := ShopItemCoords(I);
-  Result := ((FindColor(X, Y, 65536, Cords.X, Cords.Y, Cords.X+36, Cords.Y+42)) or
-             (FindColor(X, Y, 65535, Cords.X, Cords.Y, Cords.X+36, Cords.Y+42)));
+  SBox := ShopItemBoxCoords(I);
+  Result := ((FindColor(X, Y, 65536, SBox.X1, SBox.Y1, SBox.X2, SBox.Y2)) or
+             (FindColor(X, Y, 65535, SBox.X1, SBox.Y1, SBox.X2, SBox.Y2)));
+end;
+
+{*******************************************************************************
+function StockShopItem(I: Integer): Integer;
+By: DannyRS for Oldschool
+Description: Returns the shops Stock of a slot (Left to right).
+*******************************************************************************}
+function StockShopItem(I: Integer): Integer;
+var
+  SIBox,YTBox: TBox;
+  YT: TPointArray;
+begin
+  Result := -1;
+  if not Shop_Screen then
+    Exit;
+  SIBox := ShopItemBoxCoords(I);
+  if (FindColors(YT,65535,SIBox.X1,SIBox.Y1,SIBox.X2,SIBox.Y2)) then
+  begin
+    YTBox := GetTPABounds(YT);
+    Result := StrToIntDef(GetTextAtExWrap(YTBox.X1-2,YTBox.Y1-2,YTBox.X2+2
+                              ,YTBox.Y2+2,0,5,1,65535,0,'StatChars07'),-1);
+  end else
+  begin
+    if (ExistsShopItem(I)) then
+      Result := 1;
+  end;
 end;
 
 {*******************************************************************************
@@ -124,7 +145,7 @@ begin
 
   while AmountLeft > 0 do
   begin
-    MMouse(x+2, y+2, 20, 20);
+    MMouse(RandomRange(x-10,x+10), RandomRange(y-10,y+10), 0, 0);
     {if not WaitUpText('alue', 1000) then
       Exit;}
     ClickMouse2(mouse_right);
@@ -211,7 +232,7 @@ begin
 
   while AmountLeft > 0 do
   begin
-    MMouse(x+2, y+2, 20, 20);
+    MMouse(RandomRange(x-10,x+10), RandomRange(y-10,y+10), 0, 0);
    { if not WaitUpText('alue', 300)then
       Exit; }
     ClickMouse2(mouse_right);
