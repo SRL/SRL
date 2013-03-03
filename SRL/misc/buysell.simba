@@ -2,50 +2,72 @@
 //--               SRL Resource Library                          --//
 //--                Buying and Selling routines                  --//
 //-----------------------------------------------------------------//
-// * function ShopItemCoords(I: Integer): TPoint;                  // * by N1ke!
-// * function ExistsShopItem(i: Integer): Boolean;                 // * by N1ke!
-// * function BuyCoords(x, y, Amount: Integer): Boolean;           // * by RSN re-done by N1ke!
-// * function BuyAmount(i, Amount: Integer): Boolean;              // * by RSN modified by N1ke!
-// * function BuyColor(UpText: String; Color, Tol, Amount: Integer): Boolean; // * by RSN Modified by N1ke!
-// * function SellCoords(x, y, Amount: Integer): boolean;          // * by RSN redone by N1ke!
-// * function Sell(i, Amount: Integer): Boolean;                   // * RSN small edit by N1ke!
-// * function  FindItems(color, tol: Integer; text: string; num: Integer): TPointArray; // * by RSN
-// * procedure SellItems(Color, Tol, Num, Amount: Integer; Text: string); // * by RSN
+// * function ShopItemBoxCoords(I: Integer): TBox;                 //
+// * function ShopItemCoords(I: Integer): TPoint;                  //
+// * function ExistsShopItem(i: Integer): Boolean;                 //
+// * function BuyCoords(x, y, Amount: Integer): Boolean;           //
+// * function BuyAmount(i, Amount: Integer): Boolean;              //
+// * function BuyColor(UpText: String; Color, Tol, Amount: Integer): Boolean; //
+// * function SellCoords(x, y, Amount: Integer): boolean;          //
+// * function Sell(i, Amount: Integer): Boolean;                   //
+// * function  FindItems(color, tol: Integer; text: string; num: Integer): TPointArray; //
+// * procedure SellItems(Color, Tol, Num, Amount: Integer; Text: string); //
 
 {
-  Re-make of the old 'buysell.simba' because of the outdated code.
-    This include is essentially an edit-over the previous made functions.
+  Re-make of the old 'buysell.simba' for oldschool RS.
+  This include is essentially an edit-over the previous made functions.
 
-    -Lj
+  Edits by:
+  - DannyRS
+  - Le Jingle
 }
 
 function help_nothing: boolean;
 begin
-  result := false;
+  Result := False;
 end;
 
+// Fixed for Oldschool by DannyRS, Original by ??
 function Shop_Screen: Boolean;
 begin
-  Result := FindTextTPA(12054007, 10, MSX1, MSY1, MSX2, MSY2, 'splay', 'UpChars', Nothing);
+  Result := (FindTextTPA(2070783, 10, 22, 30, 476, 52, 'Store', 'UpChars07', Nothing) and
+  (GetColor(482, 36)=65536));
 end;
 
+// Fixed for Oldschool by DannyRS, Original by ??
 function Close_Shop: boolean; // Not particually needed.. simply apart of another script I use
-var                           // could be helpful?
-  x, y, Shops_X: Integer;
 begin
-  result := false;
-  Shops_X := BitmapFromString(5, 5, 'meJzT2fiXAQZ0wWwdMKmLIQ4ByLI6qOIAcvoQrw==');
-  if findbitmaptolerancein(Shops_X, x, y, msx1, msy1, msx2, msy2, 25) then
+  Result := False;
+  if Shop_Screen then
   begin
-    mouse(x, y, 3, 3, mouse_left);
-    result := true;
+    MouseBox(478, 32, 496, 50, mouse_left);
+    Result := True;
+  end else
+    Result := True;
+end;
+
+{*******************************************************************************
+function ShopItemBoxCoords(I: Integer): TBox;
+By: DannyRS for Oldschool
+Description: Results the tbox coords for shop item. (Left to right).
+*******************************************************************************}
+function ShopItemBoxCoords(I: Integer): TBox;
+var
+  row, col: Integer;
+begin
+  row := i div 10;
+  col := i - (row * 9) - 1;
+  if (col < 0) then
+  begin
+    col := 9;
+    row := row - 1;
   end;
-  FreeBitmap(Shops_X);
+  Result := IntToBox(81+(col*57),69+(row*47),81+(col*57)+32,69+(row*47)+30);
 end;
 
 {*******************************************************************************
 function ShopItemCoords(I: Integer): TPoint;
-By: N1ke!
+By: N1ke! Fixed for Oldschool by DannyRS
 Description: Results the coords for shop item. (Left to right).
 *******************************************************************************}
 function ShopItemCoords(I: Integer): TPoint;
@@ -59,12 +81,12 @@ begin
     col := 9;
     row := row - 1;
   end;
-  Result := Point(42+(col * 52), 92+(row * 52));
+  Result := Point(80+(col * 57), 68+(row * 47));
 end;
 
 {*******************************************************************************
 function ExistsShopItem(i: Integer): Boolean;
-By: N1ke!
+By: N1ke! Fixed for Oldschool by DannyRS
 Description: Checks if the shop item exists. (Left to right).
 *******************************************************************************}
 function ExistsShopItem(i: Integer): Boolean;
@@ -76,17 +98,18 @@ begin
   if not Shop_Screen then
     Exit;
   Cords := ShopItemCoords(I);
-  Result := FindColor(X, Y, 131072, Cords.X-20, Cords.Y-20, Cords.X+20, Cords.Y+20);
+  Result := ((FindColor(X, Y, 65536, Cords.X, Cords.Y, Cords.X+36, Cords.Y+42)) or
+             (FindColor(X, Y, 65535, Cords.X, Cords.Y, Cords.X+36, Cords.Y+42)));
 end;
 
 {*******************************************************************************
 function BuyCoords(x, y, Amount: Integer): Boolean;
-By: RSN re-done by N1ke!
+By: RSN re-done by N1ke! Fixed for Oldschool by DannyRS
 Description: Buys the specified amout of the Item at x, y
 *******************************************************************************}
 function BuyCoords(x, y, Amount: Integer): Boolean;
 var
-  AmountLeft, xz, yz, iTime: Integer;
+  AmountLeft, iTime: Integer;
   S: String;
 begin
   Result := False;
@@ -101,11 +124,10 @@ begin
 
   while AmountLeft > 0 do
   begin
-    MMouse(x, y, 5, 5);
-    {if not WaitUpText('more', 1000) then
+    MMouse(x+2, y+2, 20, 20);
+    {if not WaitUpText('alue', 1000) then
       Exit;}
-    GetMousePos(xz, yz);
-    Mouse(xz, yz, 0, 0, mouse_right);
+    ClickMouse2(mouse_right);
 
     case AmountLeft of
       1: S := '1';
@@ -137,15 +159,15 @@ end;
 
 {*******************************************************************************
 function BuyAmount(i, Amount: Integer): Boolean;
-By: RSN modified by N1ke!
+By: RSN modified by N1ke! Fixed for Oldschool by DannyRS
 Description: Buys the specified amount of the Item at assigned row and column
 *******************************************************************************}
-function BuyAmount(i, Amount: Integer): Boolean;
+function BuyAmount(I, Amount: Integer): Boolean;
 var
   Cords: TPoint;
 begin
   Result := False;
-  if not ExistsShopItem(i) then
+  if not ExistsShopItem(I) then
     Exit;
   Cords := ShopItemCoords(I);
   Result := BuyCoords(Cords.X, Cords.Y, Amount);
@@ -153,7 +175,7 @@ end;
 
 {*******************************************************************************
 function BuyColor(UpText: string; Color, Amount: Integer): Boolean;
-By: RSN Modified by N1ke!
+By: RSN Modified by N1ke! Fixed for Oldschool by DannyRS
 Description: Buys all items with that color
 *******************************************************************************}
 function BuyColor(UpText: string; Color, Tol, Amount: Integer): Boolean;
@@ -161,7 +183,7 @@ var
   x, y: Integer;
 begin
   Result := False;
-  if not(FindItem(x, y, 'color', Color, 19, 27, 499, 325, [Tol, 4]))then
+  if not(FindItem(x, y, 'color', Color, 22, 59, 497, 317, [Tol, 4]))then
     Exit;
 
   Result := BuyCoords(X, Y, Amount);
@@ -169,12 +191,12 @@ end;
 
 {*******************************************************************************
 function SellCoords(x, y, Amount: Integer): boolean;
-By: RSN redone by N1ke!
+By: RSN redone by N1ke! Fixed for Oldschool by DannyRS
 Description: Sells Item at x, y
 *******************************************************************************}
 function SellCoords(x, y, Amount: Integer): boolean;
 var
-  AmountLeft, xz, yz: Integer;
+  AmountLeft: Integer;
   S: String;
 begin
   Result := False;
@@ -189,11 +211,10 @@ begin
 
   while AmountLeft > 0 do
   begin
-    MMouse(x, y, 5, 5);
+    MMouse(x+2, y+2, 20, 20);
    { if not WaitUpText('alue', 300)then
-      Exit; } // No longer has 'value' in the string. + Any txt is hard to read with current shop interface colors..
-    GetMousePos(xz, yz);
-    Mouse(xz, yz, 0, 0, False);
+      Exit; }
+    ClickMouse2(mouse_right);
 
     case AmountLeft of
       1..4: S := '1';
@@ -214,7 +235,7 @@ end;
 
 {*******************************************************************************
 function Sell(i, Amount: Integer): Boolean;
-By: RSN small edit by N1ke!
+By: RSN small edit by N1ke! Fixed for Oldschool by DannyRS
 Description: Sells Items at specified Inv Slot
 *******************************************************************************}
 function Sell(i, Amount: Integer): Boolean;
@@ -230,7 +251,7 @@ end;
 
 {*******************************************************************************
 function FindItemsArray(color, tol: Integer; Text: string; num: Integer): TPointArray;
-By: RSN
+By: RSN //Broken
 Description: Returns Array of all Coords of that Item
 *******************************************************************************}
 function FindItemsArray(color, tol: Integer; Text: string; num: Integer)
@@ -243,8 +264,8 @@ begin
   SetArrayLength(Result, 0);
   if (num = 0) then
     num := -1;
-  ty := 190;
-  tx := 548;
+  ty := 212;
+  tx := 563;
   repeat
     yi := yi + 1;
     ty := ty + 37;
@@ -281,7 +302,7 @@ end;
 
 {*******************************************************************************
 function FindItems(color, tol: Integer; text: string; num: Integer): TPointArray;
-By: Mutant Squirrle
+By: Mutant Squirrle //Broken
 Description: Finds Items with color and up text.
 *******************************************************************************}
 function FindItems(color, tol: Integer; text: string; num: Integer):
@@ -294,8 +315,8 @@ begin
   SetArrayLength(Result, 0);
   if (num = 0) then
     num := -1;
-  ty := 190;
-  tx := 548;
+  ty := 212;
+  tx := 563;
   repeat
     yi := yi + 1;
     ty := ty + 37;
@@ -323,7 +344,7 @@ end;
 
 {*******************************************************************************
 procedure SellItems(Color, Tol, Num, Amount: Integer; Text: string);
-By: RSN
+By: RSN //Broken
 Description: Sells items with that color, UpText and Tolerance by
 Amount Specified
 *******************************************************************************}
