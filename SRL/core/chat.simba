@@ -195,6 +195,7 @@ If will click if Click = True, calls ChatWait if Wait = True.
 
     by _ChArMz & Narcle (Original by EvilChicken!)
     Edit [Old School RS] by : Le Jingle (Feb. 28th, 2013)
+    Edit [Old School RS] by : Slushpuppy (March. 3rd, 2013)
 
 Example:
 
@@ -211,7 +212,11 @@ begin
   Result := false;
 
   // only 1 blue color in chat.
-  FindColorsTolerance(bTxt, 16711680, MCX1, MCY1, MCX2, MCY2, 10);
+    GetMousePos(x,y);
+  while ( not FindColorsTolerance(bTxt, 16711680, MCX1, MCY1, MCX2, MCY2, 10)) AND PointInBox( Point(x,y), IntToBox(MCX1, MCY1, MCX2, MCY2)) do
+  begin
+       SleepAndMoveMouse(Random(1500));
+  end;
 
   SearchTPA := CombineTPA(bTxt, wTxt);
   if Length(SearchTPA) < 1 then

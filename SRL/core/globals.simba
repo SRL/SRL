@@ -257,6 +257,7 @@ var
   {$ELSE}
     Smart_ForceNew: Boolean;
     Smart_FixSpeed: Boolean;
+    SRL_SixHourFix: Boolean;//Placeholder
     Smart_CurrentClient: Integer;
     Smart_World: Integer;
   {$ENDIF}
@@ -505,8 +506,8 @@ const
   HP_BAR_TOL = 3;
   HP_BAR_WIDTH = 57;
   HP_BAR_HEIGHT = 7;
-  HP_BAR_COLOR1 = 9728;//Green
-  HP_BAR_COLOR2 = 132923;//Red
+  HP_BAR_COLOR1 = 65280;//Green
+  HP_BAR_COLOR2 = 255;//Red
 
 (*
 GetFightBarTPA

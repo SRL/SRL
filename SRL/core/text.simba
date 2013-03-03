@@ -843,7 +843,7 @@ var
   x, y: integer;
   chars: TStringArray;
 begin
-  chars := [UpChars, CharsNPC];
+  chars := [UpChars07, CharsNPC07];
 
   if (findTextEx(x, y, txt, chars, MCX1, MCY1, MCX2, MCY2)) then
   begin
