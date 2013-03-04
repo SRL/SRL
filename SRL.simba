@@ -165,7 +165,7 @@ begin
   UseFindTrade := True;
   UseAutoResponder := True;
   SRL_DisableIPLog := false;
-  SRL_SavePath := includePath + 'SRL/logs/';
+  SRL_SavePath := includePath + 'SRL-OSR/logs/';
   SRL_StartTime := theDate(DATE_MONTH)+' at '+theTime;
   WarnSensitivity := -2;
   SetupAutoColors;
