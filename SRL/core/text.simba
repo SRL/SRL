@@ -989,13 +989,13 @@ Example:
 Function GetChooseOptions(): Array of TOptions; // args weren't used.. thus removed
 var
   I, w, h, cts, bmp, target : Integer;
-  B, BB, BigBox, OffSetYBox, TextSearchBox : TBox;
+  B, BB, BigBox, Yoff, TextSearchBox : TBox;
   TPA, TPA1 : TPointArray;
   ATPA, tempatpa : T2DPointArray;
 begin
   target := GetImageTarget;
   GetClientDimensions(B.X2, B.Y2);
-  B := IntToBox(0, 0, B.X2-1, B.Y2-1);
+  B := IntToBox(0, 0, B.X2 - 1, B.Y2 - 1);
   cts := GetColorToleranceSpeed;
   ColorToleranceSpeed(1);
   FindColorsTolerance(TPA, 4674653, B.X1, B.Y1, B.X2, B.Y2, 0);
@@ -1007,8 +1007,8 @@ begin
   B := GetTPABounds(TPA);
   BigBox := B;
   SetColorToleranceSpeed(3);
-  OffSetYBox := IntToBox(B.X1, B.Y1 + 18, B.X2, B.Y2);
-  FindColorsTolerance(TPA1, 0, OffSetYBox.X1, OffSetYBox.Y1, OffSetYBox.X2, OffSetYBox.Y2, 0);
+  Yoff := IntToBox(B.X1, B.Y1 + 18, B.X2, B.Y2);
+  FindColorsTolerance(TPA1, 0, Yoff.X1, Yoff.Y1, Yoff.X2, Yoff.Y2, 0);
   SplitTPAExWrap(TPA1, 1, 1, ATPA);
   SortATPASize(ATPA, true);
   TextSearchBox := GetTPABounds(ATPA[0]);
@@ -1023,7 +1023,7 @@ begin
 
   SetLength(ATPA, h div 15);
   for i := 0 to High(ATPA) do
-    FindColorsTolerance(ATPA[i], clRed, 0, 2+(i*15), w-1, 16+(i*15), 0);
+    FindColorsTolerance(ATPA[i], clRed, 0, 2 + (i * 15), w - 1, 16 + (i * 15), 0);
 
   SortATPAFromFirstPointY(ATPA, Point(w div 2, 0));
   SetArrayLength(Result, Length(ATPA));
@@ -1035,7 +1035,8 @@ begin
     SortATPAFromFirstPointX(tempatpa, Point(0, 0));
     Result[i].Str := GetTextATPA(tempatpa, 5, 'UpChars07');
     BB := GetTPABounds(ATPA[i]);
-    Result[i].Bounds := BB;
+    Result[i].Bounds := IntToBox(BB.X1 + Yoff.X1, BB.Y1 + Yoff.Y1,
+                Result[0].BigBox.X2, BB.Y2 + Yoff.Y1);
     setlength(tempatpa,0);
     setlength(TPA,0);
   end;
