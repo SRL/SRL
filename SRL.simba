@@ -39,22 +39,22 @@
 {$IFDEF SMART}
 {$IFNDEF SRL_SMART}
   {$IFDEF SIMBAMAJOR980}
-    {$I SRL-007/SRL/Misc/Smart.Simba}
+    {$I SRL-OSR/SRL/Misc/Smart.Simba}
   {$ELSE}
     Procedure ActivateClient; {$IFDEF LAPE}override;{$ENDIF} begin end;
   {$ENDIF}
 {$ENDIF}
 {$ENDIF}
 
-//{$include SRL-007/SRL/core/defines.simba}
+//{$include SRL-OSR/SRL/core/defines.simba}
 {$ifdef Simba}
-{$i SRL-007/SRL/core/simba.simba}
+{$i SRL-OSR/SRL/core/simba.simba}
 {$endif}
-{$include SRL-007/SRL/core/globals.simba}
-{$include SRL-007/SRL/core/math.simba}
-{$include SRL-007/SRL/core/mouse.simba}
-{$include SRL-007/SRL/core/color.simba}
-{$include SRL-007/SRL/core/players.simba}
+{$include SRL-OSR/SRL/core/globals.simba}
+{$include SRL-OSR/SRL/core/math.simba}
+{$include SRL-OSR/SRL/core/mouse.simba}
+{$include SRL-OSR/SRL/core/color.simba}
+{$include SRL-OSR/SRL/core/players.simba}
 
 //----------------------------------------------------------------------------//
 //--                         SRL Level 2 Includes                           --//
@@ -62,13 +62,13 @@
 //--                     Interface and OCR routines.                        --//
 //----------------------------------------------------------------------------//
 
-{$include SRL-007/SRL/core/text.simba}
-{$include SRL-007/SRL/core/timing.simba}
-{$include SRL-007/SRL/core/SRLlog.simba}
-{$include SRL-007/SRL/core/chat.simba}
-{$include SRL-007/SRL/core/bitmaps.simba}
-{$include SRL-007/SRL/core/amount.simba}
-{$include SRL-007/SRL/core/gametab.simba}
+{$include SRL-OSR/SRL/core/text.simba}
+{$include SRL-OSR/SRL/core/timing.simba}
+{$include SRL-OSR/SRL/core/SRLlog.simba}
+{$include SRL-OSR/SRL/core/chat.simba}
+{$include SRL-OSR/SRL/core/bitmaps.simba}
+{$include SRL-OSR/SRL/core/amount.simba}
+{$include SRL-OSR/SRL/core/gametab.simba}
 
 //----------------------------------------------------------------------------//
 //--                         SRL Level 3 Includes                           --//
@@ -76,31 +76,31 @@
 //--   MapWalking, AntiRandoms, Objects, Bank, Symbol and many more...      --//
 //----------------------------------------------------------------------------//
 
-{$include SRL-007/SRL/core/animation.simba}
-{$include SRL-007/SRL/core/flag.simba}
-{$include SRL-007/SRL/core/worldswitcher.simba}
-{$include SRL-007/SRL/core/login.simba}
-{$include SRL-007/SRL/core/autocolor.simba}
-{$include SRL-007/SRL/core/mapwalk.simba}
-{$include SRL-007/SRL/core/object.simba}
-{$include SRL-007/SRL/core/inventory.simba}
-{$include SRL-007/SRL/core/bank.simba}
-{$include SRL-007/SRL/core/symbol.simba}
-{$include SRL-007/SRL/core/rc.simba}
-{$include SRL-007/SRL/core/cautorespond.simba}
-{$include SRL-007/SRL/core/antiban.simba}
-{$include SRL-007/SRL/core/globalstats.simba}
+{$include SRL-OSR/SRL/core/animation.simba}
+{$include SRL-OSR/SRL/core/flag.simba}
+{$include SRL-OSR/SRL/core/worldswitcher.simba}
+{$include SRL-OSR/SRL/core/login.simba}
+{$include SRL-OSR/SRL/core/autocolor.simba}
+{$include SRL-OSR/SRL/core/mapwalk.simba}
+{$include SRL-OSR/SRL/core/object.simba}
+{$include SRL-OSR/SRL/core/inventory.simba}
+{$include SRL-OSR/SRL/core/bank.simba}
+{$include SRL-OSR/SRL/core/symbol.simba}
+{$include SRL-OSR/SRL/core/rc.simba}
+{$include SRL-OSR/SRL/core/cautorespond.simba}
+{$include SRL-OSR/SRL/core/antiban.simba}
+{$include SRL-OSR/SRL/core/globalstats.simba}
 
-{$include SRL-007/SRL/core/antirandoms/antirandoms.simba}
+{$include SRL-OSR/SRL/core/antirandoms/antirandoms.simba}
 
 {$IFDEF LoadExtraFonts}
-{$include SRL-007/SRL/misc/fontupdater.simba}
+{$include SRL-OSR/SRL/misc/fontupdater.simba}
 {$ENDIF}
 
 {$IFNDEF SIMBAMAJOR980}
 {$IFDEF SMART}
   {$IFNDEF SRL_SMART}
-    {$include SRL-007/SRL/misc/SmartParams.Simba}
+    {$include SRL-OSR/SRL/misc/SmartParams.Simba}
   {$ENDIF}
 {$ENDIF}
 {$ENDIF}
