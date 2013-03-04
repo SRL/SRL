@@ -466,15 +466,17 @@ label
   ProcStart;
 begin
   ActivateClient;
-  Wait(100);
+
+  if (LoggedIn) then Exit;
+
+  Wait(100 + Random(200));
   TypeByte(vk_Escape);
-  Wait(500);
+  Wait(200 + Random(200));
 
          {Check for lobby screen already open/ already logged in}
 
   Result := ((LobbyScreen) or (LoggedIn));
-  if (Result) then
-    Exit;
+  if (Result) then Exit;
 
                        {Check for active player.}
 
