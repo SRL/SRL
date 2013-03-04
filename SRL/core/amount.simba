@@ -39,8 +39,8 @@ function TradeScreen: Integer;
 begin
   for Result := 2 downto 1 do
     case Result of
-      2: if (Trim(GetTextAtExWrap(129,34,149,46,0,5,1,16776960,0,'SmallChars07'))='Are') then Break;
-      1: if (Trim(GetTextAtExWrap(176,35,225,51,0,5,1,2070783,0,'UpChars07'))='Trading') then Break;
+      2: if (Trim(GetTextAtExWrap(205,304,243,319,0,5,1,49152,0,'SmallChars07'))='Accept') then Break;
+      1: if (Trim(GetTextAtExWrap(240,185,278,200,0,5,1,49152,0,'SmallChars07'))='Accept') then Break;
     end;
 end;
 
