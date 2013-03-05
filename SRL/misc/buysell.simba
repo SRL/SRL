@@ -1,68 +1,90 @@
-//-----------------------------------------------------------------//
-//--               SRL Resource Library                          --//
-//--                Buying and Selling routines                  --//
-//-----------------------------------------------------------------//
-// * function ShopItemBoxCoords(I: Integer): TBox;                 //
-// * function ShopItemCoords(I: Integer): TPoint;                  //
-// * function ExistsShopItem(i: Integer): Boolean;                 //
-// * function BuyCoords(x, y, Amount: Integer): Boolean;           //
-// * function BuyAmount(i, Amount: Integer): Boolean;              //
-// * function BuyColor(UpText: String; Color, Tol, Amount: Integer): Boolean; //
-// * function SellCoords(x, y, Amount: Integer): boolean;          //
-// * function Sell(i, Amount: Integer): Boolean;                   //
-// * function  FindItems(color, tol: Integer; text: string; num: Integer): TPointArray; //
-// * procedure SellItems(Color, Tol, Num, Amount: Integer; Text: string); //
+//----------------------------------------------------------------------------//
+//--               SRL-OSR Resource Library                                 --//
+//--                Buying and Selling routines                             --//
+//----------------------------------------------------------------------------//
+// * function Shop_Screen: Boolean;                                           //
+// * function Close_Shop: Boolean;                                            //
+// * function ShopItemBoxCoords(I: Integer): TBox;                            //
+// * function ShopItemCoords(I: Integer): TPoint;                             // * by N1ke!
+// * function ExistsShopItem(i: Integer): Boolean;                            // * by N1ke!
+// * function StockShopItem(I: Integer): Integer;                             //
+// * function BuyCoords(x, y, Amount: Integer): Boolean;                      // * by RSN re-done by N1ke!
+// * function BuyAmount(i, Amount: Integer): Boolean;                         // * by RSN modified by N1ke!
+// * function BuyColor(UpText: string; Color, Tol, Amount: Integer): Boolean; // * by RSN Modified by N1ke!
+// * function SellCoords(x, y, Amount: Integer): boolean;                     // * by RSN redone by N1ke!
+// * function Sell(i, Amount: Integer): Boolean;                              // * RSN small edit by N1ke!
+// * function FindItemEx(Col, Tol, Slot: integer; Text: string): TPoint;      //
+// * function FindItems(Col, Tol: integer; Text: string): TPointArray;        // * by RSN
+// * procedure SellItems(Color, tol, Num, Amount: Integer; Text: string);     // * by RSN
 
 {
-  Re-make of the old 'buysell.simba' for oldschool RS.
-  This include is essentially an edit-over the previous made functions.
+  Dev. Note:
 
-  Edits by:
-  - DannyRS
-  - Le Jingle
-}
+      REMADE FILE by:  DannyRS  &  Le Jingle
 
-function help_nothing: boolean;
-begin
-  Result := False;
-end;
+      Inteded to be used in OSR (Old School RS)
+
+      Prev. Contributers listed by function list above.
+} 
 
 // Fixed for Oldschool by DannyRS, Original by ??
 function Shop_Screen: Boolean;
 begin
-  Result := (FindTextTPA(2070783, 10, 22, 30, 476, 52, 'Store', 'UpChars07', Nothing) and
-  (GetColor(482, 36)=65536));
+  Result := (FindTextTPA(2070783, 10, 22, 30, 476, 52, 'Store', 'UpChars07', Nothing)
+                 and (GetColor(482, 36) = 65536));
 end;
 
 // Fixed for Oldschool by DannyRS, Original by ??
-function Close_Shop: boolean; // Not particually needed.. simply apart of another script I use
+function Close_Shop: Boolean;
+var
+  i, Timer: Integer;
 begin
   Result := False;
   if Shop_Screen then
   begin
-    MouseBox(478, 32, 496, 50, mouse_left);
-    Result := True;
-  end else
-    Result := True;
+    Timer := GetTimeRunning + 8000;
+    repeat
+      MouseBox(478, 32, 496, 50, mouse_left);
+      for i := 0 to 30 do
+      begin
+        if not Shop_Screen then
+        begin
+          Result:= True;
+          Break;
+        end;
+        Wait(100);
+      end;
+      Wait(Random(100));
+    until (GetTimeRunning > Timer) or Result;
+  end;
 end;
 
 {*******************************************************************************
 function ShopItemBoxCoords(I: Integer): TBox;
-By: DannyRS for Oldschool
+By: DannyRS/Le Jingle for Oldschool
 Description: Results the tbox coords for shop item. (Left to right).
 *******************************************************************************}
-function ShopItemBoxCoords(I: Integer): TBox;
+function ShopItemBoxCoords(i : integer): TBox;
 var
-  row, col: Integer;
+  row, col : integer;
 begin
-  row := i div 9;
-  col := i - (row * 8) - 1;
+  result := IntToBox(-1, -1, -1, -1);
+  if not inRange(i, 0, 39) then
+  begin
+    srl_Warn('ShopItemBoxcoords', 'Parameter not in range(0, 39)', warn_AllVersions);
+    exit;
+  end;
+  row := i div 8;
+  col := i - (row * 8);
   if (col < 0) then
   begin
     col := 8;
     row := row - 1;
   end;
-  Result := IntToBox(81+(col*47),69+(row*47),81+(col*47)+30,69+(row*47)+30);
+  Result.X1 := 80  + (col * 47);
+  Result.Y1 := 69  + (row * 47);
+  Result.X2 := 112 + (col * 47);
+  Result.Y2 := 100  + (row * 47);
 end;
 
 {*******************************************************************************
@@ -71,12 +93,8 @@ By: DannyRS for Oldschool
 Description: Results the coords for shop item. (Left to right).
 *******************************************************************************}
 function ShopItemCoords(I: Integer): TPoint;
-var
-  ShopItemBox: TBox;
 begin
-  ShopItemBox := ShopItemBoxCoords(I);
-  Result.X := Round(((ShopItemBox.X2-ShopItemBox.X1)/2)+ShopItemBox.X1);
-  Result.Y := Round(((ShopItemBox.Y2-ShopItemBox.Y1)/2)+ShopItemBox.Y1);
+  Result := MiddleBox(ShopItemBoxCoords(I));
 end;
 
 {*******************************************************************************
@@ -104,77 +122,63 @@ Description: Returns the shops Stock of a slot (Left to right).
 *******************************************************************************}
 function StockShopItem(I: Integer): Integer;
 var
-  SIBox,YTBox: TBox;
+  SIBox, YTBox: TBox;
   YT: TPointArray;
 begin
   Result := -1;
   if not Shop_Screen then
     Exit;
   SIBox := ShopItemBoxCoords(I);
-  if (FindColors(YT,65535,SIBox.X1,SIBox.Y1,SIBox.X2,SIBox.Y2)) then
+
+  if (FindColors(YT, 65535, SIBox.X1, SIBox.Y1, SIBox.X2, SIBox.Y2)) then
   begin
     YTBox := GetTPABounds(YT);
-    Result := StrToIntDef(GetTextAtExWrap(YTBox.X1-2,YTBox.Y1-2,YTBox.X2+2
-                              ,YTBox.Y2+2,0,5,1,65535,0,'StatChars07'),-1);
+    Result := StrToIntDef(GetTextAtExWrap(YTBox.X1 - 2, YTBox.Y1 - 2,
+                  YTBox.X2 + 2, YTBox.Y2 + 2, 0, 5, 1, 65535, 0, 'StatChars07'), -1);
   end else
-  begin
     if (ExistsShopItem(I)) then
       Result := 1;
-  end;
-end;
+end; 
 
 {*******************************************************************************
 function BuyCoords(x, y, Amount: Integer): Boolean;
-By: RSN re-done by N1ke! Fixed for Oldschool by DannyRS
+By: RSN re-done by N1ke! Fixed for Oldschool by Le Jingle/DannyRS
 Description: Buys the specified amout of the Item at x, y
 *******************************************************************************}
-function BuyCoords(x, y, Amount: Integer): Boolean;
+function BuyCoords(x, y, amount: Integer): Boolean;
 var
-  AmountLeft, iTime: Integer;
-  S: String;
+  target : integer;
 begin
   Result := False;
-  if not Shop_Screen then Exit;
+  if not Shop_Screen then
+    Exit;
 
-  if Amount < 1 then
+  if (amount < 1) then
   begin
     srl_Warn('BuyCoords', 'Invalid amount parameter', warn_Warning);
     Exit;
   end;
-  AmountLeft := Amount;
 
-  while AmountLeft > 0 do
+  while (amount > 0) do
   begin
-    MMouse(RandomRange(x-10,x+10), RandomRange(y-10,y+10), 0, 0);
-    {if not WaitUpText('alue', 1000) then
-      Exit;}
+    Wait(10+random(250));
+    MMouse(RandomRange(x - 10, x + 10), RandomRange(y - 10, y + 10), 0, 0);
+   { if not WaitUpText('alue', 300)then
+      Exit; }
     ClickMouse2(mouse_right);
 
-    case AmountLeft of
-      1: S := '1';
-      5: S := '5';
-      10: S := '10';
-      50: S := '50';
-      500: S := '500';
-      else S := 'Buy All'; // use 'Buy All' b/c 'Buy x' doesn't exist?
+    case (amount) of
+      1..4: target := 1;
+      5..9: target := 5;
+      else
+        target := 10;
     end;
-    if not WaitOption(S, 400)then
-      Exit;
-
-    if (S = 'Buy X') then
-    begin
-      iTime := GetSystemTime + 7000;
-      while not (CountColor(0, 211, 392, 307, 410) > 200) do
-        Wait(150+Random(100));
-
-      if AmountLeft > 49999 then
-        S := '50000' else S := IntToStr(AmountLeft);
-
-      TypeSend(S);
-    end;
-
-    AmountLeft := AmountLeft - StrToInt(S);
+    if WaitOption(IntToStr(target), 800) then
+      amount := amount - target
+    else
+      exit;
   end;
+
   Result := True;
 end;
 
@@ -204,7 +208,7 @@ var
   x, y: Integer;
 begin
   Result := False;
-  if not(FindItem(x, y, 'color', Color, 22, 59, 497, 317, [Tol, 4]))then
+  if not (FindItem(x, y, 'color', Color, 22, 59, 497, 317, [Tol, 4])) then
     Exit;
 
   Result := BuyCoords(X, Y, Amount);
@@ -217,39 +221,35 @@ Description: Sells Item at x, y
 *******************************************************************************}
 function SellCoords(x, y, Amount: Integer): boolean;
 var
-  AmountLeft: Integer;
-  S: String;
+  target : integer;
 begin
   Result := False;
-  if not Shop_Screen then Exit;
 
-  if Amount < 1 then
+  if (Amount < 1) then
   begin
     srl_Warn('SellCoords', 'Invalid amount parameter', warn_Warning);
     Exit;
   end;
-  AmountLeft := Amount;
 
-  while AmountLeft > 0 do
+  while (Amount > 0) do
   begin
-    MMouse(RandomRange(x-10,x+10), RandomRange(y-10,y+10), 0, 0);
+    Wait(10+random(250));
+    MMouse(RandomRange(x - 10, x + 10), RandomRange(y - 10, y + 10), 0, 0);
    { if not WaitUpText('alue', 300)then
       Exit; }
     ClickMouse2(mouse_right);
 
-    case AmountLeft of
-      1..4: S := '1';
-      5..9: S := '5';
-      10..49: S := '10';
+    case (amount) of
+      1..4: target := 1;
+      5..9: target := 5;
       else
-      if (Random(20) = 0)then
-        S := '10' else
-        S := '50';
+        target := 10;
     end;
-    if not WaitOption(S, 400)then
-      Exit;
 
-    AmountLeft := AmountLeft - StrToInt(S);
+    if WaitOption(IntToStr(target), 800) then
+      Amount := Amount - target
+    else
+      exit;
   end;
   Result := True;
 end;
@@ -271,110 +271,63 @@ begin
 end;
 
 {*******************************************************************************
-function FindItemsArray(color, tol: Integer; Text: string; num: Integer): TPointArray;
-By: RSN //Broken
-Description: Returns Array of all Coords of that Item
+function FindItemEx(Col, Tol, Slot: integer; Text: string): TPoint;
+By: Le Jingle (Original Idea by: RSN)
+Description: (OSR-made) Finds an inventory item given a color and tolereance,
+                in a specified slot.  Text can be '' or detailed, either way
+                the function will still search.
+                Note: (Using text provides inceased accuracy)
 *******************************************************************************}
-function FindItemsArray(color, tol: Integer; Text: string; num: Integer)
-  : TPointArray;
+function FindItemsEx(Col, Tol, Slot: integer; Text: string): TPoint;
 var
-  xi, yi, tx, ty, Used: Integer;
-  x, y: Integer;
+  x, y : integer;
+  b : TBox;
 begin
-  GameTab(tab_Inv);
-  SetArrayLength(Result, 0);
-  if (num = 0) then
-    num := -1;
-  ty := 212;
-  tx := 563;
-  repeat
-    yi := yi + 1;
-    ty := ty + 37;
-    xi := 0;
-    repeat
-      xi := xi + 1;
-      tx := tx + 41;
-      if (FindColorTolerance(x, y, color, tx - 13, ty - 13, tx + 13, ty + 13,
-        tol) and (Text <> '')) then
-      begin
-        MMouse(tx, ty, 2, 2)
-          Wait(250);
-        if (IsUpText(Text)) then
-        begin
-          Used := Used + 1;
-          SetArrayLength(Result, Used);
-          GetMousePos(Result[Used - 1].x, Result[Used - 1].y);
-          Wait(150);
-        end;
-      end
-      else
-        if (FindColorTolerance(x, y, color, tx - 13, ty - 13, tx + 13, ty + 13,
-          tol)) then
-        begin
-          Used := Used + 1;
-          SetArrayLength(Result, Used);
-          Result[Used - 1].x := tx;
-          Result[Used - 1].y := ty;
-        end;
-    until (xi = 4) or (Used = num);
-    tx := 544;
-  until (yi = 7) or (Used = num);
+  if not GameTab(Tab_Inv) then
+    exit;
+
+  b := InvBox(slot);
+
+  if (FindColorTolerance(x, y, Col, b.X1, b.Y1, b.X2, b.Y2, Tol)) then
+  begin
+    if (Text <> '') then
+    begin
+      MouseTBox(b, move);
+
+      wait(250 + random(250));
+
+      if (IsUpText(Text)) then
+        result := MiddleBox(b);
+    end else
+      result := MiddleBox(b);
+  end;
 end;
 
 {*******************************************************************************
-function FindItems(color, tol: Integer; text: string; num: Integer): TPointArray;
-By: Mutant Squirrle //Broken
-Description: Finds Items with color and up text.
+function FindItems(Col, Tol: integer; Text: string): TPointArray;
+By: Le Jingle (Original Idea by: RSN)
+Description: (OSR-made) See FindItemsEx & Also, this gives an array of matches.
 *******************************************************************************}
-function FindItems(color, tol: Integer; text: string; num: Integer):
-  TPointArray;
+function FindItems(Col, Tol: integer; Text: string): TPointArray;
 var
-  xi, yi, tx, ty, Used: Integer;
-  x, y: Integer;
+  i : integer;
 begin
-  GameTab(tab_Inv);
-  SetArrayLength(Result, 0);
-  if (num = 0) then
-    num := -1;
-  ty := 212;
-  tx := 563;
-  repeat
-    yi := yi + 1;
-    ty := ty + 37;
-    xi := 0;
-    repeat
-      xi := xi + 1;
-      tx := tx + 41;
-      if (FindColorTolerance(x, y, color, tx - 13, ty - 13, tx + 13, ty + 13,
-        tol)) then
-      begin
-        MMouse(tx, ty, 2, 2);
-        Wait(250);
-        if (IsUpText(text)) then
-        begin
-          Used := Used + 1;
-          SetArrayLength(Result, Used);
-          GetMousePos(Result[Used - 1].x, Result[Used - 1].y)
-            Wait(150);
-        end;
-      end;
-    until ((xi = 4) or (Used = num));
-    tx := 544;
-  until ((yi = 7) or (Used = num));
+  SetArrayLength(Result, 28);
+  for i := 1 to 28 do
+    result[i - 1] := FindItemsEx(Col, Tol, i, Text);
 end;
 
 {*******************************************************************************
 procedure SellItems(Color, Tol, Num, Amount: Integer; Text: string);
-By: RSN //Broken
-Description: Sells items with that color, UpText and Tolerance by
-Amount Specified
+By: RSN
+Description: Sells items with that color, UpText and Tolerance by Amount Specified
 *******************************************************************************}
 procedure SellItems(Color, tol, Num, Amount: Integer; Text: string);
 var
-  TP: TPointArray;
+  TPA : TPointArray;
   i: Integer;
 begin
-  TP := FindItems(Color, tol, Text, Num);
-  for i := 0 to GetArrayLength(TP) - 1 do
-    SellCoords(TP[i].x, TP[i].y, Amount);
+  TPA := FindItems(Color, tol, Text);
+  for i := 0 to High(TPA) do
+    SellCoords(TPA[i].x, TPA[i].y, Amount);
 end;
