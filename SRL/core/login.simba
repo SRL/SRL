@@ -510,6 +510,9 @@ begin
   WriteLn('Welcome to Runescape.');
   MouseBox(395, 275, 529, 307, mouse_Left); //Existing User
   end;
+
+  if Length(Players[CurrentPlayer].WorldInfo) > 0 then
+    SelectWorld(Players[CurrentPlayer].WorldInfo[0]);
   ProcStart:
                        {Type in username and pass}
 
