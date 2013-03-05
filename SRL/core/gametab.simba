@@ -149,7 +149,7 @@ begin
   tmpCTS := getColorToleranceSpeed;
   colorToleranceSpeed(1);
 
-  if (tab = tab_Inv) then
+  if (tab = TAB_INV) then
     if (bankScreen) then
     begin
       colorToleranceSpeed(tmpCTS);
@@ -159,21 +159,21 @@ begin
 
   case tab of
     //black outlines of inv buttons
-    tab_Combat : Result:=(FindColor(X,Y,65536, 532, 176, 554, 197));
-    tab_Stats  : Result:=(FindColor(X,Y,65536, 564, 176, 589, 197));
+    TAB_COMBAT : Result:=(GetColor(535,177)=65536);
+    TAB_STATS  : Result:=(GetColor(565,187)=65536);
     { No black outline on Quest button Jagex!?!? }
-    tab_Quest  : Result:=(FindColorTolerance(X,Y,15821910, 600, 175, 620, 196,81));
-    tab_Inv    : Result:=(FindColor(X,Y,65536, 630, 176, 640, 197));
-    tab_Equip  : Result:=(FindColor(X,Y,65536, 663, 176, 670, 197));
-    tab_Prayer : Result:=(FindColor(X,Y,65536, 696, 176, 710, 197));
-    tab_Magic  : Result:=(FindColor(X,Y,65536, 729, 176, 745, 197));
-    tab_Clan   : Result:=(FindColor(X,Y,65536, 531, 475, 549, 490));
-    tab_Friends: Result:=(FindColor(X,Y,65536, 563, 475, 585, 490));
-    tab_Ignore : Result:=(FindColor(X,Y,65536, 597, 475, 620, 490));
-    tab_LogOut : Result:=(FindColor(X,Y,65536, 630, 475, 654, 490));
-    tab_Options: Result:=(FindColor(X,Y,65536, 663, 475, 686, 490));
-    tab_Emotes : Result:=(FindColor(X,Y,65536, 698, 475, 718, 490));
-    tab_Music  : Result:=(FindColor(X,Y,65536, 730, 475, 740, 490));
+    TAB_QUEST  : Result:=(FindColorTolerance(X,Y,15821910, 600, 175, 620, 196,81));
+    TAB_INV    : Result:=(GetColor(642,173)=65536);
+    TAB_EQUIP  : Result:=(GetColor(666,177)=65536);
+    TAB_PRAYER : Result:=(GetColor(706,175)=65536);
+    TAB_MAGIC  : Result:=(GetColor(730,188)=65536);
+    TAB_CLAN   : Result:=(GetColor(538,476)=65536);
+    TAB_FRIENDS: Result:=(GetColor(565,485)=65536);
+    TAB_IGNORE : Result:=(GetColor(598,485)=65536);
+    TAB_LOGOUT : Result:=(GetColor(643,470)=65536);
+    TAB_OPTIONS: Result:=(GetColor(680,472)=65536);
+    TAB_EMOTES : Result:=(GetColor(713,475)=65536);
+    TAB_MUSIC  : Result:=(GetColor(747,471)=65536);
   end;
   colorToleranceSpeed(tmpCTS);
 end;
