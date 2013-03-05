@@ -2348,7 +2348,7 @@ begin
   Result := '';
   if (not GameTab(tab_Music)) then Exit;
   Wait(100 + Random(200));
-  Result := Trim(GetTextAtExWrap(550, 241, 730, 253, 0, 5, 1, 65280, 0, 'UpChars07'));
+  Result := Trim(GetTextAtExWrap(550, 239, 730, 253, 0, 5, 1, 65280, 0, 'UpChars07'));
 end;
 
 (*
