@@ -583,7 +583,7 @@ begin
        492: Actions := ['Error Connecting.',                 20000,    9,    'Terminate',     'Error Connecting'];  //Updated
       1721: Actions := ['Too many incorrect logins.',    5 * 60000,    2,    'PlayerFalse',   'Too many logins'];   //Updated
        906: Actions := ['This world is full.',                5000,   10,    'PlayerFalse',   'World is full'];     //Updated
-       732: Actions := ['Runescape has been updated.',           0,    0,    'RSUpdate',      'RS Updated'];
+       1136: Actions := ['Runescape has been updated.',           0,    0,    'RSUpdate',      'RS Updated'];
        777: Actions := ['Login limit exceeded.',             20000,   10,    '',              'Waiting for login.'];
       1700: Actions := ['You will need a members account to login to this world. Please subscribe, or use a different world.',        0,    0,    'PlayerFalse',   'Acc Disabled'];  //Updated
     end;
