@@ -454,7 +454,7 @@ Example:
 function LoginPlayer: Boolean;
 var
   RetryLogin: Boolean;
-  typtmp, t, w: integer;
+  typtmp, t, w, i: integer;
   Actions: TVariantArray;
   Attempts: LongInt;
   p: TPoint;
@@ -659,7 +659,16 @@ begin
 
   TakeIPScreen();
   if (LobbyScreen) then
-    MouseBox(WDx1, WDy1, WDx2, WDy2, mouse_Left);     //Click To Play
+  begin
+    MouseBox(WDx1, WDy1, WDx2, WDy2, mouse_Left); //Click To Play
+    i := 0;
+    repeat
+      i := i+1;
+      Wait(100 + Random(100));
+    until (LoggedIn) or (i > 30);
+  end;
+
+  Wait(100 + Random(100));
 
                      {Back to main screen if needed}
 
