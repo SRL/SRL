@@ -369,8 +369,6 @@ begin
     FFlag(0);
     Wait(500 + Random(1500));
   end;
-
-  SetRun(False);
 end;
 
 (*
