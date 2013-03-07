@@ -528,8 +528,8 @@ end;
    Used in srl_InFight. }
 const
   HP_BAR_TOL = 3;
-  HP_BAR_WIDTH = 57;
-  HP_BAR_HEIGHT = 7;
+  HP_BAR_WIDTH = 29;
+  HP_BAR_HEIGHT = 4;
   HP_BAR_COLOR1 = 65280;//Green
   HP_BAR_COLOR2 = 255;//Red
 
