@@ -52,7 +52,8 @@ Valid Arguments are:
 - fishing spot, fish        - portal (to player owned houses)   - water source, water
 - food shop                 - pottery, pot                      - weave
 - fur trader                - quest                             - windmill
-- furnace                   - rare trees, tree
+- furnace                   - range
+                            - rare trees, tree
 
 *******************************************************************************}
 
@@ -106,7 +107,6 @@ Const     //Symbol Constants, may be changed to integers in SRL6
   Symbol_MakeoverMage = 'makeover mage';
   Symbol_Mill = 'mill';
   Symbol_Minigame = 'minigame';
-  Symbol_MiniObelisk = 'mini obelisk';
   Symbol_MiningShop = 'mining shop';
   Symbol_MiningSpot = 'mining spot';
   Symbol_MiningSite = Symbol_MiningSpot;
@@ -118,6 +118,7 @@ Const     //Symbol Constants, may be changed to integers in SRL6
   Symbol_Pottery = 'pottery';
   Symbol_Pot = Symbol_Pottery;
   Symbol_Quest = 'quest';
+  Symbol_Range = 'range';
   Symbol_Windmill = 'windmill';
   Symbol_Sandpit = 'sandpit';
   Symbol_SawMill = 'saw mill';
@@ -133,8 +134,6 @@ Const     //Symbol Constants, may be changed to integers in SRL6
   Symbol_SpinningWheel = 'spinning wheel';
   Symbol_Spin = Symbol_SpinningWheel;
   Symbol_StaffShop = 'staff shop';
-  Symbol_SummoningStore = 'summoning store';
-  Symbol_SummoningObelisk = 'summoning obelisk';
   Symbol_SwordShop = 'sword shop';
   Symbol_Tanner = 'tanner';
   Symbol_TrainingDummy = 'training dummy';
@@ -167,26 +166,17 @@ Example:
 function LoadSymbolBitmapColor(Name: string): Integer;
 begin
   case LowerCase(Name) of
-    Symbol_Bank:
+    Symbol_Bank:             //done
       begin
-       SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwAAxsWun/9NjnbX' +
-       '/D9BUUgOR8GILJAlWiKIcogJBAdQAKYiiHqIQiiHpfJyOqRHYNLMa' +
-       'ZjEIoBKZB32A==');
+       SymbolBitmap := BitmapFromString(7, 7, 'meJzzu/GZNbveD0wuXLYSgvyQBIHo' +
+        '4LGTQOSyfC9QBIIg4kCVQEGIOLIhcMXIglhVwg1ENhMArCpSCw==');
         result := 2216175;
       end;
-    Symbol_MiniObelisk:
+    Symbol_MiningSpot, 'mining site', 'mine':                //done
       begin
-       SymbolBitmap := BitmapFromString(15, 5, 'meJxjYGDYjwTO75ymWJUpaO7FKyw' +
-        '7f/58ZCkGMEAW0QrM8q3vAapPz/AgqFg2wguoGEhyKfHhVwx0w4NH' +
-        'D4AIaL5TQh4Q4VEMcQNQDVA90HAeRStkw4EqAbnwdxs=');
-        result := 12566463;
-      end;
-    Symbol_MiningSpot, 'mining site', 'mine':
-      begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyAAXqrfB' +
-       'vCddIzMsrKSiMiIiCCQJWYiufk2INUWova2dkD1Xv7ec+fPx+rYrj' +
-       'K+WAANBaXYqDK7GDtIAsBiEqgCFAxnI2seEKsNVCluzoPXBauGOpm' +
-       'ADVlcCo=');
+        SymbolBitmap := BitmapFromString(6, 9, 'meJwrr60vR0IHj51cuGxlUnoWXATI' +
+        'BQra5S4wT5+YW1QKFAmNjgNytWObpf3LHFw9gYp9g0KBXDH7QqBii' +
+        'HagCJ9lEoQL1A4UgbAhXGQRCBeC0LgQBAAGFlo9');
         Result := 5077645;
       end;
     Symbol_Transportation:
@@ -197,31 +187,26 @@ begin
           '124A69910715C269317CEC866229B0C00B3496273');
         Result := 2650848;
       end;
-    Symbol_MagicShop:
+    Symbol_MagicShop:       //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0510A80300806' +
-          'E02B9906B6C77F3AEF7FA4A0066DABC17A1111FD1469A74CC5C46' +
-          '0D6C60875CEA17288D63CE08C771D02A09BA5CBA499DC99AD3CFA' +
-          'EB72041B97B9D9C83F6F2ECE69C3D71F46F9EE5C979D155AFDBAA' +
-          '5BBFF312D915399C927AF756C82');
+        SymbolBitmap := BitmapFromString(8, 7, 'meJxT1/9/8NhJdf3/qkv/L1y2UqHi' +
+        'vzpYBMIAkkBxOBuoAMKAiMOlIBrhgnApuHpkQVbt60BxIAk3CiLIz' +
+        'nMSKC6X+xTIAHIhIhBBIAIA+c9XNA==');
         Result := 1714669;
       end;
-    Symbol_WaterSource, 'water':
+    Symbol_WaterSource, 'water':   //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyABFJrHmt' +
-     'm/ACi+fPnH0AFQJW4FAMRfsUQlYfPPgSS7Hb30QzHVAxUCVcMRHgUQ2xHVoxs' +
-     'OAMAbyOCjQ==');
+        SymbolBitmap := BitmapFromString(5, 8, 'meJx72Vf1JtcXgg4eOwkk3587DyQf' +
+        'ugstXLYSyIZzgQhZFsKFs9EQUC/QNCAJR0AuMgIAkXBHJg==');
         Result := 16279593;
       end;
-    Symbol_Furnace:
+    Symbol_Furnace:  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA3334353435B470' +
-          '3101423308696A028466E6C6A6A626E66E6E1640062E12A206A2D' +
-          'EC90408A1261882CD3424CA6427472320DBCDCDC810C61EFC2653' +
-          '3F34882171990C0058F36390');
+        SymbolBitmap := BitmapFromString(8, 7, 'meJzTdUpTqPiPjHSd0hxcPXXB4qpL' +
+        '//P8B5FEimM1BxMBxXGhhctWYkUArMdH7A==');
         Result := 3508223;
       end;
-    Symbol_Anvil:
+    Symbol_Anvil:    //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95CF510AC0300803D02B' +
           'A59DE0F2D9F6FE771A2CFB10CAC4FE04117C443434D8E4C2EA4A8' +
@@ -229,20 +214,18 @@ begin
           '3773F92F2BE6A91CBFD05CE9FC00C9DB6164');
         Result := 4012591;
       end;
-    Symbol_RareTrees, 'tree':
+    Symbol_RareTrees, 'tree':  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABmw+jCx5' +
-       'vBDE08sOQZK7GYAkRAFQJX7FcISpGK4eKIumZf78+ZiKsZo/HwyQF' +
-       'cPVA8Xd1XmAJLJKkDMAo5RFgw==');
+        SymbolBitmap := BitmapFromString(7, 9, 'meJxjDuRnzhdg7xFGRsxYBfMF0AR5' +
+        '5stiCmLVDlIJFkQTBwkG8i9ctlJQxwlIQgQPHjsJZIMEDYKBJIQLJ' +
+        'CEIohLCBgDteDqV');
         Result := 494860;
       end;
-    Symbol_FishingSpot, 'fish':
+    Symbol_FishingSpot, 'fish':  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCE410E80300844D12B4D5BA' +
-          '9BAA404EE7F2413675343AA6EFE82D217D061682636ACCCADA779' +
-          '045B641F117987CDAFB84D2479D67257B28A0EFD90B9C9F9BB3FD' +
-          'FF02EC337F347B39977D83F37AFFEA2D76EDEA4543DE870B2922F' +
-          'BB6B6878');
+        SymbolBitmap := BitmapFromString(8, 7, 'meJw7eOzkQRzo/3kDECqTRBcsk4Qj' +
+        'hHiZJIeAAprUjmU8D92FgAguCOGioTPyXEC0cNlKIAnUBeFCRCAIK' +
+        'AgA+VZgSw==');
         Result := 16743189;
       end;
     Symbol_Cookery, 'cook':
@@ -254,11 +237,11 @@ begin
           '3E40632F');
         Result := 1194607;
       end;
-    Symbol_Quest:
+    Symbol_Quest:      //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwAA22Tnkzffim1' +
-     '5jEQAdmmPvuB5Pz58yGyQJVwxUBxIAIqg6iHqIQgNMUQ0/AgrCbDXQI0GeIYi' +
-     'EuAAFkx3M0Qx8BdAlEJMhkAMoB+aA==');
+        SymbolBitmap := BitmapFromString(8, 6, 'meJx7NbPv/aaNL/uqgOjVzL6DwfZA' +
+        'cuGylUASKAKRgghCEEQlBL3J9YUjiCxQPZANVA8XgQgCSYgyuPkQQ' +
+        'Yg4hAGUAooDAEDRW5o=');
         Result := 14908517;
       end;
     Symbol_mill:
@@ -269,11 +252,10 @@ begin
           '26DF2973F323B33C9A9D26573A47303B52569D1');
         Result := 655103;
       end;
-    Symbol_Dungeon:
+    Symbol_Dungeon:     //done
       begin
-        SymbolBitmap :=BitmapFromString(8, 9, 'meJw7cAAEFiz4ExDwBYi0tD4wMMSw' +
-        '5vwDCs6cORMoApHCKg4URBOHiBAUl3b9CxGHG8LPPx8oDkRg50Clg' +
-        'ILp6a+BbEYGhgMwMBMJHEACEKOAJIQLAAEpc48=');
+        SymbolBitmap := BitmapFromString(7, 8, 'meJw7eOykuv7/kMj/QBKIOHhXLVy2' +
+        '8iBYEI7wCy5ZhxDJzPsPEYSIo4nAEVAEWRBiApBEVoNmCwDcXWPX');
         Result := 2698232;
       end;
     Symbol_weave:
@@ -284,7 +266,7 @@ begin
           'ECC1E966649793EA6600F03E685F');
         Result := 926783;
       end;
-    Symbol_Pottery, 'pot':
+    Symbol_Pottery, 'pot':              //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DCE5B0AC0200C44D1' +
           '2D6592691B3F2DD5FD2FA98F08554A410217C9C73102B966673E7' +
@@ -293,14 +275,14 @@ begin
           'AECE76FEEFD55D5A50983FFBCB76A807CE5139EC460AC');
         Result := 270148;
       end;
-    Symbol_SpinningWheel, 'spin':
+    Symbol_SpinningWheel, 'spin':   //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABtn' +
-     '+gvPnz28I1wGygSQaG8gAqoQoDrIQAJIQQbgauMiEWGs0xenWokAE0QVXD0dA' +
-     'XciK58MAUAvIVcHaEJMh7kFWDAQQNZgk3D0MAH8HZ/A=');
+        SymbolBitmap := BitmapFromString(6, 7, 'meJxbuGzlwmUrtWObgeTBYyfN0ycC' +
+        '2UAGRATChnDhJFCczzIJWRCiWNq/DMiFkECumH0hkAEhIYJwvRC7g' +
+        'LoAPw5FPA==');
         Result := 2710649;
       end;
-    Symbol_guide:
+    Symbol_guide:             //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303400424717470B27' +
           '33086961E168E4EC64E866E264EE0C614349170B0B4B336411143' +
@@ -308,14 +290,10 @@ begin
           '8869F8CD24C664E2431E533DC44C00EBA66771');
         Result := 13345416;
       end;
-    Symbol_shop, 'store':
+    Symbol_shop, 'store':      //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0410EC4200' +
-          '840D12B2102C25290DEFF486DCA2C4C9A6666363F46E2D308020D' +
-          '32D83DA2AA3E6804276633B66B7AB4006E7D5F57E9406E51DD05B' +
-          '84D78C8435849DD5970E9EC0629AB13B692ABB5B34F279BCF6F32' +
-          '12A15CE3E8B9B7EE3265C52C73EFF0818A6FB2CA085D4FF317598' +
-          '484FA9B6C69689FB37FBFF9FEC35D3E01559765AB');
+        SymbolBitmap := BitmapFromString(5, 8, 'meJzjUNHkACPb5CqLwCwOAQUIEjQI' +
+        'BnJZeGLhXCACcoFIzL6Q2aUPSCol7ldOngNkQxDxXKBeAPQ9Hfk=');
         Result := 3176384;
       end;
     Symbol_Shield:
@@ -326,7 +304,7 @@ begin
           '339595EFD9D3CCD9DFC02CAE26976');
         Result := 9542286;
       end;
-    Symbol_altar:
+    Symbol_altar:        //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33703574323475767171' +
           '7431B670B574B2A4888498630036D300C96464F3DD880610F58E2' +
@@ -334,20 +312,16 @@ begin
           '06006E357035');
         Result := 9542286;
       end;
-    Symbol_arrow:
+    Symbol_arrow:             //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303570333470353437' +
-          '3372249E343633B33475829026161646E626C8B20660330D904C8' +
-          '6A841D6858BC454896C3EA6C9C498899FC465B2919BB1A5B12931' +
-          '24A69910715C269317CEC866229B0C001E5A61CB');
+        SymbolBitmap := BitmapFromString(7, 8, 'meJw7eOzkQRiSy33qm+CUXuULZCAj' +
+        'oCAmAirDKg5EGgbGyAgiiNXMhctWwhFQEKL+IKqTgCJAEgCFbEfB');
         Result := 2782945;
       end;
-    Symbol_bar:
+    Symbol_bar:      //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DAB5CC310EC0200C43D12B41' +
-          'E3001D0389EF7FA44ACD82D4952E5F968757B5B4E28EA56B66E33' +
-          '685908EEEA4115736FF1523A016BD8113A636079B0877A1BE663D' +
-          '24E73E25A7F99F9CE659F96BEEF2031A5D69A8');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJxT3/HZcMUTIDIuP2KXu8A8feLB' +
+        'YyfVYYIuy/cCBRcuWwkUJ0YQKIJVEKgYUzsQYSoD2g4A+OlQNw==');
         Result := 4433385;
       end;
     Symbol_underground:
@@ -367,13 +341,11 @@ begin
           '47D9FFF30DFAEB6308');
         Result := 3363443;
       end;
-    Symbol_churn:
+    Symbol_churn:                  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA9590410A00210845AFA4' +
-          'A5FE5A564CF73FD240CE40502DDA3C5CE8031F318150D1ACE94C4' +
-          '104C7D04365F159253E2C16A5737342B5735F6F6938E960D66430' +
-          '9B0D1B5292146ECD92156ABF1F013CD39DBE736D1E05FCF644FFE' +
-          '8BAC6A8FAF927AEB5338A958DF905A105631F');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJwTNAjms0yS9i+Do4PHTgrqOAki' +
+        'i8e1AQUhDCBSTp4DJMtr64GCSelZuUWlEAQU8Q0KBQoCSWQENdMgG' +
+        'ILgxi5cthLKBhsLZABNAAoCAEWXNlQ=');
         Result := 1720403;
       end;
     Symbol_house:
@@ -385,14 +357,12 @@ begin
           'F5');
         Result := 4740173
       end;
-    Symbol_AxeShop:
+    Symbol_AxeShop:     //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D04B0EC3300804D02B91' +
-          '0033F6127F72FF23A52A1BA4AA55BA1959483C036202E953A74F7' +
-          'EA6BBC35B260C403335377680767CEB92B7293FE59A71BEBE187D' +
-          '1136D2C7C583CAC6E0CCCABF7235B9A13A728B34EB2EA1E1F148E' +
-          'E8D8655CDECADF7C977D69FC8B1BA0269E2B27DEEDA9B13D63933' +
-          'EB356E4B7C6439');
+        SymbolBitmap := BitmapFromString(8, 8, 'meJw7eOzkwWMny2vrfYNCHVw9Fy5b' +
+        'eRAsAhFMSs8KjY4DSiGLA7lAQaAUUL15+kS4OAQF1S+0y10AlMotK' +
+        'gWagCwIVAzUCzEWKBjbvgEiCDQcYiCQhAhK+5cBBYEIaA7EVUBlYv' +
+        'aFEEGImRA2AG3gZpU=');
         Result := 6841956;
       end;
     Symbol_CookeryShop:
@@ -404,21 +374,16 @@ begin
           'B137B3CDAB290E76797E60B5A736560');
         Result := 7565679
       end;
-    Symbol_windmill:
+    Symbol_windmill: //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330313033B074367' +
-          '6367536C745BA0181A11132E968EC68EA8853BD01D84C0324930D' +
-          '5C4C8D8C9C217A91D9C48840D8B84CC6741BB22E6412974A885F6' +
-          '8E1665C264348882C3289CB6DB848889900AC8467DB');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJw7eOzkwWMnef7/h6CFy1YCuap+' +
+        'whAuVgYE4VEANASIkM2EGAs3GaIGIoJpOwDQsFT/');
         Result := 1245183;
       end;
-    Symbol_minigame:
+    Symbol_minigame: //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA8D90410EC0200804B' +
-          'FB4AD22E568B1FFFF52132129C6DAF432214626CB22A340342929' +
-          '47B68DAE82066E2C0D99323BFBBB0A0E88CD3555AAC32EBA1393D' +
-          '99D6E36E7E38FCEC86FF3906D412D09FBB9E4FFCCA113DFED996D' +
-          '8E7FAC13E3CAFCD2B3DD1BB34D3DC7B6CD79039CA16371');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJyLTboWC0ZOrtchDHaek3ARiCCy' +
+        'CIREUwNBmsZnISgWZiaQDVSJLAIRhIijCcJtBwDL+UPh');
         Result := 4670928;
       end;
     Symbol_furtrader:
@@ -429,7 +394,7 @@ begin
           'B16BF7A52438378F321660200DE126419');
         Result := 607112;
       end;
-    Symbol_archeryshop:
+    Symbol_archeryshop:        //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5CE490AC0201' +
           '044D12BB5560F71E910EF7FA4403A0B8318846CFEAA78143129A5' +
@@ -438,48 +403,39 @@ begin
           '37477FF5F35BBE0049C36545');
         Result := 4945565;
       end;
-    Symbol_StaffShop:
+    Symbol_StaffShop:   //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D03B0AC0300C0' +
-          '3D02BD9F1AF198D83EF7FA442BCB6C1B48B26F110020685191412' +
-          'D6C9A96A8C96B2089D5CFCA103DB84B65CA60F49CC32FFCBA55D8' +
-          'B7DD0D9ECCBFD9DDFE4F3AB6FF20D38E96664');
+        SymbolBitmap := BitmapFromString(7, 6, 'meJw7eOzkQRiyy12gnDxn4bKVB/EK' +
+        'wkXggkCulOc0ZBFMNViNAgADY1A9');
+
         Result := 4286358;
       end;
-    Symbol_ClothesShop:
+    Symbol_ClothesShop:       //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DD04B0AC0200' +
-          'C45D12D3DF2D13A0CE9FED754681CA4484A267720CF8308C1C072' +
-          '76F51925BE2023CAB2A0D66916F09A487236CF66A73AAFE4686C8' +
-          'C4D6DE25622AFE4D8E4FDBE55C8D1BE9CF7FF6FFEFC585B3EFFF9' +
-          '012BE4618A');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJwLm2wTNtlG1U84DMwAooPHTnq1' +
+        'GwARXATCdspWhgtCFAARXBDCXrhsJVZBoJlo2uGCyIohggAIxDpn');
         Result := 5935156;
       end;
-    Symbol_FarmingSpot:
+    Symbol_FarmingSpot:                //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDyAAwRZC' +
-     'Lir87iJ8c2fPx/IBarEpRiicj4M4FGMrBIuiKm4rKw0PSMDqBhNJaZiiEoIQl' +
-     'MJUgwAOf97Lg==');
+        SymbolBitmap := BitmapFromString(6, 7, 'meJw7eOzkQRjis0xauGzlQVQRQYNg' +
+        'NC5cDZwLROW19blFpRATIAqS0rOAIkASrh7IBqLQ6Di4CABdG0gf');
         Result := 12632256;
       end;
-    Symbol_Apothecary:
+    Symbol_Apothecary:   //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD0310AC030088' +
-          '5E12B69A3A68ED6D6FB1FA9D02C4230942CFF241F0F814040BD39' +
-          '7BAFAA8748C46847C2A75B33B6F21E3E13967236B33CBA2767CDD' +
-          '5EFE05926C5F3D23DB932B33C7FE6FFE66AED5A7E01E72B65AE');
+        SymbolBitmap := BitmapFromString(7, 6, 'meJw7eOzkwWMn/6TPAKKHTuULl608' +
+        'iCQCEQQiuMj7c+fhgpsl/dFE4ILIeoEiQAQ0AVkNEAHtAgAaT0wM');
         Result := 16737938;
       end;
-    Symbol_SwordShop:
+    Symbol_SwordShop:  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA95D0410AC030080' +
-          '4C02FD9C66CE25125FFFF524BBD08A5C520EC41964124269078F3' +
-          'EEE33FC5EF918535971A1B0C6000539B761D91D1A4C7A4829CCD1' +
-          '06293E5DCFF929BF231CEBAB92B47EE9A956FBC2FAF9859BE0057' +
-          'DB6637');
+        SymbolBitmap := BitmapFromString(8, 7, 'meJw7eOzkQRiaNHfRrSc/V23clpSe' +
+        'hSa4cNlKIAMonuPkgCkIZADFgQhNEIiAiuFakAWb2rvKa+shuoBci' +
+        'CAQAQVzi0ohuiBSEAQAl6Zn8Q==');
         Result := 10067100;
       end;
-    Symbol_PlatebodyShop:
+    Symbol_PlatebodyShop:       //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA8DD0410AC02' +
           '00C44D12BA56832761902BDFF910A9DCD8055DCFC850C4FD1BA85' +
@@ -488,7 +444,7 @@ begin
           '97E77F7E014609646B');
         Result := 8157816;
       end;
-    Symbol_ScimitarShop:
+    Symbol_ScimitarShop:      //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA9DD04D0AC340' +
           '0805E02B8D7FCF71399349EF7FA4A6B8A825109A203C5CE887D8A' +
@@ -498,7 +454,7 @@ begin
           '65625E');
         Result := 8752522;
       end;
-    Symbol_GemStall:
+    Symbol_GemStall:       //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA58E4B0AC0300844' +
           'AFA4F96719F3B9FF919A640A154A3729836F21FA18629A1196201' +
@@ -507,7 +463,7 @@ begin
           '6C4DA8C9E306B1653E29C4D6DBE0027B7630B');
         Result := 1777896;
       end;
-    Symbol_SilkStall:
+    Symbol_SilkStall:            //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA333034004227432' +
           '733276364D2C2C4C0D0D488181253AF81210262CA42484B67030B' +
@@ -515,7 +471,7 @@ begin
           '62486849889CB6400B4306127');
         Result := 5374340;
       end;
-    Symbol_PlateskirtShop:
+    Symbol_PlateskirtShop:     //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330340042' +
           '2743273327634CD2D9D8CCC2D9009974323235763282909686966' +
@@ -523,13 +479,13 @@ begin
           '709843BCC900457662CC');
         Result := 12609731;
       end;
-    Symbol_Agility:
+    Symbol_Agility:      //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'beNpjYGRgYDwABkAGEM2fPx' +
      '+NAWHDFRyAAbgssgIIA1Mxsnq4GjyK0czHFMcUmQ8G6I4EAIrAWyc=');
         Result := 65536;
       end;
-    Symbol_TrainingDummy:
+    Symbol_TrainingDummy:        //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5CC5B0AC43' +
           '00805D02D69468DF9BC6DEAFE97D401032384F92845B8888F434C' +
@@ -538,33 +494,28 @@ begin
           'A6EC1FB73E6BBE974D6572403C74F9AB2F9769DEA32D69B5');
         Result := 1586538;
       end;
-    Symbol_FoodShop, 'food store':
+    Symbol_FoodShop, 'food store':          //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DAA5D0610AC0200806' +
-          'D02B559ADA4F37DAFD8F3499C11C6D63B02F900A79882959B28AC' +
-          'A825E09908A0893A0B4C25441ED49A0DA2AB3DFFDDF7B467FE64D' +
-          'C88594CF13E56651A08C1DD66146F9A82E47532C0DDFE531F92C8' +
-          '77A9183F945BED9C66F396EC385D91F321AD29FE41DF6B66191');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJwLql+YPX8PBMW2bwiqX2ibXAUX' +
+        'gSCsgkCRSXMXYQouXLYSWQRoJkQQyEAW1I5tBgra5S4AGg5EEKu9i' +
+        '7uk/csAJFlOiA==');
         Result := 7837098;
       end;
-    Symbol_FishingShop, 'fish store':
+    Symbol_FishingShop, 'fish store':  //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA3330340042470B470B' +
-          '27134CD2D2C2C4C8C010425A0081A509844456832962608880E49' +
-          '9099431773425DE64E2CD4426F19B8C6CA6990950812BAE50C234' +
-          '19D9765C6E8698894C62BA193334304D0600DE086263');
+        SymbolBitmap := BitmapFromString(9, 8, 'meJw7eOzkQTBiStgJRAuXrQQiIBdC' +
+        'YorDpTDFdyzjAbKxikMQUFw5ec5BmI3IUkBxCILrghsIZEDEMQ1Ed' +
+        'g8cQVQCANLAhRw=');
         Result := 9734280;
       end;
-    Symbol_Jewelery:
+    Symbol_Jewelery:        //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA9D904B0AC0300844A' +
-          'F646843E2D24FBCFF911A6217820DB4DD0C32EA43070A28B08088' +
-          '6054AB664DB46B07E64276220109A1D7EEFB4CDE85C5840D79E0E' +
-          '05223D3D5BBEEFB4CF4DF933333AA5FFE957CFFDB95DB5356CBFF' +
-          '479E471FB395F2DCE59FC917FB9B6AAB');
+        SymbolBitmap := BitmapFromString(7, 8, 'meJw7eOzkwWMnnVyvaxqfBaKDYC4Q' +
+        'Ff//x/v0EwQB2RAR0SuvXZbvXbhsJZAEsiFqICJABFQDZEO0wEUgC' +
+        'KiYac2h/Isf4SJANlBQOXkOxBxk8yHmANkQBDEfAKWIbvk=');
         Result := 4829105;
       end;
-    Symbol_CraftingShop:
+    Symbol_CraftingShop:     //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA95CEC10AC020' +
           '0C03D05F8AD3D979AC71FFFF4BC27A29C8A45E420EE111240C748' +
@@ -582,12 +533,10 @@ begin
           'BD3CB13F26764CE');
         Result := 15287202;
       end;
-    Symbol_MakeoverMage:
+    Symbol_MakeoverMage:     //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA333034703170' +
-          '7236707676B68490066011571367734B174CD2D2D8CCD5C418993' +
-          '4C06182015E9391D5608A209BEC68E0E8EC4882C9C4BB99129391' +
-          'DD499EC9F8CDC76526A6C9003E5F6688');
+        SymbolBitmap := BitmapFromString(8, 6, 'meJybdezDrGMfsufvsctdAETM7FwH' +
+        'j50Eolmo4nApIAlEQHEIAyK+cNlKrOrh4hCVmOLI9gIFgQgAfKRDlQ==');
         Result := 10340324;
       end;
     Symbol_MaceShop:
@@ -599,15 +548,13 @@ begin
           'A8C7CDFFEEE39F39161EE1ADD6893');
         Result := 8817273;
       end;
-    Symbol_HairDresser:
+    Symbol_HairDresser:     //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA33303470317072' +
-          '36707676B68490066011030C71E2D5E0977534707476C4A206998' +
-          'DAC8654B7E1B2059984C84248F27C8D6C3EB269C4BB19531CD91C' +
-          '4CF7E37233005E916796');
+        SymbolBitmap := BitmapFromString(7, 7, 'meJw7eOzkQTBiZucCIjgbTi5cthKZ' +
+        'AUdALkQETiKrhHPhUgdhFsEVIIsgIwCqTkzJ');
         Result := 13225152;
       end;
-    Symbol_MiningShop:
+    Symbol_MiningShop:              //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'z78DA33B03430313074' +
           'B670367672C5241D2D1C8D2DA1A40158258474737473333285909' +
@@ -684,13 +631,10 @@ begin
           '2Q=');
         Result := 7316427;
       end;
-    Symbol_ShortCut:
+    Symbol_ShortCut: //done
       begin
-        SymbolBitmap := BitmapFromString(15, 5, 'z78DA8D90410AC0300804' +
-          'BFA421A1E95137EDFF9F54E8F62088259741161D64C5B4E98573E' +
-          '9821B1A206E3EE49F5DAC1F835724F36F7E9D12CCD370DBE40EE7' +
-          '9854FE9864330DF993C8ECC9CC66F65039F7FD551B3BDCFFF9018' +
-          '756682E');
+        SymbolBitmap := BitmapFromString(7, 8, 'meJwzXcBtCkapa30OHjsJQaYwQWTx' +
+        'hjs9aOJAEiIFYcMR3BxkcayGY4ogq0RGADCjVB8=');
         Result := 5286667
       end;
     Symbol_HunterStore:
@@ -729,20 +673,11 @@ begin
          'TomBhAEVAnkAo0FGg5SDADYtlua');
         result:= 11713980;
       end;
-    Symbol_SummoningObelisk:
+    Symbol_Range:     //done
       begin
-       SymbolBitmap := BitmapFromString(15, 5, 'beNpj42Nm4zt87CwE2SVP1' +
-         'XaoKeidC0SeUTWfHj4AiixetgYoCCSBKuGKgSKVNc1AZXMO3AOpWf' +
-         '8EqBiiEaIFrhioEigCRJPnrAAqBqJjl98BEVAlxFigGmSTIVqAtgM' +
-         'VAI0FqgeSEBMwFQNVAo0FigPVgxjrnwB1Obj4IBQDAImMdLM=');
-        result:= 10325360;
-      end;
-    Symbol_SummoningStore:
-      begin
-       SymbolBitmap := BitmapFromString(15, 5, 'meJyzicq0QUKMDAzIyAZVFk3ZAVS' +
-         'AVQtQJGrCfCA6gA0gqweyFyxY8OjFi5MPvwLVb9uyEVM9muLJ377C' +
-         '1WNqgRgOABDhZzk=');
-        result:= 9697013;
+       SymbolBitmap := BitmapFromString(6, 7, 'meJwTsy8UAyPl5DlA8uCxk8zsXMhI' +
+        'UMcJIgVEfJZJggbB5IksXLYSaDiQhCMgFwCsFSbn');
+        result:= 1458033;
       end;
     Symbol_RestingSpot, 'rest':
       begin
@@ -751,20 +686,13 @@ begin
          'u6kKVhAxeNyj76f/ReM5IceVZ9yhPESE1p');
         Result := 65536;
       end;
-    Symbol_Runecrafting, 'rc', 'rcing':
+    Symbol_Runecrafting, 'rc', 'rcing':            //done
       begin
         SymbolBitmap := BitmapFromString(15, 5, 'meJxjZGA4cOBAREpJY3M7U+tPxu3' +
           'fgAjICAmJBCKIOJABVMPIwMAIVgwR5/T8C1QGIZkFvsPVY1UMJOGG' +
           'A7VA1GMq1rawgQgCFQCVwdUD9QLFgbLIilV0teCGABFcPcRwoCxEM' +
           'QBG91kH');
         result := 542972;
-      end;
-    Symbol_Lodestone:
-      begin
-        SymbolBitmap := BitmapFromString(7, 7, 'meJzb09k0KSgPgvZ0Ni2qzb0yDyRS' +
-        'YhkMQUA2UBCIfv/5DWQ72tkBSQh7D1jvw8cPgVwgCdEFIYEiEARUD' +
-        'xfcvXX9y/MHgCTcZCAXyICYCWEDzQQA7QVQBA==');
-        result := 13934210;
       end;
   end;
 end;
