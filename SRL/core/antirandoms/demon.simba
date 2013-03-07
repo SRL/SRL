@@ -14,7 +14,7 @@ the main screen.
 
 // the demon's name that appears when he's talking
 const
-  DD_NPC_DEMON = 'B8!q850t85Ol80';
+  DD_NPC_DEMON = 'SergeantDamien';
 
 // these constants represent elements in an array, so do not change the values
 const

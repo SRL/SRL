@@ -34,7 +34,7 @@ solver's simba file.
 
 // represent the elements of the SRL_Randoms array
 const
-  SRL_RANDOMS_COUNT = 0;
+  SRL_RANDOMS_COUNT = 19;
   SRL_RAND_DEMON     = 0;
   SRL_RAND_MAZE      = 1;
   SRL_RAND_EVILBOB   = 2;
@@ -128,8 +128,6 @@ procedure _SetRandoms();
 var
   i: integer;
 begin
-  SRL_RandomsSet := true;
-  exit;
   if (SRL_RandomsSet) then
     exit;
 
