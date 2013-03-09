@@ -17,18 +17,21 @@ is the odd one out.
 
 const
   _QUIZ_ACCURACY = 250; // number of tries to scan object - Updated 5/06/2012 - [J]ustin
-  _QUIZ_NPC = 'GqlzD5gt8!'; // Quiz Master's name
+  _QUIZ_NPC = 'QuizMaster'; // Quiz Master's name
 
 var
   Quiz_Items: TRotateObjectArray;
 
 (**
- * Author: DemiseScythe
+ * Author: Ashaman88
  * Description: Detects if a player is in the Quiz random.
  *)
 function Quiz_Detect(): boolean;
 begin
   result := (getNPCChatName = _QUIZ_NPC) and (not tabExists(TAB_MAGIC));
+  if not result then
+    if (not tabExists(TAB_MAGIC)) then
+      result:= ((countdots('yellow') = 1) and (percentblackmm>80));
 end;
 
 (**
