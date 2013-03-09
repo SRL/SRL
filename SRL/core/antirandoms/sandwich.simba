@@ -7,127 +7,187 @@ routines should be used throughout scripts.  They only need to be called in
 SRL's random detection methods.
 
 This solver uses text recognition to determine which food to click, then uses
-DTM finding to click the required food.
+TPA scanning to find and click the required food.
+
+Original Author : DannyRS
+Edits Made By   :
 
 *)
 
-const
-  DTM_SL_COUNT = 7;
-    DTM_SL_DONUT     = 0;
-    DTM_SL_BAGUETTE  = 1;
-    DTM_SL_SQUARE    = 2;
-    DTM_SL_TRIANGLE  = 3;
-    DTM_SL_ROLL      = 4;
-    DTM_SL_PIE       = 5;
-    DTM_SL_CHOCOLATE = 6;
-
-(**
- * Author: DemiseScythe
- * Description: Detects if a player is in the Sandwich Lady random.
- *)
-function SL_Detect(): boolean;
-begin
-  result := (getNPCChatName = 'B50gwlo6l5gy') and (not tabExists(TAB_MAGIC));
-end;
-
-(**
- * Author: DemiseScythe
- * Description: Loads all needed DTMs to an integer array.
- * Updated Pie DTM - [J]ustin - 24/05/2012
- *)
-function SL_GetDTMs(): TIntegerArray;
-begin
-  setLength(result, DTM_SL_COUNT);
-
-  result[DTM_SL_DONUT]     := DTMFromString('mrAAAAHic42BgYGiH4kYgrgDiPCAuBOJqIG4D4mtAfAGITwLxKSC+CMR3gPgREN8F6ckxZajJN2coyzJhaCyxZIgP0wKL5SQagMX5gWrwYUYCGAYApHMTqQ==');
-  result[DTM_SL_BAGUETTE]  := DTMFromString('mAAEAAHic42FgYNjCyMCwHYg3Q+kdQLwbiPcC8QYg3grEG4F4DRCvB+KHQD13gPgmEF8F4hNAfBqIjwDxUyB+CcTvgfgHEP8H4sUTYhiqMswY0sJ1GRb2RTMUJRoztBZaM6ydkcjQVeXHsH5WEkNNpjnD5KZghq0L0hj4gXpIwYwkYmQAALnFI/k=');
-  result[DTM_SL_SQUARE]    := DTMFromString('mFQEAAHic42VgYDBkZGAwB2JbIDYCYl0gVgRiaSDWgIpZAbEDELsAsR0QTwDqawPiWiBuhtKtQDwViGcA8VwgXgxlg9R2A7GvizYYH+iRgbMJYX6gPlIxIxkYBQAAPBoU8Q==');
-  result[DTM_SL_TRIANGLE]  := DTMFromString('mwQAAAHic42RgYGBiZWD4zsLA8BeIuYFsaSBWA2JZIOYCYlYg7mFkYCgH4gIgLgXiCiCuAuIWIO4H4ilA7Oeiw9BT48+woDeKYV53JMOcrgiG2R3hDDnxtgyeDpoMNqZKDPxA+whhRiIwHAAAiHwSIA==');
-  result[DTM_SL_ROLL]      := DTMFromString('mAAEAAHic42FgYNgGxDuBeCMQr4TSK6Bi+4F4LxAfAOKjQHwciOcA8QQgXgzE84G4D4inAPFyIJ4KxHOh+hcA8QwQXS/OMLNKjGFCsShDZ64Iw7w6cYYVbRIMk0pEwexZ1WIMzZnCDH2FIgzLWiUY+IF6SMGMJGJkAABm7x6B');
-  result[DTM_SL_PIE]       := DTMFromString('mggAAAHicY2NgYNBiZGCQhWI1INYDYnMgnsgAwT1A3A2le4HY0c6OwcTQkEFPR4fBzMQEzPf38WEQAsphw4w4MAQAAMbbCNs=');
-  result[DTM_SL_CHOCOLATE] := DTMFromString('m6wAAAHic42ZgYIhgZGAIA+JMIHYH4mggjgHiBCAOAeIAII4D4kAgvgtUfwKILwLxCyD+AMRPgfg2EF8F4vtAfA6IXwFxiqU8GAfpSzKUuagyZNgogHGatQJDooUcWC7SWAbM5weqJxYzkoCRAABzRBYf');
-end;
-
-(**
- * Author: Coh3n & DemiseScythe
- * Description: Finds and clicks the correct food.
- *)
-function SL_ClickFood(DTMs: TIntegerArray): boolean;
 var
-  i, t: integer;
-  foods: TStringArray;
+  SL_TimeOut: integer;
+
+function SL_Detect: boolean;
 begin
-  if (not loggedIn()) then
-    exit;
+  Result := (getNPCChatName = 'Sandwich lady');
+end;
 
-  foods := ['doughnut', 'baguette', 'square', 'triangle', 'roll', 'pie', 'chocolate'];
+function SL_StopSearch: boolean;
+begin
+  Result := False;
+  if (CountColor(39423, 490, 10, 513, 32) < 5) then
+    Result := True;
+  if (TimeFromMark(SL_TimeOut) > 35000) then
+    Result := True;
+end;
 
-  // to avoid out of range errors
-  if (length(foods) <> length(DTMs)) then
-  begin
-    addToSRLLog('SL_ClickFood: Invalid foods or DTMs array');
-    exit;
+procedure SL_Message(Message: string);
+begin
+  addToSRLLog('[Sandwich Random] ' + Message);
+end;
+
+function SL_Select(SandwichNumber: integer): boolean;
+var
+  SPoint: tpoint;
+begin
+  Result := False;
+  SPoint := Point(-1,-1);
+  case SandwichNumber of
+    0: SPoint := Point(155, 120);
+    1: SPoint := Point(260, 122);
+    2: SPoint := Point(365, 132);
+    3: SPoint := Point(110, 210);
+    4: SPoint := Point(205, 219);
+    5: SPoint := Point(315, 213);
+    6: SPoint := Point(395, 217);
   end;
-
-  for i := 0 to high(foods) do
-    // the color of the text that tells you which food to take
-    if (findTextTPA(2070783, 15, MSX1, MSY1, MSX2, MSY2, foods[i], upCharsEx, nothing)) then
-    begin
-      addToSRLLog('SL_ClickFood: Need to click '+capitalize(foods[i]));
-
-      t := (getSystemTime + 5000);
-      while ((not result) and (getSystemTime < t)) do
-      begin
-        if (clickDTMRotatedIn(DTMs[i], MSX1, MSY1, MSX2, MSY2, -Pi, Pi, Pi/30, ['hoose'], mouse_Left)) then
-        begin
-          addToSRLLog('SL_ClickFood: Clicked '+capitalize(foods[i]));
-          result := true;
-        end;
-
-        wait(200 + random(300));
-      end;
-
-      break;
-    end;
+  if (SPoint.X < 0) then
+  begin
+    SL_Message('[ERROR] Invalid sandwich number');
+    Exit;
+  end;
+  if (SL_StopSearch) then Exit;
+  MMouse(RandomRange(SPoint.X-4,SPoint.X+4),
+      RandomRange(SPoint.Y-4,SPoint.Y+4), 0, 0);
+  ClickMouse2(mouse_left);
+  Result := True;
 end;
 
-(**
- * Author: Coh3n & DemiseScythe
- * Description: Solves the random.
- *)
-function SL_Solve(): boolean;
+function SL_GetSandwichName: string;
 var
-  t, dtmPortal: integer;
-  DTMs: TIntegerArray;
+  FoundString, SWName: string;
 begin
-  if (not loggedIn()) then
-    exit;
-
-  t := (getSystemTime + (5 * 60000)); // maximum 5 minutes
-  dtmPortal := DTMFromString('mggAAAHicY2NgYNBjZGDQBmJVINYAYhMgtgDibUC5tUC8GYh3Q/FGIJ5zsp5h7qkGhvlnmhhmH61lmHagkmHmsRoGfqAcNsyIA0MAAArzEPs=');
-  DTMs := SL_GetDTMs();
-
-  repeat
-    if (findNPCChatTextMulti(['exit', 'ight'], nothing)) then
-      if (clickPortal(dtmPortal)) then
-      begin
-        result := true;
-        break;
-      end;
-
-    if (not areTalking) then
-    begin
-      if (SL_ClickFood(DTMs)) then
-        wait(2000 + random(500));
-    end else
-      clickContinue(true); // in case there are extra messages (GE) or we get one wrong
-
-  until(result or (getSystemTime > t));
-
-  if (not result) then
-    addToSRLLog('SL_Solve: Sandwich Lady solver timed out');
-
-  freeDTM(dtmPortal);
-  freeDTMs(DTMs);
+  Result := ''; SWName := '';
+  FoundString := Trim(GetTextAtExWrap(80, 270, 400, 303,
+      0, 3, 1, 2070783, 0, 'UpChars07'));
+  SWName := Trim(Between('Have a', 'for free', FoundString));
+  if (not (SWName='')) then
+    Result := SWName;
 end;
 
+function SL_SandwichSearchBox(BoxNumber: integer): tbox;
+begin
+  case BoxNumber of
+    0: Result := IntToBox(100,80,205,155);
+    1: Result := IntToBox(215,80,305,160);
+    2: Result := IntToBox(320,80,410,163);
+    3: Result := IntToBox(71,170,160,255);
+    4: Result := IntToBox(165,175,255,260);
+    5: Result := IntToBox(260,175,355,265);
+    6: Result := IntToBox(360,175,435,270);
+  end;
+end;
+
+function SL_FindSandwichBoxNumber: integer;
+var
+  tmpCTS, i, SColor, STol, MinSSize: integer;
+  tmpHM, tmpSM, SHM, SSM: extended;
+  SName: string;
+  SB: tbox;
+  SWTPA: tpointarray;
+begin
+  Result := -1;
+  SName := SL_GetSandwichName;
+  tmpCTS := GetColorToleranceSpeed;
+  GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
+  if (SName='') then
+  begin
+    SL_Message('[ERROR] Unable to get sandwich name');
+    Exit;
+  end;
+  SL_Message('Sandwich Name: ' + SName);
+  case Lowercase(SName) of
+    'baguette'         : begin
+                           SColor:=2910074;
+                           STol:=10;
+                           SHM:=0.03;
+                           SSM:=0.08;
+                           MinSSize:=35;
+                         end;
+    'chocolate bar'    : begin
+                           SColor:=2375783;
+                           STol:=7;
+                           SHM:=0.03;
+                           SSM:=0.24;
+                           MinSSize:=110;
+                         end;
+    'kebab'            : begin
+                           SColor:=1276942;
+                           STol:=3;
+                           SHM:=0.08;
+                           SSM:=0.59;
+                           MinSSize:=25;
+                         end;
+    'meat pie'         : begin
+                           SColor:=5395289;
+                           STol:=24;
+                           SHM:=0.10;
+                           SSM:=0.08;
+                           MinSSize:=150;
+                         end;
+    'bread roll'       : begin
+                           SColor:=1280167;
+                           STol:=9;
+                           SHM:=0.01;
+                           SSM:=0.24;
+                           MinSSize:=110;
+                         end;
+    'triangle sandwich': begin
+                           SColor:=2276602;
+                           STol:=2;
+                           SHM:=0.05;
+                           SSM:=0.81;
+                           MinSSize:=25;
+                         end;
+    'square sandwich'  : begin
+                           SColor:=5143435;
+                           STol:=6;
+                           SHM:=0.01;
+                           SSM:=0.05;
+                           MinSSize:=110;
+                         end;
+    else
+    begin SL_Message('[ERROR] Invalid sandwich name found'); Exit; end;
+  end;
+  SL_Message('Scanning for sandwich');
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(SHM, SSM);
+  repeat
+    for i:=0 to 6 do
+    begin
+      SB := SL_SandwichSearchBox(i);
+      FindColorsTolerance(SWTPA, SColor, SB.X1, SB.Y1, SB.X2, SB.Y2, STol);
+      if (Length(SWTPA) < MinSSize) then Continue;
+      Result := i;
+      Break;
+    end;
+  until (Result > -1) or (SL_StopSearch);
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(tmpHM, tmpSM);
+end;
+
+function SL_Solve: boolean;
+begin
+  Result := False;
+  Wait(RandomRange(600,800));
+  ClickContinue(False);
+  Wait(RandomRange(1300,1800));
+  MarkTime(SL_TimeOut);
+  if (SL_StopSearch) then
+  begin
+    SL_Message('[ERROR] SandwichLady select screen not up');
+    Exit;
+  end;
+  if SL_Select(SL_FindSandwichBoxNumber) then
+    Result := True;
+end;
