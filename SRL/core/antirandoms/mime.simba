@@ -39,6 +39,7 @@ type
 
 (**
  * Author: Coh3n & NCDS
+ * Updated 09/03/2013 - Justin
  * Description: Returns true if player is in the random.
  *)
 function Mime_Detect(): boolean;
@@ -48,13 +49,11 @@ begin
   if (not loggedIn()) then
     exit;
 
-  for i := TAB_COMBAT to TAB_MUSIC do
+  for i := TAB_COMBAT to TAB_MAGIC do
     if (tabExists(i)) then
       exit;
 
-  // the ligher red on the minimap
-  result := (countColorTolerance(592960, MMX1, MMY1, MMX2, MMY2, 20) > 500) and
-            (not tabExists(TAB_EMOTES));
+  Result := (CountDots('npc') = 1) and (not tabExists(TAB_EMOTES));
 end;
 
 (**

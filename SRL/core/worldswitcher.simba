@@ -450,9 +450,8 @@ begin
    318,337,358,377,+
    319,338,359,378];
   H := Random(High(WorldArray));
-  ArrayNumber := H-1;
 
-  Result := worldarray[H-1];
+  Result := worldarray[H];
 end;
 
 (*
