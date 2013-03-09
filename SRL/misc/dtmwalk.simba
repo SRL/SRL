@@ -1,0 +1,215 @@
+(*
+
+DTMWalker
+======
+
+Includes all functions which depend on external sources.
+
+.. contents::
+
+  procedure DTMWalk_SleepWhileMoving;
+  function DTMWalk_DefaultSearchFunc(var x,y : Integer; dtm : Integer) : Boolean;
+  function DTMWalk_DTMObjCustom(searchDTM : Integer;customSearchfunction : TDTMFinderFunc) : TDTMObj;
+  function DTMWalk_DTMObj(searchDTM : Integer) : TDTMObj;
+  function DTMWalk_WalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
+  procedure DTMWalk_FreePath(path : TDTMObjArray);
+
+  Example script:
+  SetAngle(SRL_ANGLE_HIGH); //Sets camera to highest angle
+    walkto := [
+         DTMWalk_DTMObj(DTMFromString('mWAAAAHicY2FgYDBnYWBQBGJxIDYB4u9AMRFGBgZZIFYA4u1zwhhKXPkZijJdGHxKNBmeMzMwSDIgMCMaBgEAhP8HtQ==')),
+         DTMWalk_DTMObj(DTMFromString('mQwAAAHicY2ZgYGhiYWAIBmINIH4A5D8DYiZGBobtc8IYPOIFGUpc+RmeMzMwSDFAMCMSBgIAI+cHIA==')),
+         DTMWalk_DTMObj(DTMFromString('mWAAAAHicY2FgYFjFwsDQC8RpQLwCiOcCxXYA8QcoPrQshkE9SgiM3WrNGSSBYsiYEQ2DAAA82Qnb'))
+    ];     //sets path with array of dtm objects
+    DTMWalk_WalkPath(walkto,true);  // walks path
+    DTMWalk_FreePath(walkto);       //free paths of dtm objects
+
+*)
+
+
+
+
+type
+  TDTMFinderFunc = function(var x,y : Integer; dtm : Integer; optional : TVariantArray) : Boolean;
+  TDTMObj = record
+      dtm : Integer;
+      searchFunc : TDTMFinderFunc;
+      vargs : TVariantArray;
+  end;
+  TDTMObjArray = array of TDTMObj;
+
+(*
+
+DTMWalk_SleepWhileMoving
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    procedure DTMWalk_SleepWhileMoving;
+
+Sleep while character is moving
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DTMWalk_SleepWhileMoving;
+begin
+  sleep(200);
+  while isMoving do wait(300);
+end;
+
+(*
+
+DTMWalk_DefaultSearchFunc
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function DTMWalk_DefaultSearchFunc(var x,y : Integer; dtm : Integer) : Boolean;
+
+Default dtm search function, FindDTMRotated. Returns true if dtm is found. Sets compass to face north by default
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function DTMWalk_DefaultSearchFunc(var x,y : Integer; dtm : Integer;optional : TVariantArray) : Boolean;
+var aFound : extended;
+begin
+    MakeCompass('N');
+    Result := FindDTMRotated(dtm, x, y, MMX1, MMY1, MMX2, MMY2,    -Pi, Pi, Pi/30, aFound);
+end;
+
+(*
+
+DTMWalk_DTMObjCustom
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function DTMWalk_DTMObjCustom(searchDTM : Integer;customSearchfunction : TDTMFinderFunc;optional : TVariantArray) : TDTMObj;
+
+DTMObj initialization function with custom dtm search function
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+    DTMWalk_DTMObjCustom(DTMFromString('DTMString'),@customdtmfinerfunction,[2,3.02,20]),
+
+*)
+function DTMWalk_DTMObjCustom(searchDTM : Integer;customSearchfunction : TDTMFinderFunc;optional : TVariantArray) : TDTMObj;
+begin
+    with Result do
+      begin
+        dtm         := searchDTM;
+        searchFunc  := customSearchfunction;
+        vargs       := optional;
+      end;
+end;
+
+(*
+
+
+DTMWalk_DTMObj
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+   function DTMWalk_DTMObj(searchDTM : Integer) : TDTMObj;
+
+Default DTMObj initialization function with default dtm search function, FindDTMRotated.
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+    DTMWalk_DTMObj(DTMFromString('DTMString')),
+
+*)
+function DTMWalk_DTMObj(searchDTM : Integer) : TDTMObj;
+begin
+    Result := DTMWalk_DTMObjCustom(searchDTM,@DTMWalk_DefaultSearchFunc,[]);
+end;
+
+
+{*******************************************************************************
+
+By: slushpuppy
+Description: Walks TDTMObjArray. Returns true once walk path completes.
+*******************************************************************************}
+(*
+
+DTMWalk_WalkPath
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function DTMWalk_WalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
+
+Walks TDTMObjArray. Set second parameter to true toggle run. Returns true once walk path completes.
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+   DTMWalk_WalkPath(walkto,true);
+
+*)
+function DTMWalk_WalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
+var i,x,y : Integer;
+begin
+  if run then KeyDown(VK_CONTROL);
+  for i := 0 to high(path) do
+  begin
+    if path[i].searchFunc(x,y,path[i].dtm,path[i].vargs) then
+    begin
+      if i = high(path) then Result := True;
+      Mouse(x, y, 3, 3, mouse_Left);
+      sleep(300+ random(300));
+    end;
+    DTMWalk_SleepWhileMoving;
+  end;
+  KeyUp(VK_CONTROL);
+end;
+
+(*
+
+DTMWalk_FreePath
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+    procedure DTMWalk_FreePath(path : TDTMObjArray);
+
+Free path from memory.
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+procedure DTMWalk_FreePath(path : TDTMObjArray);
+var i : Integer;
+begin
+  for i := 0 to high(path) do
+  begin
+    freeDTM(path[i].dtm);
+  end;
+end;
+
