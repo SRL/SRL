@@ -777,6 +777,8 @@ begin
     begin
       If Not ExistsItem(I) Then
         Continue;
+      if GetAmountBox(InvBox(I)) <= 1 then
+         MouseItem(I, mouse_left) else
       if (not All) then
         MouseItem(I, mouse_left)
       else
@@ -850,7 +852,7 @@ begin
   for i:=1 to 3 do
     deposit(1,28,true);
   Result := WaitFunc(@InvEmpty, 50, 3000);
-end;    
+end;
 
 (*
 WithdrawEx
@@ -1524,7 +1526,7 @@ begin
 
   case LowerCase(Location) of {            Sort X     Sort Y     Color    Tol   Hue   Sat   Count  SplitTPA?  W   H }
     'cg', 'cooking guild':        Info := [MSCX,      MSCY,      5666708,  17,  0.06, 0.77,  100,   False,   10, 10];
-    'akb', 'al kharid':           Info := [MSCX - 50, MSCY,      5002594,  20,  0.02, 0.61,  100,   False,   10, 10]; // Fixed 1/5, #40
+    'akb', 'al kharid':           Info := [MSCX - 50, MSCY,      4146507,  10,  0.90, 1.24,  100,   False,   10, 10]; // Fixed 1/5, #40
     'lb', 'lumbridge':            Info := [MSCX,      MSCY,      12370116, 13,  0.65, 0.10,  30,    True,    5, 5]; // 07 fixed
     'veb', 'varrock east':        Info := [MSCX,      MSCY + 50, 3037545,  5,   0.41, 1.32,  100,   False,   10, 10]; // Fixed 12/7, #40
     'vwb', 'varrock west':        Info := [MSCX,      MSCY,      3037545,  5,   0.41, 1.32,  100,   False,   10, 10]; // Fixed 12/7, #40
@@ -1600,7 +1602,8 @@ begin
     begin
       GetMousePos(Booths[i].X, Booths[i].Y);
       Mouse(Booths[i].X, Booths[i].Y, 0, 0, mouse_right);
-      if waitoptionmulti(['ank ' ,'nk ', 'B@'],400) then
+      //if waitoptionmulti(['ank ' ,'nk ', 'B@'],400) then  //revert back to this once jagex introduces one click bank booth
+      if waitoptionmulti(['Use-quickly','e-quic','se-quickl'],400) then
       begin
         MarkTime(c);
         repeat
