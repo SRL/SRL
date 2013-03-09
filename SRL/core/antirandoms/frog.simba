@@ -22,6 +22,10 @@ const
   FROG_DTM_ROYAL = 0;
   FROG_DTM_CENTER   = 1; // big cave center
 
+  FROG_YELLOW      = 7986172;
+  FROG_RED         = 3097339;
+  FROG_GREEN       = 879885;
+
 (**
  * Author: Coh3n
  * Description: Loads the 'DTM'.
@@ -74,23 +78,14 @@ end;
  * Description: Returns true if player is in the Frog random.
  *)
 function Frog_Detect(): boolean;
-var
-  name: String;
-  frogDTM, frogX, frogY: Integer;
-
 begin
   if not (tabExists(TAB_MAGIC)) then
   begin
-    name := getNPCChatName();
-    case name of
-      FROG_NAME_HERALD: begin result := true; exit; end;
-      FROG_NAME_PRINCESS:begin result := true; exit; end;
-      FROG_NAME_PRINCE: begin result := true; exit; end;
-    end;
-
-    frogDTM := DTMFromString('mWAAAAHicY2FgYEhnZWAoBuIkIE4D4mlMDAzTgXgiEM8DYr50AQbRGfEMAqXCDALlwgxcQD3ImBENgwAAnKIHDg==');
-    if (FindDTM(frogDTM, frogX, frogY, MSX1, MSY1, MSX2, MSY2)) then
-      result := true;
+  If Length(GetMinimapDots('npc')) >= 4 Then
+    If PercentBlackMM >= 35 Then
+      If (CountColorTolerance(FROG_GREEN, MSX1, MSY1, MSX2, MSY2, 30) >= 150) Then // Green
+        If (CountColorTolerance(FROG_RED, MSX1, MSY1, MSX2, MSY2, 30) >= 20) Then // Red
+          Result := (CountColorTolerance(FROG_YELLOW, MSX1, MSY1, MSX2, MSY2, 30) >= 5); // Yellow
   end;
 end;
 
