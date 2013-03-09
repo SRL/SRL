@@ -27,7 +27,7 @@ type
   TMDBigPuzzleArray = array of TMDBigPuzzle;
 
 const
-  MD_NPC_MORDAUT = 'D!!Do!g5qt';
+  MD_NPC_MORDAUT = 'Mr.Mordaut';
 
   // new data for MD_GetObject will need to be gathered if these are to change
   MD_ACCURACY  = 50; // gets the average of MD_ACCURACY times to ID objects
@@ -132,13 +132,16 @@ begin
 end;
 
 (**
- * Author: DemiseScythe & Coh3n
+ * Author: Ashaman88
  * Description: Returns true if player is in the random.
  *)
 function MD_Detect(): boolean;
 begin
   result := (getNPCChatName() = MD_NPC_MORDAUT) and (not tabExists(TAB_MAGIC));
-end;
+  if not result then
+    if not tabexists(TAB_MAGIC) then
+      result:= ((countdots('yellow') = 7) and (inrange(countcolor(243,MMX1,MMY1,MMX2,MMY2),10,20)));
+end;    
 
 (**
  * Author: Coh3n
