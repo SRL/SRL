@@ -53,9 +53,7 @@ begin
     if (tabExists(i)) then
       exit;
 
-  // the ligher red on the minimap
-  result := (countColorTolerance(528730, MMX1, MMY1, MMX2, MMY2, 20) > 500) and
-            (not tabExists(TAB_EMOTES));
+  Result := (CountDots('npc') = 1) and (not tabExists(TAB_EMOTES));
 end;
 
 (**
