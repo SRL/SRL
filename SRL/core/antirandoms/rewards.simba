@@ -19,7 +19,7 @@ begin
 
   result[DTM_REWARD_BOX]     := DTMFromString('mlwAAAHicY2dgYMhmYmBIA+IsIC4A4lIonQzEz4Hy94H4OhDfA+JHQPwWiN8AcQqfI0OnhTDDRg9JhnZzYYYMPhcwH4T5gfK4MCMeDAUADmYPew==');
   result[DTM_REWARD_MYSTERY] := DTMFromString('mlwAAAHicY2dgYMhhYmBIBeJcIC4G4hIgzgTiFCCeycjAMAGIe4F4EhDPAeIlQDwPiGdHigJ1MzHMtBNlmBIqwtBsJgTmTw0TZeBngAB+JAzjM+LBUAAA3YEMSA==');
-  result[DTM_REWARD_LAMP]    := DTMFromString('mggAAAHicY2NgYMhhYmDIAOIyIK4A4kIgTgPip0C5B0D8kAHCfgXEz4F46hRRIMkExn29ImB6zSoJBn4GBOBHohlxYAgAACyDDBw=');
+  result[DTM_REWARD_LAMP]    := DTMFromString('mwQAAAHic42RgYHjExsDwEIjvAPE1IL4AxLegYq+B+AUQ5zAyMKQBcToUZwJxPhAXAHEuEGcA8dQpQkDTGPFiZiBJCOM3AYLhAAATaQ1A');
   result[DTM_REWARD_BOOK]    := DTMFromString('mrAAAAHic42BgYHBiYmCwBmIfIPYCYlcmiJglFD8CqrkFxHeA+BkQvwDiD0D8FsovyM5mCDGTZPA2EGcwVxZk8DMUZ/DT4WIIN5cCs/mBavBhRgIYBgCtoQ8M');
 end;
 
@@ -70,12 +70,14 @@ end;
 
 (**
  * Author: Coh3n
+ * Update: J J/Justin - OSR
  * Description: Solves XP rewards (at coords x, y) with 'uptext'.
  *)
 function RD_SolveXP(x, y: integer; uptext: string): boolean;
 var
-  slot, skill: integer;
-  b: TBox;
+  skill: integer;
+  Slot: TPoint;
+  Box: TBox;
 begin
   mmouse(x, y, 3, 3);
   if (waitUptext(uptext, 300)) then
@@ -84,8 +86,8 @@ begin
     mouse(x, y, 0, 0, mouse_Left);
     addToSRLLog('RD_SolveXP: Clicked XP reward');
 
-    // the color of the background (i.e. scroll color)
-    if (not waitFindColor(x, y, 10803447, MSX1, MSY1, MSX2, MSY2, 5, 5000)) then
+    // the color of the HP logo
+    if (not waitFindColor(x, y, 85981, MSX1, MSY1, MSX2, MSY2, 5, 5000)) then
     begin
       addToSRLLog('RD_SolveXP: XP reward didn''t open');
       exit;
@@ -99,41 +101,49 @@ begin
 
     // slot returned by gridBox below
     case skill of
-      SKILL_ATTACK              : slot := 1;
-      SKILL_DEFENCE             : slot := 15;
-      SKILL_STRENGTH            : slot := 8;
-      SKILL_HITPointS, SKILL_HP : slot := 22;
-      SKILL_RANGE               : slot := 9;
-      SKILL_PRAYER              : slot := 16;
-      SKILL_MAGIC               : slot := 2;
-      SKILL_COOKING             : slot := 24;
-      SKILL_WOODCUTTING         : slot := 4;
-      SKILL_FLETCHING           : slot := 6;
-      SKILL_FISHING             : slot := 17;
-      SKILL_FIREMAKING          : slot := 11;
-      SKILL_CRAFTING            : slot := 18;
-      SKILL_SMITHING            : slot := 10;
-      SKILL_MINING              : slot := 3;
-      SKILL_HERBLORE            : slot := 12;
-      SKILL_AGILITY             : slot := 5;
-      SKILL_THIEVING            : slot := 7;
-      SKILL_SLAYER              : slot := 13;
-      SKILL_FARMING             : slot := 19;
-      SKILL_RUNECRAFTING        : slot := 25;
-      SKILL_HUNTER              : slot := 20;
-      SKILL_CONSTRUCTION        : slot := 14;
-      SKILL_SUMMONING           : slot := 21;
-      SKILL_DUNGEONEERING       : slot := 23;
+      SKILL_ATTACK              : slot := Point(0, 0);
+      SKILL_STRENGTH            : slot := Point(1, 0);
+      SKILL_RANGE               : slot := Point(2, 0);
+      SKILL_MAGIC               : slot := Point(3, 0);
+      SKILL_DEFENCE             : slot := Point(4, 0);
+      SKILL_HITPOINTS, SKILL_HP : slot := Point(0, 1);
+      SKILL_PRAYER              : slot := Point(1, 1);
+      SKILL_AGILITY             : slot := Point(2, 1);
+      SKILL_HERBLORE            : slot := Point(3, 1);
+      SKILL_THIEVING            : slot := Point(4, 1);
+      SKILL_CRAFTING            : slot := Point(5, 1);
+      SKILL_RUNECRAFTING        : slot := Point(0, 2);
+      SKILL_SLAYER              : slot := Point(1, 2);
+      SKILL_FARMING             : slot := Point(2, 2);
+      SKILL_MINING              : slot := Point(3, 2);
+      SKILL_SMITHING            : slot := Point(4, 2);
+      SKILL_FISHING             : slot := Point(5, 2);
+      SKILL_COOKING             : slot := Point(0, 3);
+      SKILL_FIREMAKING          : slot := Point(1, 3);
+      SKILL_WOODCUTTING         : slot := Point(2, 3);
+      SKILL_FLETCHING           : slot := Point(3, 3);
+      SKILL_CONSTRUCTION        : slot := Point(4, 3);
+      SKILL_HUNTER              : slot := Point(5, 3);
 
       else
-        slot := 3; // Mining
+        slot := Point(3, 2); // Mining
     end;
 
-    b := gridBox(slot, 7, 4, 40, 40, 65, 57, point(64, 104));
-    mouseBox(b.x1, b.y1, b.x2, b.y2, mouse_Left); // click skill
+      if Slot.y > 0 then
+    Box := IntToBox(173 + Slot.x * 24 + Slot.x * 8,
+                    164 + (Slot.y-1) * 24 + (Slot.y-1) * 4,
+                    173 + Slot.x * 24 + Slot.x * 8 + 24,
+                    164 + (Slot.y-1) * 24 + (Slot.y-1) * 4 + 24)
+  else
+    Box := IntToBox(189 + Slot.x * 24 + Slot.x * 8,
+                    134 + Slot.y * 24 + Slot.y * 4,
+                    189 + Slot.x * 24 + Slot.x * 8 + 24,
+                    134 + Slot.y * 24 + Slot.y * 4 + 24);
+
+    mouseBox(Box.x1, Box.y1, Box.x2, Box.y2, mouse_Left); // click skill
 
     wait(500 + random(500));
-    mouse(387, 263, 20, 5, mouse_Left); // click confirm
+    mouse(253, 277, 5, 5, mouse_Left); // click confirm
 
     addToSRLLog('RD_SolveXP: Solved experience reward');
     wait(2000 + random(500));
