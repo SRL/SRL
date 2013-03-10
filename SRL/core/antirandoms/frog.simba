@@ -15,8 +15,8 @@ const
   FROG_YELLOW = 7986172;
   FROG_RED = 3097339;
   FROG_GREEN = 879885;
-  FROG_SWAMP = 6386743;
-  FROG_CROWN = 962018;
+  FROG_SWAMP = 8031312;
+  FROG_CROWN = 1616077;
 
 function Frog_Speakto: boolean; forward;
 function Frog_IsTalkingTo: boolean; forward;
@@ -103,7 +103,7 @@ begin
   else
   begin
     addToSRLLog('Frog_WalkCenter: Unable to find main DTM, Falling back onto backup');
-    if (FindColorsTolerance(TPA, FROG_SWAMP, MMX1, MMY1, MMX2, MMY2, 30)) then
+    if (FindColorsTolerance(TPA, FROG_SWAMP, MMX1, MMY1, MMX2, MMY2, 50)) then
     begin
       MiddleTPAEx(TPA, TPAX, TPAY);
       Mouse(TPAX, TPAY, 8, 8, mouse_Left);
@@ -123,7 +123,7 @@ end;
  *)
 function Frog_FindFrog: boolean;
 var
-  T, Attempt, X, Y: integer;
+  T, Attempt: integer;
   TPA: TPointArray;
 begin
   addToSRLLog('Frog_FindFrog: Attempting to find the Frog Princess');
@@ -140,7 +140,7 @@ begin
     begin
       addToSRLLog('Frog_FindFrog: Could not find Frog Princess. Falling onto backup');
       MakeCompass(rs_GetCompassAngleDegrees + RandomRange(85, 95));
-      if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 10)) then
+      if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 30)) then
       begin
         Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
         if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
@@ -161,7 +161,7 @@ end;
  *)
 function Frog_SpeakTo: boolean;
 var
-  T, Attempt, TPAX, TPAY: integer;
+  T, Attempt: integer;
   TPA: TPointArray;
 begin
   addToSRLLog('Frog_SpeakTo: Attempting to speak to the Frog Princess');
@@ -210,9 +210,9 @@ begin
     Result := FindNPCChatText('Hmph. Have you come to apologize for ignoring me?', Nothing);
     if Result then
     begin
-      ClickContinue(True);
       addToSRLLog('Frog_IsTalkingTo: Continuing to chat to Frog Princess');
       Wait(1000 + Random(500));
+      DoConversation('', true);
       Result := true;
       addToSRLLog('Frog_IsTalkingTo: result: ' + BoolToStr(result));
       exit;
