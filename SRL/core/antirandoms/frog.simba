@@ -12,11 +12,12 @@ var
   O_MouseSpeed, FROG_ISLAND_DTM, FROG_ISLAND_DTM_BACKUP, FROG_CROWN_DTM: Integer;
 
 const
-  FROG_YELLOW = 7986172;
-  FROG_RED = 3097339;
-  FROG_GREEN = 879885;
-  FROG_SWAMP = 8031312;
-  FROG_CROWN = 1616077;
+  FROG_YELLOW             = 7986172;
+  FROG_RED                = 3097339;
+  FROG_GREEN              = 879885;
+  FROG_SWAMP              = 8031312;
+  FROG_CROWN              = 699876; //1616077
+  FROG_CROWN_COLOR_BACKUP = 633312;
 
 function Frog_Speakto: boolean; forward;
 function Frog_IsTalkingTo: boolean; forward;
@@ -66,7 +67,7 @@ procedure Frog_Set_DTMS;
 begin
   FROG_ISLAND_DTM := DTMFromString('mrAAAAHic42BgYDjJxsBwA4qvA/EpID4MxLuAeBMQtwDV9ABxNRAXA3EuEBcBcQkQ1wJxaJAdg3lxAk4sB1SDDzMSwDAAAMr5E3M=');
   FROG_ISLAND_DTM_BACKUP := DTMFromString('maQEAAHicE2RgYLjGxMDwGIjvMEHY54H4NBSfg+KrQHwTqu4BED8H4idAfAmqfgbQnIlA3AvFE4B4CgNEfB4QLwLipVA8H8qfDZUHqV8JxIGeNgxmRfFw7ONiARYD4RBvWzAGsf3dLVHUIWNWoDmUYkYqYAwAAGpfKPw=');
-  FROG_CROWN_DTM := DTMFromString('mbQAAAHicY2VgYNBmhWANINYCYn0g/g4U/8QAoX9D6Z293AzHpvMynJnDy/B4LR/DpnZuBi6gODpmxILBAABnNQ0R');
+  FROG_CROWN_DTM := DTMFromString('mggAAAHicY2NgYNBkZGDQAGItINZDwneBcjeB+BoQXwfiWwwQsUI+doZjkjwMG9u4GN5v42O4tICHIZeHlUEEKIcNM+LAEAAAEgENCw==');
 end;
 
 (**
@@ -135,23 +136,28 @@ begin
       result := true;
       addToSRLLog('Frog_FindFrog[Main]: result: ' + BoolToStr(result));
       exit;
-    end
-    else
-    begin
-      addToSRLLog('Frog_FindFrog: Could not find Frog Princess. Falling onto backup');
-      MakeCompass(rs_GetCompassAngleDegrees + RandomRange(85, 95));
-      if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 30)) then
+    end else
       begin
-        Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
-        if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
+        addToSRLLog('Frog_FindFrog: Could not find Frog Princess. Falling onto backup');
+        MakeCompass(rs_GetCompassAngleDegrees + RandomRange(85, 95));
+        wait(1000);
+        if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 30)) then
         begin
-          Result := true;
-          addToSRLLog('Frog_FindFrog[Backup]: result: ' + BoolToStr(result));
-          exit;
-        end;
+        addToSRLLog('Frog_FindFrog: Found TPA color, Moving mouse to TPA');
+          Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
+          addToSRLLog('Frog_FindFrog: Checking multi uptext');
+          if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
+            begin
+              Result := true;
+              addToSRLLog('Frog_FindFrog[Backup]: result: ' + BoolToStr(result));
+              exit;
+            end else
+            writeln('Frog_FindFrog: Could not find uptext');
+        end else
+        writeln('Frog_FindFrog: Could not find TPA');
       end;
-    end;
     Inc(Attempt);
+    writeln('Attempt: ' + inttostr(Attempt));
   until ((Attempt > 3) or (Result)) exit;
 end;
 
@@ -178,7 +184,7 @@ begin
     else
     begin
       addToSRLLog('Frog_SpeakTo: Could not find Frog Princess. Falling onto backup');
-      if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 3)) then
+      if (FindColorsSpiralTolerance(MSCX, MSCY, TPA, FROG_CROWN_COLOR_BACKUP, MSX1, MSY1, MSX2, MSY2, 12)) then
       begin
         Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
         if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
