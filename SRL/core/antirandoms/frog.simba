@@ -16,10 +16,10 @@ const
   FROG_RED                = 3097339;
   FROG_GREEN              = 879885;
   FROG_SWAMP              = 8031312;
-  FROG_CROWN              = 699876; //1616077
+  FROG_CROWN              = 699876;
   FROG_CROWN_COLOR_BACKUP = 633312;
 
-function Frog_Speakto: boolean; forward;
+//function Frog_Speakto: boolean; forward;
 function Frog_IsTalkingTo: boolean; forward;
 function Frog_FindFrog: boolean; forward;
 
@@ -140,16 +140,19 @@ begin
       begin
         addToSRLLog('Frog_FindFrog: Could not find Frog Princess. Falling onto backup');
         MakeCompass(rs_GetCompassAngleDegrees + RandomRange(85, 95));
-        wait(1000);
-        if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 30)) then
+        wait(800+Random(400));
+        if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 40)) then
         begin
         addToSRLLog('Frog_FindFrog: Found TPA color, Moving mouse to TPA');
           Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
           addToSRLLog('Frog_FindFrog: Checking multi uptext');
           if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
             begin
-              Result := true;
+              ClickMouse2(mouse_Right);
+              Result := WaitOptionMulti(['Talk-to', 'alk-t', 'Frog', 'rog'], 500);
               addToSRLLog('Frog_FindFrog[Backup]: result: ' + BoolToStr(result));
+              wait(600 + Random(120));
+              FFlag(0);
               exit;
             end else
             writeln('Frog_FindFrog: Could not find uptext');
@@ -161,7 +164,7 @@ begin
   until ((Attempt > 3) or (Result)) exit;
 end;
 
-(**
+{(**
  * Author: Xtrapsp/Justin
  * Description: Handles talking to the Frog Princeess.
  *)
@@ -184,7 +187,7 @@ begin
     else
     begin
       addToSRLLog('Frog_SpeakTo: Could not find Frog Princess. Falling onto backup');
-      if (FindColorsSpiralTolerance(MSCX, MSCY, TPA, FROG_CROWN_COLOR_BACKUP, MSX1, MSY1, MSX2, MSY2, 12)) then
+      if (FindColorsSpiralTolerance(MSCX, MSCY, TPA, FROG_CROWN_COLOR_BACKUP, MSX1, MSY1, MSX2, MSY2, 25)) then
       begin
         Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
         if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
@@ -201,7 +204,7 @@ begin
   if (Attempt > 20) then
     Frog_WalkCenter;
   exit;
-end;
+end;}
 
 (**
  * Author: Xtrapsp/Justin
@@ -249,7 +252,7 @@ begin
   repeat
     if Frog_WalkCenter then
       if Frog_FindFrog then
-        result := Frog_SpeakTo;
+        result := Frog_IsTalkingTo;
   until (result or (getSystemTime > t));
   MouseSpeed := O_MouseSpeed;
   if (not result) then
