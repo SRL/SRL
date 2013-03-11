@@ -29,7 +29,7 @@ function EB_Detect(): boolean;
 begin
   if (not (tabExists(TAB_MAGIC))) then
     if (inRange(countDots('yellow'), 1, 2)) then
-      result := (not (tabExists(TAB_MAGIC)) or (GetMusic = 'Evil Bob' 'sIsland'));
+      result := (not (tabExists(TAB_MAGIC)) or (GetMusic = 'Evil Bob''sIsland'));
 end;
 
 (**
