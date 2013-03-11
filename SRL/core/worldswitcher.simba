@@ -92,7 +92,6 @@ var
   txt :  String;
 begin
   txt := GetTextAtExWrap(61, 465, 88, 480, 0, 5, 2, 16777215, 2, 'UpChars07');
-  txt := Copy(txt, 0, High(txt));
   result := strToIntDef(txt, 0);
 end;
 
@@ -268,7 +267,6 @@ var
 begin
   checkbox := WorldIndexToMSBox(World);
   txt := GetTextAtExWrap(checkbox.x1+44, checkbox.y1, checkbox.x2-10, checkbox.y2, 0, 4, 2, 16777215, 0, 'StatChars07');
-  txt := Copy(txt, 0, High(txt));
   result:= arrinstr(['FULL','ENLL','FNLL','EULL'],txt);
 end;
 
