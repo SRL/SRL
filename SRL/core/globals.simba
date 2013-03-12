@@ -165,6 +165,8 @@ const
 var
   SRL_Procs: array [0..14] of procedure();
   SRL_OnFindRandomCall : function(var Cont : boolean) : boolean; // no longer used
+  SRL_CombatRandoms : boolean;
+  SRL_FindRandomRunDirection : tstringarray;
 
 { const GameTab Constants;
   Description: Constants representing gametab numbers. }
