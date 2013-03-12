@@ -142,6 +142,9 @@ begin
   CheckHPFirst := True;
   Reincarnate := False;
   TalkAfterRandoms := False;
+  SRL_CombatRandoms := True;
+  setlength(SRL_FindRandomRunDirection,3);
+
   RoadColor := 0;
   WaterColor := 0;
   BankColor := 0;
