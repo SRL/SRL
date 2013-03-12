@@ -16,7 +16,7 @@ const
   FROG_RED                = 3097339;
   FROG_GREEN              = 879885;
   FROG_SWAMP              = 8031312;
-  FROG_CROWN              = 699876;
+  FROG_CROWN              = 1095911;
   FROG_CROWN_COLOR_BACKUP = 633312;
 
 //function Frog_Speakto: boolean; forward;
@@ -124,11 +124,14 @@ end;
  *)
 function Frog_FindFrog: boolean;
 var
-  T, Attempt: integer;
-  TPA: TPointArray;
+  T, Attempt, tmpCTS, i, arL: integer;
+  arP: TPointArray;
+  ararP: T2DPointArray;
+  P: TPoint;
 begin
   addToSRLLog('Frog_FindFrog: Attempting to find the Frog Princess');
   Marktime(T);
+  tmpCTS := GetColorToleranceSpeed;
   repeat
     if ClickDTMRotatedIn(FROG_CROWN_DTM, MSX1, MSY1, MSX2, MSY2, - Pi, Pi, Pi / 30, ['rog'], mouse_Left) then
     begin
@@ -141,12 +144,21 @@ begin
         addToSRLLog('Frog_FindFrog: Could not find Frog Princess. Falling onto backup');
         MakeCompass(rs_GetCompassAngleDegrees + RandomRange(85, 95));
         wait(800+Random(400));
-        if (FindColorsTolerance(TPA, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 40)) then
+        ColorToleranceSpeed(2);
+        SetColorSpeed2Modifiers(0.02, 0.76);
+        if (FindColorsTolerance(arP, FROG_CROWN, MSX1, MSY1, MSX2, MSY2, 12)) then
         begin
-        addToSRLLog('Frog_FindFrog: Found TPA color, Moving mouse to TPA');
-          Mouse(TPA[0].X, TPA[0].Y, 2, 2, mouse_Move);
-          addToSRLLog('Frog_FindFrog: Checking multi uptext');
-          if IsUpTextMultiCustom(['Frog', 'Talk', 'rog']) then
+          addToSRLLog('Frog_FindFrog: Found TPA color, Moving mouse to TPA');
+          SortTPAFrom(arP, Point(MSCX, MSCY));
+          ararP := SplitTPAEx(arP, 8, 8);
+          arL := High(ararP);
+          for i := 0 to arL do
+          begin
+            P := MiddleTPA(ararP[i]);
+            MMouse(P.x, P.y, 5, 5);
+            addToSRLLog('Frog_FindFrog: Checking multi uptext');
+            Wait(100 + Random(100));
+            if (IsUpTextMultiCustom(['Frog', 'Talk', 'rog'])) then
             begin
               ClickMouse2(mouse_Right);
               Result := WaitOptionMulti(['Talk-to', 'alk-t', 'Frog', 'rog'], 500);
@@ -154,13 +166,16 @@ begin
               wait(600 + Random(120));
               FFlag(0);
               exit;
-            end else
-            writeln('Frog_FindFrog: Could not find uptext');
+          end else
+            addToSRLLog('Frog_FindFrog: Could not find uptext');
+          end;
         end else
-        writeln('Frog_FindFrog: Could not find TPA');
+         addToSRLLog('Frog_FindFrog[Backup]: Unable to find TPA');
       end;
     Inc(Attempt);
-    writeln('Attempt: ' + inttostr(Attempt));
+    addToSRLLog('Frog_FindFrog: Attempt: ' + inttostr(Attempt));
+    ColorToleranceSpeed(tmpCTS);
+    SetColorSpeed2Modifiers(0.2, 0.2);
   until ((Attempt > 3) or (Result)) exit;
 end;
 

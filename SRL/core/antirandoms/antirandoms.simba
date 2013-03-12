@@ -590,9 +590,9 @@ begin
 
   //Dr Jekyll Handler
 
-  if (Pos('eky', RawMenuText) <> 0) or (Pos('kyll', RawMenuText) <> 0) then
+  if (Pos('eky', RawMenuText) <> 0) or (Pos('kyll', RawMenuText) <> 0) or (Pos('yde', RawMenuText) <> 0) then
   begin
-    writeln('Found JEKYLL random');
+    writeln('Found JEKYLL/HYDE random');
     for IC := 1 to 4 do
     begin
       Wait(1000 + Random(500));
