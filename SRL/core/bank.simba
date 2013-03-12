@@ -618,10 +618,10 @@ Example:
 *)
 function DepositItemBox(Item: Integer): TBox;
 begin
-  Result.X1 := 97 + (Item - 1) mod 7 * 48;
-  Result.Y1 := 60 + (Item - 1) div 7 * 50;
-  Result.X2 := Result.X1 + 48;
-  Result.Y2 := Result.Y1 + 50;
+  Result.X1 := 132 + (Item - 1) mod 7 * 40;
+  Result.Y1 := 75 + (Item - 1) div 7 * 42;
+  Result.X2 := Result.X1 + 30;
+  Result.Y2 := Result.Y1 + 30;
 end;
 
 (*
