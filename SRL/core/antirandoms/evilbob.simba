@@ -115,12 +115,12 @@ begin
           ClickMouse2(mouse_Left);
           result := waitFindDTM(x, y, EB_DTMs[DTM_EB_NET_INV], 5000);
           if (not result) then
-            addToSRLLog('EB_GetNet: Didn' 't find DTM_EB_NET_INV');
+            addToSRLLog('EB_GetNet: Didn''t find DTM_EB_NET_INV');
         end;
         Break;
       end;
     end else
-      addToSRLLog('EB_GetNet: Didn' 't click DTM_EB_NET_GROUND');
+      addToSRLLog('EB_GetNet: Didn''t click DTM_EB_NET_GROUND');
   end;
   ColorToleranceSpeed(tmpCTS);
   SetColorSpeed2Modifiers(0.2, 0.2);
@@ -224,9 +224,9 @@ begin
       end;
   until ((result <> '') or (getSystemTime > t));
   if (result <> '') then
-    addToSRLLog('EB_GetStatue: Found statue ' '' + result + '' '')
+    addToSRLLog('EB_GetStatue: Found statue ''' + result + '''')
   else
-    addToSRLLog('EB_GetStatue: Didn' 't identify statue');
+    addToSRLLog('EB_GetStatue: Didn''t identify statue');
   wait(3000 + random(500));
   clickContinue(true);
 end;
@@ -373,9 +373,9 @@ begin
         if (waitFindDTM(x, y, EB_DTMs[DTM_EB_FISH_COOKED], 10000)) then
           result := true
         else
-          addToSRLLog('EB_GetFish: Didn' 't find DTM_EB_FISH_COOKED');
+          addToSRLLog('EB_GetFish: Didn''t find DTM_EB_FISH_COOKED');
     end else
-      addToSRLLog('EB_GetFish: Didn' 't click DTM_EB_FISHSPOT');
+      addToSRLLog('EB_GetFish: Didn''t click DTM_EB_FISHSPOT');
   end;
   if (result) then
     addToSRLLog('EB_GetFish: Got fish')
@@ -389,7 +389,6 @@ function EB_Uncook(): boolean;
 var
   arP: TPointArray;
   ararP: T2DPointArray;
-  arC: TIntegerArray;
   tmpCTS, i, arL, x, y: Integer;
   P: TPoint;
 begin
@@ -487,9 +486,9 @@ begin
       ColorToleranceSpeed(tmpCTS);
       SetColorSpeed2Modifiers(0.2, 0.2);
     end else
-      addToSRLLog('EB_FeedBob: Didn' 't find Bob');
+      addToSRLLog('EB_FeedBob: Didn''t find Bob');
   end else
-    addToSRLLog('EB_FeedBob: Didn' 't find DTM_EB_FISH_RAW');
+    addToSRLLog('EB_FeedBob: Didn''t find DTM_EB_FISH_RAW');
 end;
 
 (**
