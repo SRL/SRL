@@ -34,7 +34,7 @@ solver's simba file.
 
 // represent the elements of the SRL_Randoms array
 const
-  SRL_RANDOMS_COUNT = 19;
+  SRL_RANDOMS_COUNT = 18;
   SRL_RAND_DEMON     = 0;
   SRL_RAND_MAZE      = 1;
   SRL_RAND_EVILBOB   = 2;
@@ -44,16 +44,15 @@ const
   SRL_RAND_ABYSS     = 6;
   SRL_RAND_FROG      = 7;
   SRL_RAND_PINBALL   = 8;
-  SRL_RAND_SANDWICH  = 9;
-  SRL_RAND_PILLORY   = 10;
-  SRL_RAND_ARNAV     = 11;
-  SRL_RAND_QUIZ      = 12;
-  SRL_RAND_LEO       = 13;
-  SRL_RAND_PETE      = 14;
-  SRL_RAND_FORESTER  = 15;
-  SRL_RAND_BEEKEEPER = 16;
-  SRL_RAND_MOLLY     = 17;
-  SRL_RAND_REWARDS   = 18;
+  SRL_RAND_PILLORY   = 9;
+  SRL_RAND_ARNAV     = 10;
+  SRL_RAND_QUIZ      = 11;
+  SRL_RAND_LEO       = 12;
+  SRL_RAND_PETE      = 13;
+  SRL_RAND_FORESTER  = 14;
+  SRL_RAND_BEEKEEPER = 15;
+  SRL_RAND_MOLLY     = 16;
+  SRL_RAND_REWARDS   = 17;
 
 type
   TRandom = record
@@ -208,15 +207,6 @@ begin
     name := 'Pinball';
     solve := @PB_Solve;
     detect := @PB_Detect;
-    isInvRandom := false;
-    hasRewardBox := true;
-  end;
-
-  with SRL_Randoms[SRL_RAND_SANDWICH] do
-  begin
-    name := 'Sandwich Lady';
-    solve := @SL_Solve;
-    detect := @SL_Detect;
     isInvRandom := false;
     hasRewardBox := true;
   end;
@@ -401,6 +391,452 @@ var
 begin
   Result := _SolveRandom(SRL_RAND_REWARDS, b);
 end;
+
+Var
+  NicknameBMP:  integer;
+
+{*******************************************************************************
+procedure SetScreenName(ScreenName: String);
+by: WT-Fakawi edited by Ashaman88
+Description: Sets screenname for use with FindTalk and one Player.
+*******************************************************************************}
+
+procedure SetScreenName(ScreenName: string);
+begin
+  NickNameBMP := BitmapFromText(ScreenName, upchars07);
+end;
+
+{*******************************************************************************
+function SolveTalkingRandom(RawMenuText: String): Boolean;
+By: Ashaman88
+Description: Talking Random Handler. Called by FindTalkingRandom. (FindTalk)
+*******************************************************************************}
+
+function SolveTalkingRandom(RawMenuText: string): Boolean;
+var
+  IC, FI: Byte;
+ // A: Boolean;
+begin
+  TakeScreen('Solving Talking Random - '+RawMenuText);
+// Security Guard Handler
+  if (Pos('uard', RawMenuText) <> 0) or (Pos('ecur', RawMenuText) <> 0) then
+  begin
+    writeln('Found GUARD random');
+    for IC := 1 to 2 do
+    begin
+      Wait(1000 + Random(500));
+      ClickToContinue;
+      Wait(50 + Random(50));
+    end;
+    Result := True;
+    Exit;
+  end;
+
+{// Freaky Forrester Handler.
+
+  if (Pos('reak', RawMenuText) <> 0) or (Pos('orest', RawMenuText) <> 0) then
+  begin
+    writeln('Found FORRESTER random');
+    CloseWindow;
+    Logout;
+    Result := False;
+    Exit;
+  end;          }
+
+// Sandwich Lady Handler.
+
+  if (Pos('ady', RawMenuText) <> 0) or (Pos('ich', RawMenuText) <> 0) then
+  begin
+    writeln('Found SANDWICH random');
+    ClickToContinue;
+    Wait(500 + Random(500));
+    if SL_Solve then
+    begin
+      Result := True;
+      CloseWindow;
+      Exit;
+    end
+    else
+    begin
+      CloseWindow;
+      Result := False;
+      Logout;
+      Exit;
+    end;
+  end;
+
+  // Genie Handler.
+
+  if (Pos('Geni', RawMenuText) <> 0) or (Pos('enie', RawMenuText) <> 0) then
+  begin
+    writeln('Found geni random');
+    Wait(1000 + Random(500));
+    Result := True;
+    //if SolveGenie(LampSkill) then
+    begin
+      Exit;
+    end
+    //else
+    begin
+      Exit;
+    end;
+  end;
+
+  // Certer Handler
+
+  if (Pos('ile', RawMenuText) <> 0) or (Pos('iles', RawMenuText) <> 0) then
+  begin
+    writeln('Found certer random');
+    Wait(1000 + Random(500));
+//    ClickToContinue;
+
+   // if UseCerterSolver then
+   //   A := SolveCerter
+  //  else
+   //   A := FindCerter;
+
+   // if A then
+    begin
+      Exit;
+    end
+    //else
+    begin
+      Logout;
+      Exit;
+    end;
+  end;
+
+  // Frog Handler
+
+  if (Pos('rog', RawMenuText) <> 0) or (Pos('Fro', RawMenuText) <> 0) then
+  begin
+    writeln('Found Frog random');
+   // if SolveFrog then
+    begin
+      Exit;
+    end
+    //else
+    begin
+      for FI := 0 to 3 do
+        ClickToContinue;
+      Wait(10000);
+    //  if DetectFrogCave then if SolveFrogSwamp then
+        begin
+         // Frogs := Frogs + 1;
+          Exit;
+        end
+      //  else
+        begin
+      //    NOFrogs := NOFrogs + 1;
+      //    WriteLn('Frogs Missed Twice');
+          Logout;
+      //    SRLRandomsReport;
+          Exit;
+        end;
+    end
+  end;
+
+  // Rick Handler
+
+  if (Pos('ick', RawMenuText) <> 0) or (Pos('urpen', RawMenuText) <> 0) then
+  begin
+    writeln('Found RICK random');
+    Wait(1000 + Random(500));
+    ClickToContinue;
+   // Ricks := Ricks + 1;
+    //SRLRandomsReport;
+    result := true;
+    Exit;
+  end;
+
+  // Dwarf Handler. (Might add: DwarfItem)
+
+  if (Pos('runk', RawMenuText) <> 0) or (Pos('warf', RawMenuText) <> 0) then
+  begin
+    writeln('Found DWARF random');
+    Wait(1000 + Random(500));
+    ClickToContinue;
+    //Dwarfs := Dwarfs + 1;
+    //SRLRandomsReport;
+    Result := true;
+    Exit;
+  end;
+
+  // Cap 'n Hand (ler).
+
+  if (Pos('Cap ', RawMenuText) <> 0) or (Pos('Hand', RawMenuText) <> 0) then
+  begin
+    writeln('Found CAP random');
+    Wait(1000 + Random(500));
+    ClickToContinue;
+   // Caps := Caps + 1;
+    //SRLRandomsReport;
+    result := true;
+    Exit;
+  end;
+
+  // Mysterious Old Man Handler.
+
+  if (Pos('yste', RawMenuText) <> 0) or (Pos('rious', RawMenuText) <> 0) then
+  begin
+    writeln('Found OLD MAN random');
+    Wait(1000 + Random(500));
+    ClickToContinue;
+   // Oldmen := Oldmen + 1;
+    //SRLRandomsReport;
+    result := true;
+    Exit;
+  end;
+
+  //Dr Jekyll Handler
+
+  if (Pos('eky', RawMenuText) <> 0) or (Pos('kyll', RawMenuText) <> 0) then
+  begin
+    writeln('Found JEKYLL random');
+    for IC := 1 to 4 do
+    begin
+      Wait(1000 + Random(500));
+      ClickToContinue;
+    end;
+    result := true;
+    //Jekylls := Jekylls + 1;
+  end;
+end;
+
+{*******************************************************************************
+function ChooseOptionGetMenuText(RawMenuText: String; Texts: TStringArray; Action: fnct_ActionOptions): Boolean;
+By: Ashaman88.
+Description: Gets the option of which random we have
+*******************************************************************************}
+
+
+function ChooseOptionGetMenuText(var RawMenuText: string; Texts: TStringArray; Action: fnct_ActionOptions): Boolean;
+var
+   B: TBox;
+   i, H, x, R: Integer;
+   T: TPoint;
+   Options: array of TOptions;
+begin
+  Result := False;
+  Options := GetChooseOptions();
+  if (Length(Options) < 1) then
+    Exit;
+  H := High(Options);
+  for i := 0 To H do
+  begin
+    if ArrInStr(Texts, Options[i].Str) then
+    begin
+      Result := True;
+      RawMenuText:= Options[i].Str;
+      B := Options[i].Bounds;
+      GetMousePos(T.x, T.y);
+      R:= Min(((B.X2 - B.X1) shr 1), 5); //Prevents x2 passed to MouseBoxEx being smaller than x1
+      case Action of
+        ClickLeft:
+          if PointInBox(T, B) then
+            ClickMouse2(true)
+          else
+            MouseBoxEx(B.x1 + R, B.Y1, B.x2 - R, B.Y1 + 5, R, mouse_Left);
+        Move:
+          if not PointInBox(T, B) then
+            MouseBoxEx(B.x1 + R, B.Y1, B.x2 - R, B.Y1 + 5, R, mouse_move);
+
+        Nothing:
+          begin
+          end;
+
+        else
+          srl_warn('ChooseOptionMultiEx', 'ClickRight not a valid click for RS menus!', warn_AllVersions);
+      end;
+      Exit;
+    end;
+  end;
+  B := Options[0].BigBox;//to mmouse away
+  if Action <> Nothing then
+  begin
+    x := Max(B.X1 - 52, 0);
+    if x = 0 then
+      x := B.X2+10;
+    MMouse(x, Max(B.Y1 - 50, 0), 40, B.Y2-B.Y1);
+    Wait(200 + Random(100));
+  end;
+end;
+
+{*******************************************************************************
+function FindTalk: Boolean;
+by: Ashaman88
+Description: Searches screen for NickName and handles ALL Talking Randoms
+*******************************************************************************}
+
+
+const gTalkOldComputer = False;
+const gTalkSaveBitmap = False;
+
+var
+  gtalksBox, YelSkipBoxs: array of TBox;
+  gTalksCount: Integer;
+
+function FindTalk: Boolean;
+var
+  ax, ay, yCount, zCount, Count2, x1, y1, x2, y2, Count1, bmpScreen: Integer;
+  RawMenuText: string;
+begin
+  Result := False;
+  if (GetArrayLength(Players) < 1) then Exit;
+
+  if FindColor(ax, ay, 65535, MSX1, MSY1, MSX2, MSY2) then
+  begin
+
+    SetArrayLength(gtalksBox, 0);
+    SetArrayLength(YelSkipBoxs, 0);
+
+    y1 := ay;
+    if ( ( ay + 5 ) > 334 ) then y2 := 334 else y2 := ay + 5;
+
+    x1 := ax; x2 := x1;
+    zCount := 0;
+
+    repeat
+      if FindColor(ax, ay, 65535, x2, y1 + 2, x2 + 3, y2 + 3) then
+        zCount := 0
+      else
+        zCount := zCount + 1;
+
+      if ( zCount = 4 ) then Break;
+      x2 := x2 + 3;
+    until ( x2 + 3 > 515 );
+
+    if ( x2 + 3 <= 515 ) then x2 := x2 - 12;
+
+    if (x2 - x1 >= length(Players[CurrentPlayer].Nick) * 4) then
+    begin
+
+      x1 := x1 - 8;
+      y1 := y1 - 8;
+      x2 := x2 + 8;
+      y2 := y2 + 8;
+
+      if ( x1 < 0 ) then x1 := 0;
+      if ( y1 < 0 ) then y1 := 0;
+      if ( x2 > 515 ) then x2 := 515;
+      if ( y2 > 334 ) then y2 := 334;
+
+      Count2 := Count2 + 1;
+      Count1 := Count1 + 1;
+      SetArrayLength(gtalksBox, Count2);
+      gtalksBox[Count2 - 1].x1 := x1;
+      gtalksBox[Count2 - 1].y1 := y1;
+      gtalksBox[Count2 - 1].x2 := x2;
+      gtalksBox[Count2 - 1].y2 := y2 + 6;
+
+      SetArrayLength(YelSkipBoxs, Count1);
+      YelSkipBoxs[Count1 - 1].x1 := x1;
+      YelSkipBoxs[Count1 - 1].y1 := y1;
+      YelSkipBoxs[Count1 - 1].x2 := x2;
+      YelSkipBoxs[Count1 - 1].y2 := y2;
+
+    end else
+    begin
+      y1 := y1 - 2;
+      y2 := y2 + 8;
+      x1 := x1 - 5;
+      x2 := x2 + 5;
+      if ( x1 < 0 ) then x1 := 0;
+      if ( y1 < 0 ) then y1 := 0;
+      if ( x2 > 515 ) then x2 := 515;
+      if ( y2 > 334 ) then y2 := 334;
+
+      Count1 := Count1 + 1;
+      SetArrayLength(YelSkipBoxs, Count1);
+      YelSkipBoxs[Count1 - 1].x1 := x1;
+      YelSkipBoxs[Count1 - 1].y1 := y1;
+      YelSkipBoxs[Count1 - 1].x2 := x2;
+      YelSkipBoxs[Count1 - 1].y2 := y2;
+    end;
+
+    if ( GetArrayLength(gtalksBox) <> 0 ) then
+    begin
+      for yCount := 0 to GetArrayLength(gtalksBox) - 1 do
+      begin
+        if FindBitmapMaskTolerance(NickNameBMP, ax, ay, gtalksBox[yCount].x1, gtalksBox[yCount].y1, gtalksBox[yCount].x2, gtalksBox[yCount].y2, 0, 40) then
+        begin
+          WriteLn('Found NickName');
+          ax := (gtalksBox[yCount].x2 + gtalksBox[yCount].x1) shr 1;
+          ay := gtalksBox[yCount].y2 - 2;
+
+          if gTalkSaveBitmap then
+          begin
+            bmpScreen := BitmapFromString(515, 334, '');
+            CopyClientToBitmap(bmpScreen, 1, 1, 515, 334);
+
+            if ( gtalksBox[yCount].x1 = 0 ) then x1 := 1 else x1 := gtalksBox[yCount].x1;
+            if ( gtalksBox[yCount].y1 = 0 ) then y1 := 1 else y1 := gtalksBox[yCount].y1;
+
+            gTalksCount := gTalksCount + 1;
+            for Count1 := -1 to 1 do
+              for Count2 := -1 to 1 do
+                FastSetPixel(bmpScreen, Count1 + x1, Count2 + y1, 255);
+
+            if ( gtalksBox[yCount].x2 = 515 ) then x1 := 515 else x1 := gtalksBox[yCount].x2;
+            if ( gtalksBox[yCount].y2 = 334 ) then y1 := 334 else y1 := gtalksBox[yCount].y2;
+
+            for Count1 := -1 to 1 do
+              for Count2 := -1 to 1 do
+                FastSetPixel(bmpScreen, Count1 + x1, Count2 + y1, 255);
+
+            for Count1 := -1 to 1 do
+              for Count2 := -1 to 1 do
+                FastSetPixel(bmpScreen, Count1 + ax, Count2 + ay, 255);
+            SaveBitmap(bmpScreen, ScriptPath + 'FTalk' + IntToStr(gTalksCount) + '.bmp');
+            FreeBitmap(bmpScreen);
+          end;
+
+          MMouse(ax, ay, 0, 0);
+          Wait(100 + Random(50));
+          if WaitUpTextMulti(['Talk', 'lk-to', 'uard', 'ard'],RandomRange(300,400)) then
+          begin
+            Mouse(ax, ay, 0, 0, False);
+            Wait(300 + Random(100));
+
+
+            if (ChooseOptiongetMenuText(RawMenuText, ['Talk'], ClickLeft)) then
+            begin
+              WriteLn('******** FOUND TALKING RANDOM TEXT********: ' + RawMenuText);
+              Flag;
+              Wait(1000 + Random(500))
+              if SolveTalkingRandom(RawMenuText) then
+                Result := True;
+              Exit;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function RandomDirection: string;
+var
+  direction: tstringarray;
+  i: integer;
+begin
+
+  for i:=0 to High(SRL_FindRandomRunDirection) do
+    if SRL_FindRandomRunDirection[i] <> '' then
+      setlength(direction, length(direction) + 1);
+
+  if length(direction) = 0 then
+  begin
+    writeln('No direction found, setting manually');
+    setlength(direction, 3);
+    SRL_FindRandomRunDirection := ['N', 'E', 'S', 'W'];
+  end;
+
+  direction := SRL_FindRandomRunDirection;
+
+  result:= direction[Random(High(direction)+1)];
+  writeln('Running ' + result);
+end;
  
 function _FindAllRandoms(checkInv: boolean): boolean;
 var
@@ -414,9 +850,19 @@ begin
   if (not SRL_RandomsSet) then
     _SetRandoms();
 
-  // handle the GE update message
-  if (findNPCChatText('exchan', nothing)) then
-    clickContinue(true);
+  if SRL_CombatRandoms then
+    if SRL_infight then
+    begin
+      runaway(RandomDirection, False, 1, RandomRange(2000,4000));
+      result := true;
+      exit;
+    end;
+
+  if FindTalk then
+  begin
+    result := true;
+    exit;
+  end;
 
   for i := 0 to high(SRL_Randoms) do
   begin
