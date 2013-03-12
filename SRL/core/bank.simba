@@ -777,8 +777,6 @@ begin
     begin
       If Not ExistsItem(I) Then
         Continue;
-      if GetAmountBox(InvBox(I)) <= 1 then
-         MouseItem(I, mouse_left) else
       if (not All) then
         MouseItem(I, mouse_left)
       else
