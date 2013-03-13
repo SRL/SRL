@@ -23,9 +23,7 @@ function PB_Detect(): boolean;
 begin
   // makes sure friends tab exists and magic doesn't
   if ((not tabExists(TAB_MAGIC)) and (tabExists(TAB_FRIENDS))) then
-    if (getNPCChatName() = SRL_NPC_OLDMAN) then
-      if (findNPCChatTextMulti(['10', 'flashing', 'pillars'], nothing)) then
-        result := (countColor(clBlack, MMCX-20, MMCY-20, MMCX+20, MMCY+20) = 1681);
+        result := (GetTextAtExWrap(374, 238, 419, 253, 0, 5, 1, 65535, 5, 'UpChars07') = 'Score..');
 end;
 
 (**
@@ -38,7 +36,7 @@ var
   tpa: TPointArray;
 begin
   // yellow color of the score
-  if (findColorsTolerance(tpa, 381907, 280, 15, 315, 50, 30)) then
+  if (findColorsTolerance(tpa, 65535, 373, 239, 434, 258, 30)) then
     result := length(tpa);
 end;
 
@@ -68,7 +66,7 @@ begin
     setColorToleranceSpeed(3);
 
     // the green of the spinning pillars
-    findColorsTolerance(tpa, 8708721, MSX1, MMY1, MSX2, MSY2, 5);
+    findColorsTolerance(tpa, 6737749, MSX1, MMY1, MSX2, MSY2, 5);
 
     setColorToleranceSpeed(tmpCTS);
 
