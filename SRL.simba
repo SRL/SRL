@@ -172,7 +172,7 @@ begin
   SRL_StartTime := theDate(DATE_MONTH)+' at '+theTime;
   WarnSensitivity := -2;
   SetupAutoColors;
-
+  CheckUserNicks;
 {$IFDEF LoadExtraFonts}
   srl_UpdateFonts(srl_FontsUp2date);
 {$ENDIF}
