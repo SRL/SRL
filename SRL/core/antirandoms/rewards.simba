@@ -129,16 +129,19 @@ begin
         slot := Point(3, 2); // Mining
     end;
 
-      if Slot.y > 0 then
-    Box := IntToBox(173 + Slot.x * 24 + Slot.x * 8,
-                    164 + (Slot.y-1) * 24 + (Slot.y-1) * 4,
-                    173 + Slot.x * 24 + Slot.x * 8 + 24,
-                    164 + (Slot.y-1) * 24 + (Slot.y-1) * 4 + 24)
-  else
-    Box := IntToBox(189 + Slot.x * 24 + Slot.x * 8,
-                    134 + Slot.y * 24 + Slot.y * 4,
-                    189 + Slot.x * 24 + Slot.x * 8 + 24,
-                    134 + Slot.y * 24 + Slot.y * 4 + 24);
+    if (Sloy.y > 0) then
+    begin
+      Box.X1 := 173 + Slot.x * 32;
+      Box.Y1 := 164 + (Slot.y - 1) * 28;
+      Box.X2 := 197 + Slot.x * 32;
+      Box.Y2 := 188 + (Slot.y - 1) * 28;
+    end else
+    begin
+      Box.X1 := 189 + Slot.x * 32;
+      Box.Y1 := 134 + Slot.y * 28;
+      Box.X2 := 213 + Slot.x * 32;
+      Box.Y2 := 158 + Slot.y * 28;
+    end;
 
     mouseBox(Box.x1, Box.y1, Box.x2, Box.y2, mouse_Left); // click skill
 
