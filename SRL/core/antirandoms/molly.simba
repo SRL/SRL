@@ -24,9 +24,7 @@ var
 function Molly_Detect(): boolean;
 begin
   if (not tabExists(TAB_MAGIC)) then
-    if (areTalking()) then
-      if (countColorTolerance(clBlack, MMCX-30, MMCY-30, MMCX+30, MMCY+30, 20) = 3721) then
-        result := (getNPCChatName <> SRL_NPC_OLDMAN);
+        result := (GetMusic = 'Head to Head');
 end;
 
 {*******************************************************************************

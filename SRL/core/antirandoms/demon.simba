@@ -35,7 +35,7 @@ const
  *)
 function DD_Detect(): boolean;
 begin
-  result := (getNPCChatName() = DD_NPC_DEMON) and (not tabExists(TAB_MAGIC));
+  result := (GetMusic = 'CorPoral Punisbment') and (not tabExists(TAB_MAGIC));
 end;
 
 (**
