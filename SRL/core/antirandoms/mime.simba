@@ -52,7 +52,7 @@ begin
   for i := TAB_COMBAT to TAB_MAGIC do
     if (tabExists(i)) then
       exit;
-
+    if (not(GetMusic = 'Tbe Quizmaster')) then //False Positive
   Result := (CountDots('npc') = 1) and (not tabExists(TAB_EMOTES));
 end;
 

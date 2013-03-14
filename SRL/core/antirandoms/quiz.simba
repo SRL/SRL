@@ -28,9 +28,8 @@ var
  *)
 function Quiz_Detect(): boolean;
 begin
-  result := (getNPCChatName = _QUIZ_NPC) and (not tabExists(TAB_MAGIC));
-  if not result then
     if (not tabExists(TAB_MAGIC)) then
+      if (GetMusic = 'Tbe Quizmaster') then
       result:= ((countdots('yellow') = 1) and (percentblackmm>80));
 end;
 
