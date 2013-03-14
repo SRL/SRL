@@ -799,7 +799,7 @@ begin
             Wait(300 + Random(100));
 
 
-            if (ChooseOptiongetMenuText(RawMenuText, ['Talk'], ClickLeft)) then
+            if (ChooseOptiongetMenuText(RawMenuText, ['Talk', 'lk-t'], ClickLeft)) then
             begin
               WriteLn('******** FOUND TALKING RANDOM TEXT********: ' + RawMenuText);
               Flag;
