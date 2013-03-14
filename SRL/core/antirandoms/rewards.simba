@@ -129,7 +129,7 @@ begin
         slot := Point(3, 2); // Mining
     end;
 
-    if (Sloy.y > 0) then
+    if (Slot.y > 0) then
     begin
       Box.X1 := 173 + Slot.x * 32;
       Box.Y1 := 164 + (Slot.y - 1) * 28;
