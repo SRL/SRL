@@ -16,7 +16,7 @@ is the odd one out.
 *)
 
 const
-  _QUIZ_ACCURACY = 500; // number of tries to scan object
+  _QUIZ_ACCURACY = 2000; // number of tries to scan object
   _QUIZ_NPC = 'QuizMaster'; // Quiz Master's name
 
 var
@@ -28,10 +28,9 @@ var
  *)
 function Quiz_Detect(): boolean;
 begin
-  result := (getNPCChatName = _QUIZ_NPC) and (not tabExists(TAB_MAGIC));
-  if not result then
     if (not tabExists(TAB_MAGIC)) then
-      result:= ((countdots('yellow') = 1) and (percentblackmm>80));
+      if (GetMusic = 'Tbe Quizmaster') then
+        result:= ((countdots('yellow') = 1) and (percentblackmm>80));
 end;
 
 (**
@@ -66,209 +65,209 @@ begin
   begin
     name := 'Trout Fish Big';
     use := 'Edible';
-    count := 650;
-    width := 63;
-    height := 32;
-    totalCount := 2080;
-    coverPercent := 3.1;
+    count := 582;
+    width := 47;
+    height := 27;
+    totalCount := 1270;
+    coverPercent := 4.5;
   end;
 
   with Quiz_Items[1] do
   begin
     name := 'Trout Fish Small';
     use := 'Edible';
-    count := 610;
-    width := 62;
-    height := 32;
-    totalCount := 2000;
-    coverPercent := 3.00;
+    count := 564;
+    width := 47;
+    height := 27;
+    totalCount := 1248;
+    coverPercent := 4.5;
   end;
 
   with Quiz_Items[2] do
   begin
     name := 'Tuna Fish Big';
     use := 'Edible';
-    count := 838;
-    width := 65;
-    height := 32;
-    totalCount := 2100;
-    coverPercent := 4.1;
+    count := 795;
+    width := 47;
+    height := 28;
+    totalCount := 1380;
+    coverPercent := 5.7;
   end;
 
   with Quiz_Items[3] do
   begin
     name := 'Tuna Fish Small';
     use := 'Edible';
-    count := 735;
-    width := 65;
-    height := 32;
-    totalCount := 2050;
-    coverPercent := 3.7;
+    count := 745;
+    width := 46;
+    height := 29;
+    totalCount := 1300;
+    coverPercent := 5.6;
   end;
 
   with Quiz_Items[4] do
   begin
     name := 'Necklace Small';
     use := 'Jewelry';
-    count := 289;
-    width := 56;
-    height := 32;
-    totalCount := 1835;
-    coverPercent := 1.6;
+    count := 250;
+    width := 31;
+    height := 22;
+    totalCount := 700;
+    coverPercent := 3.7;
   end;
 
   with Quiz_Items[5] do
   begin
     name := 'Necklace Big';
     use := 'Jewelry';
-    count := 302;
-    width := 57;
-    height := 32;
-    totalCount := 1850;
-    coverPercent := 1.60;
+    count := 275;
+    width := 32;
+    height := 24;
+    totalCount := 755;
+    coverPercent := 3.5;
   end;
 
   with Quiz_Items[6] do
   begin
     name := 'Ring Small';
     use := 'Jewelry';
-    count := 530;
-    width := 59;
-    height := 32;
-    totalCount := 1890;
-    coverPercent := 2.5;
+    count := 536;
+    width := 34;
+    height := 24;
+    totalCount := 870;
+    coverPercent := 6.0;
   end;
 
   with Quiz_Items[7] do
   begin
     name := 'Ring Big';
     use := 'Jewelry';
-    count := 560;
-    width := 59;
-    height := 32;
-    totalCount := 1900;
-    coverPercent := 3.00;
+    count := 556;
+    width := 34;
+    height := 25;
+    totalCount := 895;
+    coverPercent := 6.1;
   end;
 
   with Quiz_Items[8] do
   begin
     name := 'Shield Small';
     use := 'Armour';
-    count := 486;
-    width := 61;
-    height := 32;
-    totalCount := 1830;
-    coverPercent := 2.5;
+    count := 485;
+    width := 32;
+    height := 23;
+    totalCount := 785;
+    coverPercent := 6.0;
   end;
 
   with Quiz_Items[9] do
   begin
     name := 'Shield Big';
     use := 'Armour';
-    count := 500;
-    width := 58;
-    height := 32;
-    totalCount := 1950;
-    coverPercent := 27;
+    count := 495;
+    width := 33;
+    height := 23;
+    totalCount := 802;
+    coverPercent := 6.1;
   end;
 
   with Quiz_Items[10] do
   begin
     name := 'Spade';
     use := 'Tool';
-    count := 150;
-    width := 52;
-    height := 32;
-    totalCount := 1650;
-    coverPercent := 9.0;
+    count := 140;
+    width := 26;
+    height := 20;
+    totalCount := 505;
+    coverPercent := 2.7;
   end;
 
   with Quiz_Items[11] do
   begin
     name := 'Sword Small';
     use := 'Weapon';
-    count := 165;
-    width := 55;
-    height := 32;
-    totalCount := 1820;
-    coverPercent := 9.2;
+    count := 170;
+    width := 32;
+    height := 23;
+    totalCount := 722;
+    coverPercent := 2.3;
   end;
 
   with Quiz_Items[12] do
   begin
     name := 'Sword Big';
     use := 'Weapon';
-    count := 185;
-    width := 56;
-    height := 32;
-    totalCount := 1850;
-    coverPercent := 9.0;
+    count := 180;
+    width := 34;
+    height := 22;
+    totalCount := 780;
+    coverPercent := 2.4;
   end;
 
   with Quiz_Items[13] do
   begin
     name := 'Shears Small';
     use := 'Tool';
-    count := 610;
-    width := 61;
-    height := 32;
-    totalCount := 1998;
-    coverPercent := 3.05;
+    count := 645;
+    width := 45;
+    height := 28;
+    totalCount := 1302;
+    coverPercent := 4.8;
   end;
 
   with Quiz_Items[14] do
   begin
     name := 'Shears Big';
     use := 'Tool';
-    count := 642;
-    width := 63;
-    height := 32;
-    totalCount := 2010;
-    coverPercent := 3.12;
+    count := 655;
+    width := 46;
+    height := 29;
+    totalCount := 1350;
+    coverPercent := 4.9;
   end;
 
   with Quiz_Items[16] do
   begin
     name := 'BattleAxe Big';
     use := 'Weapon';
-    count := 390;
-    width := 58;
-    height := 32;
-    totalCount := 1950;
-    coverPercent := 2.05;
+    count := 375;
+    width := 41;
+    height := 26;
+    totalCount := 1065;
+    coverPercent := 3.5;
   end;
 
   with Quiz_Items[17] do
   begin
     name := 'BattleAxe Small';
     use := 'Weapon';
-    count := 377;
-    width := 58;
-    height := 32;
-    totalCount := 1855;
-    coverPercent := 1.9;
+    count := 360;
+    width := 40;
+    height := 25;
+    totalCount := 1040;
+    coverPercent := 3.4;
   end;
 
   with Quiz_Items[18] do
   begin
     name := 'Helmet Small';
     use := 'Weapon';
-    count := 836;
-    width := 62;
-    height := 32;
-    totalCount := 2010;
-    coverPercent := 3.7;
+    count := 775;
+    width := 44;
+    height := 26;
+    totalCount := 1220;
+    coverPercent := 6.2;
   end;
 
   with Quiz_Items[19] do
   begin
     name := 'Helmet Big';
     use := 'Weapon';
-    count := 850;
-    width := 63;
-    height := 32;
-    totalCount := 2050;
-    coverPercent := 4.0;
+    count := 855;
+    width := 45;
+    height := 27;
+    totalCount := 1310;
+    coverPercent := 6.9;
   end;
 end;
 
@@ -280,19 +279,10 @@ function Quiz_ScanItem(slot: integer): TRotateObject;
 var
   i, maxScore, maxIndex: integer;
   obj: TRotateObject;
-  objarray: Array of TRotateObject;
   scores: TintegerArray;
 begin
-  setlength(objarray,4);
-  for i:=0 to 3 do
   // the colors of the blue background and border of the items
-    objarray[i] := scanRotateObject([7807248, 11040367], [35, 35], Quiz_ItemBox(slot), 5, _QUIZ_ACCURACY);
-
-  obj.count:= AverageTIA([objarray[0].count,objarray[1].count,objarray[2].count,objarray[3].count]);
-  obj.width:= AverageTIA([objarray[0].width,objarray[1].width,objarray[2].width,objarray[3].width]);
-  obj.height:= AverageTIA([objarray[0].height,objarray[1].height,objarray[2].height,objarray[3].height]);
-  obj.totalCount:= AverageTIA([objarray[0].totalCount,objarray[1].totalCount,objarray[2].totalCount,objarray[3].totalCount]);
-  obj.coverPercent:= AverageExtended([objarray[0].coverPercent,objarray[1].coverPercent,objarray[2].coverPercent,objarray[3].coverPercent]);
+  obj := scanRotateObject([7807248, 8806491, 6395562], [35, 35, 30], Quiz_ItemBox(slot), 5, _QUIZ_ACCURACY);
 
   setLength(scores, length(Quiz_Items));
 
@@ -302,11 +292,11 @@ begin
     if (Quiz_Items[i].width = obj.width) and (Quiz_Items[i].height = obj.height) then
       scores[i] := scores[i] + 5
     else
-      if inRange(obj.width, Quiz_Items[i].width - 4, Quiz_Items[i].width + 4) and inRange(obj.height, Quiz_Items[i].height - 3, Quiz_Items[i].height + 3) then
-        scores[i] := scores[i] + 2;
+      if inRange(obj.width, Quiz_Items[i].width - 2, Quiz_Items[i].width + 2) and inRange(obj.height, Quiz_Items[i].height - 2, Quiz_Items[i].height + 2) then
+        scores[i] := scores[i] + 4;
 
     if inRange(obj.count, Quiz_Items[i].count - 15, Quiz_Items[i].count + 15) then
-      scores[i] := scores[i] + 2;
+      scores[i] := scores[i] + 3;
 
     if inRange(obj.totalCount, Quiz_Items[i].totalCount - 20, Quiz_Items[i].totalCount + 20) then
       scores[i] := scores[i] + 3;
@@ -332,8 +322,6 @@ begin
     result.name := Quiz_Items[maxIndex].name;
     result.use := Quiz_Items[maxIndex].use;
   end;
-
-  setlength(objarray,0);
 end;
 
 (**
@@ -390,14 +378,15 @@ begin
 
   t := (getSystemTime + (10 * 60000)); // maximum 10 minutes
   Quiz_LoadItems();
+  addToSRLLog('Quiz_Solve: Starting solver')
 
   repeat
     if (Quiz_QuestionScreen()) then
       if (Quiz_SolveQuestion()) then
         if (waitNPCTalking(_QUIZ_NPC, 4000)) then
         begin
-          wait(Random(300));
-          if (findNPCChatText('RIGHT', nothing)) Or (findNPCChatText('Prize', nothing)) then
+          wait(Random(400));
+          if (findNPCChatText('Corr', nothing)) or (findNPCChatText('COR', nothing)) or (findNPCChatText('YES', nothing)) or (findNPCChatText('RIGHT', nothing)) Or (findNPCChatText('Prize', nothing)) then
             addToSRLLog('Quiz_Solve: Answered question right')
           else
             addToSRLLog('Quiz_Solve: Answered question wrong');
@@ -426,4 +415,3 @@ begin
     addToSRLLog('Quiz_Solve: Quiz solver timed out') else
     addToSRLLog('Quiz_Solve: Quiz completed successfully');
 end;
-
