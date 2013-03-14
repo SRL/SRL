@@ -128,7 +128,7 @@ begin
                            SSM:=0.59;
                            MinSSize:=25;
                          end;
-    'meat pie'         : begin
+    'pie'              : begin
                            SColor:=5395289;
                            STol:=24;
                            SHM:=0.10;
@@ -190,4 +190,6 @@ begin
   end;
   if SL_Select(SL_FindSandwichBoxNumber) then
     Result := True;
+  Wait(RandomRange(600,800);
+  ClickContinue(False);
 end;
