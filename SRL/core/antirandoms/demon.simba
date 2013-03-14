@@ -35,7 +35,8 @@ const
  *)
 function DD_Detect(): boolean;
 begin
-  result := (GetMusic = 'CorPoral Punisbment') and (not tabExists(TAB_MAGIC));
+  if not tabExists(TAB_MAGIC) then
+  result := (GetMusic = 'CorPoral Punisbment');
 end;
 
 (**
