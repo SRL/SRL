@@ -190,6 +190,6 @@ begin
   end;
   if SL_Select(SL_FindSandwichBoxNumber) then
     Result := True;
-  Wait(RandomRange(600,800);
+  Wait(RandomRange(600,800));
   ClickContinue(False);
 end;
