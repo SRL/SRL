@@ -56,9 +56,9 @@ begin
   if (not Result) then
   begin
     repeat
-      MMouse(235, 120, 40, 30);
+      MMouse(224,143,70,65);
 
-      Wait(RandomRange(90, 250));
+      Wait(RandomRange(90, 270));
 
       if (IsUpTextMultiCustom(['Unlock','lock','Cage','age'])) then
       begin
@@ -70,7 +70,7 @@ begin
         end else
           PL_Message('[PL_ClickCage] Failed to open Lock Screen');
       end;
-    until (Result) or (GetSystemTime - t > 10000);
+    until (Result) or (GetSystemTime - t > 20000);
   end;
 end;
 
@@ -107,17 +107,17 @@ var
 begin
   Result := '';
   WatchTime := RandomRange(9000,10000);
-  setColorToleranceSpeed(2);
-  setToleranceSpeed2Modifiers(0.21, 0.92);
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.21, 2.01);
   MarkTime(CountTime);
   repeat
-    CNum := CountColorTolerance(1319982, 60, 65, 150, 150, 4);
+    CNum := CountColorTolerance(1057067, 60, 65, 150, 150, 5);
     if (CNum > Count) then
       Count := CNum;
   until (TimeFromMark(CountTime) > WatchTime);
-  if (Count > 840) and (Count < 900) then Result := 'square';
-  if (Count > 570) and (Count < 720) then Result := 'triangle';
-  if (Count > 400) and (Count < 550) then Result := 'diamond';
+  if (Count > 800) and (Count < 949) then Result := 'square';
+  if (Count > 570) and (Count < 799) then Result := 'triangle';
+  if (Count > 400) and (Count < 569) then Result := 'diamond';
   if (Count > 950) and (Count < 1200) then Result := 'circle';
   PL_Message('[PL_GetLock] Lock Found: ' + Result + ' [' + ToStr(Count) + ']');
 end;
@@ -133,12 +133,12 @@ var
 begin
   SetLength(Result,3);
   SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.21, 0.92);
+  SetToleranceSpeed2Modifiers(0.21, 2.01);
 
   MarkTime(WatchTime);
   Result[0] := '';
   repeat
-    case CountColorTolerance(1319982, 180, 170, 235, 260, 4) of
+    case CountColorTolerance(1057067, 180, 170, 235, 260, 5) of
       286: Result[0] := 'triangle';
       493: Result[0] := 'diamond';
       506: Result[0] := 'circle';
@@ -149,7 +149,7 @@ begin
   MarkTime(WatchTime);
   Result[1] := '';
   repeat
-    case CountColorTolerance(1319982, 265, 170, 345, 260, 4) of
+    case CountColorTolerance(1057067, 265, 170, 345, 260, 5) of
       286: Result[1] := 'triangle';
       493: Result[1] := 'diamond';
       506: Result[1] := 'circle';
@@ -160,7 +160,7 @@ begin
   MarkTime(WatchTime);
   Result[2] := '';
   repeat
-    case CountColorTolerance(1319982, 355, 170, 435, 260, 4) of
+    case CountColorTolerance(1057067, 355, 170, 435, 260, 5) of
       286: Result[2] := 'triangle';
       493: Result[2] := 'diamond';
       506: Result[2] := 'circle';
@@ -189,8 +189,6 @@ begin
   if (not LoggedIn) then Exit;
 
   t := GetSystemTime;
-
-  MakeCompass('N');
 
   if (not PL_ClickCage) then Exit;
 
@@ -242,6 +240,9 @@ begin
   SetToleranceSpeed2Modifiers(tmpHM, tmpSM);
 
   if (not Result) then
+  begin
     if (GetSystemTime - t > 120000) then
       PL_Message('[ERROR] Pillory solver timed out');
+  end else
+    Wait(RandomRange(1200, 1600));
 end;
