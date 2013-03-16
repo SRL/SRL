@@ -75,7 +75,7 @@
 //--                                                                        --//
 //--   MapWalking, AntiRandoms, Objects, Bank, Symbol and many more...      --//
 //----------------------------------------------------------------------------//
-
+procedure SetScreenName(ScreenName: string); forward;
 {$include SRL-OSR/SRL/core/animation.simba}
 {$include SRL-OSR/SRL/core/flag.simba}
 {$include SRL-OSR/SRL/core/worldswitcher.simba}
@@ -212,6 +212,8 @@ begin
 
   SetupGauss;
   Proc_WorldSwitcherEnabled;
+  if Length(Players) > 0 then
+  SetScreenName(Players[CurrentPlayer].Nick);
 end;
 
 {$ifdef CompileSRL}

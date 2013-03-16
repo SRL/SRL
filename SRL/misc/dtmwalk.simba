@@ -60,7 +60,12 @@ Example:
 procedure DTMWalk_SleepWhileMoving;
 begin
   sleep(200);
-  while isMoving do wait(300);
+  WalkingToFlag(1000 + Random(500));
+  while isMoving do
+  begin
+    wait(200);
+    if not SRL_DisableRandoms then FindNormalRandoms;
+  end;
 end;
 
 (*
@@ -86,7 +91,7 @@ function DTMWalk_DefaultSearchFunc(var x,y : Integer; dtm : Integer;optional : T
 var aFound : extended;
 begin
     MakeCompass('N');
-    Result := FindDTMRotated(dtm, x, y, MMX1, MMY1, MMX2, MMY2,    -Pi, Pi, Pi/30, aFound);
+    Result := FindDTMRotated(dtm, x, y, MMX1, MMY1, MMX2, MMY2,    -17.0, 17.0, 0.1, aFound);
 end;
 
 (*
@@ -143,12 +148,49 @@ begin
     Result := DTMWalk_DTMObjCustom(searchDTM,@DTMWalk_DefaultSearchFunc,[]);
 end;
 
+(*
 
-{*******************************************************************************
+DTMWalk_DebugWalkPath
+~~~~~~~~~~~~
 
-By: slushpuppy
-Description: Walks TDTMObjArray. Returns true once walk path completes.
-*******************************************************************************}
+.. code-block:: pascal
+    function DTMWalk_DebugWalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
+
+Walks TDTMObjArray and debugs it. Set second parameter to true toggle run. Returns true once walk path completes.
+/!\WARNING/!\ Use this function ONLY at the starting point
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+   DTMWalk_DebugWalkPath(walkto,true);
+
+*)
+function DTMWalk_DebugWalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
+var i,x,y,u : Integer;
+  isLast : Boolean;
+begin
+  if run AND IsKeyDown(VK_CONTROL) then KeyDown(VK_CONTROL);
+  for i := 0 to high(path) do
+  begin
+    if path[i].searchFunc(x,y,path[i].dtm,path[i].vargs) then
+    begin
+      writeln('[DTMWALK]::: Currently walking index: ' + IntToStr(i));
+      Mouse(x, y, 3, 3, mouse_Left);
+      for u := 0 to high(path) do
+      begin
+        if path[u].searchFunc(x,y,path[i].dtm,path[i].vargs) then
+          if i <> u then writeln('[DTMWALK]::: (warning) found duplicate matching points at' + inttostr(u) );
+      end;
+      sleep(300+ random(300));
+    end;
+    DTMWalk_SleepWhileMoving;
+  end;
+  if IsKeyDown(VK_CONTROL) then KeyUp(VK_CONTROL);
+end;
+
 (*
 
 DTMWalk_WalkPath
@@ -170,19 +212,28 @@ Example:
 *)
 function DTMWalk_WalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
 var i,x,y : Integer;
+  isLast : Boolean;
 begin
-  if run then KeyDown(VK_CONTROL);
-  for i := 0 to high(path) do
+  if run AND IsKeyDown(VK_CONTROL) then KeyDown(VK_CONTROL);
+  for i := high(path) to high(path) do
   begin
     if path[i].searchFunc(x,y,path[i].dtm,path[i].vargs) then
     begin
+      {$IFDEF DEBUG_DTMWALK}
+        writeln('[DTMWALK]::: Currently walking index: ' + IntToStr(i));
+      {$ENDIF}
       if i = high(path) then Result := True;
       Mouse(x, y, 3, 3, mouse_Left);
       sleep(300+ random(300));
+    end else
+    if not isLast then
+    begin
+      i := -1;
+      isLast := true;
     end;
     DTMWalk_SleepWhileMoving;
   end;
-  KeyUp(VK_CONTROL);
+  if IsKeyDown(VK_CONTROL) then KeyUp(VK_CONTROL);
 end;
 
 (*

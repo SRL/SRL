@@ -13,7 +13,7 @@ This solver uses findGapsTPA to determine which post to click.
 //{$DEFINE PB_DEBUG}
 
 const
-  PB_SCORE_10 = 60; // the tpa length of when the score is 10
+  PB_SCORE_10 = 180; // the tpa length of when the score is 10
 
 (**
  * Author: Coh3n
@@ -66,7 +66,7 @@ begin
     setColorToleranceSpeed(3);
 
     // the green of the spinning pillars
-    findColorsTolerance(tpa, 6737749, MSX1, MMY1, MSX2, MSY2, 5);
+    findColorsTolerance(tpa, 6011467, MSX1, MMY1, MSX2, MSY2, 38);
 
     setColorToleranceSpeed(tmpCTS);
 
@@ -188,13 +188,15 @@ var
   tpa, tpa_Exit: TPointArray;
   ATPA: T2DPointArray;
 begin
+
  if (not loggedIn()) then
    exit;
  addToSRLLog('PB_Exit: Exiting cave');
  t := (getSystemTime + 20000);
+ SetAngle(SRL_ANGLE_HIGH);
  repeat
    // the green path color
-   if (findColorsTolerance(tpa, 9283213, MSX1, MMCY, MSX2, MSY2, 15)) then
+   if (findColorsTolerance(tpa, 5603685, MSX1, MMCY, MSX2, MSY2, 15)) then
      if (length(tpa) > 0) then
      begin
        sortTPAFrom(tpa, point(MSCX, MSY2)); // center of the bottom of the MS
@@ -230,6 +232,7 @@ begin
  begin
    addToSRLLog('PB_Exit: Took to long to find exit... Looking for backup');
    t := (getSystemTime + 20000);
+   MakeCompass('S');
    repeat
      if (FindColorsTolerance(tpa_Exit, 10390671, MSX1, MSY1, MSX2, MSY2, 10)) then
        ATPA := TPAToATPAEx(tpa_Exit, 70, 5);
