@@ -64,7 +64,6 @@ begin
       RandomRange(SPoint.Y-4,SPoint.Y+4), 0, 0);
 
   ClickMouse2(mouse_left);
-  ClickMouse2(mouse_left);
 
   Result := True;
 end;
@@ -233,11 +232,18 @@ begin
     Exit;
   end;
 
-  if SL_Select(SL_FindSandwichBoxNumber) then
-  begin
-    SL_Message('Selected sandwich');
-    Result := True;
-  end;
+  repeat
+
+    if SL_Select(SL_FindSandwichBoxNumber) then
+    begin
+      SL_Message('Selected sandwich');
+      Result := True;
+    end;
+
+  until (Result) or (SL_StopSearch);
+
+  if ((GetSystemTime - _SL_TimeOut) > 35000) then
+    SL_Message('[ERROR] SandwichLady solver timed out');
 
   Wait(RandomRange(1600, 1900));
 
