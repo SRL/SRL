@@ -136,7 +136,7 @@ begin
 
   MarkTime(WatchTime);
   Result[0] := '';
-  Count := 0;
+  Count := 0; CNum := 0;
   repeat
     CNum := CountColorTolerance(1057067, 180, 170, 235, 260, 5);
 
@@ -150,14 +150,14 @@ begin
     if (CNum > Count) then
       Count := CNum;
 
-  until (not (Result[0] = '')) or (TimeFromMark(WatchTime) > 6000);
+  until (not (Result[0] = '')) or (TimeFromMark(WatchTime) > 10000);
 
   if (Result[0] = '') then
   begin
     if InRange(Count, 250, 350) then Result[0] := 'triangle';
     if InRange(Count, 400, 500) then Result[0] := 'diamond';
     if InRange(Count, 501, 600) then Result[0] := 'circle';
-    if InRange(Count, 670, 800) then Result[0] := 'square';
+    if InRange(Count, 670, 1300) then Result[0] := 'square';
   end;
 
   C1 := Count;
@@ -167,7 +167,7 @@ begin
 
   MarkTime(WatchTime);
   Result[1] := '';
-  Count := 0;
+  Count := 0; CNum := 0;
   repeat
     CNum := CountColorTolerance(1057067, 265, 170, 345, 260, 5);
 
@@ -181,14 +181,14 @@ begin
     if (CNum > Count) then
       Count := CNum;
 
-  until (not (Result[1] = '')) or (TimeFromMark(WatchTime) > 6000);
+  until (not (Result[1] = '')) or (TimeFromMark(WatchTime) > 10000);
 
   if (Result[1] = '') then
   begin
     if InRange(Count, 250, 350) then Result[1] := 'triangle';
     if InRange(Count, 400, 500) then Result[1] := 'diamond';
     if InRange(Count, 501, 600) then Result[1] := 'circle';
-    if InRange(Count, 670, 800) then Result[1] := 'square';
+    if InRange(Count, 670, 1300) then Result[1] := 'square';
   end;
 
   C2 := Count;
@@ -198,7 +198,7 @@ begin
 
   MarkTime(WatchTime);
   Result[2] := '';
-  Count := 0;
+  Count := 0; CNum := 0;
   repeat
     CNum := CountColorTolerance(1057067, 365, 170, 430, 260, 5);
 
@@ -212,14 +212,14 @@ begin
     if (CNum > Count) then
       Count := CNum;
 
-  until (not (Result[2] = '')) or (TimeFromMark(WatchTime) > 6000);
+  until (not (Result[2] = '')) or (TimeFromMark(WatchTime) > 10000);
 
   if (Result[2] = '') then
   begin
     if InRange(Count, 250, 350) then Result[2] := 'triangle';
     if InRange(Count, 400, 500) then Result[2] := 'diamond';
     if InRange(Count, 501, 600) then Result[2] := 'circle';
-    if InRange(Count, 670, 800) then Result[2] := 'square';
+    if InRange(Count, 670, 1300) then Result[2] := 'square';
   end;
 
   C3 := Count;
@@ -241,7 +241,6 @@ var
   tmpHM, tmpSM: Extended;
   lock: String;
   keys: TStringArray;
-  PLError: Boolean;
 begin
   Result := False;
   keysolves := 0;
@@ -257,8 +256,6 @@ begin
     Result := (TabExists(TAB_OPTIONS));
     if (Result) then Break;
 
-    PLError := False;
-
     // open the lock screen if it's not already open
     if (not PL_LockScreen) then PL_ClickCage;
 
@@ -272,11 +269,8 @@ begin
       if (keys[i] = '') then
       begin
          PL_Message('[ERROR] [PL_GetKeys] Failed to get all keys');
-         PLError := True;
          Break;
       end;
-
-      if (PLError) then Continue;
 
       if (lock = '') then
       begin
