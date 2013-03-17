@@ -6,28 +6,22 @@ Stores all the routines to solve the Sandwich Lady random.  None of these
 routines should be used throughout scripts.  They only need to be called in
 SRL's random detection methods.
 
-This solver uses text recognition to determine which food to click, then uses
-TPA scanning to find and click the required food.
-
-Original Author : DannyRS
-Edits Made By   :
+This solver uses text recognition to determine which food to click,
+then uses TPA Scanning to find and click the required food.
 
 *)
 
 var
-  SL_TimeOut: integer;
-
-function SL_Detect: boolean;
-begin
-  Result := (getNPCChatName = 'Sandwich lady');
-end;
+  _SL_TimeOut: integer;
 
 function SL_StopSearch: boolean;
 begin
   Result := False;
+
   if (CountColor(39423, 490, 10, 513, 32) < 5) then
     Result := True;
-  if (TimeFromMark(SL_TimeOut) > 35000) then
+
+  if ((GetSystemTime - _SL_TimeOut) > 35000) then
     Result := True;
 end;
 
@@ -36,12 +30,18 @@ begin
   addToSRLLog('[Sandwich Random] ' + Message);
 end;
 
+(**
+ * Author: DannyRS
+ * Last modified 15/03/2013 By DannyRS
+ * Description: Selects a sandwich number 0-6 (left-right)
+ *)
 function SL_Select(SandwichNumber: integer): boolean;
 var
   SPoint: tpoint;
 begin
   Result := False;
   SPoint := Point(-1,-1);
+
   case SandwichNumber of
     0: SPoint := Point(155, 120);
     1: SPoint := Point(260, 122);
@@ -51,30 +51,48 @@ begin
     5: SPoint := Point(315, 213);
     6: SPoint := Point(395, 217);
   end;
+
   if (SPoint.X < 0) then
   begin
     SL_Message('[ERROR] Invalid sandwich number');
     Exit;
   end;
+
   if (SL_StopSearch) then Exit;
+
   MMouse(RandomRange(SPoint.X-4,SPoint.X+4),
       RandomRange(SPoint.Y-4,SPoint.Y+4), 0, 0);
+
   ClickMouse2(mouse_left);
+
   Result := True;
 end;
 
+(**
+ * Author: DannyRS
+ * Last modified 15/03/2013 By DannyRS
+ * Description: Gets sandwich name from screen
+ *)
 function SL_GetSandwichName: string;
 var
   FoundString, SWName: string;
 begin
   Result := ''; SWName := '';
+
   FoundString := Trim(GetTextAtExWrap(80, 270, 400, 303,
       0, 3, 1, 2070783, 0, 'UpChars07'));
+
   SWName := Trim(Between('Have a', 'for free', FoundString));
+
   if (not (SWName='')) then
     Result := SWName;
 end;
 
+(**
+ * Author: DannyRS
+ * Last modified 15/03/2013 By DannyRS
+ * Description: Returns TBox area of all the sandwiches
+ *)
 function SL_SandwichSearchBox(BoxNumber: integer): tbox;
 begin
   case BoxNumber of
@@ -88,6 +106,11 @@ begin
   end;
 end;
 
+(**
+ * Author: DannyRS
+ * Last modified 15/03/2013 By DannyRS
+ * Description: Finds the correct box number to click
+ *)
 function SL_FindSandwichBoxNumber: integer;
 var
   tmpCTS, i, SColor, STol, MinSSize: integer;
@@ -97,15 +120,20 @@ var
   SWTPA: tpointarray;
 begin
   Result := -1;
+
   SName := SL_GetSandwichName;
+
   tmpCTS := GetColorToleranceSpeed;
   GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
+
   if (SName='') then
   begin
     SL_Message('[ERROR] Unable to get sandwich name');
     Exit;
   end;
+
   SL_Message('Sandwich Name: ' + SName);
+
   case Lowercase(SName) of
     'baguette'         : begin
                            SColor:=2910074;
@@ -119,7 +147,7 @@ begin
                            STol:=7;
                            SHM:=0.03;
                            SSM:=0.24;
-                           MinSSize:=110;
+                           MinSSize:=120;
                          end;
     'kebab'            : begin
                            SColor:=1276942;
@@ -159,10 +187,13 @@ begin
     else
     begin SL_Message('[ERROR] Invalid sandwich name found'); Exit; end;
   end;
+
   SL_Message('Scanning for sandwich');
   SetColorToleranceSpeed(2);
   SetToleranceSpeed2Modifiers(SHM, SSM);
+
   repeat
+
     for i:=0 to 6 do
     begin
       SB := SL_SandwichSearchBox(i);
@@ -171,25 +202,50 @@ begin
       Result := i;
       Break;
     end;
+
   until (Result > -1) or (SL_StopSearch);
+
   SetColorToleranceSpeed(tmpCTS);
   SetToleranceSpeed2Modifiers(tmpHM, tmpSM);
 end;
 
+(**
+ * Author: DannyRS
+ * Last modified 15/03/2013 By DannyRS
+ * Description: Solves the Sandwich Lady random event
+ *)
 function SL_Solve: boolean;
 begin
   Result := False;
-  Wait(RandomRange(600,800));
+
+  _SL_TimeOut := GetSystemTime;
+
+  Wait(RandomRange(600, 800));
+
   ClickContinue(False);
+
   Wait(RandomRange(1300,1800));
-  MarkTime(SL_TimeOut);
+
   if (SL_StopSearch) then
   begin
     SL_Message('[ERROR] SandwichLady select screen not up');
     Exit;
   end;
-  if SL_Select(SL_FindSandwichBoxNumber) then
-    Result := True;
-  Wait(RandomRange(600,800));
+
+  repeat
+
+    if SL_Select(SL_FindSandwichBoxNumber) then
+    begin
+      SL_Message('Selected sandwich');
+      Result := True;
+    end;
+
+  until (Result) or (SL_StopSearch);
+
+  if ((GetSystemTime - _SL_TimeOut) > 35000) then
+    SL_Message('[ERROR] SandwichLady solver timed out');
+
+  Wait(RandomRange(1600, 1900));
+
   ClickContinue(False);
 end;
