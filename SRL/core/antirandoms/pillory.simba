@@ -25,7 +25,7 @@ function PL_Detect: boolean;
 var
   tpa: TPointArray;
 begin
-  if (not tabExists(TAB_OPTIONS)) and (tabExists(TAB_FRIENDS)) then
+  if (not TabExists(TAB_OPTIONS)) and (TabExists(TAB_FRIENDS)) then
   begin
     // red doors of the cages
     FindColorsTolerance(tpa, 235, MMCX - 15, MMCY - 15, MMCX + 15, MMCY + 15, 20);
@@ -116,7 +116,7 @@ begin
   if (Count > 800) and (Count < 949) then Result := 'square';
   if (Count > 570) and (Count < 799) then Result := 'triangle';
   if (Count > 400) and (Count < 569) then Result := 'diamond';
-  if (Count > 950) and (Count < 1200) then Result := 'circle';
+  if (Count > 950) and (Count < 1600) then Result := 'circle';
   PL_Message('[PL_GetLock] Lock Found: ' + Result + ' [' + ToStr(Count) + ']');
 end;
 
@@ -253,6 +253,10 @@ begin
   if (not PL_ClickCage) then Exit;
 
   repeat
+
+    Result := (TabExists(TAB_OPTIONS));
+    if (Result) then Break;
+
     PLError := False;
 
     // open the lock screen if it's not already open
@@ -291,7 +295,8 @@ begin
         end;
       end;
 
-    Result := ((keysolves > 2) and (not PL_LockScreen));
+    Result := ((keysolves > 2) and (not PL_LockScreen)) or
+        (TabExists(TAB_OPTIONS));
 
   until (Result) or (GetSystemTime - t > 120000);
 
