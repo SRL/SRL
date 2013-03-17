@@ -9,9 +9,6 @@ detection methods.
 This solver uses color counting to determine the shape
 of the lock and which key to use.
 
-Original Author : DannyRS
-Edits Made By   :
-
 *)
 
 procedure PL_Message(Message: string);
@@ -66,6 +63,7 @@ begin
         if (waitFunc(@PL_LockScreen, 50, 5000)) then
         begin
           PL_Message('[PL_ClickCage] Opened Lock Screen');
+          Wait(RandomRange(190, 270));
           Result := True;
         end else
           PL_Message('[PL_ClickCage] Failed to open Lock Screen');
@@ -129,45 +127,107 @@ end;
  *)
 function PL_GetKeys: TStringArray;
 var
-  WatchTime: Integer;
+  C1,C2,C3,CNum,Count,WatchTime: Integer;
 begin
-  SetLength(Result,3);
+  SetLength(Result, 3);
+
   SetColorToleranceSpeed(2);
   SetToleranceSpeed2Modifiers(0.21, 2.01);
 
   MarkTime(WatchTime);
   Result[0] := '';
+  Count := 0;
   repeat
-    case CountColorTolerance(1057067, 180, 170, 235, 260, 5) of
+    CNum := CountColorTolerance(1057067, 180, 170, 235, 260, 5);
+
+    case CNum of
       286: Result[0] := 'triangle';
       493: Result[0] := 'diamond';
       506: Result[0] := 'circle';
       729: Result[0] := 'square';
     end;
-  until (not (Result[0] = '')) or (TimeFromMark(WatchTime) > 10000);
+
+    if (CNum > Count) then
+      Count := CNum;
+
+  until (not (Result[0] = '')) or (TimeFromMark(WatchTime) > 6000);
+
+  if (Result[0] = '') then
+  begin
+    if InRange(Count, 250, 350) then Result[0] := 'triangle';
+    if InRange(Count, 400, 500) then Result[0] := 'diamond';
+    if InRange(Count, 501, 600) then Result[0] := 'circle';
+    if InRange(Count, 670, 800) then Result[0] := 'square';
+  end;
+
+  C1 := Count;
+
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.21, 2.01);
 
   MarkTime(WatchTime);
   Result[1] := '';
+  Count := 0;
   repeat
-    case CountColorTolerance(1057067, 265, 170, 345, 260, 5) of
+    CNum := CountColorTolerance(1057067, 265, 170, 345, 260, 5);
+
+    case CNum of
       286: Result[1] := 'triangle';
       493: Result[1] := 'diamond';
       506: Result[1] := 'circle';
       729: Result[1] := 'square';
     end;
-  until (not (Result[1] = '')) or (TimeFromMark(WatchTime) > 10000);
+
+    if (CNum > Count) then
+      Count := CNum;
+
+  until (not (Result[1] = '')) or (TimeFromMark(WatchTime) > 6000);
+
+  if (Result[1] = '') then
+  begin
+    if InRange(Count, 250, 350) then Result[1] := 'triangle';
+    if InRange(Count, 400, 500) then Result[1] := 'diamond';
+    if InRange(Count, 501, 600) then Result[1] := 'circle';
+    if InRange(Count, 670, 800) then Result[1] := 'square';
+  end;
+
+  C2 := Count;
+
+  SetColorToleranceSpeed(2);
+  SetToleranceSpeed2Modifiers(0.21, 2.01);
 
   MarkTime(WatchTime);
   Result[2] := '';
+  Count := 0;
   repeat
-    case CountColorTolerance(1057067, 355, 170, 435, 260, 5) of
+    CNum := CountColorTolerance(1057067, 365, 170, 430, 260, 5);
+
+    case CNum of
       286: Result[2] := 'triangle';
       493: Result[2] := 'diamond';
       506: Result[2] := 'circle';
       729: Result[2] := 'square';
     end;
-  until (not (Result[2] = '')) or (TimeFromMark(WatchTime) > 10000);
-  PL_Message('[PL_GetKeys] Keys Found: '+Result[0]+' '+Result[1]+' '+Result[2]);
+
+    if (CNum > Count) then
+      Count := CNum;
+
+  until (not (Result[2] = '')) or (TimeFromMark(WatchTime) > 6000);
+
+  if (Result[2] = '') then
+  begin
+    if InRange(Count, 250, 350) then Result[2] := 'triangle';
+    if InRange(Count, 400, 500) then Result[2] := 'diamond';
+    if InRange(Count, 501, 600) then Result[2] := 'circle';
+    if InRange(Count, 670, 800) then Result[2] := 'square';
+  end;
+
+  C3 := Count;
+
+  PL_Message('[PL_GetKeys] Keys Found: '+
+      Result[0]+' ['+IntToStr(C1)+']'+' '+
+      Result[1]+' ['+IntToStr(C2)+']'+' '+
+      Result[2]+' ['+IntToStr(C3)+']');
 end;
 
 (**
@@ -196,8 +256,7 @@ begin
     PLError := False;
 
     // open the lock screen if it's not already open
-    if (not PL_LockScreen) then
-      PL_ClickCage;
+    if (not PL_LockScreen) then PL_ClickCage;
 
     tmpCTS := GetColorToleranceSpeed;
     GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
@@ -244,5 +303,5 @@ begin
     if (GetSystemTime - t > 120000) then
       PL_Message('[ERROR] Pillory solver timed out');
   end else
-    Wait(RandomRange(1200, 1600));
+    Wait(RandomRange(800, 1200));
 end;
