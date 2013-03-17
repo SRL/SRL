@@ -64,6 +64,7 @@ begin
       RandomRange(SPoint.Y-4,SPoint.Y+4), 0, 0);
 
   ClickMouse2(mouse_left);
+  ClickMouse2(mouse_left);
 
   Result := True;
 end;
@@ -147,7 +148,7 @@ begin
                            STol:=7;
                            SHM:=0.03;
                            SSM:=0.24;
-                           MinSSize:=110;
+                           MinSSize:=120;
                          end;
     'kebab'            : begin
                            SColor:=1276942;
