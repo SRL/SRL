@@ -113,10 +113,10 @@ begin
     if (CNum > Count) then
       Count := CNum;
   until (TimeFromMark(CountTime) > WatchTime);
-  if (Count > 800) and (Count < 949) then Result := 'square';
+  if (Count > 800) and (Count < 1000) then Result := 'square';
   if (Count > 570) and (Count < 799) then Result := 'triangle';
   if (Count > 400) and (Count < 569) then Result := 'diamond';
-  if (Count > 950) and (Count < 1600) then Result := 'circle';
+  if (Count > 1001) and (Count < 1600) then Result := 'circle';
   PL_Message('[PL_GetLock] Lock Found: ' + Result + ' [' + ToStr(Count) + ']');
 end;
 
