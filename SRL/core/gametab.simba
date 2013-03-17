@@ -8,20 +8,6 @@ This Include contains all Gametab Routines.
 
 *)
 
-type
-  TSMSetting = (Stereo, Mono, NoChange);
-
-{ const LobbyTab Constants;
-  Description: Constants representing lobbytab numbers. }
-{ **************** Not Required in 07 ***************** }
-const
-  L_PlayerInfo = 1;
-  L_WorldSelect = 2;
-  L_FriendsList = 3;
-  L_FriendsChat = 4;
-  L_ClanChat = 5;
-  L_Options = 6;
-
 (*
 Gametab Functions
 -----------------
