@@ -6,269 +6,372 @@ Stores all the routines to solve the Drill Demon random.  None of these routines
 should be used throughout scripts.  They only need to be called in SRL's random
 detection methods.
 
-This solver uses DTMs of the signs to determine which mat to exercise on.  It
-also uses relocating DTMs in case the sign we're looking for doesn't appear on
-the main screen.
+This solver uses Deformed BMPs to locate the signs
+to solve the Drill Demon (Sergeant Damien) random.
 
 *)
 
-// the demon's name that appears when he's talking
-const
-  DD_NPC_DEMON = 'SergeantDamien';
-
-// these constants represent elements in an array, so do not change the values
-const
-  DTM_DD_EXERCISE_COUNT = 4;
-    DTM_DD_JOG      = 0;
-    DTM_DD_SITUP    = 1;
-    DTM_DD_PUSHUP   = 2;
-    DTM_DD_STARJUMP = 3;
-
-  DTM_DD_RELOCATE_COUNT = 3;
-    DTM_DD_RIGHT    = 0;
-    DTM_DD_LEFT     = 1;
-    DTM_DD_CENTER   = 2;
-
-(**
- * Author: DemiseScythe & Coh3n
- * Description: Returns true if player is in the Drill Demon random.
- *)
-function DD_Detect(): boolean;
+procedure DD_Message(Message: String);
 begin
-  if not tabExists(TAB_MAGIC) then
-    result := (GetMusic = 'CorPoral Punisbment');
+  addToSRLLog('[DemonDrill Random] ' + Message);
+end;
+
+function DD_Detect(): Boolean;
+begin
+  if (not TabExists(TAB_OPTIONS)) and (not TabExists(TAB_EMOTES)) then
+    Result := (GetMusic = 'CorPoral Punisbment');
 end;
 
 (**
- * Author: Coh3n, DTMs by DemiseScythe
- * Description: Returns the four DTMs of the exercise signs.
+ * Author: DannyRS
+ * Last Modified: 17/03/2013 - DannyRS
+ * Description: Moves the player back to the center of the random
+ * Note: Inspired by Le Jingle
  *)
-function DD_ExerciseDTMs(): TIntegerArray;
-begin
-  setLength(result, DTM_DD_EXERCISE_COUNT);
-
-  // The signs
-  result[DTM_DD_JOG]      := DTMFromString('mrAAAAHic42BgYNjFyMCwBYpB7L1AfBSIVwPxciAuAKrJBOISKA3iFwNxDpROK4lkKG5JBWMQG4Sd0izhmB+oBh9mJIBhAABkYhKt');
-  result[DTM_DD_SITUP]    := DTMFromString('mggAAAHicY2NgYDgCxKeA+DwQ7wfijUB8BYiLgTgHiAuBuASIs4C4FIRb01CwQ4oFGPMD5bBhRhwYAgALjQ7j');
-  result[DTM_DD_PUSHUP]   := DTMFromString('mlwAAAHicY2dgYNjNyMCwGYhXAfEpID4DxAeAeDUQFwHl84C4FIiLgTgLCZe3Z6BgpzRLMM4oi2bgB8rjwox4MBQAALfyETE=');
-  result[DTM_DD_STARJUMP] := DTMFromString('mbQAAAHicY2VgYHBkZGCwAmJXIA4AYmMgzgeKZwFxGRAXQnF5ewYcO6VZgjE/UBwdM2LBYAAAhp8Jww==');
-end;
-
-(**
- * Author: Coh3n, DTMs by DemiseScythe
- * Description: Returns the three DTMs used to relocate inside the random.
- *)
-function DD_RelocateDTMs(): TIntegerArray;
-begin
-  setLength(result, DTM_DD_RELOCATE_COUNT);
-
-  // Used to relocate inside the fence
-  result[DTM_DD_RIGHT]  := DTMFromString('mbQAAAHicY2VgYDAE4iwgngDEz4E4AYjPA3E+EBcCcS4QvwFi7yAVBsc0Czj2DOJm4AeKo2NGLBgMAMJeCdQ=');
-  result[DTM_DD_LEFT]   := DTMFromString('mbQAAAHicY2VgYDjPyMAgAsQ5QDwJiOcA8S2geA4Q5wFxARB/BmKfYBUGpzRLOLZp0WDgB4qjY0YsGAwA3gcKPQ==');
-  result[DTM_DD_CENTER] := DTMFromString('mbQAAAHicY2VgYNgJxM+AeBIQMzMyMMQC6fNAnAfEBUD8EohfAbFPsAqDU5olGHsESjBYN2kw8APF0TEjFgwGAP5iCoM=');
-end;
-
-(**
- * Author: DemiseScythe & Coh3n
- * Description: Sets up the screen to solve the random.
- *)
-procedure DD_Setup();
-begin
-  if (not loggedIn()) then
-    exit;
-
-  if (findNPCChatText('minute', Nothing)) then
-    clickToContinue;
-end;
-
-(**
- * Author: DemiseScythe & Coh3n
- * Description: Checks the NPC chat and finds which exercise we must do. Then
- * it finds the sign and uses its coords to click the mat. The wait is just
- * large enough to make it wait until it has walked, performed the exercise,
- * and ready to return to the center of the fence.
- *)
-function DD_DoExercise(DTMs: TIntegerArray): boolean;
+function DD_ResetPosition: Boolean;
 var
-  i, x, y: integer;
-  texts: TStringArray;
-  aFound: extended;
+  WallTPA: TPointArray;
+  WallATPA: T2DPointArray;
+  tb: TBox;
+  p: TPoint;
+  //pa: TPointArray;
 begin
-  if (not loggedIn()) then
-    exit;
+  Result := False;
 
-  texts := ['jog', 'sit', 'push', 'star'];
+  if (not LoggedIn) then Exit;
 
-  if (length(texts) <> length(DTMs)) then
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.02, 0.02);
+  FindColorsTolerance(WallTPA, 15593957, 600, 58, 690, 110, 70);
+  SplitTPAExWrap(WallTPA, 5, 5, WallATPA);
+  SortATPASize(WallATPA, True);
+
+  if (Length(WallATPA) < 1) then Exit;
+
+  //SMART_DrawBoxEx(True, False, WallATPA[0], clGreen);
+
+  tb := GetTPABounds(WallATPA[0]);
+  p := MiddleBox(tb);
+
+  //Seems white alone is accurate enough to leave this out - Danny
+  //pa := GetMiniMapDots('yellow');
+  //if (Length(pa) < 1) then Exit;
+  //if (not PointInBox(pa[0], tb)) then Exit;
+
+  MMouse(p.x, RandomRange(p.y, p.y + 2), 0, 0);
+  ClickMouse2(mouse_left);
+
+  Wait(RandomRange(3800, 4200));
+
+  Result := True;
+end;
+
+function DD_TalkingToDemon: Boolean;
+begin
+  Result := (Trim(GetNPCChatName) = 'SergeantDamien');
+end;
+
+(**
+ * Author: DannyRS
+ * Last Modified: 17/03/2013 - DannyRS
+ * Description: Talks to Sergeant Damien
+ *)
+function DD_TalkDemon: Boolean;
+var
+  DemonTPA: TPointArray;
+  DemonATPA: T2DPointArray;
+  x, y, i, Attemps: Integer;
+begin
+  Result := False;
+
+  if (DD_TalkingToDemon) then
   begin
-    addToSRLLog('DD_DoExercise: Invalid DTMs or texts array');
-    exit;
+    Result := True;
+    Exit;
   end;
-
-  // There should not be any out of range errors here as all arrays should be the same length
-  for i := 0 to high(texts) do
-    if (findNPCChatText(texts[i], nothing)) then
-      if (findDTMRotated(DTMs[i], x, y, MSX1, MSY1, MSX2, MSY2, -Pi/12, Pi/12, Pi/30, aFound)) then
-      begin
-        addToSRLLog('DD_DoExercise: '+capitalize(texts[i]));
-        mouse(x, (y + 100), 3, 3, true);
-
-        if (waitNPCTalking(DD_NPC_DEMON, 10000)) then
-        begin
-          wait(2000 + random(500));
-          result := true;
-          break;
-        end;
-      end else
-        addToSRLLog('DD_Exercise: Didn''t find exercise DTM: '+capitalize(texts[i]));
-end;
-
-(**
- * Author: Coh3n
- * Description: Returns a TBox of the exercise area on the minimap. It finds the
- * distance from the player to each side of the exercise area.  Saves the
- * distance and points in arrays.  It then uses those arrays to calculate the
- * top left and bottom right corners of the exercise area.
- *)
-function DD_GetExerciseArea(var exerciseArea: TBox): boolean;
-var
-  i, c, t, w, h, distFound: integer;
-  dist: array[0..3] of integer;
-  area: array[0..3] of TBox;
-  tpa: array[0..3] of TPoint;
-begin
-  if (not loggedIn()) then
-    exit;
-
-  t := (getSystemTime + 15000);
 
   repeat
-    inc(c);
 
-    // search areas for each direction (only one pixel at a time)
-    area[0] := intToBox(MMCX, MMCY - 1 - c, MMCX, MMCY - 1 - c); // north
-    area[1] := intToBox(MMCX + 1 + c, MMCY, MMCX + 1 + c, MMCY); // east
-    area[2] := intToBox(MMCX, MMCY + 1 + c, MMCX, MMCY + 1 + c); // south
-    area[3] := intToBox(MMCX - 1 - c, MMCY, MMCX - 1 - c, MMCY); // west
+    if (Attemps > 6) then Break;
 
-    // loop through each area (i.e. direction) to get the distance from the player to the fence on the MM
-    for i := 0 to high(area) do
-      if (dist[i] = 0) then
-        // the white color of the fence
-        if (findColorTolerance(tpa[i].x, tpa[i].y, 15068652, area[i].x1, area[i].y1, area[i].x2, area[i].y2, 25)) then
-        begin
-          dist[i] := distance(tpa[i].x, tpa[i].y, MMCX, MMCY);
-          inc(distFound);
-        end;
+    SetColorToleranceSpeed(2);
+    SetToleranceSpeed2Modifiers(0.15, 1.61);
+    FindColorsTolerance(DemonTPA, 994406, MSX1, MSY1, MSX2, MSY2, 16);
+    SplitTPAExWrap(DemonTPA, 50, 100, DemonATPA);
+    SortATPASize(DemonATPA, True);
 
-    // if all 4 distances are found
-    if (distFound = 4) then
+    if (Length(DemonATPA) < 1) then
     begin
-      // calculate the top left and bottom right of the exercise box
-      exerciseArea.x1 := tpa[3].x;
-      exerciseArea.y1 := tpa[3].y - dist[0];
-      exerciseArea.x2 := tpa[1].x;
-      exerciseArea.y2 := tpa[1].y + dist[2];
-
-      //SMART_DrawBoxEx(true, exerciseArea, clGreen);
-
-      w := (exerciseArea.x2 - exerciseArea.x1);
-      h := (exerciseArea.y2 - exerciseArea.y1);
-      //writeln('w: '+toStr(w)+', h: '+toStr(h));
-
-      // sometimes the Drill Demon is standing right inline with the player, causing the next white line to be found on the edge of the MM
-      result := (inRange(38, w - 2, w + 2)  and inRange(20, h - 2, h + 2));
+      Attemps := Attemps + 1;
+      Wait(RandomRange(200, 400));
+      Continue;
     end;
 
-  until(result or (getSystemTime > t));
+    for i := 0 to High(DemonATPA) do
+    begin
+      if (Length(DemonATPA[i]) < 50) then Continue;
+      MiddleTPAEx(DemonATPA[i], x, y);
+      MMouse(RandomRange(x - 5, x + 5), RandomRange(y - 5, y + 5), 0, 0);
+      ClickMouse2(mouse_right);
+      Wait(RandomRange(30, 50));
+      if (ChooseOptionMulti(['Talk','alk-to'])) then
+      begin
+        if (WaitFunc(@DD_TalkingToDemon, 50, 25000)) then
+        begin
+          DD_Message('[DD_TalkDemon] Talked to demon');
+          Result := True;
+          Exit;
+        end else
+          DD_Message('[DD_TalkDemon] Failed to Talked to demon');
+      end;
+    end;
+    Attemps := Attemps + 1;
+
+  until (Result) or (Attemps > 6);
 end;
 
 (**
- * Author: DemiseScythe & Coh3n
- * Description: Relocates the player to the center of the exercise area.
+ * Author: DannyRS
+ * Last Modified: 17/03/2013 - DannyRS
+ * Description: Gets the TBoxes of the green signs
  *)
-function DD_Relocate(DTMs: TIntegerArray): boolean;
+function DD_GetSigns: TBoxArray;
 var
-  i: integer;
-  exerciseArea: TBox;
-  p: TPoint;
+  ESignsTPA: TPointArray;
+  ESignsATPA: T2DPointArray;
+  SignsSorted: Boolean;
+  i: Integer;
 begin
-  if (not loggedIn()) then
-    exit;
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.02, 0.02);
+  FindColorsTolerance(ESignsTPA, 4553552, MSX1, MSY1, MSX2, MSY2, 25);
+  SplitTPAExWrap(ESignsTPA, 20, 30, ESignsATPA);
 
-  for i := 0 to high(DTMs) do
-    if (clickDTMRotatedIn(DTMs[i], MSX1, MSY1, MSX2, MSY2, -Pi, Pi, Pi/30, ['alk'], mouse_Left)) then
+  repeat
+    SignsSorted := True;
+    for i := 0 to High(ESignsATPA) do
     begin
-      result := true;
-      break;
+      if (Length(ESignsATPA[i]) < 5) then
+      begin
+        DeleteValueInATPA(ESignsATPA,i);
+        SignsSorted := False;
+        Break;
+      end;
     end;
+  until (SignsSorted);
 
-  if (not result) then
+  SetLength(Result, Length(ESignsATPA));
+
+  for i := 0 to high(ESignsATPA) do
   begin
-    addToSRLLog('DD_Relocate: Didn''t find any relocate DTMs, using area detection');
+    Result[i] := GetTPABounds(ESignsATPA[i]);
+  end;
+end;
 
-    if (DD_GetExerciseArea(exerciseArea)) then
-    begin
-      p := middleBox(exerciseArea);
-      mouse(p.x, p.y + 5, 2, 2, mouse_Left);
-      result := true;
-    end;
+(**
+ * Author: DannyRS
+ * Last Modified: 17/03/2013 - DannyRS
+ * Description:
+ *  Compares bitmaps to the signs and tries to
+ *  return it's position, roughly centered
+ *)
+function DD_FindSign(WhichSign: String): TPoint;
+var
+  SB: TBoxArray;
+  x, y, i, SBMP: Integer;
+  Saccuracy: Extended;
+begin
+  Result := Point(-1, -1);
+
+  SB := DD_GetSigns;
+
+  SetColorToleranceSpeed(1);
+  SetToleranceSpeed2Modifiers(0.02, 0.02);
+
+  case LowerCase(WhichSign) of
+    'jog':       SBMP := BitmapFromString(29, 10, 'meJxzrQ5wJRrF9ZUSr3gwGItsMh' +
+                        'qXbJQ5qxGI4EZRxViImRBjIaZRbizcTGR3UmgsmpnUCltcxlIrVKl' +
+                        'rLNxk4tUDAIc3Qs8=');
+    'starjumps': SBMP := BitmapFromString(37, 16, 'meJxzrQ5wJR3F9ZXCERnacaHs+S' +
+                        '34raOiXXAbIYjqJhNjKfGIPjbSx5t0C1U6RyI97Ro21tEtNdLHOuR' +
+                        'iCtN8qtuIXDBiNZlGHgQiXMbSIgbh1uGJUyKrJAA7N7QN');
+    'situps':    SBMP := BitmapFromString(37, 16, 'meJxzrQ5wHRwoe34LENHTLgqtI1' +
+                        '473DqybSReL7Jd5FlHkl4060i1kSSNmHaRZB2pepGVkWojmnqCGtE' +
+                        'MpyRYiLcOf8ASg4hJMJiyZFsX11cKRMhcuJkQKbgswWRDpF3I1mHa' +
+                        'BZElJpUSaRcEkZSDyLCRVPOHEwIAf3vRcQ==');
+    'pushups':   SBMP := BitmapFromString(43, 16, 'meJxzrQ5wBaO4vlI4coUJ0hMhO2' +
+                        'Cg3ICJsue3ANHA2o6MBtZ2OjuGoANo6hhMk+npBjxm0scNBE2jaWg' +
+                        'QbwiNkgcZuqiSVuEFICUBOLAZh57phFqOoacb0OJ6AK3GtB0AjuAl' +
+                        '9Q==');
   end;
 
-  if (result) then
+  for i := 0 to High(SB) do
   begin
-    addToSRLLog('DD_Relocate: Walking to Center!');
-    flag();
-    wait(1000 + random(100));
-  end else
-    addToSRLLog('DD_Relocate: Failed to relocate');
+    if (SB[i].X1 > SB[i].X2) or (SB[i].Y1 > SB[i].Y2) then Continue;
+
+    if FindDeformedBitmapToleranceIn(SBMP, x, y, SB[i].X1-5, SB[i].Y1-5,
+      SB[i].X2+5, SB[i].Y2+5, 2, 4, False, Saccuracy) then
+      begin
+        Result := Point(x + 20, y + 7);
+        Break;
+      end;
+  end;
+
+  FreeBitmap(SBMP);
 end;
 
 (**
- * Author: DemiseScythe & Coh3n
- * Description: Solves the Drill Demon random event.
+ * Author: DannyRS
+ * Last Modified: 17/03/2013 - DannyRS
+ * Description: Attemps to solve the Drill Demon random
  *)
 function DD_Solve(): boolean;
 var
-  t: integer;
-  exerciseDTMs, relocateDTMs: TIntegerArray;
+  p: TPoint;
+  t, tmpCompass, tmpCTS, MMoves: Integer;
+  tmpHM, tmpSM: Extended;
+  MatName, LastMatt: String;
 begin
-  DD_Setup();
+  Result := False;
 
-  exerciseDTMs := DD_ExerciseDTMs();
-  relocateDTMs := DD_RelocateDTMs();
+  if (not LoggedIn) then Exit;
+
+  t := GetSystemTime;
+
+  tmpCTS := GetColorToleranceSpeed;
+  GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
+  tmpCompass := Round(rs_GetCompassAngleDegrees);
+
+  SetAngle(SRL_ANGLE_LOW);
+  MakeCompass('N');
 
   repeat
-    inc(t); // tries counter
 
-    // checks if we have sucessfully completed the Demon's requests
-    if (findNPCChatText('actual', nothing)) then
+    Result := TabExists(TAB_MAGIC);
+
+    if (Result) then Break;
+
+    if (not DD_TalkDemon) then
     begin
-      clickContinue(true);
-
-      if (waitTabExists(TAB_MAGIC, 10000)) then
-      begin
-        result := true;
-        break;
-      end;
-
-    end else begin
-      doConversation('', false); // GE message or if we get exercise wrong
-
-      if (not DD_DoExercise(exerciseDTMs)) then
-        DD_Relocate(relocateDTMs);
+      DD_ResetPosition;
+      Continue;
     end;
 
-    // just in case ;)
-    result := tabExists(TAB_MAGIC);
+    Wait(RandomRange(1200, 1600));
 
-  until(result or (not loggedIn()) or (t > 30));
+    case CountColor(0, MCX1, MCY1, MCX2, MCY2) of
+      687,988 : MatName := 'jog';
+      707     : MatName := 'starjumps';
+      569     : MatName := 'situps';
+      637,938 : MatName := 'pushups';
+      else
+      begin
+        ClickToContinue;
+        Wait(RandomRange(1200, 1500));
+        Continue;
+      end;
+    end;
 
-  // free the DTMs
-  freeDTMs(exerciseDTMs);
-  freeDTMs(relocateDTMs);
+    if (LastMatt = MatName) then
+    begin
+      MMoves := 0;
 
-  if (not result) then
-    addToSRLLog('DD_Solve: Drill Demon exceeded maximum tries');
+      DD_Message('[DD_Solve] Already standing on the matt : ' + MatName);
+      DD_Message('[DD_Solve] Using matt : ' + MatName + ' again');
+
+      repeat
+        MMouse(246, 184, 40, 30);
+        MMoves := MMoves + 1;
+        Wait(RandomRange(90, 340));
+        if (IsUpTextMultiCustom(['Use','xercise','mat'])) then
+        begin
+          ClickMouse2(mouse_right);
+          Wait(RandomRange(40, 90));
+          if (ChooseOptionMulti(['Use'])) then
+          begin
+            Wait(RandomRange(1200, 1500));
+            if (WaitFunc(@DD_TalkingToDemon, 50, 15000)) then
+            begin
+              DD_Message('[DD_Solve] Used matt successfully');
+              LastMatt := MatName;
+              Break;
+            end else
+            begin
+              DD_Message('[ERROR] Failed to use matt');
+              Break;
+            end;
+          end;
+        end;
+      until (MMoves > 10);
+
+      Continue;
+    end;
+
+    DD_Message('[DD_Solve] Walking to center to search for sign');
+
+    if (not DD_ResetPosition) then
+    begin
+      DD_Message('[ERROR] Failed to walk to center');
+      Continue;
+    end;
+
+    DD_Message('[DD_Solve] Searching for sign : ' + MatName);
+
+    p := DD_FindSign(MatName);
+
+    if (p.x < 0) or (p.y < 0) then
+    begin
+      DD_Message('[ERROR] Failed to find sign : ' + MatName);
+      Continue;
+    end;
+
+    MMoves := 0;
+
+    DD_Message('[DD_Solve] Searching for matt : ' + MatName);
+
+    repeat
+
+      MMouse(p.x - 10, p.y + 64, 50, 30);
+
+    //SMART_DrawBoxEx(True,False,IntToBox(p.x-10,p.y+64,p.x+40,p.y+94),clGreen);
+
+      MMoves := MMoves + 1;
+      Wait(RandomRange(90, 340));
+      if (IsUpTextMultiCustom(['Use','xercise','mat'])) then
+      begin
+        ClickMouse2(mouse_right);
+        Wait(RandomRange(40, 90));
+        if (ChooseOptionMulti(['Use'])) then
+        begin
+          Wait(RandomRange(1200, 1500));
+          if (WaitFunc(@DD_TalkingToDemon, 50, 15000)) then
+          begin
+            DD_Message('[DD_Solve] Used matt successfully');
+            LastMatt := MatName;
+            Break;
+          end else
+          begin
+            DD_Message('[ERROR] Failed to use matt');
+            Break;
+          end;
+        end;
+      end;
+    until (MMoves > 10);
+
+  Result := TabExists(TAB_MAGIC);
+
+  until (Result) or (GetSystemTime - t > 240000);
+
+  if (not Result) then
+  begin
+    if (GetSystemTime - t > 240000) then
+      DD_Message('[ERROR] DrillDemon solver timed out');
+  end else
+    Wait(RandomRange(1200, 1600));
+
+  SetAngle(SRL_ANGLE_HIGH);
+  MakeCompass(tmpCompass);
+
+  SetColorToleranceSpeed(tmpCTS);
+  SetToleranceSpeed2Modifiers(tmpHM, tmpSM);
 end;
-
