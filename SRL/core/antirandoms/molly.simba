@@ -17,14 +17,11 @@ var
   MollyHair: String;
   CorrectMolly: Boolean;
 
-(**
- * Author: Coh3n and/or [J]ustin?
- * Description: Detects if a player is in the random.
- *)
 function Molly_Detect(): boolean;
 begin
-  if (not tabExists(TAB_MAGIC)) then
-        result := (GetMusic = 'Head to Head');
+  if (not TabExists(TAB_MAGIC)) and (not TabExists(TAB_EMOTES)) then
+    if (CountColorTolerance(0, MMCX-30, MMCY-30, MMCX+30, MMCY+30, 20) = 3721) then
+      Result := (CountColorTolerance(3883137, MSX1, MSY1, MSX2, MSY2, 19) > 6000);
 end;
 
 {*******************************************************************************
