@@ -9,14 +9,16 @@ detection methods.
 *)
 
 (**
- * Author: Justin
+ * Author: Justin and DannyRS
  * Description: Detects if a player is in the random.
  *)
 function PP_Detect(): boolean;
 begin
-  if (not tabExists(TAB_MAGIC)) then
-    if (length(getMinimapDots('npc')) = 1) then
-     result := (GetMusic = 'In tbe Clink')
+  if (CountColor(0, MMX1, MMY1, MMX2, MMY2) > 1000) then
+    if (CountColorTolerance(2771782, MMX1, MMY1, MMX2, MMY2, 25) > 2000) then
+      if (CountColorTolerance(235, MMX1, MMY1, MMX2, MMY2, 25) > 1) then
+        if (length(getMinimapDots('npc')) = 1) then
+          result := (GetMusic = 'In tbe Clink')
 end;
 
 (**
