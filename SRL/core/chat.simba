@@ -212,12 +212,8 @@ begin
   Result := false;
 
   // only 1 blue color in chat.
-    GetMousePos(x,y);
-  while ( not FindColorsTolerance(bTxt, 16711680, MCX1, MCY1, MCX2, MCY2, 10)) AND PointInBox( Point(x,y), IntToBox(MCX1, MCY1, MCX2, MCY2)) do
-  begin
-       SleepAndMoveMouse(Random(1500));
-  end;
-
+  FindColorsTolerance(bTxt, 16711680, MCX1, MCY1, MCX2, MCY2, 10);
+  FindColorsTolerance(wTxt, 16777215, MCX1, MCY1, MCX2, MCY2, 30);
   SearchTPA := CombineTPA(bTxt, wTxt);
   if Length(SearchTPA) < 1 then
     Exit;

@@ -658,6 +658,7 @@ begin
   until (Result);
 
   TakeIPScreen();
+
   if (LobbyScreen) then
   begin
     MouseBox(WDx1, WDy1, WDx2, WDy2, mouse_Left); //Click To Play
@@ -796,6 +797,7 @@ begin
   CurrentPlayer := PlayerNo;
   SRL_Logs := SRL_Logs + 1;
   LoginPlayer;
+  SetScreenName(Players[CurrentPlayer].Nick);
   Result := LoggedIn;
 end;
 

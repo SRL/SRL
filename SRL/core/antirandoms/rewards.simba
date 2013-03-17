@@ -7,11 +7,12 @@ Stores all the routines to solving reward/inventory random events.
 *)
 
 const
-  DTM_REWARD_COUNT = 4;
+  DTM_REWARD_COUNT = 5;
     DTM_REWARD_BOX     = 0;
     DTM_REWARD_MYSTERY = 1;
     DTM_REWARD_LAMP    = 2;
     DTM_REWARD_BOOK    = 3;
+    DTM_STRANGE_BOX    = 4;
 
 function RD_GetDTMs(): TIntegerArray;
 begin
@@ -21,6 +22,7 @@ begin
   result[DTM_REWARD_MYSTERY] := DTMFromString('mlwAAAHicY2dgYMhhYmBIBeJcIC4G4hIgzgTiFCCeycjAMAGIe4F4EhDPAeIlQDwPiGdHigJ1MzHMtBNlmBIqwtBsJgTmTw0TZeBngAB+JAzjM+LBUAAA3YEMSA==');
   result[DTM_REWARD_LAMP]    := DTMFromString('mwQAAAHic42RgYHjExsDwEIjvAPE1IL4AxLegYq+B+AUQ5zAyMKQBcToUZwJxPhAXAHEuEGcA8dQpQkDTGPFiZiBJCOM3AYLhAAATaQ1A');
   result[DTM_REWARD_BOOK]    := DTMFromString('mrAAAAHic42BgYHBiYmCwBmIfIPYCYlcmiJglFD8CqrkFxHeA+BkQvwDiD0D8FsovyM5mCDGTZPA2EGcwVxZk8DMUZ/DT4WIIN5cCs/mBavBhRgIYBgCtoQ8M');
+  result[DTM_STRANGE_BOX]    := DTMFromString('mlwAAAHicY2dgYEhlYmDIhuICIE4C4gwgTgbiLYwMDOuBeDsQbwXibUC8Bor7WloYctPSwBjEBuHirCwwlgSaiwsz4sFQAAC3CxJK');
 end;
 
 (**
@@ -333,6 +335,17 @@ begin
   end;
 end;
 
+ (**
+ * Author: Slushpuppy
+ * Description: Solves the Strange Box (at coords x, y) inventory random.
+ *)
+function RD_SolveStrangeBox(x, y: integer): boolean;
+begin
+  addToSRLLog('RD_SolveStrangeBox: Found StrangeBox box');
+
+  addToSRLLog('RD_SolveStrangeBox: solver currently disabled');
+end;
+
 (**
  * Author: Coh3n
  * Description: Loops through the rewards DTMs. If one is found, calls the
@@ -357,6 +370,7 @@ begin
         DTM_REWARD_MYSTERY : result := RD_SolveMystery(x, y);
         DTM_REWARD_LAMP    : result := RD_SolveLamp(x, y);
         DTM_REWARD_BOOK    : result := RD_SolveBook(x, y);
+        DTM_STRANGE_BOX    : result := RD_SolveStrangeBox(x, y);
       end;
 
       if (not result) then
