@@ -14,11 +14,15 @@ detection methods.
  *)
 function PP_Detect(): boolean;
 begin
-  if (CountColor(0, MMX1, MMY1, MMX2, MMY2) > 1000) then
+  if (CountColor(0, MMX1, MMY1, MMX2, MMY2) > 600) then
     if (CountColorTolerance(2771782, MMX1, MMY1, MMX2, MMY2, 25) > 2000) then
-      if (CountColorTolerance(235, MMX1, MMY1, MMX2, MMY2, 25) > 1) then
+      if (InRange(CountColorTolerance(235, MMX1, MMY1, MMX2, MMY2, 25),1,15)) then
         if (length(getMinimapDots('npc')) = 1) then
-          result := (GetMusic = 'In tbe Clink')
+        begin
+          doConversation('', false);
+          if (not tabExists(TAB_MAGIC)) then
+            result := (GetMusic = 'In tbe Clink');
+        end;
 end;
 
 (**
