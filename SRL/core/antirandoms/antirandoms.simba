@@ -394,6 +394,17 @@ end;
 
 Var
   NicknameBMP:  integer;
+  NicknameSet: boolean;
+
+{*******************************************************************************
+procedure FreeScreenName;
+by: DannyRS
+Description: Frees screenname BMP from memory
+*******************************************************************************}
+procedure FreeScreenName;
+begin
+  FreeBitmap(NickNameBMP);
+end;
 
 {*******************************************************************************
 procedure SetScreenName(ScreenName: String);
@@ -404,6 +415,11 @@ Description: Sets screenname for use with FindTalk and one Player.
 procedure SetScreenName(ScreenName: string);
 begin
   NickNameBMP := BitmapFromText(ScreenName, upchars07);
+
+  if (not NicknameSet) then
+    AddOnTerminate('FreeScreenName');
+
+  NicknameSet := true;
 end;
 
 {*******************************************************************************
@@ -813,6 +829,22 @@ begin
       end;
     end;
   end;
+end;
+
+{*******************************************************************************
+function FTWait(WaitTime: Integer): Boolean;
+by: DannyRS
+Description: Used to replace wait(); to watch for NickName randoms while waiting
+*******************************************************************************}
+function FTWait(WaitTime: Integer): Boolean;
+var
+  _FTW_StartTime: Integer;
+begin
+  _FTW_StartTime := GetSystemTime;
+  repeat
+    if FindTalk then Result := True;
+    Wait(50);
+  until ((GetSystemTime - _FTW_StartTime) > WaitTime);
 end;
 
 function RandomDirection: string;
