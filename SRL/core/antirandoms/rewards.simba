@@ -344,6 +344,8 @@ begin
   addToSRLLog('RD_SolveStrangeBox: Found StrangeBox box');
 
   addToSRLLog('RD_SolveStrangeBox: solver currently disabled');
+
+  result := false;
 end;
 
 (**
