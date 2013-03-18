@@ -831,6 +831,22 @@ begin
   end;
 end;
 
+{*******************************************************************************
+function FTWait(WaitTime: Integer): Boolean;
+by: DannyRS
+Description: Used to replace wait(); to watch for NickName randoms while waiting
+*******************************************************************************}
+function FTWait(WaitTime: Integer): Boolean;
+var
+  _FTW_StartTime: Integer;
+begin
+  _FTW_StartTime := GetSystemTime;
+  repeat
+    if FindTalk then Result := True;
+    Wait(50);
+  until ((GetSystemTime - _FTW_StartTime) > WaitTime);
+end;
+
 function RandomDirection: string;
 var
   direction: tstringarray;
