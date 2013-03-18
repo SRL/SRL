@@ -394,6 +394,17 @@ end;
 
 Var
   NicknameBMP:  integer;
+  NicknameSet: boolean;
+
+{*******************************************************************************
+procedure FreeScreenName;
+by: DannyRS
+Description: Frees screenname BMP from memory
+*******************************************************************************}
+procedure FreeScreenName;
+begin
+  FreeBitmap(NickNameBMP);
+end;
 
 {*******************************************************************************
 procedure SetScreenName(ScreenName: String);
@@ -404,6 +415,11 @@ Description: Sets screenname for use with FindTalk and one Player.
 procedure SetScreenName(ScreenName: string);
 begin
   NickNameBMP := BitmapFromText(ScreenName, upchars07);
+
+  if (not NicknameSet) then
+    AddOnTerminate('FreeScreenName');
+
+  NicknameSet := true;
 end;
 
 {*******************************************************************************
