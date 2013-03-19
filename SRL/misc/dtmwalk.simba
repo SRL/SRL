@@ -150,6 +150,34 @@ end;
 
 (*
 
+DTMWalk_isOnMap
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+    function DTMWalk_isOnMap(point : TDTMObj) : Boolean;
+
+Check if TDTMObj is on screen
+
+.. note::
+    by: Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function DTMWalk_isOnMap(point : TDTMObj) : Boolean;
+var i,x,y,u : Integer;
+  isLast : Boolean;
+begin
+
+  Result := point.searchFunc(x,y,point.dtm,point.vargs);
+
+end;
+
+(*
+
 DTMWalk_DebugWalkPath
 ~~~~~~~~~~~~
 
@@ -214,7 +242,7 @@ function DTMWalk_WalkPath(path : TDTMObjArray; run : Boolean) : Boolean;
 var i,x,y : Integer;
   isLast : Boolean;
 begin
-  if run AND IsKeyDown(VK_CONTROL) then KeyDown(VK_CONTROL);
+  if run AND (not IsKeyDown(VK_CONTROL)) then KeyDown(VK_CONTROL);
   for i := high(path) to high(path) do
   begin
     if path[i].searchFunc(x,y,path[i].dtm,path[i].vargs) then
