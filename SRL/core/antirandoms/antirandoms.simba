@@ -408,13 +408,16 @@ end;
 
 {*******************************************************************************
 procedure SetScreenName(ScreenName: String);
-by: WT-Fakawi edited by Ashaman88
+by: WT-Fakawi edited by Ashaman88, Justin
 Description: Sets screenname for use with FindTalk and one Player.
 *******************************************************************************}
 
 procedure SetScreenName(ScreenName: string);
 begin
-  NickNameBMP := BitmapFromText(ScreenName, upchars07);
+  if (ScreenName = '') then
+    Exit;
+
+  NickNameBMP := BitmapFromText(ScreenName, UpChars07);
 
   if (not NicknameSet) then
     AddOnTerminate('FreeScreenName');
