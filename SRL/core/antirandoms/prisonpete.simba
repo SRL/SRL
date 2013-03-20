@@ -8,6 +8,17 @@ detection methods.
 
 *)
 
+const
+  PETE_DOG   = 1;
+  PETE_CAT   = 2;
+  PETE_SHEEP = 3;
+  PETE_GOAT  = 4;
+
+procedure PP_Message(Message: String);
+begin
+  addToSRLLog('[PrisonPete Random] ' + Message);
+end;
+
 (**
  * Author: Justin and DannyRS
  * Description: Detects if a player is in the random.
@@ -26,6 +37,263 @@ begin
 end;
 
 (**
+ * Author: DannyRS
+ * Description: Compares int to int array to find closest match array position
+ *)
+function PP_FindClosestArrayPos(Num: Integer; Arr: TIntegerArray): Integer;
+var
+  i, d, bd, r: Integer;
+begin
+  //just to get bd <> 0
+  for i := 0 to High(Arr) do
+    if (bd < Arr[i]) then
+      bd := Arr[i];
+
+  for i := 0 to High(Arr) do
+    if (Num > Arr[i]) then
+    begin
+      d := (Num - Arr[i]);
+      if (d < bd) then
+      begin
+        bd := d;
+        r := i;
+      end;
+    end
+    else
+    begin
+      d := (Arr[i] - Num);
+      if (d < bd) then
+      begin
+        bd := d;
+        r := i;
+      end;
+    end;
+  Result := r;
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Tries to get animal ID from a TPACount
+ *)
+function PP_GetClosestScreenAnimal(TPACountNumber: Integer): Integer;
+var
+  CA, AC: TIntegerArray;
+  i: Integer;
+begin
+  AC := [PETE_SHEEP, PETE_GOAT, PETE_CAT, PETE_DOG]
+
+  CA := [1200, 4300, 3750, 3200];
+
+  i := PP_FindClosestArrayPos(TPACountNumber, CA);
+
+  Result := AC[i];
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Tries to move just below pete
+ *)
+function PP_MoveToPete: Boolean;
+var
+  TPA: TPointArray;
+  t: Integer;
+begin
+  Result := False;
+  t := GetSystemTime;
+
+  if (not LoggedIn) then Exit;
+
+  SetColorToleranceSpeed(1);
+  SetColorspeed2Modifiers(0.02, 0.02);
+
+  repeat
+
+    FindColorsTolerance(TPA, 62965, MMX1, MMY1, MMX2, MMY2, 100);
+
+    if (Length(TPA) < 1) then
+    begin
+      MMouse(MMCX + 20, MMCY - 10, 40, 20);
+      ClickMouse2(mouse_left);
+      Wait(300 + Random(200));
+      Flag;
+      Wait(800 + Random(200));
+      Continue;
+    end;
+
+    MMouse(TPA[0].X + 2, TPA[0].Y + 6, 2, 2);
+    ClickMouse2(mouse_left);
+    Wait(300 + Random(200));
+    Flag;
+    Wait(800 + Random(200));
+    Result := True;
+
+  until (Result) or ((GetSystemTime - t) > 20000);
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Tries to move ROUGHLY to the center of the room
+ *)
+function PP_MoveToCenter: Boolean;
+var
+  TPA: TPointArray;
+  t: Integer;
+begin
+  Result := False;
+  t := GetSystemTime;
+
+  if (not LoggedIn) then Exit;
+
+  SetColorToleranceSpeed(1);
+  SetColorspeed2Modifiers(0.02, 0.02);
+
+  repeat
+
+    FindColorsTolerance(TPA, 62965, MMX1, MMY1, MMX2, MMY2, 100);
+
+    if (Length(TPA) < 1) then
+    begin
+      MMouse(MMCX + 20, MMCY - 10, 40, 20);
+      ClickMouse2(mouse_left);
+      Wait(300 + Random(200));
+      Flag;
+      Wait(800 + Random(200));
+      Continue;
+    end;
+
+    MMouse(TPA[0].X - 25, TPA[0].Y + 2, 2, 2);
+    ClickMouse2(mouse_left);
+    Wait(300 + Random(200));
+    Flag;
+    Wait(800 + Random(200));
+    Result := True;
+
+  until (Result) or ((GetSystemTime - t) > 20000);
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Returns true if lever screen open
+ *)
+function PP_LeverScreen: Boolean;
+begin
+  Result := (CountColorTolerance(39423, 490, 8, 513, 30, 25) > 100);
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Tries to open the lever screen
+ *)
+function PP_OpenLeverScreen: Boolean;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  t, i, h, x, y: Integer;
+begin
+  Result := False;
+  t := GetSystemTime;
+
+  if (PP_LeverScreen) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  if (not PP_MoveToPete) then Exit;
+
+  SetColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.03, 0.36);
+
+  repeat
+
+    FindColorsTolerance(TPA, 4810615, MSX1, MSY1, MSX2, MSY2, 13);
+    SplitTPAExWrap(TPA, 5, 5, ATPA);
+    SortATPASize(ATPA, True);
+    if (Length(ATPA) < 1) then Continue;
+
+    h := High(ATPA);
+
+    for i := 0 to h do
+    begin
+      MiddleTPAEx(ATPA[i], x, y);
+      MMouse(RandomRange(x - 1, x + 1), RandomRange(y - 1, y + 3), 0, 0);
+      Wait(RandomRange(90, 140));
+      if (IsUpTextMultiCustom(['Pull','Lever','ull'])) then
+      begin
+        ClickMouse2(mouse_right);
+        Wait(RandomRange(40, 90));
+        if (ChooseOptionMulti(['Pull','ull Lever'])) then
+        begin
+          Wait(RandomRange(500, 600));
+          if (WaitFunc(@PP_LeverScreen, 50, 8000)) then
+          begin
+            PP_Message('[PP_OpenLeverScreen] Used lever successfully');
+            Result := True;
+            Break;
+          end else
+          begin
+            PP_Message('[ERROR] Failed to use lever');
+            Break;
+          end;
+        end;
+      end;
+    end;
+
+  until (Result) or ((GetSystemTime - t) > 20000);
+end;
+
+(**
+ * Author: DannyRS
+ * Description: Scans lever screen for closest animal
+ *)
+function PP_IDScanLeverAnimal: Integer;
+var
+  TPA: TPointArray;
+  ST, CNum, TCount: Integer;
+begin
+  Result := -1;
+
+  if (not PP_LeverScreen) then
+    if (not PP_OpenLeverScreen) then
+      Exit;
+
+  //can't have any small animals on far right of screen
+  MakeCompass('N');
+
+  SetColorToleranceSpeed(2);
+  SetColorspeed2Modifiers(0.09, 0.97);
+
+  ST := GetSystemTime;
+
+  PP_Message('[PP_IDScanLeverAnimal] Scanning animal...');
+
+  repeat
+
+    FindColorsTolerance(TPA, 10298282, 370, 65, 475, 305, 32);
+
+    CNum := Length(TPA);
+    if CNum > TCount then
+    begin
+      TCount := CNum;
+    //WriteLn(IntToStr(TCount)+' : '+ToStr(PP_GetClosestScreenAnimal(TCount)));
+    end;
+
+    //SMART_DrawDotsEx(True, TPA, clRed);
+
+  until ((GetSystemTime - ST) > 20000);
+
+  Result := PP_GetClosestScreenAnimal(TCount);
+
+  case Result of
+    1: PP_Message('[PP_IDScanLeverAnimal] Animal Closest Match : PETE_DOG');
+    2: PP_Message('[PP_IDScanLeverAnimal] Animal Closest Match : PETE_CAT');
+    3: PP_Message('[PP_IDScanLeverAnimal] Animal Closest Match : PETE_SHEEP');
+    4: PP_Message('[PP_IDScanLeverAnimal] Animal Closest Match : PETE_GOAT');
+  end;
+
+end;
+
+(**
  * Author:
  * Description: Solves the random.
  *)
@@ -33,17 +301,15 @@ function PP_Solve(): boolean;
 var
   t: integer;
 begin
-  if (not loggedIn()) then
-    exit;
+  if (not LoggedIn) then Exit;
 
   t := (getSystemTime + (5 * 60000)); // maximum 5 minutes
   doConversation('', false);
 
   repeat
-
+    Wait(1000);
   until(result or (getSystemTime > t));
 
   if (not result) then
     addToSRLLog('PP_Solve: '' solver timed out');
 end;
-
