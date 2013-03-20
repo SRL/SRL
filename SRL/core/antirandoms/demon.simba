@@ -61,7 +61,9 @@ begin
   MMouse(p.x, RandomRange(p.y, p.y + 2), 0, 0);
   ClickMouse2(mouse_left);
 
-  Wait(RandomRange(3800, 4200));
+  Wait(RandomRange(300, 400));
+  Flag;
+  Wait(RandomRange(800, 1200));
 
   Result := True;
 end;
@@ -144,8 +146,8 @@ var
 begin
   SetColorToleranceSpeed(1);
   SetToleranceSpeed2Modifiers(0.02, 0.02);
-  FindColorsTolerance(ESignsTPA, 4553552, MSX1, MSY1, MSX2, MSY2, 25);
-  SplitTPAExWrap(ESignsTPA, 20, 30, ESignsATPA);
+  FindColorsTolerance(ESignsTPA, 4553552, MSX1, MSY1, MSX2, MSY2, 30);
+  SplitTPAExWrap(ESignsTPA, 70, 60, ESignsATPA);
 
   repeat
     SignsSorted := True;
@@ -166,6 +168,9 @@ begin
   begin
     Result[i] := GetTPABounds(ESignsATPA[i]);
   end;
+
+  DD_Message('[DD_GetSigns] Number of signs located : ' +
+      IntToStr(Length(ESignsATPA)));
 end;
 
 (**
@@ -178,46 +183,80 @@ end;
 function DD_FindSign(WhichSign: String): TPoint;
 var
   SB: TBoxArray;
-  x, y, i, SBMP: Integer;
+  x, y, i, ib, hb: Integer;
   Saccuracy: Extended;
+  SBMP: TIntegerArray;
 begin
   Result := Point(-1, -1);
 
   SB := DD_GetSigns;
+  if (Length(SB) < 1) then Exit;
+
+  SetLength(SBMP, 2);
+
+  hb := High(SBMP);
 
   SetColorToleranceSpeed(1);
   SetToleranceSpeed2Modifiers(0.02, 0.02);
 
   case LowerCase(WhichSign) of
-    'jog':       SBMP := BitmapFromString(29, 10, 'meJxzrQ5wJRrF9ZUSr3gwGItsMh' +
-                        'qXbJQ5qxGI4EZRxViImRBjIaZRbizcTGR3UmgsmpnUCltcxlIrVKl' +
-                        'rLNxk4tUDAIc3Qs8=');
-    'starjumps': SBMP := BitmapFromString(37, 16, 'meJxzrQ5wJR3F9ZXCERnacaHs+S' +
-                        '34raOiXXAbIYjqJhNjKfGIPjbSx5t0C1U6RyI97Ro21tEtNdLHOuR' +
-                        'iCtN8qtuIXDBiNZlGHgQiXMbSIgbh1uGJUyKrJAA7N7QN');
-    'situps':    SBMP := BitmapFromString(37, 16, 'meJxzrQ5wHRwoe34LENHTLgqtI1' +
-                        '473DqybSReL7Jd5FlHkl4060i1kSSNmHaRZB2pepGVkWojmnqCGtE' +
-                        'MpyRYiLcOf8ASg4hJMJiyZFsX11cKRMhcuJkQKbgswWRDpF3I1mHa' +
-                        'BZElJpUSaRcEkZSDyLCRVPOHEwIAf3vRcQ==');
-    'pushups':   SBMP := BitmapFromString(43, 16, 'meJxzrQ5wBaO4vlI4coUJ0hMhO2' +
-                        'Cg3ICJsue3ANHA2o6MBtZ2OjuGoANo6hhMk+npBjxm0scNBE2jaWg' +
-                        'QbwiNkgcZuqiSVuEFICUBOLAZh57phFqOoacb0OJ6AK3GtB0AjuAl' +
-                        '9Q==');
+    'jog':        begin
+                    SBMP[0] := BitmapFromString(26, 17, 'meJxzqwl0w0AJfWUQhMYmD2E1jR' +
+                    'IDIShrdhMQwa2grmlkGwgxB4IodxVaMFLXNGQDKYwRNM+SHcvIQQf' +
+                    'XS57b0CICOQVSYhSmH8k2jSrxOJhNc0PNVhQiKhYdbuQmKgBkSPbW');
+                    SBMP[1] := BitmapFromString(29, 10, 'meJxzrQ5wJRrF9ZUSr3gwGItsMh' +
+                    'qXbJQ5qxGI4EZRxViImRBjIaZRbizcTGR3UmgsmpnUCltcxlIrVKl' +
+                    'rLNxk4tUDAIc3Qs8=');
+                  end;
+    'starjumps':  begin
+                    SBMP[0] := BitmapFromString(33, 17, 'meJxzqwl0Ixol9JUBEfHqSUUQ8+' +
+                    'lmC4Xm5CxohSNaqMeqkSCilo+objhBu6ge0cPAClrHAi4rqGgLHZI' +
+                    'TprHUtQWXsym3Al4Q4XIwsjh5pRa8uMPjWmTzyS4Y4bbgCUZiSngA' +
+                    'a5KX0w==');
+                    SBMP[1] := BitmapFromString(37, 16, 'meJxzrQ5wJR3F9ZXCERnacaHs+S' +
+                    '34raOiXXAbIYjqJhNjKfGIPjbSx5t0C1U6RyI97Ro21tEtNdLHOuR' +
+                    'iCtN8qtuIXDBiNZlGHgQiXMbSIgbh1uGJUyKrJAA7N7QN');
+                  end;
+    'situps':     begin
+                    SBMP[0] := BitmapFromString(36, 14, 'meJxzqwl0GwQoZ0ErENHNIgrtIl' +
+                    'I73C7yrCNeL7JFZNhFkl40u0iyjiSNmBYRbxepepHVUBIaboRSMpr' +
+                    'J+O3C6gus2km1i3gE0ZvQV0aMO4lxOR4EtAWCkEXgZqJJUWIX3CKs' +
+                    'BqLJEh8pBO1C9g6dEQA0UXaL');
+                    SBMP[1] := BitmapFromString(37, 16, 'meJxzrQ5wHRwoe34LENHTLgqtI1' +
+                    '473DqybSReL7Jd5FlHkl4060i1kSSNmHaRZB2pepGVkWojmnqCGtE' +
+                    'MpyRYiLcOf8ASg4hJMJiyZFsX11cKRMhcuJkQKbgswWRDpF3I1mHa' +
+                    'BZElJpUSaRcEkZSDyLCRVPOHEwIAf3vRcQ==');
+                  end;
+    'pushups':    begin
+                    SBMP[0] := BitmapFromString(39, 16, 'meJxzqwl0qwlM6CuDIDcwlz5oYC' +
+                    '2ls73IKGdBKwTR30ZkNCCW0tQBBG2kugOwmkZre/GbQwt7iTeEin6' +
+                    'nRAsZboCUCZSEFalpD7ksonpqHFRZntb2okUina1DthEAClrmig==');
+                    SBMP[1] := BitmapFromString(43, 16, 'meJxzrQ5wBaO4vlI4coUJ0hMhO2' +
+                    'Cg3ICJsue3ANHA2o6MBtZ2OjuGoANo6hhMk+npBjxm0scNBE2jaWg' +
+                    'QbwiNkgcZuqiSVuEFICUBOLAZh57phFqOoacb0OJ6AK3GtB0AjuAl' +
+                    '9Q==');
+                  end;
   end;
 
   for i := 0 to High(SB) do
   begin
-    if (SB[i].X1 > SB[i].X2) or (SB[i].Y1 > SB[i].Y2) then Continue;
+    for ib := 0 to hb do
+    begin
+      if (Result.X > 0) or (Result.Y > 0) then Break;
+      if (SB[i].X1 > SB[i].X2) or (SB[i].Y1 > SB[i].Y2) then Continue;
 
-    if FindDeformedBitmapToleranceIn(SBMP, x, y, SB[i].X1-5, SB[i].Y1-5,
-      SB[i].X2+5, SB[i].Y2+5, 2, 4, False, Saccuracy) then
-      begin
-        Result := Point(x + 20, y + 7);
-        Break;
-      end;
+      if FindDeformedBitmapToleranceIn(SBMP[ib], x, y, SB[i].X1-2, SB[i].Y1-2,
+        SB[i].X2+2, SB[i].Y2+2, 2, 4, False, Saccuracy) then
+        begin
+          Result := Point(x + 20, y + 7);
+          DD_Message('[DD_FindSign] Matching sign found at : ' + ToStr(Result));
+          Break;
+        end;
+    end;
   end;
 
-  FreeBitmap(SBMP);
+  for ib := 0 to hb do
+    FreeBitmap(SBMP[ib]);
 end;
 
 (**
