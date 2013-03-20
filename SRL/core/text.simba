@@ -1015,7 +1015,7 @@ begin
   ComBineTPAWrap(TPA, TPA1, TPA); // TPA = grey, TPA1 = black
   ReturnPointsNotInTPAWrap(TPA, TextSearchBox, TPA1);
   SetColorToleranceSpeed(cts);
-  bmp := CreateBitmap(TextSearchBox.X2 - TextSearchBox.X1, TextSearchBox.Y2 - TextSearchBox.Y1);
+  bmp := CreateBitmap(TextSearchBox.X2 - TextSearchBox.X1 + 1, TextSearchBox.Y2 - TextSearchBox.Y1 + 1);
   OffSetTPA(TPA1, Point(-TextSearchBox.X1, -TextSearchBox.Y1));
   DrawTPABitmap(bmp, TPA1, clRed);
   GetbitmapSize(bmp, w, h);
