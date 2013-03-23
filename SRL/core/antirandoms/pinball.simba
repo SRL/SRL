@@ -23,7 +23,8 @@ function PB_Detect(): boolean;
 begin
   // makes sure friends tab exists and magic doesn't
   if ((not tabExists(TAB_MAGIC)) and (tabExists(TAB_FRIENDS))) then
-        result := (GetTextAtExWrap(374, 238, 419, 253, 0, 5, 1, 65535, 5, 'UpChars07') = 'Score..');
+    result := (Trim(GetTextAtExWrap(374, 238, 411, 253, 0, 5, 1,
+        65535, 5, 'UpChars07')) = 'Score');
 end;
 
 (**
@@ -156,7 +157,8 @@ begin
 
   if (PB_ScanPost(x, y)) then
   begin
-    Mouse(x, y, 5, 5, mouse_Right);
+    MMouse(x, y, 5, 5);
+    ClickMouse2(mouse_right);
 
     if (WaitOptionMulti(['ag', 'g P'], 618)) then
     begin
@@ -180,7 +182,7 @@ end;
 (**
  * Author: DemiseScythe & Coh3n
  * Description: Uses mainscreen walking to exit the random.
- * Updated: Added a backup to the exit as it can sometimes miss it. - [J]ustin - 03/08/2012
+ * Updated: Fixed for 07scape. - DannyRS - 23/03/2013
  *)
 function PB_Exit(): boolean;
 var
@@ -196,6 +198,24 @@ begin
  SetAngle(SRL_ANGLE_HIGH);
  repeat
    // the green path color
+   if (findColorsTolerance(tpa, 4544055, MSX1, MMCY+10, MSX2, MSY2, 15)) then
+   begin
+     if (length(tpa) > 0) then
+     begin
+       MiddleTPAEx(tpa, x, y);
+       MMouse(x, y, 5, 5);
+       Wait(RandomRange(90,150));
+       if (waitUptextMulti(['Exit', 'xit', 'Cave', 'ave'], 200)) then
+       begin
+         ClickMouse2(mouse_left);
+         if (waitTabExists(TAB_MAGIC, 8000)) then
+         begin
+           result := true;
+           break;
+         end;
+       end;
+     end;
+   end;
    if (findColorsTolerance(tpa, 5603685, MSX1, MMCY, MSX2, MSY2, 15)) then
      if (length(tpa) > 0) then
      begin
@@ -203,19 +223,16 @@ begin
        x := tpa[0].x;
        y := tpa[0].y - 20; // so it's actually on the MS
 
-       mouse(x, y, 5, 5, mouse_Move);
+       MMouse(x, y, 5, 5);
 
        // check for the proper uptexts
        if (waitUptextMulti(['Walk', 'alk', 'here', 'ere'], 200)) then
        begin
-         getMousePos(x, y);
-         mouse(x, y, 0, 0, mouse_Left);
+         ClickMouse2(mouse_left);
        end
        else if (waitUptextMulti(['Exit', 'xit', 'Cave', 'ave'], 200)) then
        begin
-         getMousePos(x, y);
-         mouse(x, y, 0, 0, mouse_Left);
-
+         ClickMouse2(mouse_left);
          if (waitTabExists(TAB_MAGIC, 8000)) then
          begin
            result := true;
@@ -234,7 +251,7 @@ begin
    t := (getSystemTime + 20000);
    MakeCompass('S');
    repeat
-     if (FindColorsTolerance(tpa_Exit, 10390671, MSX1, MSY1, MSX2, MSY2, 10)) then
+     if (FindColorsTolerance(tpa_Exit, 4677175, MSX1, MSY1, MSX2, MSY2, 23)) then
        ATPA := TPAToATPAEx(tpa_Exit, 70, 5);
      if (length(ATPA) > 0) then
      begin
@@ -242,11 +259,11 @@ begin
        for i := 0 to High(ATPA) do
        begin
          MiddleTPAEx(ATPA[i], x, y);
-         mouse(x, y, 5, 5, mouse_Move);
+         MMouse(x, y, 5, 5);
+         Wait(RandomRange(90,150));
          if (waitUptextMulti(['Exit', 'xit', 'Cave', 'ave'], 200)) then
          begin
-           getMousePos(x, y);
-           mouse(x, y, 0, 0, mouse_Left);
+           ClickMouse2(mouse_left);
            if (waitTabExists(TAB_MAGIC, 8000)) then
            begin
              result := true;
