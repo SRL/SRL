@@ -157,8 +157,7 @@ begin
 
   if (PB_ScanPost(x, y)) then
   begin
-    MMouse(x, y, 5, 5);
-    ClickMouse2(mouse_right);
+    Mouse(x, y, 5, 5, mouse_right);
 
     if (WaitOptionMulti(['ag', 'g P'], 618)) then
     begin
