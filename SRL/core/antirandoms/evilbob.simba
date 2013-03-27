@@ -183,7 +183,8 @@ begin
           result := ChooseOptionMulti(['Talk-to Servant', 'alk-to S', 'ervant']);
           FFlag(0);
           wait(400 + Random(400));
-          DoConversation('', true) Break;
+          DoConversation('', true);
+          Break;
         end;
       end;
       ColorToleranceSpeed(tmpCTS);
