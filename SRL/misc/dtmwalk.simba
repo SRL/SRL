@@ -91,7 +91,7 @@ function DTMWalk_DefaultSearchFunc(var x,y : Integer; dtm : Integer;optional : T
 var aFound : extended;
 begin
     MakeCompass('N');
-    Result := FindDTMRotated(dtm, x, y, MMX1, MMY1, MMX2, MMY2,    -17.0, 17.0, 0.1, aFound);
+    Result := FindDTMRotatedAlternating(dtm, x, y, MMX1, MMY1, MMX2, MMY2,    -17.0, 17.0, 1, aFound);
 end;
 
 (*
@@ -209,7 +209,7 @@ begin
       Mouse(x, y, 3, 3, mouse_Left);
       for u := 0 to high(path) do
       begin
-        if path[u].searchFunc(x,y,path[i].dtm,path[i].vargs) then
+        if path[u].searchFunc(x,y,path[u].dtm,path[u].vargs) then
           if i <> u then writeln('[DTMWALK]::: (warning) found duplicate matching points at' + inttostr(u) );
       end;
       sleep(300+ random(300));

@@ -1600,8 +1600,8 @@ begin
     begin
       GetMousePos(Booths[i].X, Booths[i].Y);
       Mouse(Booths[i].X, Booths[i].Y, 0, 0, mouse_right);
-      //if waitoptionmulti(['ank ' ,'nk ', 'B@'],400) then  //revert back to this once jagex introduces one click bank booth
-      if waitoptionmulti(['Use-quickly','e-quic','se-quickl'],400) then
+      if waitoptionmulti(['ank ' ,'nk ', 'B@'],400) then  //revert back to this once jagex introduces one click bank booth
+      //if waitoptionmulti(['Use-quickly','e-quic','se-quickl'],400) then
       begin
         MarkTime(c);
         repeat
