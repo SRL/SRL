@@ -174,7 +174,7 @@ begin
       end;
     Inc(Attempt);
     addToSRLLog('Frog_FindFrog: Attempt: ' + inttostr(Attempt));
-  until ((Attempt > 3) or (Result))
+  until ((Attempt > 3) or (Result));
   ColorToleranceSpeed(tmpCTS);
   SetColorSpeed2Modifiers(0.2, 0.2);
   exit;

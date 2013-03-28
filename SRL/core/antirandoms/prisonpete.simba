@@ -80,7 +80,7 @@ var
   CA, AC: TIntegerArray;
   i: Integer;
 begin
-  AC := [PETE_SHEEP, PETE_GOAT, PETE_CAT, PETE_DOG]
+  AC := [PETE_SHEEP, PETE_GOAT, PETE_CAT, PETE_DOG];
 
   CA := [1200, 4300, 3750, 3200];
 
