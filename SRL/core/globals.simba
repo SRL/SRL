@@ -605,6 +605,45 @@ begin
   Result := InRange(Length(GetFightBarTPA(MFBox)), 30, 240);
 end;
 
+(*
+srl_IsPoisoned
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function srl_IsPoisoned: Boolean;
+
+Checks whether player currently posioned based on the green splat.
+
+.. note::
+
+    by Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+    if srl_IsPoisoned then
+    begin
+      DrinkAntiPoison
+    end;
+
+*)
+Function srl_IsPoisoned: Boolean;
+var box : TBox;
+begin                                 //19200
+  box := IntToBox(233,147,267,179);
+  with box do
+  begin
+
+     Result :=
+     (CountColorTolerance(49152,x1,y1,x2,y2,59) > 50)
+     AND
+    (CountColorTolerance(19200,x1,y1,x2,y2,59) > 210);
+
+  end;
+end;
+
 procedure Proc_WorldSwitcherEnabled;
 begin
   WorldSwitcherEnabled := WorldSwitcherEnabled;

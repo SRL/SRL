@@ -237,7 +237,7 @@ begin
 
   //Removal of Smart 7.2?
   //{$IFDEF SMART8}
-  Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), 'http://oldschool' + World + '.runescape.com/', '/j1', 765, 503, '', '', '');
+  Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), 'http://oldschool' + World + '.runescape.com/', 'j1', 765, 503, '', '', '');
   //{$ELSE}
   //Result := SmartSpawnClient(ReplaceWrap(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], 765, 553, 's', '', '');
   //{$ENDIF}
