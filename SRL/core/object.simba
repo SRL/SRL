@@ -471,6 +471,7 @@ begin
   end;
   ColorToleranceSpeed(1);
   aPoints := TPAtoATPAEx(Points, ObjWidth, ObjHeight);
+  SortATPAFromFirstpoint(aPoints,Point(x,y));
   SetLength(Points, 0);
   for I := 0 to High(aPoints) do
   begin
