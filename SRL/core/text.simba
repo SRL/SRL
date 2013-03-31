@@ -1011,6 +1011,7 @@ begin
   FindColorsTolerance(TPA1, 0, Yoff.X1, Yoff.Y1, Yoff.X2, Yoff.Y2, 0);
   SplitTPAExWrap(TPA1, 1, 1, ATPA);
   SortATPASize(ATPA, true);
+  if Length(ATPA) > 0 then
   TextSearchBox := GetTPABounds(ATPA[0]);
   ComBineTPAWrap(TPA, TPA1, TPA); // TPA = grey, TPA1 = black
   ReturnPointsNotInTPAWrap(TPA, TextSearchBox, TPA1);
@@ -1027,6 +1028,7 @@ begin
 
   SortATPAFromFirstPointY(ATPA, Point(w div 2, 0));
   SetArrayLength(Result, Length(ATPA));
+  if Length(Result) > 0 then
   Result[0].BigBox := BigBox;
   for i := 0 to high(ATPA) do
   begin

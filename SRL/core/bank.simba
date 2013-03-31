@@ -1537,7 +1537,7 @@ begin
     'ctb', 'catherby bank':       Info := [MSCX,      MSCY,      3239049,  8,    0.20, 0.20, 100,   False,   10, 10];
     'clt', 'camelot bank':        Info := [MSCX,      MSCY,      7636882,  5,    0.20, 0.20, 100,   False,   10, 10];
     'nab', 'north ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
-    'sab', 'south ardougne bank': Info := [MSCX,      MSCY,      4084572,  5,    0.20, 0.20, 100,   False,   10, 10];
+    'sab', 'south ardougne bank': Info := [MSCX,      MSCY,      606035,  10,    0.12, 0.70, 50,   False,   10, 10];
     'ynb', 'yanille bank':        Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
     'ngb', 'north gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
     'sgb', 'south gnome bank':    Info := [MSCX,      MSCY,      3239049,  7,    0.20, 0.20, 100,   False,   10, 10];
