@@ -39,7 +39,7 @@ function Maze_Detect(): boolean;
 begin
   if ((getNPCChatName() = SRL_NPC_OLDMAN) or (FindTextTPA(13750737, 3, 417, 290, 476, 311, 'ward', CharsNPC07, Nothing))) then
     // the red maze walls on the minimap
-    result := (countColorTolerance(240, MMX1, MMY1, MMX2, MMY2, 15) > 900);
+    result := (countColorTolerance(240, MMX1, MMY1, MMX2, MMY2, 15) > 900) or (GetMusic = 'Time Out');
 end;
 
 (**
