@@ -146,6 +146,7 @@ begin
     detect := @Maze_Detect;
     isInvRandom := false;
     hasRewardBox := false;
+    disabled := true;
   end;
 
   with SRL_Randoms[SRL_RAND_EVILBOB] do
@@ -283,7 +284,7 @@ begin
     detect := @Molly_Detect;
     isInvRandom := false;
     hasRewardBox := true;
-    disabled := false;
+    disabled := true;
   end;
 
   with SRL_Randoms[SRL_RAND_REWARDS] do
