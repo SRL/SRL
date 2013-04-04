@@ -1,126 +1,230 @@
-//-----------------------------------------------------------------//
-//--               SRL Resource Library                          --//
-//--                      Ranging routines                       --//
-//-----------------------------------------------------------------//
-// * function ArrowAmount: Integer;                                // by masquerader
-// * function getarrowcolor: Boolean;                              // by masquerader & Freddy1990
-// * function findinvarrows(var arrowx, arrowy: Integer): Boolean; // by masquerader
-// * function invarrows: Integer;                                  // by masquerader
-// * function EquipArrows: Boolean;                                // by Freddy1990
-// * procedure SetupRanging;                                       // by SRL
+//----------------------------------------------------------------------------//
+//--                     SRL Resource Library                               --//
+//--                       Ranging routines                                 --//
+//----------------------------------------------------------------------------//
+// * function BoxContainsArrows(T: TBox): Boolean;                          * //
+// * function ArrowTypeFromBox(T: TBox): String;                            * //
+// * function ArrowAmount: Integer;                                         * //
+// * function FindInvArrows(var arrowx, arrowy: Integer): Boolean;          * //
+// * function EquippedArrowName: String;                                    * //
+// * function EquippedBowName: String;                                      * //
+// * function function InvArrowType: String;                                * //
+// * function InvArrows: Integer;                                           * //
+// * function EquipArrows: Boolean;                                         * //
 
+
+{*******************************************************************************
+function BoxContainsArrows(T: TBox): Boolean;
+By: DannyRS
+Description: Returns amount true if a TBox contains arrows
+*******************************************************************************}
+function BoxContainsArrows(T: TBox): Boolean;
 var
-  headcolorar, tailcolor: Integer;
-
-(*
-ArrowAmount
-~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    function ArrowAmount: Integer;
-
-Returns the number of equiped arrows or equiped knives.
-
-.. note::
-
-    by masquerader & Narcle
-
-Example:
-
-.. code-block:: pascal
-
-
-*)
-function ArrowAmount: Integer;
-var
-  K: integer;
+  x, y: Integer;
 begin
-  GameTab(tab_Equip);
-  K := GetAmountBox(IntToBox(566, 284, 606, 321));
-  if K > 1 then
-    Result := K
-  else
-    Result := GetAmountBox(IntToBox(660, 240, 720, 282));
+  Result := False;
+
+  if FindColor(x, y, 857196, T.X1, (T.Y2 - 12), T.X2, T.Y2) then
+    if FindColor(x, y, 537173, T.X1, T.Y1, T.X2, T.Y2) then
+      Result := True;
 end;
 
 {*******************************************************************************
-function GetArrowColor: Boolean;
-By: masquerader | Fixed by Freddy1990
-Description: Returns the number of equiped arrows.
+function ArrowTypeFromBox(T: TBox): Boolean;
+By: DannyRS
+Description: Returns arrow type from an Inv TBox around the arrows
 *******************************************************************************}
-function GetArrowColor: Boolean;
+function ArrowTypeFromBox(T: TBox): String;
 begin
-  if (ArrowAmount > 0) then
-  begin
-    Result := True;
-    headcolorar := GetColor(700, 257);
-    tailcolor := GetColor(688, 271);
-    WriteLn('arrow head color: ' + IntToStr(headcolorar));
-    WriteLn('tail color: ' + IntToStr(tailcolor));
-  end;
-end;
+  Result := '';
 
-{*******************************************************************************
-function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
-By: masquerader
-Description: Returns true if arrows are found in the inventory and the coordinates.
-*******************************************************************************}
-function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
-var
-  tailcoords: TPointArray;
-  i, headx, heady: Integer;
-begin
-  GameTab(tab_Inv);
-  tailcoords := ItemCoordinates('inv', 'color', tailcolor, [0]); //finds all arrow stacks
-  if (GetArrayLength(tailcoords) > 0) then
+  if (BoxContainsArrows(T)) then
   begin
-    for i := 0 to GetArrayLength(tailcoords) - 1 do
+    case GetColor((T.X1 + 24), (T.Y1 + 10)) of
+      1714999: Result := 'bronze';
+      3750206: Result := 'iron';
+      5658204: Result := 'steel';
+      4599599: Result := 'mithril';
+      3292977: Result := 'adamant';
+      5064244: Result := 'rune';
+      -1     : Result := 'dragon'; // not done yet
+    end;
+    if (Result = '') then
     begin
-      if (FindColor(headx, heady, headcolorar, tailcoords[i].x, tailcoords[i].y,
-        tailcoords[i].x + 36, tailcoords[i].y + 42)) then
-      begin //only one stack of headcolorar :)
-        Result := True;
-        arrowx := tailcoords[i].x;
-        arrowy := tailcoords[i].y;
-        Exit;
+      case GetColor((T.X1 + 23), (T.Y1 + 5)) of
+        1714999: Result := 'bronze';
+        3750206: Result := 'iron';
+        5658204: Result := 'steel';
+        4599599: Result := 'mithril';
+        3292977: Result := 'adamant';
+        5064244: Result := 'rune';
+        -1     : Result := 'dragon'; // not done yet
       end;
     end;
   end;
 end;
 
 {*******************************************************************************
+function ArrowAmount: Integer;
+By: DannyRS
+Description: Returns amount of arrows / knives equipped
+*******************************************************************************}
+function ArrowAmount: Integer;
+begin
+  Result := -1;
+
+  if (not FTab(TAB_EQUIP)) then
+    Exit;
+
+  Result := GetAmountBox(IntToBox(667, 249, 700, 282));
+  if (Result > 1) then
+    Exit
+  else
+    Result := GetAmountBox(IntToBox(570, 288, 603, 321));
+end;
+
+{*******************************************************************************
+function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
+By: DannyRS
+Description: Returns true if arrows are found in the inventory and their coords
+*******************************************************************************}
+function FindInvArrows(var arrowx, arrowy: Integer): Boolean;
+var
+  i: Integer;
+  TB: TBox;
+  TP: TPoint;
+begin
+  Result := False;
+  TP := Point(-1, -1);
+
+  if (not FTab(TAB_INV)) then
+    Exit;
+
+  for i := 1 to 28 do
+  begin
+    TB := InvBox(i);
+    if (BoxContainsArrows(TB)) then
+    begin
+      TP := ItemCoords(i);
+      Result := True;
+      Break;
+    end;
+  end;
+
+  arrowx := TP.X;
+  arrowy := TP.Y;
+end;
+
+{*******************************************************************************
+function EquippedArrowName: String;
+By: DannyRS
+Description: Returns the equipped arrow name
+*******************************************************************************}
+function EquippedArrowName: String;
+begin
+  Result := '';
+
+  if (not FTab(TAB_EQUIP)) then
+    Exit;
+
+  Result := ArrowTypeFromBox(IntToBox(668, 250, 700, 282));
+end;
+
+{*******************************************************************************
+function EquippedBowName: String;
+By: DannyRS
+Description: Returns the equipped bow name
+*******************************************************************************}
+function EquippedBowName: String;
+var
+  y: Integer;
+begin
+  Result := '';
+
+  if (not FTab(TAB_EQUIP)) then
+    Exit;
+
+  //crossbow, longbow or shortbow
+  case CountColor(65536, 570, 288, 603, 321) of
+    102: y := 306; //short
+    106: y := 301; //long
+    137: y := 307; //crossbow
+    else Exit;
+  end;
+  //not all bows added yet
+  case GetColor(588, y) of
+    2307134 : Result := 'crossbow';
+    870508  : Result := 'shortbow';
+    1140890 : Result := 'longbow';
+    880006  : Result := 'oak shortbow';
+    1547198 : Result := 'oak longbow';
+    2847867 : Result := 'willow shortbow';
+    -1      : Result := 'willow longbow'; // not done yet
+    6778498 : Result := 'maple shortbow';
+    -1      : Result := 'maple longbow';  // not done yet
+    882054  : Result := 'yew shortbow';
+    -1      : Result := 'yew longbow';    // not done yet
+    5528340 : Result := 'magic shortbow';
+    -1      : Result := 'magic longbow';  // not done yet
+    -1      : Result := 'darkbow';        // not done yet
+  end;
+end;
+
+{*******************************************************************************
+function EquippedArrowType: String;
+By: DannyRS
+Description: Returns the name of the first arrows found in inventory
+*******************************************************************************}
+function InvArrowType: String;
+var
+  i: Integer;
+  TB: TBox;
+begin
+  Result := '';
+
+  if (not FTab(TAB_INV)) then
+    Exit;
+
+  for i := 1 to 28 do
+  begin
+    TB := InvBox(i);
+    if (BoxContainsArrows(TB)) then
+    begin
+      Result := ArrowTypeFromBox(TB);
+      Break;
+    end;
+  end;
+end;
+
+{*******************************************************************************
 function InvArrows: Integer;
-By: masquerader
-Description: Returns the number of arrows in the inventory.
+By: DannyRS
+Description: Returns the number of the first set of arrows in the inventory
 *******************************************************************************}
 function InvArrows: Integer;
 var
-  arrowx, arrowy: Integer;
+  x, y: Integer;
 begin
-  if (FindInvArrows(arrowx, arrowy)) then
-    Result := GetAmount(arrowx, arrowy);
+  Result := -1;
+
+  if (FindInvArrows(x, y)) then
+    Result := GetAmount(x, y);
 end;
 
 {*******************************************************************************
 function EquipArrows: Boolean;
-By: Freddy1990
-Description: Equips arrows if they are found in the inventory.
+By: DannyRS
+Description: Equips first set of arrows if any are found in the inventory
 *******************************************************************************}
 function EquipArrows: Boolean;
 var
-  xx, yy: Integer;
+  x, y: Integer;
 begin
-  Result := FindInvArrows(xx, yy);
-  Wait(100 + Random(250));
-  Mouse(xx, yy, 0, 0, True);
-end;
+  Result := FindInvArrows(x, y);
 
-{*******************************************************************************
-procedure SetupRanging;
-By: SRL
-Description: Declares Global Bitmaps.
-*******************************************************************************}
-procedure SetupRanging;
-begin
+  if (not Result) then
+    Exit;
+
+  MouseBox(x - 4, y - 6, x + 4, y + 2, mouse_left);
+  Wait(190 + Random(100));
 end;
