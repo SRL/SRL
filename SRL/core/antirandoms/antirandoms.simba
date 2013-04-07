@@ -990,6 +990,29 @@ begin
       exit;
     end;
 
+  for x := 0 to High(randomSet) do
+  for i := 0 to High(randomSet[x]) do
+  begin
+    if randomSet[x][i].detect(custom) then
+    begin
+    if randomSet[x][i].disabled then
+    begin
+      addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
+      addToSRLLog(randomSet[x][i].name+' currently disabled');
+      continue;
+    end;
+
+        {$IFDEF ANTIRANDOM_CUSTOMSETSOLVER}
+           customSolved := AntiRandom_CustomSetSolver(randomSet[x][i].name,custom);
+        {$ENDIF}
+           if not customSolved then
+           begin
+            addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
+           customSolved := randomSet[x][i].solve(custom);
+           end;
+        if not customSolved then addToSRLLog('***** Failed Random: '+randomSet[x][i].name+' *****');
+    end;
+  end;
   if FindTalk then
   begin
     result := true;
@@ -1034,29 +1057,7 @@ begin
 
   findDead();
   findMod();
-  for x := 0 to High(randomSet) do
-  for i := 0 to High(randomSet[x]) do
-  begin
-    if randomSet[x][i].detect(custom) then
-    begin
-    if randomSet[x][i].disabled then
-    begin
-      addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
-      addToSRLLog(randomSet[x][i].name+' currently disabled');
-      continue;
-    end;
 
-        {$IFDEF ANTIRANDOM_CUSTOMSETSOLVER}
-           customSolved := AntiRandom_CustomSetSolver(randomSet[x][i].name,custom);
-        {$ENDIF}
-           if not customSolved then
-           begin
-            addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
-           customSolved := randomSet[x][i].solve(custom);
-           end;
-        if not customSolved then addToSRLLog('***** Failed Random: '+randomSet[x][i].name+' *****');
-    end;
-  end;
   if SRL_HasProc(SRL_OnRandomCall) then
     SRL_Procs[SRL_OnRandomCall]();
 end;

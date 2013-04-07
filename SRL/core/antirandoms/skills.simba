@@ -22,7 +22,10 @@ Example:
 function SkillPS_Detect(var args : T2DPointArray): boolean;
 var tpa : TPointArray;
 begin
-  Result := FindColorsTolerance(tpa,4096630,MSX1,MSY1,MSX2,MSY2,26) AND (Length(tpa) > 50);
+  if CountColorTolerance(4096630,MSX1,MSY1,MSX2,MSY2,26) > 50 then
+  begin
+     Result := FindColorsTolerance(tpa,4096630,MSX1,MSY1,MSX2,MSY2,26);
+  end;
   SetLength(args,1);
   args[0] := tpa;
 end;
