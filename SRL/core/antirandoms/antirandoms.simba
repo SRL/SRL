@@ -12,6 +12,7 @@ solver's simba file.
 
 // include all the solver files
 {$include_once common.simba}
+{$include_once box.simba}
 {$include_once rewards.simba}
 {$include_once demon.simba}
 {$include_once maze.simba}
