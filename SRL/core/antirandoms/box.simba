@@ -1,0 +1,625 @@
+//-----------------------------------------------------------------//
+//--               Scar Standard Resource Library                --//
+//--               ? Box Routines                                --//
+//-----------------------------------------------------------------//
+// * function GambleBox: Boolean;   // * by WT-Fakawi
+// * function GetBoxSide: Integer;  // * by pups/Ashaman88
+// * function GetQuestion(var num: Integer; var shape: string): Integer; // * by pups
+// * function GetNumber: Integer;   // * by Ashaman88
+// * function GetShape: String;     // * by Ashaman88
+// * function OpenBox: Boolean;     // * by Ashaman88
+// * function SolveBox: Boolean;    // * by Ashaman88
+
+//{$I SRL-OSR/SRL/misc/Debug.Simba}
+//{$I SRL-OSR/SRL/misc/SmartGraphics.Simba}
+var
+  NumberBounds: TBox;
+
+const
+  DebugBox=False;
+
+{*******************************************************************************
+function GambleNewBox: Boolean;
+by: WT-Fakawi  (left this in here just in case we want to guess)
+Description: A random box clicker. Will try to solve the box ONCE, by a random click
+             @ any of the three answers. THIS IS NOT A BOXSOLVER, JUST A BOXCLICKER!
+*******************************************************************************}
+
+function GambleBox: Boolean;
+var
+  xb, yb, Choise: Integer;
+begin
+  //if FindBitmapToleranceIn(Box, xb, yb, MIX1, MIY1, MIX2, MIY2, 40) then
+  begin
+    Mouse(xb, yb, 0, 0, True);
+    Wait(2000);
+    Choise:= Random(3);
+    TakeScreen('Gambling box Choise - '+IntToStr(Choise));
+    case Choise of
+      0: Mouse(145, 295, 4, 4, True);
+      1: Mouse(270, 295, 4, 4, True);
+      2: Mouse(381, 295, 4, 4, True);
+    end;
+    IdleTime(4000, 2000, 1.0);
+  //  if FindBitmapToleranceIn(Box, xb, yb, MIX1, MIY1, MIX2, MIY2, 40) then
+    begin
+      WriteLn('Box Missed');
+     // NOnewboxes := NOnewboxes + 1;
+      Result := False;
+      repeat
+        Logout;
+      until (not (LoggedIn));
+      Exit;
+    end
+    //else
+    begin
+      WriteLn('Box solved');
+    //  newboxes := newboxes + 1;
+      Result := True;
+    end;
+  end;
+end;
+
+{*******************************************************************************
+function OpenBox: Boolean;
+by: Ashaman88
+Description: Opens the box.
+*******************************************************************************}
+
+function OpenBox : Boolean;
+var
+  x, y, i,BoxDTM : Integer;
+begin
+  Result := False;
+  GameTab(Tab_Inv);
+  Wait(100 + Random(50));
+  BoxDTM:=DTMFromString('mwQAAAHic42RgYHBiYmAwQ8J+SNgZiN2A+BlQ3QMGCP0GiO8C8SMo/wMU97W0AElGvNiIgTDAbwIEwwEAyPkMaQ==');
+  if FindDTM(BoxDTM, x, y, MIX1, MIY1, MIX2, MIY2) then
+  begin
+    Mouse(x, y, 4, 4, True);
+    for i := 0 to 9 do
+    begin
+      if (GetColor(487, 39) = 13567) and (GetColor(350, 295) = 2304814) then
+      begin
+        Result := True;
+        Break;
+      end;
+      Wait(500);
+    end;
+  end;
+  freedtm(boxdtm);
+end;
+
+type
+  NumberRotate = record
+    Number, DTM, BMin, BMax, WMin, WMax: integer;
+  end;
+  NumberRotateArray = array of NumberRotate;
+
+var
+  NumberArray: NumberRotateArray;
+
+{*******************************************************************************
+procedure LoadNumbers;
+by: Ashaman88
+Description: Loadsup all the numbers!
+*******************************************************************************}
+
+procedure LoadNumbers;
+begin
+  if Length(NumberArray)<>0 then
+    Exit;
+
+  SetLength(NumberArray,10);
+
+  with NumberArray[0] do {Good2}
+  begin
+    Number := 0;
+    DTM  := DTMFromString('mYQMAAHic1c5bCsIwFIThExWr9YJ2F766D99dhptRRFREii0i7jDgBH8xFIX2TQMfpyQzaWZm1nNmiXvPvqQfhP2xjGRAtiudSEJ2iJDPZIoJ/VfP4KSFNudp1N8rdpJcLlIyc/aP9sycmTvZIu6G3hVlpR++C87uuFVyh+juNTb8w3tf22q5aKzJ/d/M9c5f5/5A7fUAGciE0g==');
+    BMin := 125;
+    BMax := 215;
+    WMin := 160;
+    WMax := 30;
+  end;
+
+  with NumberArray[1] do {Good}
+  begin
+    Number := 1;
+    DTM  := DTMFromString('mggAAAHicY2NgYGBigABmIGaBshmBmA+IuaFYCirOAcT1mXEMf//8AWMQG4aNgHLYMBMODAEARdcMkQ==');
+    BMin := 85;
+    BMax := 130;
+    WMin := 0;
+    WMax := 100;
+  end;
+
+  with NumberArray[2] do {Good2}
+  begin
+    Number := 2;
+    DTM  := DTMFromString('mygMAAHic1c5bCoJQFIXh43uWkdnNaAY9NKOG0Dyigkq7XyypqCkK/dESojepF4WP7dlu1z5dY4xjGVOGi6pUrHe/BBsFVVt9R72XouZraEgdnjLTLE/ffElnWzp3VNuqTWW6+t9XbnoOufsMcyywxh4RYhxwwgZLrLBFgCnGmOg90MwOR5xxwfVLLNHHrpt2hMp6ZQ4/3OUhSZL8bDToZ/KPnT3unkdWTmV7nhL4nss=');
+    BMin := 0;
+    BMax := 1000;
+    WMin := 0;
+    WMax := 1000;
+  end;
+
+  with NumberArray[3] do {Good2}
+  begin
+    Number := 3;
+    DTM  := DTMFromString('mHgQAAHic3c/PDsFAEAbwGZTwOH0eF2cnT+EiJaJII0gJ4gn92/KNfomN7MVN2uSXndmd/drGIvIAUZGalmuB5Sllr1Rwzvi1412r73SDK+csowktaEMnwPYb+sm5MNu+QXlmGRHUKeKef29KKSwhgxVsIYc9Wb2BNc8zzs9ozt6yJjCihL3tL77yLfcAZ4/1JziS9TvO++9NmTkm59zfSQa9oGG/+xY6i/EvVaAV8fvzApQlvTI=');
+    BMin := 140;
+    BMax := 220;
+    WMin := 300;
+    WMax := 550;
+  end;
+
+  with NumberArray[4] do {Good2}
+  begin
+    Number := 4;
+    DTM  := DTMFromString('mygMAAHic1c5dCoJAFAXga1ipRVnto4eWUguIVhG0loiIDEn7ISSjvQ11Bs7ALXrxoQcHPgauc49nLCKRJ9KliAJoQxN8aEGDt3vfhxhG0FPcPFa5HWa6HJ/ZdhZyb8Asa6i4rFDtv9A7hw1sYQd7SCClDE5whotyVbMjHLh7gwJKKjj7dqcHPKnkt4z/TtjJ9luzY8rOxhhZLWaVLefTj/sXm/0vE3SvI6+mqp033MCMjw==');
+    BMin := 130;
+    BMax := 300;
+    WMin := 200;
+    WMax := 450;
+  end;
+
+  with NumberArray[5] do {Good2}
+  begin
+    Number := 5;
+    DTM  := DTMFromString('mXQQAAHic3c9dDsFAFAXg26pWikosRWIZ3i3DAhBpCFHx/x8RLJMMzo0jGk9Sb23ypbczp/fOVEXkAZYl4oBHDrlgw1009Mq9a8O35nLgQx4KpGtZcsljLoArfr/Jp58dk2FWc2X2878UqUQBZ+p5tmi5J60XtKZNrNb1OczgAMcY/d4xt4QpTCCCPoTQoZCzNDeiAXS534YmtJjtcU8zQxizp85YcfYJLnAGY0wijXrtL0nn/qKCe6WNlUKJnifIELAH');
+    BMin := 230;
+    BMax := 300;
+    WMin := 340;
+    WMax := 900;
+  end;
+
+  with NumberArray[6] do {Good2B}
+  begin
+    Number := 6;
+    DTM  := DTMFromString('mSAQAAHic3c/bCgFRFAbgtYcijyOXbr2DZ5Gc0yTKYXI+xptw52GUGIxJ/t38w+QOd7Pra7da/9qHlIgklEgM4hT98EDmDEc40QXu4vUMZkR5XGxXcphxAzmHtT9jBO6KqHf+xjNs3n8IvMFm3z/XYa0zS1jBHKYwgQFY0IE2daEPY5gxv+A+Yq/HnJ4dMmtRk1rQABPqUIMyFCAPJaiyZ5I/azJfgSLkYA0b/kG/IZtJy363fdH1t4Lz//r3jiT+FCYqZH5ZT1UtpIA=');
+    BMin := 160;
+    BMax := 440;
+    WMin := 300;
+    WMax := 600;
+  end;
+
+  with NumberArray[7] do {Good2}
+  begin
+    Number := 7;
+    DTM  := DTMFromString('mIgMAAHiczc5hCoJAEAXgtyoZQtfwAN2oI3SD0JCIEiuR8KjiRm/wBUu/8k+48LHsvGFmcwAjwQEJrWWldySQTPWYnGqe10sQ9A6aHbKa9dvMlDaaGe79OGJSSkUXaqiljp7UU0En5Td6KGv1rpVZz1U1y86aa3sOgUKZ7bp/7av3u1m893+x5d+WyC3Ub+cNI6GFkQ==');
+    BMin := 140;
+    BMax := 220;
+    WMin := 200;
+    WMax := 550;
+  end;
+
+  with NumberArray[8] do {Good2}
+  begin
+    Number := 8;
+    DTM  := DTMFromString('mtQMAAHic1c7NCoJAFIbhMyJZVibeR5vuo313EAWVVKRUhEVdttA3+AZuhTYKD2eO52dmbmYDZxZJLEPX5CHnCCOZEBPOEX1BS8i87xvTNyXG1HyfiWPXTDKk5CkS3vGbCdhxULqzJh7lTMzlJg+5c76SV/KSZ6vua6UUuMiJPX7/FvvWPSV7K2LB/5y+jayZ87WPvKWu607y1fLvur5hoXf3jeuhTt8X9gh9aA==');
+    BMin := 130;
+    BMax := 400;
+    WMin := 200;
+    WMax := 450;
+  end;
+
+  with NumberArray[9] do {Good2}
+  begin
+    Number := 9;
+    DTM  := DTMFromString('mdgMAAHic1c7NCgFRGMbxM4U0Jh8TwzVYWstOuQTltoTEyCShIffAzk15Tv5Tp0aysDH16z3zdOZ5p2uMqXjGVKUuAecyAvJQWtLkXJMG096JnDzkns3a0kFER0inz46SFFB0dvvOtDtW5iWWDTMmW2BJtpUdcy8nOctFrkjJj9xNZE3HTKaOOXnWn/CN7T7QlfL+uN9yxsP+R5PRIJe96/mFrLunf/0H3p/4/nkC/OhyWw==');
+    BMin := 160;
+    BMax := 440;
+    WMin := 300;
+    WMax := 600;
+  end;
+End;
+
+{*******************************************************************************
+procedure FreeNumbers;
+by: Ashaman88
+Description: Frees the number dtms!
+*******************************************************************************}
+
+procedure FreeNumbers;
+var
+  I: Integer;
+begin
+  for i := 0 to high(NumberArray) do
+    FreeDTM(NumberArray[i].DTM);
+end;
+
+{*******************************************************************************
+function GetNumber: Integer;
+by: Ashaman88.
+Description: Gets the number on the side of the box.
+*******************************************************************************}
+
+
+function GetNumber: Integer;
+var
+  i, maxScore, maxIndex: integer;
+  CTS,X,Y: Integer;
+  MidBox: TPoint;
+  TPA,TPA1,TPA2,TPAW: TPointArray;
+  ATPA: T2DPointArray;
+  BrownBox: TBox;
+  afound: Extended;
+  scores: TintegerArray;
+begin
+  LoadNumbers;
+  setLength(scores, length(NumberArray));
+
+  CTS:= GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+
+  SetColorSpeed2Modifiers(0.05, 0.31);
+  MidBox:=MiddleBox(IntToBox(NumberBounds.X1+5, NumberBounds.Y1+5, NumberBounds.X2-5, NumberBounds.Y2-5));
+  FindColorsSpiralTolerance(MidBox.X, MidBox.Y, TPA, 6187391, NumberBounds.X1, NumberBounds.Y1, NumberBounds.X2, NumberBounds.Y2, 16);
+  ColorToleranceSpeed(CTS);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+
+  ATPA:=FloodFillTPA(TPA);
+
+  if Length(ATPA)=0 then
+  begin
+    Writeln('No brown found');
+    Exit;
+  end;
+
+  if DebugBox then
+  begin
+   // DebugATPABounds(ATPA);
+    Writeln('Length of Brown Shape: '+ToStr(Length(ATPA[0])));
+  End;
+
+  BrownBox:=GetTPABounds(ATPA[0]);
+
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA1, 16579837, BrownBox.X1, BrownBox.Y1, BrownBox.X2, BrownBox.Y2, 5);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA2, 12764106, BrownBox.X1, BrownBox.Y1, BrownBox.X2, BrownBox.Y2, 5);
+  TPAW:=CombineTPA(TPA1,TPA2);
+
+
+  if DebugBox then
+    Writeln('Length of White TPA in Brown: '+ToStr(Length(TPAW)));
+
+  // loop through fields, scoring each item
+  for i := 0 to high(NumberArray) do
+  begin
+    if inRange(Length(ATPA[0]), NumberArray[i].Bmin, NumberArray[i].BMax) then
+      scores[i] := scores[i] + 1;
+
+    if inRange(Length(TPAW), NumberArray[i].Wmin, NumberArray[i].WMax) then
+      scores[i] := scores[i] + 1;
+
+    if findDTMrotated(NumberArray[i].DTM, x, y, BrownBox.X1-3, BrownBox.Y1-3, BrownBox.X2+3, BrownBox.Y2+3,-Pi,Pi,Pi/30,aFound) then
+      scores[i] := scores[i] + 5;
+  end;
+
+  // get the item with the highest score
+  maxScore := -1;
+  maxIndex := -1;
+  for i := 0 to high(scores) do
+    if (scores[i] > maxScore) then
+    begin
+      maxScore := scores[i];
+      maxIndex := i;
+    end;
+
+  if maxindex<>-1 then
+  begin
+    writeln('NumberScan: '+ToStr(NumberArray[maxIndex].number) + ', with a score of ' + intToStr(scores[maxIndex]));
+
+    result := NumberArray[maxIndex].number;
+  end;
+
+  SetLength(ATPA,0);
+  SetLength(TPA,0);
+  SetLength(TPA1,0);
+  SetLength(TPA2,0);
+  SetLength(TPAW,0);
+end;
+
+type
+  ShapeRotate = record
+    Shape: String;
+    SMin, SMax, WMin, WMax, BMin, BMax : integer;
+  end;
+  ShapeRotateArray = array of ShapeRotate;
+
+var
+  ShapeArray: ShapeRotateArray;
+
+{*******************************************************************************
+procedure LoadShapes;
+by: Ashaman88
+Description: Loadsup all the shapes!
+*******************************************************************************}
+
+Procedure LoadShapes;
+begin
+  if Length(ShapeArray)<>0 then
+    Exit;
+
+
+  SetLength(ShapeArray,5);
+
+  with ShapeArray[0] do {Good2}
+  begin
+    Shape := 'Triangle';
+    SMin := 10;
+    SMax := 13;
+    WMin := 4600;
+    WMax := 4900;
+    BMin := 3200;
+    BMax := 4500;
+  end;
+
+  with ShapeArray[1] do {Good2}
+  begin
+    Shape := 'Square';
+    SMin := 8;
+    SMax := 13;
+    WMin := 5000;
+    WMax := 5800;
+    BMin := 100;
+    BMax := 2500;
+  end;
+
+  with ShapeArray[2] do {Good2}
+  begin
+    Shape := 'Star';
+    SMin := 15;
+    SMax := 17;
+    WMin := 4100;
+    WMax := 4400;
+    BMin := 7500;
+    BMax := 8400;
+  end;
+
+  with ShapeArray[3] do {Good2}
+  begin
+    Shape := 'Circle';
+    SMin := 17;
+    SMax := 20;
+    WMin := 7000;
+    WMax := 7500;
+    BMin := 300;
+    BMax := 1300;
+  end;
+
+  with ShapeArray[4] do {Good}
+  begin
+    Shape := 'Pentagon';
+    SMin := 8;
+    SMax := 16;
+    WMin := 4400;
+    WMax := 4800;
+    BMin := 1600;
+    BMax := 2400;
+  end;
+End;
+
+{*******************************************************************************
+function GetShape: String;
+by: Ashaman88.
+Description: Gets the shape on the side of the box.
+*******************************************************************************}
+
+Function GetShape: String;
+Var
+  i, maxScore, maxIndex: integer;
+  CTS: Integer;
+  TPA,TPA1,TPA2, TPAB: TPointArray;
+  ATPA,ATPAB: T2DPointArray;
+  WhiteBox: TBox;
+  scores: TintegerArray;
+begin
+  LoadShapes;
+  setLength(scores, length(shapeArray));
+
+  Result:='';
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA1, 16579837, 172, 45, 352, 225, 5);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPA2, 12764106, 172, 45, 352, 225, 5);
+  TPA:=CombineTPA(TPA1,TPA2);
+
+  ATPA:=FloodFillTPA(TPA);
+  SortATPASize(ATPA,True);
+  if DebugBox then
+    Writeln('Length of Full White ATPA: '+ToStr(Length(ATPA)));
+  if Length(ATPA)=0 then
+  begin
+    Writeln('No white found');
+    Exit;
+  End;
+
+  //if DebugBox then
+  //  DebugATPABounds(ATPA);
+
+  CTS:= GetColorToleranceSpeed;
+  ColorToleranceSpeed(2);
+
+  WhiteBox:=GetTPABounds(ATPA[0]);
+  NumberBounds:=WhiteBox;
+
+  SetColorSpeed2Modifiers(0.05, 0.31);
+  FindColorsSpiralTolerance(MSCX, MSCY, TPAB, 6187391, WhiteBox.X1, WhiteBox.Y1, WhiteBox.X2, WhiteBox.Y2, 16);
+  ColorToleranceSpeed(CTS);
+  SetColorSpeed2Modifiers(0.2, 0.2);
+
+  SplitTPAWrap(TPAB,10,ATPAB);
+  SortATPASize(ATPAB,True);
+
+  if DebugBox then
+  begin
+    Writeln('Length of Shape: '+ToStr(Length(ATPA[0])));
+    Writeln('Length of OutterBox: '+ToStr(Length(ATPAB[0])));
+  end;
+
+  // loop through fields, scoring each item
+  for i := 0 to high(ShapeArray) do
+  begin
+    if inRange(Length(ATPA[0]), ShapeArray[i].Wmin, ShapeArray[i].WMax) then
+      scores[i] := scores[i] + 2;
+
+    if inRange(Length(ATPAB[0]), ShapeArray[i].Bmin, ShapeArray[i].BMax) then
+      scores[i] := scores[i] + 1;
+
+    if inRange(Length(ATPA), ShapeArray[i].Smin, ShapeArray[i].SMax) then
+      scores[i] := scores[i] + 4;
+  end;
+
+  // get the item with the highest score
+  maxScore := -1;
+  maxIndex := -1;
+  for i := 0 to high(scores) do
+    if (scores[i] > maxScore) then
+    begin
+      maxScore := scores[i];
+      maxIndex := i;
+    end;
+
+  if maxindex<>-1 then
+  begin
+    writeln('ShapeScan: '+ShapeArray[maxIndex].shape + ', with a score of ' + intToStr(scores[maxIndex]));
+
+    result := ShapeArray[maxIndex].shape;
+  end;
+
+  SetLength(ATPA,0);
+  SetLength(TPA,0);
+  SetLength(TPA1,0);
+  SetLength(TPA2,0);
+  SetLength(ATPAB,0);
+  SetLength(TPAB,0);
+end;
+
+{*******************************************************************************
+function GetBoxSide: Integer;
+by: pups/Ashaman88
+Description: Gets Box side and freezes client
+*******************************************************************************}
+
+Procedure GetBoxSide;
+var
+  X,Y: Integer;
+begin
+  repeat
+    wait(100);
+    if FindColorTolerance(x, y, 16579837, 182, 45, 182, 225, 5) then continue;
+    if FindColorTolerance(x, y, 16579837, 342, 45, 342, 225, 5) then continue;
+    if FindColorTolerance(x, y, 16579837, 172, 55, 352, 55, 5) then continue;
+    if FindColorTolerance(x, y, 16579837, 172, 215, 352, 215, 5) then continue;
+    if FindColorTolerance(x, y, 12764106, 182, 45, 182, 225, 5) then continue;
+    if FindColorTolerance(x, y, 12764106, 342, 45, 342, 225, 5) then continue;
+    if FindColorTolerance(x, y, 12764106, 172, 55, 352, 55, 5) then continue;
+    if FindColorTolerance(x, y, 12764106, 172, 215, 352, 215, 5) then continue;
+    Break;
+  until False;
+  Freeze;
+end;
+
+{*******************************************************************************
+function GetQuestion(var num: Integer; var shape: String): Integer;
+by: pups
+Description: Returns number and type.
+*******************************************************************************}
+
+function GetQuestion(var num: Integer; var shape: string): Integer;
+var
+  x, y, i: Integer;
+  text: string;
+begin
+  num := 10;
+  shape := '';
+  for i := 0 to 14 do
+  begin
+    case i of
+      0: text := '0'; //Zero
+      1: text := '1'; //One
+      2: text := '2'; //Two
+      3: text := '3'; //Three
+      4: text := '4'; //Four
+      5: text := '5'; //Five
+      6: text := '6'; //Six
+      7: text := '7'; //Seven
+      8: text := '8'; //Eight
+      9: text := '9'; //Nine
+      10: text := 'Circle'; //Circle
+      11: text := 'Triangle'; //Triangle
+      12: text := 'Square'; //Square
+      13: text := 'Star'; //Star
+      14: text := 'Pentagon'; //Pentagon
+    end;
+    if (FindText(x, y, Text, upchars07, 110, 250, 415, 275)) then
+    begin
+      Result := i;
+      if (i < 10) then
+        num := i;
+      if (i >= 10) then
+        shape := text;
+      Exit;
+    end;
+  end;
+end;
+
+
+{*******************************************************************************
+function SolveBox: Boolean;
+by: Ashaman88
+Description: Solves the Box!
+*******************************************************************************}
+
+function SolveBox: Boolean;
+var
+  st2: Integer;
+  shapeQ, shape, ans: string;
+  numQ, num: Integer;
+  x, y: Integer;
+begin
+  while OpenBox do
+  begin
+    WriteLn('Found a box, solving...');
+    Wait(1000);
+    GetQuestion(numQ, shapeQ);
+    if (shapeQ = '') and (numQ = 10) then
+      exit;
+    WriteLn('Question is:');
+    if shapeQ = '' then
+      WriteLn('Which shape has number ' + IntToStr(numQ))
+    else
+      WriteLn('What number is the ' + shapeQ);
+    st2 := GetSystemTime;
+    repeat
+      GetBoxSide;
+      Shape:=GetShape;
+      Num:=GetNumber;
+      UnFreeze;
+      if DebugBox then
+        Wait(2000) Else
+        if (num = numQ) or (shape = shapeQ) then
+        begin
+          if num = numQ then
+            ans := shape
+          else
+            ans := IntToStr(num);
+          WriteLn('Answer is ' + ans);
+          if FindText(x, y, ans, upchars07, 116, 286, 183, 311) then
+            Mouse(120, 290, 30, 10, True);
+          if FindText(x, y, ans, upchars07, 235, 286, 302, 311) then
+            Mouse(240, 290, 30, 10, True);
+          if FindText(x, y, ans, upchars07, 350, 286, 417, 311) then
+            Mouse(355, 290, 30, 10, True);
+          WriteLn('******** SOLVED BOX RANDOM ********');
+          Result := True;
+          Break;
+        end;
+    until GetSystemTime > st2 + 12000;
+    Wait(1500 + Random(1000));
+  end;
+  if Length(NumberArray)>0 then
+  begin
+    FreeNumbers;
+    SetLength(NumberArray,0);
+  end;
+  if Length(ShapeArray)>0 then
+    SetLength(ShapeArray,0);
+end;
