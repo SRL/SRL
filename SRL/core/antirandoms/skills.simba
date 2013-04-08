@@ -1,0 +1,322 @@
+(*
+SkillPS_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillPS_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillPS_Detect(var args : T2DPointArray): boolean;
+var tpa : TPointArray;
+begin
+  if CountColorTolerance(4096630,MSX1,MSY1,MSX2,MSY2,26) > 50 then
+  begin
+     Result := FindColorsTolerance(tpa,4096630,MSX1,MSY1,MSX2,MSY2,26);
+  end;
+  SetLength(args,1);
+  args[0] := tpa;
+end;
+
+(*
+SkillPS_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillPS_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillPS_Solve(var args : T2DPointArray): boolean;
+begin
+  runaway(RandomDirection, False, 1, RandomRange(2000,4000));
+  Result := true;
+end;
+
+(*
+SkillEnt_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillEnt_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillEnt_Detect(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+SkillEnt_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillEnt_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillEnt_Solve(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+SkillSmokeR_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillSmokeR_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillSmokeR_Detect(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+SkillSmokeR_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillSmokeR_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillSmokeR_Solve(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+SkillWhirl_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillWhirl_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillWhirl_Detect(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+SkillWhirl_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function SkillWhirl_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function SkillWhirl_Solve(var args : T2DPointArray): boolean;
+begin
+ Result := false;
+end;
+
+(*
+Combat_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Combat_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function Combat_Detect(var args : T2DPointArray): boolean;
+begin
+ Result := SRL_infight;
+end;
+
+(*
+Combat_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function Combat_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function Combat_Solve(var args : T2DPointArray): boolean;
+begin
+  runaway(RandomDirection, False, 1, RandomRange(2000,4000));
+  Result := true;
+  addToSRLLog('[Poison] Player in combat running away..');
+end;
+
+(*
+CombatPoison_Detect
+~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CombatPoison_Detect(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function CombatPoison_Detect(var args : T2DPointArray): boolean;
+begin
+ Result := srl_IsPoisoned;
+end;
+
+(*
+CombatPoison_Solve
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function CombatPoison_Solve(var args : T2DPointArray): boolean;
+
+Random event sovler
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+
+
+*)
+function CombatPoison_Solve(var args : T2DPointArray): boolean;
+begin
+  runaway(RandomDirection, False, 2, RandomRange(2000,4000));
+  Result := Logout;
+  addToSRLLog('[Combat Poison] Player poisoned... running away and logging out');
+end;

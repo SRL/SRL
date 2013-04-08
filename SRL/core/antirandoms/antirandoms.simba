@@ -10,6 +10,14 @@ solver's simba file.
 
 *)
 
+//Function prototypes
+function RandomDirection: string; forward;
+function FindNormalRandoms(): boolean; forward;
+{$IFDEF ANTIRANDOM_CUSTOMSETSOLVER}
+function AntiRandom_CustomSetSolver(name : String; args : T2DPointArray) : Boolean; forward;
+{$ENDIF}
+
+
 // include all the solver files
 {$include_once common.simba}
 {$include_once rewards.simba}
@@ -31,6 +39,7 @@ solver's simba file.
 {$include_once forester.simba}
 {$include_once molly.simba}
 {$include_once beekeeper.simba}
+{$include_once skills.simba}
 
 // represent the elements of the SRL_Randoms array
 const
@@ -54,6 +63,16 @@ const
   SRL_RAND_MOLLY     = 16;
   SRL_RAND_REWARDS   = 17;
 
+  SRL_SKILL_RANDOMS_COUNT     = 5;
+  SRL_SKILL_RAND_POISONGAS    = 0;
+  SRL_SKILL_RAND_BIGFISH      = 1;
+  SRL_SKILL_RAND_SMOKINGROCK  = 2;
+  SRL_SKILL_RAND_ENT          = 3;
+  SRL_SKILL_RAND_WHIRLPOOL    = 4;
+
+  SRL_COMBAT_RAND             = 0;
+  SRL_COMBAT_RAND_POISON      = 1;
+
 type
   TRandom = record
     name: string;
@@ -61,10 +80,18 @@ type
     solved, failed: integer; // for SRL stats/randoms report
     isInvRandom, hasRewardBox, disabled: boolean;
   end;
-
+  TRandomEx = record
+    name: string;
+    solve, detect: function(var args : T2DPointArray): boolean;
+    solved, failed: integer;
+    isInvRandom, hasRewardBox, disabled: boolean;
+   end;
 var
   SRL_Randoms: array[0..(SRL_RANDOMS_COUNT - 1)] of TRandom;
+  SRL_SkillRandoms :  array[0..(SRL_SKILL_RANDOMS_COUNT - 1)] of TRandomEx;
   SRL_RandomsSet, SRL_DisableRandoms, SRL_RandomScreenShot: boolean;
+  SRL_FishingRandoms, SRL_ThievingRandoms, SRL_WoodCuttingRandoms,SRL_MiningRandoms : array of TRandomEx;
+  SRL_CombatRandomsEx : array[0..1] of TRandomEx;
 
 // needs to be included after variables are declared
 {$include_once randomtool.simba}
@@ -295,6 +322,62 @@ begin
     isInvRandom := true;
     hasRewardBox := true;
   end;
+
+  with SRL_SkillRandoms[SRL_SKILL_RAND_POISONGAS] do
+  begin
+    name := 'Poison Gas';
+    solve := @SkillPS_Solve;
+    detect := @SkillPS_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+  with SRL_SkillRandoms[SRL_SKILL_RAND_ENT] do
+  begin
+    name := 'Ent';
+    solve := @SkillEnt_Solve;
+    detect := @SkillEnt_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+  with SRL_SkillRandoms[SRL_SKILL_RAND_SMOKINGROCK] do
+  begin
+    name := 'Smoking Rock';
+    solve := @SkillSmokeR_Solve;
+    detect := @SkillSmokeR_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+  with SRL_SkillRandoms[SRL_SKILL_RAND_WHIRLPOOL] do
+  begin
+    name := 'WhirlPool';
+    solve := @SkillWhirl_Solve;
+    detect := @SkillWhirl_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+
+  with SRL_CombatRandomsEx[SRL_COMBAT_RAND] do
+    begin
+    name := 'Combat';
+    solve := @Combat_Solve;
+    detect := @Combat_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+  with SRL_CombatRandomsEx[SRL_COMBAT_RAND_POISON] do
+    begin
+    name := 'Combat Poison';
+    solve := @CombatPoison_Solve;
+    detect := @CombatPoison_Detect;
+    isInvRandom := false;
+    hasRewardBox := false;
+  end;
+
+   SRL_FishingRandoms     := [SRL_SkillRandoms[SRL_SKILL_RAND_WHIRLPOOL],SRL_SkillRandoms[SRL_SKILL_RAND_BIGFISH]];
+   SRL_ThievingRandoms    := [SRL_SkillRandoms[SRL_SKILL_RAND_POISONGAS]];
+   SRL_WoodCuttingRandoms := [SRL_SkillRandoms[SRL_SKILL_RAND_ENT]];
+   SRL_MiningRandoms      := [SRL_SkillRandoms[SRL_SKILL_RAND_SMOKINGROCK]];
+
 
   // disable all randoms if set to
 
@@ -851,6 +934,17 @@ begin
   until ((GetSystemTime - _FTW_StartTime) > WaitTime);
 end;
 
+function FNRWait(WaitTime: Integer): Boolean;
+var
+  _FTW_StartTime: Integer;
+begin
+  _FTW_StartTime := GetSystemTime;
+  repeat
+    if FindNormalRandoms then Result := True;
+    Wait(50);
+  until ((GetSystemTime - _FTW_StartTime) > WaitTime);
+end;
+
 function RandomDirection: string;
 var
   direction: tstringarray;
@@ -874,10 +968,12 @@ begin
   writeln('Running ' + result);
 end;
  
-function _FindAllRandoms(checkInv: boolean): boolean;
+function _FindAllRandoms(checkInv: boolean; randomSet : array of array of TRandomEx): boolean;
 var
-  i: integer;
-  manually: boolean;
+  i,x : integer;
+  manually,customSolved : boolean;
+  custom : T2DPointArray;
+
 begin
   // no tabs exists if bank is open; could throw false positives
   if (not loggedIn()) or (bankScreen()) then
@@ -894,6 +990,29 @@ begin
       exit;
     end;
 
+  for x := 0 to High(randomSet) do
+  for i := 0 to High(randomSet[x]) do
+  begin
+    if randomSet[x][i].detect(custom) then
+    begin
+    if randomSet[x][i].disabled then
+    begin
+      addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
+      addToSRLLog(randomSet[x][i].name+' currently disabled');
+      continue;
+    end;
+
+        {$IFDEF ANTIRANDOM_CUSTOMSETSOLVER}
+           customSolved := AntiRandom_CustomSetSolver(randomSet[x][i].name,custom);
+        {$ENDIF}
+           if not customSolved then
+           begin
+            addToSRLLog('******* Found ' + randomSet[x][i].name + ' *******');
+           customSolved := randomSet[x][i].solve(custom);
+           end;
+        if not customSolved then addToSRLLog('***** Failed Random: '+randomSet[x][i].name+' *****');
+    end;
+  end;
   if FindTalk then
   begin
     result := true;
@@ -967,7 +1086,7 @@ Example:
 *)
 function FindNormalRandoms(): boolean;
 begin
-  result := _FindAllrandoms(true);
+  result := _FindAllrandoms(true,[]);
 end;
 
 (*
@@ -994,5 +1113,32 @@ Example:
 *)
 function FindNonInventoryRandoms(): boolean;
 begin
-  result := _FindAllRandoms(false);
+  result := _FindAllRandoms(false,[]);
+end;
+
+(*
+FindNormalRandomsCustom
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function FindNormalRandomsCustom(customSet : Array of Array of TRandom): boolean;
+
+Finds and solves all non-skill-specific(i.e. whirlpool,ent,poison gas) Runescape's random events unless specified in args.
+It also accepts custom random event solvers. Returns true if an event was solved.
+
+.. note::
+
+    Author: Slushpuppy
+    Last Modified: 31/04/2013 By Slushpuppy
+
+Example:
+
+.. code-block:: pascal
+    SkillsRandom := [SRL_FishingRandoms]
+    FindNonInventoryRandoms(RandomSet : Array of TRandom)
+*)
+function FindNormalRandomsCustoms(RandomSet : Array of Array of TRandomEx): boolean;
+begin
+  result := _FindAllRandoms(false,RandomSet);
 end;

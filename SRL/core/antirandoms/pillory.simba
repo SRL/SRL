@@ -53,7 +53,7 @@ begin
   if (not Result) then
   begin
     repeat
-      MMouse(224,143,70,65);
+      MMouse(243,143,70,65);
 
       Wait(RandomRange(90, 270));
 
@@ -245,6 +245,9 @@ begin
   Result := False;
   keysolves := 0;
 
+  tmpCTS := GetColorToleranceSpeed;
+  GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
+
   if (not LoggedIn) then Exit;
 
   t := GetSystemTime;
@@ -258,9 +261,6 @@ begin
 
     // open the lock screen if it's not already open
     if (not PL_LockScreen) then PL_ClickCage;
-
-    tmpCTS := GetColorToleranceSpeed;
-    GetToleranceSpeed2Modifiers(tmpHM, tmpSM);
 
     lock := PL_GetLock;
     keys := PL_GetKeys;
