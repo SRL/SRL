@@ -343,9 +343,8 @@ function RD_SolveStrangeBox(x, y: integer): boolean;
 begin
   addToSRLLog('RD_SolveStrangeBox: Found StrangeBox box');
 
-  addToSRLLog('RD_SolveStrangeBox: solver currently disabled');
-
-  result := false;
+  if solvebox then
+    result:=true;
 end;
 
 (**
