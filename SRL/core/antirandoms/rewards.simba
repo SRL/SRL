@@ -13,6 +13,9 @@ const
     DTM_REWARD_LAMP    = 2;
     DTM_REWARD_BOOK    = 3;
 
+  BMP_REWARD_COUNT = 1;
+    BMP_STRANGE_BOX    = 0;
+
 function RD_GetDTMs(): TIntegerArray;
 begin
   setLength(result, DTM_REWARD_COUNT);
@@ -25,12 +28,12 @@ end;
 
 function RD_GetBMPs(): TIntegerArray;
 begin
-  setLength(result, 1);
+  setLength(result, BMP_REWARD_COUNT);
 
-  result[0] := BitmapFromString(25, 14, 'meJxjZGDIyMjHgwIDIzARXLatbQ' +
-               'IQARmMDAyMhIzChSCGYDUqOjoJWRaI/P1DIcjHJxiCsJpDjFFoyNM' +
-               '7gEijYuNSB6FR8Qnpg9CoxMTMQWhUSkr2wBoFF0HLOCQZFRYWi2yI' +
-               'goIBnjyIx6iQkCi4OUBDIAgA/5a/xA==');
+  result[BMP_STRANGE_BOX] := BitmapFromString(25, 14, 'meJxjZGDIyMjHgwIDIzARXLatbQ' +
+                             'IQARmMDAyMhIzChSCGYDUqOjoJWRaI/P1DIcjHJxiCsJpDjFFoyNM' +
+                             '7gEijYuNSB6FR8Qnpg9CoxMTMQWhUSkr2wBoFF0HLOCQZFRYWi2yI' +
+                             'goIBnjyIx6iQkCi4OUBDIAgA/5a/xA==');
 end;
 
 (**
@@ -407,7 +410,7 @@ begin
       if FindBitmapIn(BMPs[i], x, y, MIX1, MIY1, MIX2, MIY2) then
       begin
         case i of
-          0 : result := RD_SolveStrangeBox(x, y);
+          BMP_STRANGE_BOX : result := RD_SolveStrangeBox(x, y);
         end;
 
         if (not result) then
