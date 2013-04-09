@@ -1139,7 +1139,7 @@ Example:
     SkillsRandom := [SRL_FishingRandoms]
     FindNonInventoryRandoms(RandomSet : Array of TRandom)
 *)
-function FindNormalRandomsCustoms(RandomSet : Array of Array of TRandomEx): boolean;
+function FindNormalRandomsCustom(RandomSet : Array of Array of TRandomEx): boolean;
 begin
   result := _FindAllRandoms(false,RandomSet);
 end;
