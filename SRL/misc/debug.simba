@@ -9,6 +9,8 @@
 // * function DebugATPA(Points: TPointArray; BmpName: String): Boolean; // by Wizzup?
 // * procedure DebugATPABounds(aPoints: Array Of TPointArray);     // by Wizzup?, lordsaturn, & caused
 // * procedure DebugColorArray(C: TIntegerArray);                  // by Nava2
+// * procedure DebugBoxesEx(Boxes: Array of TBox; Color: Integer); // by DannyRS
+// * procedure DebugBoxes(Boxes: TBoxArray);                       // by DannyRS
 
 {*******************************************************************************
 procedure TakeScreenshotEx(Path: string; X1, Y1, X2, Y2 : Integer);
@@ -102,7 +104,7 @@ end;
 
 {*******************************************************************************
 function DebugATPA(aPoints: array of TPointArray; BmpName: string): Boolean;
-By: Wizzup
+By: Wizzup?
 Description: Shows an image of the client, plotting each TPA of the 2D point
              array aPoints. Each TPA is a different color. If a name is
              specified, an image will be saved.
@@ -224,4 +226,50 @@ begin
     Writeln('');
   end;
   Writeln('DebugColorArray took: ' + IntToStr(GetTimeRunning - t) + ' ms to complete.');
+end;
+
+{*******************************************************************************
+procedure DebugBoxesEx(Boxes: Array of TBox; Color: Integer);
+By: DannyRS
+Description: Shows an image of the client, plotting each box on it
+*******************************************************************************}
+procedure DebugBoxesEx(Boxes: TBoxArray; Color: Integer);
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  Bmp, i, j: Integer;
+  B: TBox;
+begin
+  SetLength(ATPA, 4);
+  for i := 0 to High(Boxes) do
+  begin
+    ATPA[0] := TPABetweenPoints(Point(Boxes[i].X1, Boxes[i].Y1),
+                                Point(Boxes[i].X2, Boxes[i].Y1), 1, 0);
+    ATPA[1] := TPABetweenPoints(Point(Boxes[i].X2, Boxes[i].Y1),
+                                Point(Boxes[i].X2, Boxes[i].Y2), 1, 0);
+    ATPA[2] := TPABetweenPoints(Point(Boxes[i].X2, Boxes[i].Y2),
+                                Point(Boxes[i].X1, Boxes[i].Y2), 1, 0);
+    ATPA[3] := TPABetweenPoints(Point(Boxes[i].X1, Boxes[i].Y2),
+                                Point(Boxes[i].X1, Boxes[i].Y1), 1, 0);
+    for j := 0 to 3 do
+      CombineTPAWrap(TPA, ATPA[j], TPA);
+  end;
+  //Credit to Wizzup? for this
+  B := GetTPABounds(TPA);
+  Bmp := BitmapFromClient(B.X1, B.Y1, B.X2, B.Y2);
+  OffsetTPA(TPA, Point(-B.X1,-B.Y1));
+  DrawTPABitmap(Bmp, TPA, Color);
+  DisplayDebugImgWindow(B.X2-B.X1 + 1, B.Y2-B.Y1 + 1);
+  DrawBitmapDebugImg(Bmp);
+  FreeBitmap(Bmp);
+end;
+
+{*******************************************************************************
+procedure DebugBoxes(Boxes: TBoxArray);
+By: DannyRS
+Description: Shows an image of the client, plotting each box on it
+*******************************************************************************}
+procedure DebugBoxes(Boxes: TBoxArray);
+begin
+  DebugBoxesEx(Boxes, clAqua);
 end;
