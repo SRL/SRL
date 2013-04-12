@@ -267,7 +267,7 @@ end;
 function DD_Solve(): boolean;
 var
   p: TPoint;
-  t, tmpCompass, tmpCTS, MMoves: Integer;
+  t, tmpCompass, tmpCTS, MMoves, debugColorCount: Integer;
   tmpHM, tmpSM: Extended;
   MatName, LastMatt: String;
 begin
@@ -298,11 +298,12 @@ begin
 
     Wait(RandomRange(1200, 1600));
 
-    case CountColor(0, MCX1, MCY1, MCX2, MCY2) of
-      687,988 : MatName := 'jog';
-      707     : MatName := 'starjumps';
-      569     : MatName := 'situps';
-      637,938 : MatName := 'pushups';
+    debugColorCount := CountColor(0, MCX1, MCY1, MCX2, MCY2);
+    case debugColorCount of
+      687,988,691 : MatName := 'jog';
+      707,711     : MatName := 'starjumps';
+      569,573     : MatName := 'situps';
+      637,938,641 : MatName := 'pushups';
       else
       begin
         ClickToContinue;
@@ -310,7 +311,8 @@ begin
         Continue;
       end;
     end;
-
+    DD_Message('[DD_Solve] Last color count: ' + inttostr(debugColorCount));
+    LastMatt := '';
     if (LastMatt = MatName) then
     begin
       MMoves := 0;
