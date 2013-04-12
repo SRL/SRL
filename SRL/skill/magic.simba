@@ -1,8 +1,9 @@
 //----------------------------------------------------------------------------//
 //--                     SRL Resource Library                               --//
-//--                       Magic routines                                  --//
+//--                        Magic routines                                  --//
 //----------------------------------------------------------------------------//
-// * function CurrentSpellBook: String;                                     * //
+// * function GetCurrentSpellBook: String;                                  * //
+// * procedure SetupMagic;                                                  * //
 // * function GetSpellBox(SpellNumber: Integer): TBox;                      * //
 // * function GetSpellNumber(Name: Variant): Integer;                       * //
 // * function SpellAvailable(Name: Variant): Boolean;                       * //
@@ -12,12 +13,16 @@
 // * function CountRunes(Name: String): Integer;                            * //
 
 
+var
+  CurrentSpellBook: String;
+  Magic_Setup: Boolean;
+
 {*******************************************************************************
-function CurrentSpellBook: String;
+function GetCurrentSpellBook: String;
 By: DannyRS
 Description: Returns name of the current spellbook
 *******************************************************************************}
-function CurrentSpellBook: String;
+function GetCurrentSpellBook: String;
 begin
   Result := '';
 
@@ -26,6 +31,22 @@ begin
 
   if ((Result = '') and (GetColor(561, 236) = 65536)) then
     Result := 'standard';
+
+  if ((Result = '') and (GetColor(568, 222) = 65536)) then
+    Result := 'ancient';
+end;
+
+{*******************************************************************************
+procedure SetupMagic;
+By: DannyRS
+Description: Sets CurrentSpellBook var
+*******************************************************************************}
+procedure SetupMagic;
+begin
+  CurrentSpellBook := GetCurrentSpellBook;
+
+  if (not (CurrentSpellBook = '')) then
+    Magic_Setup := True;
 end;
 
 {*******************************************************************************
@@ -35,19 +56,52 @@ Description: Returns TBox of a magic spell number 1-63
 *******************************************************************************}
 function GetSpellBox(SpellNumber: Integer): TBox;
 var
-  Row, Col: Integer;
+  Row, Col, NumC, R, C: Integer;
 begin
+  if (not Magic_Setup) then
+    SetupMagic;
+
   Result := IntToBox(-1, -1, -1, -1);
 
-  if (not InRange(SpellNumber, 1, 63)) then
-    Exit;
+  case CurrentSpellBook of
+    'ancient': NumC := 4;
+    else NumC := 7;
+  end;
 
   SpellNumber := SpellNumber - 1;
-  Row := Round(SpellNumber / 7);
-  Col := SpellNumber - (Row * 7);
+  Row := Round(SpellNumber / NumC);
+  Col := SpellNumber - (Row * NumC);
 
-  Result := IntToBox(561 + (Col * 24), 229 + (Row * 24),
-                     580 + (Col * 24), 248 + (Row * 24));
+  case CurrentSpellBook of
+    'ancient':  begin
+                  if (not InRange(SpellNumber, 1, 25)) then
+                    Exit;
+
+                  case Col of
+                    1 : C := 613;
+                    2 : C := 659;
+                    3 : C := 700;
+                    else C := 568;
+                  end;
+                  case Row of
+                    1 : R := 243;
+                    2 : R := 271;
+                    3 : R := 299;
+                    4 : R := 327;
+                    5 : R := 355;
+                    6 : R := 383;
+                    else R := 215;
+                  end;
+                  Result := IntToBox(C , R, C + 19, R + 19);
+                end;
+    else
+    begin
+      if (not InRange(SpellNumber, 1, 63)) then
+        Exit;
+      Result := IntToBox(561 + (Col * 24), 229 + (Row * 24),
+                              580 + (Col * 24), 248 + (Row * 24));
+    end;
+  end;
 end;
 
 {*******************************************************************************
@@ -57,6 +111,9 @@ Description: Returns 1-63 position of a spell string or int
 *******************************************************************************}
 function GetSpellNumber(Name: Variant): Integer;
 begin
+  if (not Magic_Setup) then
+    SetupMagic;
+
   Result := -1;
 
   if VariantIsString(Name) then
@@ -133,22 +190,42 @@ begin
                       end;
                     end;
                   end;
-      'ancient': begin
+      'ancient' : begin
                     case Capitalize(LowerCase(Name)) of
-                      '-1' : Result := 1;
+                      'Edgeville Home Teleport', '1':  Result := 1;
+                      'Smoke Rush', '2':               Result := 2;
+                      'Shadow Rush', '3':              Result := 3;
+                      'Paddewwa Teleport', '4':        Result := 4;
+                      'Blood Rush', '5':               Result := 5;
+                      'Ice Rush', '6':                 Result := 6;
+                      'Senntisten Teleport', '7':      Result := 7;
+                      'Smoke Burst', '8':              Result := 8;
+                      'Shadow  Burst', '9':            Result := 9;
+                      'Kharyrll Teleport', '10':       Result := 10;
+                      'Blood  Burst', '11':            Result := 11;
+                      'Ice Burst', '12':               Result := 12;
+                      'Lassar Teleport', '13':         Result := 13;
+                      'Smoke Blitz', '14':             Result := 14;
+                      'Shadow Blitz', '15':            Result := 15;
+                      'Dareeyak Teleport', '16':       Result := 16;
+                      'Blood Blitz', '17':             Result := 17;
+                      'Ice Blitz', '18':               Result := 18;
+                      'Carrallangar Teleport', '19':   Result := 19;
+                      'Smoke Barrage', '20':           Result := 20;
+                      'Shadow Barrage', '21':          Result := 21;
+                      'Annakarl Teleport', '22':       Result := 22;
+                      'Blood Barrage', '23':           Result := 23;
+                      'Ice Barrage', '24':             Result := 24;
+                      'Ghorrock Teleport', '25':       Result := 25;
                       else
-                      begin
-                        srl_Warn('GetSpellNumber', 'Invalid Spell Name', warn_Warning);
-                      end;
+                       srl_Warn('GetSpellNumber', 'Invalid Spell Name', warn_Warning);
                     end;
                   end;
-      'lunar': begin
+      'lunar'   : begin
                     case Capitalize(LowerCase(Name)) of
                       '-1' : Result := 1;
                       else
-                      begin
-                        srl_Warn('GetSpellNumber', 'Invalid Spell Name', warn_Warning);
-                      end;
+                       srl_Warn('GetSpellNumber', 'Invalid Spell Name', warn_Warning);
                     end;
                   end;
     end;
@@ -173,6 +250,9 @@ var
   SN: Integer;
   TB: Tbox;
 begin
+  if (not Magic_Setup) then
+    SetupMagic;
+
   Result := False;
 
   if (not FTab(TAB_MAGIC)) then
@@ -180,13 +260,13 @@ begin
 
   SN := GetSpellNumber(Name);
 
-  if (not InRange(SN, 1, 63)) then
+  TB := GetSpellBox(SN);
+
+  if (TB.X1 < 1) then
   begin
     srl_Warn('SpellAvailable', 'Invalid Spell', warn_Warning);
     Exit;
   end;
-
-  TB := GetSpellBox(SN);
 
   Result := (CountColor(65536, TB.X1, TB.Y1, TB.X2, TB.Y2) > 5);
 end;
@@ -201,20 +281,26 @@ var
   SN: Integer;
   TB: Tbox;
 begin
+  if (not Magic_Setup) then
+    SetupMagic;
+
   Result := False;
+
+  TB := IntToBox(-1, -1, -1, -1);
 
   if (not GameTab(TAB_MAGIC)) then
     Exit;
 
   SN := GetSpellNumber(Name);
 
-  if (not InRange(SN, 1, 63)) then
+  TB := GetSpellBox(SN);
+
+  if (TB.X1 < 1) then
   begin
     srl_Warn('CastSpell', 'Invalid Spell: ' + ToStr(Name), warn_Warning);
+    writeln(tostr(TB.X1));
     Exit;
   end;
-
-  TB := GetSpellBox(SN);
 
   if SpellAvailable(SN) then
   begin
@@ -244,6 +330,9 @@ var
   TBF, TBC: Tbox;
 begin
   Result := False;
+
+  if (not Magic_Setup) then
+    SetupMagic;
 
   if (not GameTab(TAB_MAGIC)) or (not (CurrentSpellBook = 'standard')) then
     Exit;
