@@ -56,7 +56,7 @@ Description: Returns TBox of a magic spell number 1-63
 *******************************************************************************}
 function GetSpellBox(SpellNumber: Integer): TBox;
 var
-  Row, Col, NumC, R, C: Integer;
+  Row, Col, NumC, R, C, S: Integer;
 begin
   if (not Magic_Setup) then
     SetupMagic;
@@ -68,9 +68,9 @@ begin
     else NumC := 7;
   end;
 
-  SpellNumber := SpellNumber - 1;
-  Row := Round(SpellNumber / NumC);
-  Col := SpellNumber - (Row * NumC);
+  S := SpellNumber - 1;
+  Row := Round(S / NumC);
+  Col := S - (Row * NumC);
 
   case CurrentSpellBook of
     'ancient':  begin
@@ -232,10 +232,7 @@ begin
   end else
   if VariantIsInteger(Name) then
   begin
-    if InRange(Name, 1, 63) then
-      Result := Name
-    else
-      srl_Warn('GetSpellNumber', 'Invalid Spell Number', warn_Warning);
+    Result := Name;
   end else
     srl_Warn('GetSpellNumber', 'Invalid Spell Parameter Type', warn_Warning);
 end;
