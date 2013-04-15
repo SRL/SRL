@@ -255,7 +255,7 @@ begin
     begin
         if CameraAngle = '' then
           SetCamera := False
-    	else
+        else
         CameraAngle := StrToInt(CameraAngle);
     end;
 
@@ -1153,25 +1153,23 @@ begin
   if (FindNPCChatText('gratu', Nothing) or FindBlackChatMessage('just adva')) then
   begin
     ClickContinue(True);
+    Wait(RandomRange(125, 250));
+    ClickContinue(True);
 
     if (ClickSkill) then
     begin
       Wait(RandomRange(50, 110));
 
       Skills := [
-        'Attack', 'Defence', 'Strength', 'Constitution', 'Mining', 'Smithing',
-        'Woodcutting', 'Firemaking', 'Magic', 'Fletching', 'Hunting', 'Summoning',
-        'Fishing', 'Construction', 'Herblore', 'Agility', 'Thieving', 'Crafting',
-        'Ranged', 'Slayer', 'Farming', 'Prayer', 'Runecrafting', 'Cooking',
-        'Dungeoneering'
+        'Attack', 'Defence', 'Strength', 'Hitpoints', 'Mining', 'Smithing',
+        'Woodcutting', 'Firemaking', 'Magic', 'Fletching', 'Hunting', 'Fishing',
+        'Construction', 'Herblore', 'Agility', 'Thieving', 'Crafting', 'Ranged',
+        'Slayer', 'Farming', 'Prayer', 'Runecrafting', 'Cooking'
       ];
 
       for i := 0 to High(Skills) do
         if IsChatBoxTextBetween(Skills[i], clMessage, 1, 8) then
-          if IsChatBoxTextBetween('Constitution', clMessage, 1, 8) then
-            HoverSkill('HitPoints', True)
-          else
-            HoverSkill(Skills[i], True);
+          HoverSkill(Skills[i], True);
     end;
 
     Result := True;
