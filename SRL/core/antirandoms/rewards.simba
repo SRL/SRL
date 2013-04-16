@@ -7,12 +7,14 @@ Stores all the routines to solving reward/inventory random events.
 *)
 
 const
-  DTM_REWARD_COUNT = 5;
+  DTM_REWARD_COUNT = 4;
     DTM_REWARD_BOX     = 0;
     DTM_REWARD_MYSTERY = 1;
     DTM_REWARD_LAMP    = 2;
     DTM_REWARD_BOOK    = 3;
-    DTM_STRANGE_BOX    = 4;
+
+  BMP_REWARD_COUNT = 1;
+    BMP_STRANGE_BOX    = 0;
 
 function RD_GetDTMs(): TIntegerArray;
 begin
@@ -22,7 +24,16 @@ begin
   result[DTM_REWARD_MYSTERY] := DTMFromString('mlwAAAHicY2dgYMhhYmBIBeJcIC4G4hIgzgTiFCCeycjAMAGIe4F4EhDPAeIlQDwPiGdHigJ1MzHMtBNlmBIqwtBsJgTmTw0TZeBngAB+JAzjM+LBUAAA3YEMSA==');
   result[DTM_REWARD_LAMP]    := DTMFromString('mwQAAAHic42RgYHjExsDwEIjvAPE1IL4AxLegYq+B+AUQ5zAyMKQBcToUZwJxPhAXAHEuEGcA8dQpQkDTGPFiZiBJCOM3AYLhAAATaQ1A');
   result[DTM_REWARD_BOOK]    := DTMFromString('mrAAAAHic42BgYHBiYmCwBmIfIPYCYlcmiJglFD8CqrkFxHeA+BkQvwDiD0D8FsovyM5mCDGTZPA2EGcwVxZk8DMUZ/DT4WIIN5cCs/mBavBhRgIYBgCtoQ8M');
-  result[DTM_STRANGE_BOX]    := DTMFromString('mwQAAAHic42RgYHBiYmAwQ8J+SNgZiN2A+BlQ3QMGCP0GiO8C8SMo/wMU97W0AElGvNiIgTDAbwIEwwEAyPkMaQ==');
+end;
+
+function RD_GetBMPs(): TIntegerArray;
+begin
+  setLength(result, BMP_REWARD_COUNT);
+
+  result[BMP_STRANGE_BOX] := BitmapFromString(25, 14, 'meJxjZGDIyMjHgwIDIzARXLatbQ' +
+                             'IQARmMDAyMhIzChSCGYDUqOjoJWRaI/P1DIcjHJxiCsJpDjFFoyNM' +
+                             '7gEijYuNSB6FR8Qnpg9CoxMTMQWhUSkr2wBoFF0HLOCQZFRYWi2yI' +
+                             'goIBnjyIx6iQkCi4OUBDIAgA/5a/xA==');
 end;
 
 (**
@@ -356,12 +367,13 @@ end;
 function RD_Solve(): boolean;
 var
   i, x, y: integer;
-  DTMs: TIntegerArray;
+  DTMs, BMPs: TIntegerArray;
 begin
   if (not loggedIn()) then
     exit;
 
   DTMs := RD_GetDTMs();
+  BMPs := RD_GetBMPs();
 
   for i := 0 to high(DTMs) do
     if (findDTM(DTMs[i], x, y, MIX1, MIY1, MIX2, MIY2)) then
@@ -371,7 +383,6 @@ begin
         DTM_REWARD_MYSTERY : result := RD_SolveMystery(x, y);
         DTM_REWARD_LAMP    : result := RD_SolveLamp(x, y);
         DTM_REWARD_BOOK    : result := RD_SolveBook(x, y);
-        DTM_STRANGE_BOX    : result := RD_SolveStrangeBox(x, y);
       end;
 
       if (not result) then
@@ -387,12 +398,43 @@ begin
         begin
           addToSRLLog('RD_Solve: Falsely identified item: ' + GetUpText);
           addToSRLLog('RD_Solve: Please report this at: http://villavu.com/forum/showthread.php?t=72956');
-        end;           
+        end;
         result := true;
       end;
 
       break;
     end;
 
+  if (not result) then
+    for i := 0 to high(BMPs) do
+      if FindBitmapIn(BMPs[i], x, y, MIX1, MIY1, MIX2, MIY2) then
+      begin
+        case i of
+          BMP_STRANGE_BOX : result := RD_SolveStrangeBox(x, y);
+        end;
+
+        if (not result) then
+        begin
+          addToSRLLog('RD_Solve: Didn''t solve reward');
+          MouseItem(coordsToItem(x, y), mouse_Move);
+          if (WaitUpTextMulti(['andom', 'event', 'ift', 'pen', 'amp', 'ook'], 618 + Random(200))) then
+          begin
+            addToSRLLog('RD_Solve: Dropping item as a failsafe');
+            ClickMouse2(mouse_Right);
+            WaitOption('rop', 200+Random(800));
+          end else
+          begin
+            addToSRLLog('RD_Solve: Falsely identified item: ' + GetUpText);
+            addToSRLLog('RD_Solve: Please report this at: http://villavu.com/forum/showthread.php?t=72956');
+          end;
+          result := true;
+        end;
+
+        break;
+      end;
+
   freeDTMs(DTMs);
+
+  for i := 0 to high(BMPs) do
+    freeBitmap(BMPs[i]);
 end;
