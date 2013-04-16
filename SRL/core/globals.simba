@@ -601,8 +601,16 @@ Example:
 
 *)
 Function srl_InFight: Boolean;
+var box : TBox;                                //19200
 begin
-  Result := InRange(Length(GetFightBarTPA(MFBox)), 30, 240);
+  box := IntToBox(233,147,267,179);
+  with box do
+  begin
+    Result := InRange(Length(GetFightBarTPA(MFBox)), 30, 240) OR (
+     (CountColorTolerance(192,x1,y1,x2,y2,0) > 50)
+     AND
+    (CountColorTolerance(65899,x1,y1,x2,y2,0) > 210));
+  end;
 end;
 
 (*
@@ -637,9 +645,9 @@ begin                                 //19200
   begin
 
      Result :=
-     (CountColorTolerance(49152,x1,y1,x2,y2,59) > 50)
+     (CountColorTolerance(49152,x1,y1,x2,y2,59) > 30)
      AND
-    (CountColorTolerance(19200,x1,y1,x2,y2,59) > 210);
+    (CountColorTolerance(19200,x1,y1,x2,y2,59) > 150);
 
   end;
 end;

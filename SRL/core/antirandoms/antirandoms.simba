@@ -897,9 +897,9 @@ begin
 
           MMouse(ax, ay, 0, 0);
           Wait(100 + Random(50));
-          if WaitUpTextMulti(['Talk', 'lk-to', 'uard', 'ard'],RandomRange(300,400)) then
+          if WaitUpTextMulti(['Talk', 'lk-to', 'uard', 'ard','security','ecurity','curity'],RandomRange(300,400)) then
           begin
-            Mouse(ax, ay, 0, 0, False);
+            Mouse(ax, ay, 0, 0, mouse_Right);
             Wait(300 + Random(100));
 
 
@@ -1139,7 +1139,7 @@ Example:
     SkillsRandom := [SRL_FishingRandoms]
     FindNonInventoryRandoms(RandomSet : Array of TRandom)
 *)
-function FindNormalRandomsCustoms(RandomSet : Array of Array of TRandomEx): boolean;
+function FindNormalRandomsCustom(RandomSet : Array of Array of TRandomEx): boolean;
 begin
   result := _FindAllRandoms(false,RandomSet);
 end;
