@@ -96,7 +96,7 @@ end;
 
 (**
  * Author: DannyRS
- * Last modified 15/03/2013 By DannyRS
+ * Last modified 9/04/2013 By DannyRS
  * Description: Scans for lock type
  *)
 function PL_GetLock: String;
@@ -109,7 +109,7 @@ begin
   SetToleranceSpeed2Modifiers(0.21, 2.01);
   MarkTime(CountTime);
   repeat
-    CNum := CountColorTolerance(1057067, 60, 65, 150, 150, 5);
+    CNum := CountColorTolerance(1057067, 60, 65, 150, 150, 10);
     if (CNum > Count) then
       Count := CNum;
   until (TimeFromMark(CountTime) > WatchTime);
@@ -122,7 +122,7 @@ end;
 
 (**
  * Author: DannyRS
- * Last modified 15/03/2013 By DannyRS
+ * Last modified 9/04/2013 By DannyRS
  * Description: Scans for key types
  *)
 function PL_GetKeys: TStringArray;
@@ -132,13 +132,13 @@ begin
   SetLength(Result, 3);
 
   SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.21, 2.01);
+  SetToleranceSpeed2Modifiers(0.43, 2.81);
 
   MarkTime(WatchTime);
   Result[0] := '';
   Count := 0; CNum := 0;
   repeat
-    CNum := CountColorTolerance(1057067, 180, 170, 235, 260, 5);
+    CNum := CountColorTolerance(1516846, 180, 170, 235, 260, 7);
 
     case CNum of
       286: Result[0] := 'triangle';
@@ -162,14 +162,11 @@ begin
 
   C1 := Count;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.21, 2.01);
-
   MarkTime(WatchTime);
   Result[1] := '';
   Count := 0; CNum := 0;
   repeat
-    CNum := CountColorTolerance(1057067, 265, 170, 345, 260, 5);
+    CNum := CountColorTolerance(1516846, 265, 170, 345, 260, 7);
 
     case CNum of
       286: Result[1] := 'triangle';
@@ -193,14 +190,11 @@ begin
 
   C2 := Count;
 
-  SetColorToleranceSpeed(2);
-  SetToleranceSpeed2Modifiers(0.21, 2.01);
-
   MarkTime(WatchTime);
   Result[2] := '';
   Count := 0; CNum := 0;
   repeat
-    CNum := CountColorTolerance(1057067, 365, 170, 430, 260, 5);
+    CNum := CountColorTolerance(1516846, 365, 170, 430, 260, 7);
 
     case CNum of
       286: Result[2] := 'triangle';
