@@ -968,14 +968,23 @@ begin
   result:= direction[Random(High(direction)+1)];
   writeln('Running ' + result);
 end;
- 
+procedure _resetColorMods( tmpTS : LongInt;tmpH,tmpS,tmpMod : Extended);
+begin
+  SetColorToleranceSpeed(tmpTS);
+  SetToleranceSpeed2Modifiers(tmpH,tmpS);
+  SetToleranceSpeed3Modifier(tmpMod);
+end;
 function _FindAllRandoms(checkInv: boolean; randomSet : array of array of TRandomEx): boolean;
 var
   i,x : integer;
   manually,customSolved : boolean;
   custom : T2DPointArray;
-
+  tmpTS : LongInt;
+  tmpH,tmpS,tmpMod : Extended;
 begin
+  tmpTS := GetToleranceSpeed;
+  GetToleranceSpeed2Modifiers(tmpH,tmpS);
+  tmpMod := GetToleranceSpeed3Modifier();
   // no tabs exists if bank is open; could throw false positives
   if (not loggedIn()) or (bankScreen()) then
     exit;
@@ -994,6 +1003,7 @@ begin
   for x := 0 to High(randomSet) do
   for i := 0 to High(randomSet[x]) do
   begin
+  _resetColorMods( tmpTS,tmpH,tmpS,tmpMod);
     if randomSet[x][i].detect(custom) then
     begin
     if randomSet[x][i].disabled then
@@ -1022,6 +1032,7 @@ begin
 
   for i := 0 to high(SRL_Randoms) do
   begin
+  _resetColorMods( tmpTS,tmpH,tmpS,tmpMod);
     if ((SRL_Randoms[i].isInvRandom) and (not checkInv)) then
       continue;
 
@@ -1061,6 +1072,7 @@ begin
 
   if SRL_HasProc(SRL_OnRandomCall) then
     SRL_Procs[SRL_OnRandomCall]();
+  _resetColorMods( tmpTS,tmpH,tmpS,tmpMod);
 end;
 
 (*
