@@ -609,18 +609,27 @@ begin
     'bank': B := IntToBox(MBx1, MBy1, MBx2, MBy2);
     'trade': B := IntToBox(323, 73, 509, 302);
     'your trade': B := IntToBox(9, 73, 196, 302);
+    else
+      srl_Warn('FindCoins', 'Invalid Area string', warn_AllVersions);
   end;
-  V[0] := [1479346, 1, 0.00, 0.00]; //Darker colour (top of coins)
+  V[0] := [1413554, 1, 0.00, 0.00]; //Darker colour (top of coins)
   V[1] := [3722229, 7, 0.05, 0.86]; //Lighter colour (rest of the coins)
   CTS := GetColorToleranceSpeed;
   ColorToleranceSpeed(2);
-  SetLength(tPts, 0);
+  SetArrayLength(tPts, 0);
   try
     for I := 0 to 1 do
     begin
       SetColorSpeed2Modifiers(V[I][2], V[I][3]);
       FindColorsTolerance(Pts, V[I][0], B.X1, B.Y1, B.X2, B.Y2, V[I][1]);
-      if (Length(Pts) < 10) then Exit;
+      if (Length(Pts) < 10) then
+      begin
+        SetArrayLength(Pts, 0);
+        SetArrayLength(ATPA, 0);
+        ColorToleranceSpeed(CTS);
+        SetColorSpeed2Modifiers(0.2, 0.2);
+        Exit;
+      end;
       ATPA := SplitTPAEx(Pts, 10, 10);
       h := High(ATPA);
       L := High(tPts) + 1;
@@ -633,10 +642,19 @@ begin
     for I := 0 to H do
       if (High(ATPA[I]) = 1) then
         Break;
-    if (I > H) then Exit;
+    if (I > H) then
+    begin
+      SetArrayLength(Pts, 0);
+      SetArrayLength(ATPA, 0);
+      ColorToleranceSpeed(CTS);
+      SetColorSpeed2Modifiers(0.2, 0.2);
+      Exit;
+    end;
     Result := True;
     MiddleTPAEx(ATPA[I], X, Y);
   finally
+    SetArrayLength(Pts, 0);
+    SetArrayLength(ATPA, 0);
     ColorToleranceSpeed(CTS);
     SetColorSpeed2Modifiers(0.2, 0.2);
   end;
