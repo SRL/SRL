@@ -129,8 +129,8 @@ var
   {$ENDIF}
 begin
   GetMousePos(cx, cy);
-  halfRx := rx / 2;
-  halfRy := ry / 2;
+  halfRx := rx div 2;
+  halfRy := ry div 2;
   {$IFDEF UseLaptopMouse}
     miss := (Random(LMouse_MissChance) = 0);
     e:= 0;

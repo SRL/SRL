@@ -37,13 +37,6 @@ begin
   {$ENDIF}
 end;
 
-{
-function GetMufasaBitmap(bmp: Integer): Integer;
-begin
-  Result := bmp;
-end;
-}
-
 function ExceptionType: TIFException;
 begin
   WriteLn('ExceptionType is not supported in Lape');
@@ -58,6 +51,7 @@ end;
 
 const
   GetTickCount_StartTime := GetTickCount;
+  
 function GetTickCount: UInt32; override;
 begin
   Result := inherited() - GetTickCount_StartTime;
