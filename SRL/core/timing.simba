@@ -100,6 +100,7 @@ begin
       Result := Result + PadZ(IntToStr(Time[i]), STA[TheType][4]) + STA[TheType][i];
 end;
 
+{$IFNDEF LAPE}
 procedure ConvertTime64(timeMS: int64; var YEAR, MONTH, WEEK, DAY, HOUR, MINUTE, SECOND:integer);
 var
   x: int64;
@@ -120,6 +121,7 @@ begin
   SECOND := x div (1000); // 1000 (1 second, is in MS format now)
   x      := x mod (1000);
 end;
+{$ENDIF}
 
 (*******************************************************************************
 ** An edited version of the MsToTime include function.  This redone version of

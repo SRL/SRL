@@ -151,6 +151,7 @@ Example:
 .. code-block:: pascal
 
 *)
+{$IFNDEF LAPE}
 function FixRad(rad: Extended): Extended;  // by Nava2
 begin
   result := rad;
@@ -161,6 +162,7 @@ begin
   while (result < 0) do
     result := result + MATH_2PI;
 end;
+{$ENDIF}
 
 
 (*
@@ -758,6 +760,7 @@ Example:
 .. code-block:: pascal
 
 *)
+{$IFNDEF LAPE}
 function InAbstractBox(x1, y1, x2, y2, x3, y3, x4, y4: Integer; x, y: Integer):
   Boolean;
 var
@@ -794,6 +797,7 @@ begin
   if (LM = Pi) and (x > x1) then L := True;
   if U and D and L and R then Result := True;
 end;
+{$ENDIF}
 
 (*
 Sine
@@ -1373,10 +1377,12 @@ Example:
     // midPt == Point(MMCX, MMCY)!
 
 *)
+{$IFNDEF LAPE}
 function MiddleBox(b : TBox) : TPoint;
 begin
   result := point((b.x2+b.x1) div 2,(b.y2+b.y1) div 2);
 end;
+{$ENDIF}
 
 (*
 GroupDigits
