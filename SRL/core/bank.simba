@@ -82,7 +82,7 @@ Example:
 *)
 function BankScreen: Boolean;
 begin
-  result := findTextTPA(2070783, 20, 204, 31, 245, 49, 'Bank', upChars07, nothing);
+  result := findTextTPA(2070783, 5, 119, 287, 149, 302, 'mode', 'SmallChars07', nothing);
 end;
 
 (*
@@ -240,6 +240,39 @@ begin
     Wait(500);
   end;
   Result := not PinScreen;
+end;
+
+(*
+getBankItemCount
+~~~~~
+
+.. code-block:: pascal
+
+    function getBankItemCount: integer;
+
+Returns the number of total items in your bank account.
+
+.. note::
+
+    Author: Flight
+    Last Modified: 12-9-2013
+
+Example:
+
+.. code-block:: pascal
+
+    writeln('I have a total of '+intToStr(getBankItemCount)+' items in my bank account');
+*)
+function getBankItemCount: integer;
+var
+  S: String;
+begin
+  Result := 0;
+  if Not BankScreen then
+    Exit;
+
+  S := GetTextAtExWrap(25, 28, 45, 38, 1, 2, 1, 2070783, 0, StatChars07);
+  Result := StrToInt(Replace(S, ' ', ''));
 end;
 
 (*
@@ -853,6 +886,41 @@ begin
 end;
 
 (*
+QuickDeposit
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure QuickDeposit(Which: String);
+
+Withdraws Amount at Column/Row.
+
+.. note::
+
+    Author: Flight
+    Last Modified: Flight 12-9-2013
+
+Example:
+
+.. code-block:: pascal
+
+    QuickDeposit('inventory');
+*)
+procedure QuickDeposit(Which: String);
+begin
+  if BankScreen then
+  begin
+    case lowercase(Which) of
+      'inventory','inv':          MouseBox(428, 291, 460, 322, mouse_left);
+      'equipment','worn','equip': MouseBox(465, 291, 497, 322, mouse_left);
+      else
+        SRL_Warn('QuickDeposit', 'Invalid deposit method ', WARN_ALLVERSIONS);
+    end;
+    Wait(200 + Random(300));
+  end;
+end;
+
+(*
 WithdrawEx
 ~~~~~~~~~~
 
@@ -908,8 +976,8 @@ begin
     if (WaitOptionMultiEx(['Withdraw All', 'w A','All','ll '], 'All', Nothing, 600)) then
       Result := ChooseOptionMulti(['Withdraw All', 'w A','All','ll ']);
   end else
-    if (WaitOptionMultiEx(['Withdraw ' + IntToStr(Amount) + ' ', 'w ' + IntToStr(Amount) + ' '], 'All', Nothing, 300)) then
-      Result := ChooseOptionMulti(['Withdraw ' + IntToStr(Amount) + ' ', 'w ' + IntToStr(Amount) + ' ']);
+    if (WaitOptionMultiEx(['Withdraw-' + IntToStr(Amount) + ' ', 'w-' + IntToStr(Amount) + ' '], 'All', Nothing, 300)) then
+      Result := ChooseOptionMulti(['Withdraw-' + IntToStr(Amount) + ' ', 'w-' + IntToStr(Amount) + ' ']);
 
   if (not (Result)) and (Amount > 0) then
   begin
@@ -1082,6 +1150,39 @@ begin
   Result := WithdrawItemEx(Ident, IdentType, I, Amount, UpText, Tol);
 end;
 
+procedure SearchBank(Item: string);
+var
+  T, i: Integer;
+begin
+  if (not(BankScreen)) then Exit;
+
+  if (Item = '') then
+    if (InRange(CountColor(0, 211, 394, 308, 411), 200, 300)) then
+    begin
+      Mouse(399, 307, 16, 16, mouse_left);
+      T := GetSystemTime;
+      while (BankScreen) and (GetSystemTime - T < 5000) do
+        Wait(250 + Random(350));
+      Exit;
+    end;
+
+  for i := 0 to 2 do
+  begin
+    Mouse(399, 307, 16, 16, mouse_left);
+    T := GetSystemTime;
+    while (BankScreen) and (GetSystemTime - T < 5000) do
+    begin
+      Wait(250 + Random(350));
+      if (InRange(CountColor(0, 211, 394, 308, 411), 200, 300)) then
+      begin
+        TypeSend(Item);
+        Exit;
+      end;
+    end;
+    Wait(250 + Random(350));
+  end;
+end;
+
 (*
 Notes
 ~~~~~
@@ -1090,12 +1191,12 @@ Notes
 
     procedure Notes(SwitchOn: Boolean);
 
-Toggles note withdrawal on or off.
+Toggles withdraw mode to Item or Note (True for Note, False for Item).
 
 .. note::
 
-    Author: lordsaturn, idea by R1ch
-    Last Modified: Ashaman88 -07
+    Author: lordsaturn & Flight
+    Last Modified: Flight 12-9-2013
 
 Example:
 
@@ -1107,8 +1208,15 @@ Example:
 procedure Notes(SwitchOn: Boolean);
 begin
   if BankScreen then
-    if (getColor(430, 310) <> 5067345) xor switchOn then
-      MouseBox(385, 307, 437, 318, mouse_left);
+    if SwitchOn then
+    begin
+      if (getColor(305, 318) = 5067345) then
+        MouseBox(287, 304, 368, 322, mouse_left);
+    end else
+    begin
+      if (getColor(230, 314) = 5067345) and (not SwitchOn) then
+        MouseBox(203, 304, 282, 322, mouse_left);
+    end;
 end;
 
 (*
