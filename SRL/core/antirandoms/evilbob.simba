@@ -279,6 +279,7 @@ begin
   until (Length(arr) < 1)
 end;
 
+{$IFNDEF SIMBAMAJOR1000}
 (**
  * Author: riwu
  * Description: Sort TPAs into 2D TPAs through deduction, based on size and min count.
@@ -290,6 +291,7 @@ begin
   SortTPAFrom(TPA, Point(0, 0));
   Result := TPA[Length(TPA) shr 1];
 end;
+{$ENDIF}
 
 (**
  * Author: Justin - Credits to Flight

@@ -26,8 +26,12 @@
 
 {$DEFINE SRL5}
 
+{$IFDEF PascalScript}
+{$DEFINE NPCChars}
+{$ENDIF}
+
 {$IFDEF Lape}
-{$include SRLLape.simba}
+{$INCLUDE SRLLape.simba}
 {$ENDIF}
 
 {$IFDEF SMART8}

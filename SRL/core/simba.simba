@@ -153,6 +153,7 @@ begin
 end;
 
 {$ifdef Simba}
+{$IFNDEF SIMBAMAJOR1000}
 
 //{$define SimbaDebug}
 type
@@ -164,6 +165,8 @@ function AddDTM(DTM : TDTM) : integer;
 begin
   Result := AddSDTM(dtm);
 end;
+
+{$ENDIF}
 
 function InitializeHTTPClient(HandleCookies,handleredirects: Boolean): Integer; {$IFDEF LAPE}overload;{$ENDIF}
 begin
@@ -445,6 +448,7 @@ begin;
     result := max(result,data[i]);
 end;
 
+{$IFNDEF SIMBAMAJOR1000}
 function AddOnTerminate(const proc : string) : boolean;
 var
   OldProcs : TVariantArray;
@@ -479,12 +483,15 @@ begin
     end;
   SetScriptProp(SP_OnTerminate,NewProcs);
 end;
+{$ENDIF}
 
 function Readln(Question : string ) : string;
 begin
   InputQuery('Question box',Question,result);
 end;
 
+{$IFDEF NPCChars}
 const
   NPCChars = CharsNPC;
+{$ENDIF}
 {$endif}

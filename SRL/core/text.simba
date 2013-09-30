@@ -887,6 +887,7 @@ begin
   result := findNPCChatTextMulti([txt], action);
 end;
 
+{$IFNDEF SIMBAMAJOR1000}
 (*
 SortATPAFromFirstPointY
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -966,6 +967,7 @@ begin
 
   QuickATPASort(DistArr, a, 0, l, True);
 end;
+{$ENDIF}
 
 (*
 GetChooseOptions

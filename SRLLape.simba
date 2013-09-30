@@ -1,3 +1,5 @@
+{$IFNDECL NPCChars}{$DEFINE NPCChars}{$ENDIF}
+
 function iAbs(i: Integer): Integer;
 begin
   if (i < 0) then
