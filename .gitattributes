@@ -1,0 +1,6 @@
+* text=auto
+
+*.simba text
+
+*.png binary
+*.jpg binary
