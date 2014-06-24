@@ -8,71 +8,21 @@ SRL library isn't available to you.
 
 *)
 
-{$include_once lib/utilities/types/types.simba}
-{$include_once lib/utilities/time.simba}
-{$include_once lib/utilities/drawing.simba}
-{$include_once lib/utilities/pixelshift.simba}
-{$include_once lib/utilities/color.simba}
-{$include_once lib/utilities/math.simba}
+{$include_once shared/types/extended.simba}
+{$include_once shared/types/integer.simba}
+{$include_once shared/types/string.simba}
+{$include_once shared/types/tbox.simba}
+{$include_once shared/types/tpoint.simba}
 
-{$include_once lib/core/globals.simba}
-{$include_once lib/core/mouse.simba}
-{$include_once lib/core/debug.simba}
-{$include_once lib/core/text.simba}
-{$include_once lib/core/players.simba}
-{$include_once lib/core/client.simba}
-
-{$include_once lib/interfaces/gametabs/gametab.simba}
-{$include_once lib/interfaces/gametabs/backpack.simba}
-{$include_once lib/interfaces/gametabs/stats.simba}
-
-{$include_once lib/interfaces/lobby/lobby.simba}
-{$include_once lib/interfaces/lobby/worlds.simba}
-{$include_once lib/interfaces/mainscreen.simba}
-{$include_once lib/interfaces/actionbar.simba}
-{$include_once lib/interfaces/minimap.simba}
-{$include_once lib/interfaces/bankscreen.simba}
-{$include_once lib/interfaces/pinscreen.simba}
-{$include_once lib/interfaces/options.simba}
-{$include_once lib/interfaces/chatbox.simba}
-{$include_once lib/interfaces/conversationbox.simba}
-
-{$include_once lib/misc/srlstats.simba}
-{$include_once lib/misc/antiban.simba}
-{$include_once lib/misc/items.simba}
-
-{$IFDEF SMART}
-  {$include_once lib/misc/smart.simba}
+{$IFDEF RS3}
+  WriteLn('Including RS3 files');
 {$ENDIF}
 
-{$f+}
+{$IFDEF OSR}
+  WriteLn('Includeing OSR files');
+{$ENDIF}
 
-function setupSRL(): boolean;
-var
-  t := getSystemTime();
+procedure SetupSRL();
 begin
-  print('setupSRL()', TDebug.HEADER);
-  print('Setting up SRL...');
 
-  {$IFNDEF SMART}
-    activateClient();
-  {$ELSE}
-    initSmart(smartForceNewClient);
-
-    if (smartEnableDrawing) then
-      smartSetupDrawing();
-  {$ENDIF}
-
-  if (waitClientReady()) then
-    print('Client is ready.')
-  else begin
-    print('Client is taking too long to load, terminating...');
-    print('setupSRL(): '+toStr(result), TDebug.FOOTER);
-    terminateScript();
-  end;
-
-  result := true;
-  print('Setup SRL in '+toStr(getSystemTime() - t)+'ms.');
-  print('setupSRL(): '+toStr(result), TDebug.FOOTER);
 end;
-
