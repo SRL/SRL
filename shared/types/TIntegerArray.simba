@@ -1,0 +1,47 @@
+procedure TIntegerArray.Append(const Value: Integer);
+begin
+end;
+
+procedure TIntegerArray.Insert(const Value, Index: Integer);
+begin
+end;
+
+procedure TIntegerArray.Del(const Index: Integer);
+begin
+end;
+
+function TIntegerArray.Len(): Integer;
+begin
+
+end;
+
+procedure TIntegerArray.Remove(const Value: Integer; const All: Boolean = False);
+begin
+
+end;
+
+function TIntegerArray.Pop(): Integer;
+begin
+end;
+
+function TIntegerArray.Find(const Value: Integer): Boolean;
+begin
+end;
+
+function TIntegerArray.Find(const Value: Integer): Integer;
+begin
+
+end;
+
+function TIntegerArray.FindAll(const Value: Integer): TIntegerArray;
+begin
+
+end
+
+procedure TIntegerArray.Reverse();
+begin
+end;
+
+function TIntegerArray.Combine(const Arr2: TIntegerArray): TIntegerArray;
+begin
+end;

@@ -1,28 +1,16 @@
-(*
-SRL
-===
+{$include_once shared/wrappers.simba}
+{$include_once shared/onterminate.simba}
+{$include_once shared/tsrl.simba}
 
-The SRL file is the most important file in SRL.  It's the file included in
-every script that requires an SRL function.  Without this file included, the
-SRL library isn't available to you.
+{$IFDEF SMART}
+  {$include_once shared/smartbase.simba}
 
-*)
-
-{$include_once shared/types/extended.simba}
-{$include_once shared/types/integer.simba}
-{$include_once shared/types/string.simba}
-{$include_once shared/types/tbox.simba}
-{$include_once shared/types/tpoint.simba}
-
-{$IFDEF RS3}
-  WriteLn('Including RS3 files');
+  {$IFDEF RS3} {$include_once rs3/smart.simba} {$ENDIF}
+  {$IFDEF OSR} {$include_once osr/smart.simba} {$ENDIF}
 {$ENDIF}
 
-{$IFDEF OSR}
-  WriteLn('Includeing OSR files');
-{$ENDIF}
-
-procedure SetupSRL();
 begin
 
 end;
+
+

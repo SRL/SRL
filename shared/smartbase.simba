@@ -1,0 +1,226 @@
+{$loadlib libsmartremote}
+
+type
+  TSmartBase = record
+    Parameters: record Root, Param, UserAgent, InitSeq, jPath: String; Plugins: TStringArray; end;
+    Name: String;
+    Width, Height: UInt16;
+    Image: TMufasaBitmap;
+    Target: PtrUInt;
+    PID, InitAttempts: Integer;
+    ForceSpawn, EnableDebug, _isDrawingSetup, ShowConsole: Boolean;
+    Hook_After_Reload: procedure();
+  end;
+
+function TSmartBase.getHWND(): PtrUInt;
+var
+  a: TSysProcArr := Client.getIOManager().GetProcesses();
+  c: TChildWindowArr;
+  i, j: Integer;
+begin
+  Result := 0;
+
+  for i := 0 to High(a) do
+    if (a[i].PID = Self.PID) then
+    begin
+      c := Client.getIOManager().GetChildWindows(a[i].Handle);
+
+      for j := 0 to High(c) do
+        if (c[j].Width >= Self.Width) and (c[j].Height >= Self.Height) then
+          Exit(c[j].Handle);
+    end;
+
+  srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd', TDebug.ERROR);
+end;
+
+procedure TSmartBase.setDebug(const Enable: Boolean);
+begin
+  SmartSetDebug(Self.Target, Enable);
+
+  if (Self.EnableDebug) and (Enable) and (not Self._isDrawingSetup) then
+  begin
+    Self.Image.Init(Client.getMBitmaps());
+
+    with (Self.Image) do
+    begin
+      setName(Format('Smart[%d] Image', [Self.PID]));
+      setSize(Width, Height);
+      setPersistentMemory(SmartDebugArray(Self.Target), Self.Width, Self.Height);
+      DrawClear($000000);
+    end;
+
+    Self._isDrawingSetup := True;
+  end;
+end;
+
+procedure TSmartBase.setEnabled(const Enable: Boolean);
+begin
+  SmartSetEnabled(Self.Target, Enable);
+end;
+
+function TSmartBase.getEnabled(): Boolean;
+begin
+  Result := SmartEnabled(Self.Target);
+end;
+
+function TSmartBase.SetAsTarget(): Boolean;
+var
+  idx: Integer = -1;
+begin
+  try
+    idx := SetEIOSTarget('libsmartremote', intToStr(Self.PID));
+  except
+    srl.WriteFmt('Failed to set libsmartremote(%d) as our target', [Self.PID], TDebug.ERROR);
+    idx := -1;
+  finally
+    Result := (idx > -1);
+  end;
+end;
+
+function TSmartBase.CreateClient(): Boolean;
+begin
+  Result := True;
+  srl.Writeln(Self.Name + '.CreateClient()', TDebug.HEADER);
+
+  with (Self.Parameters) do
+  begin
+    if (jPath = '') then
+      jPath := 'java';
+
+    if (not Self.ShowConsole) then
+      jPath += 'w';
+
+    {$IFDEF WINDOWS}
+      if (Pos('.exe', jPath) = 0) then
+        jPath += '.exe'
+    {$ENDIF};
+
+    srl.Writeln('Java path: ' + jPath);
+    srl.Writeln('Params: ' + Root + Param);
+    srl.Writeln('Plugins: ' + toString(Plugins));
+
+    Self.Target := SmartSpawnClient(jPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]),
+                                    Root, Param, Width, Height, InitSeq, UserAgent, '', Implode(',', Plugins));
+  end;
+
+  if (Self.Target = 0) then
+    Exit(False);
+
+  Self.PID := SmartGetClientPID(Self.Target);
+  if (not Self.SetAsTarget()) then
+  begin
+    SmartFreeClient(Self.Target);
+    Exit(False);
+  end;
+
+  srl.Writeln('Succesfully created a SMART client, PID = ' + toString(Self.PID), TDebug.SUB);
+  srl.Writeln(Self.Name + '.CreateClient(): Result = True', TDebug.FOOTER);
+end;
+
+function TSmartBase.PairToExisting(): Boolean;
+
+  function GetPIDs(): TIntegerArray;
+  var
+    i: Integer;
+  begin
+    for i := 0 to SmartGetClients(True) do
+      Result := Result + SmartGetAvailablePID(i);
+  end;
+
+var
+  Pids: TIntegerArray;
+  i: Integer;
+  tmp: PtrUInt;
+begin
+  Result := False;
+
+  Pids := GetPIDs();
+  if (Length(Pids) = 0) then
+    Exit();
+
+  srl.Writeln(Self.Name + '.PairToExisting()', TDebug.HEADER);
+  srl.WriteFmt('Free clients: %s', [toString(Pids)]);
+
+  for i := 0 to High(Pids) do
+  begin
+    if (Pids[i] = 0) then
+      Continue();
+
+    tmp := 0;
+    tmp := SmartPairClient(Pids[i]);
+
+    if (tmp > 0) then
+    begin
+      Self.PID := Pids[i];
+
+      if (Self.SetAsTarget()) then
+      begin
+        Self.Target := tmp;
+        Exit(srl.WriteFmt('Succesfully paired to existing client; SMART[%d]', [Self.PID],
+                          True, Self.Name + '.PairToExisting(): Result = True'));
+      end;
+    end else begin
+      srl.WriteFmt('Failed to pair to SMART[%d]', [Pids[i]], TDebug.ERROR);
+      SmartFreeClient(tmp);
+    end;
+  end;
+
+  srl.Writeln(Self.Name + '.PairToExisting(): Result = False');
+end;
+
+function TSmartBase.Reload(): Boolean;
+begin
+  if (Assigned(@Self.Hook_After_Reload)) then
+    Self.Hook_After_Reload();
+end;
+
+function TSmartBase.Init(): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  Self.Name := GetGlobalName(@Self);
+
+  if (Self.InitAttempts = 0) then
+    Self.InitAttempts := 1;
+
+  while (not Result) do
+  begin
+    Inc(i);
+
+    if (i > Self.InitAttempts) then
+      Exit(False);
+
+    if (not Self.ForceSpawn) then
+    begin
+      if (not Self.PairToExisting()) then
+        if (not Self.CreateClient()) then
+          Continue();
+    end else
+      if (not Self.CreateClient()) then
+        Continue();
+
+    Result := True;
+  end;
+
+  if (Self.getEnabled() = False) then
+    Self.setEnabled(True);
+
+  if (Self.EnableDebug) then
+    Self.setDebug(True);
+end;
+
+procedure TSmartBase.Free();
+begin
+  Writeln(Format('Freeing SMART[%d]', [Self.PID]));
+
+  if (Self._isDrawingSetup) then
+  begin
+    Self.Image.ResetPersistentMemory();
+    Self.Image.Free();
+    Self._isDrawingSetup := False;
+  end;
+
+  if (Self.Target > 0) then
+    SmartFreeClient(Self.Target);
+end;

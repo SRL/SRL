@@ -1,0 +1,160 @@
+type
+  TSmart = record(TSmartBase)
+    FindJavaPath: Boolean;
+    JavaPath: String;
+  end;
+
+function TSmart.LocateJavaPath(var Res: String; Dir: char = 'A'; Recursive: Boolean = False): Boolean;
+
+  function GetDirectoryName(Directory, Path: String): String;
+  var
+    I: Integer;
+    Directories: TStringArray;
+  begin
+    Directories := GetDirectories(Path);
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+      begin
+        Result := Directories[I];
+        Exit;
+      end;
+  end;
+
+  function GetDirectoryNames(Directory, Path: String): TStringArray;
+  var
+    I: Integer;
+    Directories: TStringArray;
+  begin
+    Directories := GetDirectories(Path);
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+        Result := Result + Directories[I];
+  end;
+
+  function FindDirectory(Directory, Path: String): Boolean;
+  begin
+    Result := Length(GetDirectoryName(Directory, Path)) > 0;
+  end;
+
+var
+  Drive: String;
+  CurrentPath, c: String;
+  Drives: TStringArray;
+  i: Integer;
+begin
+  Result := False;
+  Res := '';
+
+  if (Recursive) then
+  begin
+    Drive := Dir + ':/';
+  end else
+    Drive := Copy(PluginPath, 0, 3);
+
+  if (FindDirectory('Program\sFiles\s\(x86\)', Drive)) then
+  begin
+    CurrentPath := Drive + 'Program Files (x86)\';
+  end else
+    CurrentPath := Drive + 'Program Files\';
+
+  if (FindDirectory('Java|java', CurrentPath + '\')) then
+  begin
+    CurrentPath := CurrentPath + 'Java\';
+  end else
+    if (Dir <> 'Z') then
+      Result := Self.LocateJavaPath(Res, chr(ord(Dir) + 1), True);
+
+  if (Result) then
+    Exit();
+
+  Drives := GetDirectoryNames('jre', CurrentPath);
+
+  if (Length(Drives) > 0) then
+  begin
+    c := CurrentPath;
+    for i := 0 to High(Drives) do
+      begin
+        CurrentPath := c;
+        if (Self.ShowConsole) then
+          CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
+        else
+          CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
+
+        Result := FileExists(CurrentPath);
+        if (Result) then
+          Break;
+      end;
+  end else begin
+    Drives := GetDirectoryNames('jdk', CurrentPath);
+    c := CurrentPath;
+
+    for i := 0 to High(Drives) do
+    begin
+      CurrentPath := c;
+      if (Self.ShowConsole) then
+        CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
+      else
+        CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
+
+      Result := FileExists(CurrentPath);
+      if (Result) then
+        Break;
+    end;
+  end;
+
+  Result := FileExists(CurrentPath);
+  Res := CurrentPath;
+end;
+
+
+function TSmart.getParams(out Root, Params: String): Boolean;
+const
+  RS_URL = 'http://www.runescape.com/game';
+var
+  Page: String;
+  p: Integer;
+begin
+  Page := Between('id="game" src="', '" ', GetPage(RS_URL));
+
+  p := Pos('/,', Page);
+  Result := (p > 0);
+
+  if (Result) then
+  begin
+    Root := Copy(Page, 1, p);
+    Params := Copy(Page, p + 1, Length(Page) - p);
+  end;
+end;
+
+function TSmart.Init(): Boolean; override;
+begin
+  if (not Self.getParams(Self.Parameters.Root, Self.Parameters.Param)) then
+    Exit(False);
+
+  {$IFDEF WINDOWS}
+    if (Self.FindJavaPath) and (Self.JavaPath = '') then // Hasnt been set already
+      if (not Self.LocateJavaPath(Self.JavaPath)) then
+      begin
+        Writeln('Failed to find java path, if you can''t enter a graphics mode set Smart.JavaPath to your java.exe');
+        Self.JavaPath := '';
+      end;
+  {$ENDIF}
+
+  Self.Parameters.jPath := Self.JavaPath;
+
+  Result := inherited();
+  if (Result) then
+    AddOnTerminate(@Self.Free);
+end;
+
+var
+  Smart: TSmart;
+
+begin
+  Smart.FindJavaPath := True;
+  Smart.Parameters.Plugins := ['opengl32.dll', 'd3d9.dll'];
+  Smart.Width := 800;
+  Smart.Height := 600;
+end;
+
+
