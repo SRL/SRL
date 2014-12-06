@@ -1,23 +1,31 @@
 type
-  TSmart = type TSmartBase;
+  TSmart = record(TSmartBase)
+    World: Integer;
+  end;
 
 function TSmart.getSpawnParams(): Boolean;
 const
-  RS_URL = 'http://www.runescape.com/game';
+  RS_URL = 'http://oldschool%d.runescape.com/';
 var
-  Page: String;
-  p: Integer;
+  s: String;
 begin
-  Page := Between('id="game" src="', '" ', GetPage(RS_URL));
+  if (Self.World <> 0) then
+    Self.Parameters.Root := Format(RS_URL, [Self.World])
+  else begin
+    s := Between('<span>(Old School', ')', GetPage('http://oldschool.runescape.com/slu'));
+    Self.World := StrToIntDef(ExtractFromStr(s, Numbers), -1);
 
-  p := Pos('/,', Page);
-  Result := (p > 0);
+    if (Self.World = -1) then
+    begin
+      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2', TDebug.WARNING);
+      Self.World := 2;
+    end;
 
-  if (Result) then
-  begin
-    Self.Parameters.Root := Copy(Page, 1, p);
-    Self.Parameters.Param := Copy(Page, p + 1, Length(Page) - p);
+    Self.Parameters.Root := Format(RS_URL, [Self.World]);
   end;
+
+  Self.Parameters.Param := 'j1';
+  Result := True; // Can't really fail unlike the RS3 version
 end;
 
 function TSmart.Init(): Boolean; override;
@@ -34,6 +42,7 @@ begin
   {$ENDIF}
 
   Result := inherited();
+
   if (Result) then
     AddOnTerminate(@Self.Free);
 end;
@@ -43,9 +52,8 @@ var
 
 begin
   Smart.FindJavaPath := True;
-  Smart.Parameters.Plugins := ['opengl32.dll', 'd3d9.dll'];
-  Smart.Width := 800;
-  Smart.Height := 600;
+  Smart.Width := 765;
+  Smart.Height := 503;
   Smart.getParams := @Smart.getSpawnParams;
 end;
 

@@ -1,6 +1,14 @@
 {$include_once shared/wrappers.simba}
+
+{$include_once shared/types/TStringArray.simba}
+{$include_once shared/types/TIntegerArray.simba}
+{$include_once shared/types/TExtendedArray.simba}
+{$include_once shared/types/TBoolArray.simba}
+{$include_once shared/types/TBoxArray.simba}
+
 {$include_once shared/onterminate.simba}
-{$include_once shared/tsrl.simba}
+{$include_once shared/srl.simba}
+{$include_once shared/time.simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}

@@ -2,13 +2,14 @@
 
 type
   TSmartBase = record
-    Parameters: record Root, Param, UserAgent, InitSeq, jPath: String; Plugins: TStringArray; end;
-    Name: String;
+    Parameters: record Root, Param, UserAgent, InitSeq: String; Plugins: TStringArray; end;
+    Name, JavaPath: String;
     Width, Height: UInt16;
     Image: TMufasaBitmap;
     Target: PtrUInt;
     PID, InitAttempts: Integer;
-    ForceSpawn, EnableDebug, _isDrawingSetup, ShowConsole: Boolean;
+    ForceSpawn, EnableDebug, _isDrawingSetup, ShowConsole, FindJavaPath: Boolean;
+    GetParams: function(): Boolean of object;
     Hook_After_Reload: procedure();
   end;
 
@@ -63,6 +64,107 @@ begin
   Result := SmartEnabled(Self.Target);
 end;
 
+function TSmartBase.LocateJavaPath(var Res: String; x86: Boolean; Dir: char = 'A'; Recursive: Boolean = False): Boolean;
+
+  function GetDirectoryName(Directory, Path: String): String;
+  var
+    I: Integer;
+    Directories: TStringArray;
+  begin
+    Directories := GetDirectories(Path);
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+      begin
+        Result := Directories[I];
+        Exit;
+      end;
+  end;
+
+  function GetDirectoryNames(Directory, Path: String): TStringArray;
+  var
+    I: Integer;
+    Directories: TStringArray;
+  begin
+    Directories := GetDirectories(Path);
+    for I := 0 To High(Directories) Do
+      if ExecRegExpr(Directory, Directories[I]) then
+        Result := Result + Directories[I];
+  end;
+
+  function FindDirectory(Directory, Path: String): Boolean;
+  begin
+    Result := Length(GetDirectoryName(Directory, Path)) > 0;
+  end;
+
+var
+  Drive: String;
+  CurrentPath, c: String;
+  Drives: TStringArray;
+  i: Integer;
+begin
+  Result := False;
+  Res := '';
+  writeln(Dir);
+  if (Recursive) then
+  begin
+    Drive := Dir + ':/';
+  end else
+    Drive := Copy(PluginPath, 0, 3);
+
+  if (x86) then
+    CurrentPath := Drive + 'Program Files (x86)\'
+  else
+   CurrentPath := Drive + 'Program Files\';
+
+  if (FindDirectory('Java|java', CurrentPath + '\')) then
+  begin
+    CurrentPath := CurrentPath + 'Java\';
+  end else
+    if (Dir <> 'Z') then
+      Result := Self.LocateJavaPath(Res, x86, chr(ord(Dir) + 1), True)
+
+  if (Result) then
+    Exit();
+
+  Drives := GetDirectoryNames('jre', CurrentPath);
+
+  if (Length(Drives) > 0) then
+  begin
+    c := CurrentPath;
+    for i := 0 to High(Drives) do
+      begin
+        CurrentPath := c;
+        if (Self.ShowConsole) then
+          CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
+        else
+          CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
+
+        Result := FileExists(CurrentPath);
+        if (Result) then
+          Break;
+      end;
+  end else begin
+    Drives := GetDirectoryNames('jdk', CurrentPath);
+    c := CurrentPath;
+
+    for i := 0 to High(Drives) do
+    begin
+      CurrentPath := c;
+      if (Self.ShowConsole) then
+        CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
+      else
+        CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
+
+      Result := FileExists(CurrentPath);
+      if (Result) then
+        Break;
+    end;
+  end;
+
+  Result := FileExists(CurrentPath);
+  Res := CurrentPath;
+end;
+
 function TSmartBase.SetAsTarget(): Boolean;
 var
   idx: Integer = -1;
@@ -70,7 +172,7 @@ begin
   try
     idx := SetEIOSTarget('libsmartremote', intToStr(Self.PID));
   except
-    srl.WriteFmt('Failed to set libsmartremote(%d) as our target', [Self.PID], TDebug.ERROR);
+    srl.WriteFmt('Failed to set libsmartremote(%d) as our target', [Self.PID]);
     idx := -1;
   finally
     Result := (idx > -1);
@@ -82,35 +184,39 @@ begin
   Result := True;
   srl.Writeln(Self.Name + '.CreateClient()', TDebug.HEADER);
 
+  if (@Self.GetParams <> nil) then
+    if (not Self.GetParams()) then
+      Exit(srl.Writeln('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
+
   with (Self.Parameters) do
   begin
-    if (jPath = '') then
-      jPath := 'java';
+    if (JavaPath = '') then
+      JavaPath := 'java';
 
     if (not Self.ShowConsole) then
-      jPath += 'w';
+      JavaPath += 'w';
 
     {$IFDEF WINDOWS}
-      if (Pos('.exe', jPath) = 0) then
-        jPath += '.exe'
+    if (Pos('.exe', JavaPath) = 0) then
+      JavaPath += '.exe'
     {$ENDIF};
 
-    srl.Writeln('Java path: ' + jPath);
+    srl.Writeln('Java path: ' + JavaPath);
     srl.Writeln('Params: ' + Root + Param);
     srl.Writeln('Plugins: ' + toString(Plugins));
 
-    Self.Target := SmartSpawnClient(jPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]),
+    Self.Target := SmartSpawnClient(JavaPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]),
                                     Root, Param, Width, Height, InitSeq, UserAgent, '', Implode(',', Plugins));
   end;
 
   if (Self.Target = 0) then
-    Exit(False);
+    Exit(srl.Writeln('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
 
   Self.PID := SmartGetClientPID(Self.Target);
   if (not Self.SetAsTarget()) then
   begin
     SmartFreeClient(Self.Target);
-    Exit(False);
+    Exit(srl.Writeln('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
   end;
 
   srl.Writeln('Succesfully created a SMART client, PID = ' + toString(Self.PID), TDebug.SUB);
@@ -156,8 +262,8 @@ begin
       if (Self.SetAsTarget()) then
       begin
         Self.Target := tmp;
-        Exit(srl.WriteFmt('Succesfully paired to existing client; SMART[%d]', [Self.PID],
-                          True, Self.Name + '.PairToExisting(): Result = True'));
+        Exit(srl.WriteFmtEx('Succesfully paired to existing client; SMART[%d]', [Self.PID],
+                            True, Self.Name + '.PairToExisting(): Result = True'));
       end;
     end else begin
       srl.WriteFmt('Failed to pair to SMART[%d]', [Pids[i]], TDebug.ERROR);
@@ -176,10 +282,12 @@ end;
 
 function TSmartBase.Init(): Boolean;
 var
-  i: Integer;
+  i: Integer = 0;
 begin
   Result := False;
   Self.Name := GetGlobalName(@Self);
+
+  srl.Writeln(Self.Name + '.Init()', TDebug.HEADER);
 
   if (Self.InitAttempts = 0) then
     Self.InitAttempts := 1;
@@ -189,7 +297,8 @@ begin
     Inc(i);
 
     if (i > Self.InitAttempts) then
-      Exit(False);
+      Exit(srl.WriteFmtEx('Reached max(%d) init attempts', [Self.InitAttempts], False,
+                          Self.Name + '.Init(): Result = False', TDebug.ERROR));
 
     if (not Self.ForceSpawn) then
     begin
@@ -208,11 +317,13 @@ begin
 
   if (Self.EnableDebug) then
     Self.setDebug(True);
+
+  srl.Writeln(Self.Name + '.Init(): Result = True', TDebug.FOOTER);
 end;
 
 procedure TSmartBase.Free();
 begin
-  Writeln(Format('Freeing SMART[%d]', [Self.PID]));
+  srl.WriteFmt('Freeing SMART[%d]', [Self.PID]);
 
   if (Self._isDrawingSetup) then
   begin

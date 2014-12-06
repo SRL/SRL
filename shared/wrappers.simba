@@ -850,4 +850,17 @@ begin
   Result := Distance(p1.x, p1.y, p2.x, p2.y);
 end;
 
+function SameBox(const Box1, Box2: TBox): Boolean;
+begin
+  Result := (Box1.X1 = Box2.X1) and
+            (Box1.Y1 = Box2.Y1) and
+            (Box1.X2 = Box2.X2) and
+            (Box1.Y2 = Box2.Y2);
+end;
+
+function SamePoint(const Point1, Point2: TPoint): Boolean;
+begin
+  Result := (Point1.X = Point2.X) and (Point1.Y = Point2.Y);
+end;
+
 {$f+}

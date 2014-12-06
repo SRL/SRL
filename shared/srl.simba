@@ -1,5 +1,5 @@
 type
-  TDebug = (HEADER, FOOTER, HINT, FATAL, DEPRECATED, ERROR, DEBUG, SUB);
+  TDebug = (HEADER, FOOTER, HINT, FATAL, DEPRECATED, ERROR, DEBUG, SUB, WARNING);
 
 type
   TSRLInternals = record
@@ -40,7 +40,7 @@ begin
   Result := DebugFile > -1;
 
   if (Result) then
-    AddOnTerminate(@Self.CloseLogFile);
+    AddOnTerminate(@Self.CloseLogFile, True); // We need to call this last!
 end;
 
 procedure TSRL.Log(const s: String);
@@ -49,7 +49,7 @@ begin
     if (not Self.Internals.CreateLogFile()) then
       Exit();
 
-  WriteFileString(Self.Internals.DebugFile, s);
+  WriteFileString(Self.Internals.DebugFile, s + LineEnding);
 end;
 
 procedure TSRL.Writeln(s: String; const debugType: TDebug);
@@ -69,6 +69,9 @@ begin
 
     TDebug.DEPRECATED:
       s := 'DEPRECATED: ' + s;
+
+    TDebug.WARNING:
+      s := 'WARNING: ' + s;
 
     TDebug.FOOTER:
       Dec(Self.Internals.DebugLevel);
@@ -122,17 +125,12 @@ begin
     Self.Writeln(Footer, TDebug.FOOTER);
 end;
 
-procedure TSRL.WriteFmt(const s: String; Args: TVariantArray; debugType: TDebug);
+procedure TSRL.WriteFmt(const s: String; Args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
 begin
   Self.Writeln(Format(s, Args), debugType);
 end;
 
-procedure TSRL.WriteFmt(const s: String; Args: TVariantArray); overload;
-begin
-  Self.Writeln(Format(s, Args));
-end;
-
-function TSRL.WriteFmt(const s: String; Args: TVariantArray; TheResult: Variant; Footer: String = ''; debugType: TDebug = TDebug.DEBUG): Variant; overload;
+function TSRL.WriteFmtEx(const s: String; Args: TVariantArray; TheResult: Variant; Footer: String = ''; debugType: TDebug = TDebug.DEBUG): Variant;
 begin
   Result := TheResult;
   Self.WriteFmt(s, Args, debugType);

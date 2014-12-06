@@ -1,9 +1,9 @@
-procedure TIntegerArray.Append(const Value: Integer);
+procedure TBoolArray.Append(const Value: Boolean);
 begin
   Self += Value;
 end;
 
-procedure TIntegerArray.Insert(const Value, Index: Integer);
+procedure TBoolArray.Insert(const Value: Boolean; Index: Integer);
 var
   l: UInt32;
 begin
@@ -15,21 +15,21 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L-Index) * SizeOf(Integer));
+  MemMove(Self[Index], Self[Index + 1], (L - Index) * SizeOf(Integer));
   Self[Index] := Value;
 end;
 
-procedure TIntegerArray.Del(const Index: Integer; const Count: Integer = 1);
+procedure TBoolArray.Del(const Index: Integer; const Count: Integer = 1);
 begin
   Delete(Self, Index, Count);
 end;
 
-function TIntegerArray.Len(): Integer;
+function TBoolArray.Len(): Integer;
 begin
   Result := Length(Self);
 end;
 
-procedure TIntegerArray.Remove(const Value: Integer; const All: Boolean = False);
+procedure TBoolArray.Remove(const Value: Boolean; const All: Boolean = False);
 var
   Arr: TIntegerArray;
   i: Integer;
@@ -45,7 +45,7 @@ begin
     Self.Del(Arr[i]);
 end;
 
-function TIntegerArray.Pop(): Integer;
+function TBoolArray.Pop(): Boolean;
 var
   h: Integer;
 begin
@@ -54,7 +54,7 @@ begin
   SetLength(Self, h);
 end;
 
-function TIntegerArray.Find(const Value: Integer): Integer;
+function TBoolArray.Find(const Value: Boolean): Integer;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -63,7 +63,7 @@ begin
   Result := -1;
 end;
 
-function TIntegerArray.FindAll(const Value: Integer): TIntegerArray;
+function TBoolArray.FindAll(const Value: Boolean): TIntegerArray;
 var
   i: UInt32;
 begin
@@ -72,10 +72,10 @@ begin
       Result += i;
 end
 
-function TIntegerArray.Reversed(): TIntegerArray;
+function TBoolArray.Reversed(): TBoolArray;
 var
   lo:PtrUInt;
-  p,r:^Integer;
+  p,r:^Boolean;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -93,10 +93,10 @@ begin
   end;
 end;
 
-procedure TIntegerArray.Reverse();
+procedure TBoolArray.Reverse();
 var
-  tmp:Integer;
-  lo,hi:^Integer;
+  tmp:Boolean;
+  lo,hi:^Boolean;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -111,9 +111,4 @@ begin
     dec(hi);
     inc(lo);
   end;
-end;
-
-function TIntegerArray.Combine(const Arr2: TIntegerArray): TIntegerArray;
-begin
-  Result := CombineIntArray(Self, Arr2);
 end;

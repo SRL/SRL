@@ -1,9 +1,9 @@
-procedure TIntegerArray.Append(const Value: Integer);
+procedure TExtendedArray.Append(const Value: Extended);
 begin
   Self += Value;
 end;
 
-procedure TIntegerArray.Insert(const Value, Index: Integer);
+procedure TExtendedArray.Insert(const Value: Extended; Index: Integer);
 var
   l: UInt32;
 begin
@@ -15,21 +15,21 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L-Index) * SizeOf(Integer));
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
   Self[Index] := Value;
 end;
 
-procedure TIntegerArray.Del(const Index: Integer; const Count: Integer = 1);
+procedure TExtendedArray.Del(const Index: Integer; const Count: Integer = 1);
 begin
   Delete(Self, Index, Count);
 end;
 
-function TIntegerArray.Len(): Integer;
+function TExtendedArray.Len(): Integer;
 begin
   Result := Length(Self);
 end;
 
-procedure TIntegerArray.Remove(const Value: Integer; const All: Boolean = False);
+procedure TExtendedArray.Remove(const Value: Extended; const All: Boolean = False);
 var
   Arr: TIntegerArray;
   i: Integer;
@@ -45,7 +45,7 @@ begin
     Self.Del(Arr[i]);
 end;
 
-function TIntegerArray.Pop(): Integer;
+function TExtendedArray.Pop(): Extended;
 var
   h: Integer;
 begin
@@ -54,7 +54,7 @@ begin
   SetLength(Self, h);
 end;
 
-function TIntegerArray.Find(const Value: Integer): Integer;
+function TExtendedArray.Find(const Value: Extended): Integer;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -63,7 +63,7 @@ begin
   Result := -1;
 end;
 
-function TIntegerArray.FindAll(const Value: Integer): TIntegerArray;
+function TExtendedArray.FindAll(const Value: Extended): TIntegerArray;
 var
   i: UInt32;
 begin
@@ -72,10 +72,10 @@ begin
       Result += i;
 end
 
-function TIntegerArray.Reversed(): TIntegerArray;
+function TExtendedArray.Reversed(): TExtendedArray
 var
   lo:PtrUInt;
-  p,r:^Integer;
+  p,r:^Extended;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -93,10 +93,10 @@ begin
   end;
 end;
 
-procedure TIntegerArray.Reverse();
+procedure TExtendedArray.Reverse();
 var
-  tmp:Integer;
-  lo,hi:^Integer;
+  tmp:Extended;
+  lo,hi:^Extended;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -113,7 +113,20 @@ begin
   end;
 end;
 
-function TIntegerArray.Combine(const Arr2: TIntegerArray): TIntegerArray;
+function TExtendedArray.Combine(const Arr2: TExtendedArray): TExtendedArray;
+var
+  i, h, j: Integer;
 begin
-  Result := CombineIntArray(Self, Arr2);
+  if (Length(Arr2) = 0) then
+    Exit(Self);
+
+  Result := Self;
+  SetLength(Result, Length(Self) + Length(Arr2));
+
+  j := 0;
+  for i := Length(Self) to High(Arr2) + Length(Self) do
+  begin
+    Result[i] := Arr2[j];
+    Inc(j);
+  end;
 end;
