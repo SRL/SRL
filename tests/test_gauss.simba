@@ -6,7 +6,7 @@ type
   TMode = (g_circle, g_box, g_gauss);
 
 const
-  Tries = 15000;
+  Tries = 10;
   Mode = g_gauss;
   animated = False;
 
@@ -61,7 +61,7 @@ end;
 
 procedure doGauss();
 var
-  a: array[0..15000] of Extended;
+  a: array[0..Tries] of Extended;
   i: Integer;
 begin
   for i := 0 to High(a) do
@@ -77,7 +77,7 @@ begin
   case (Mode) of
     g_circle: doCircle();
     g_box: doBox();
-    g_circle: doGauss();
+    g_gauss: doGauss();
   end;
 
   ShowBitmap(img);

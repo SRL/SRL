@@ -1,0 +1,58 @@
+{$i srl/shared/mouse.simba}
+
+var
+  img: Integer;
+  w, h: Integer;
+  s, e: TPoint;
+
+procedure Hook(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+var
+  c: Integer = 255;
+begin
+  if (Mouse.getMode() = mouse_Brake) then
+    c := 3453454
+  else if (Mouse.getMode() = mouse_Human) then
+    c := 7675675;
+  try FastSetPixel(img, X, Y, c); except end;
+end;
+
+procedure Mouse_Event(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  Writeln('Event ', Button);
+end;
+
+begin
+  GetClientDimensions(w, h);
+  img := CreateBitmap(800, 700);
+
+  Mouse.setOnMouseMove(@Hook);
+  Mouse.setOnMouseEvent(@Mouse_Event);
+
+  s.x := 100;
+  e.x := 600;
+  s.y := 100;
+  e.y := 150;
+
+  Mouse.setMode(mouse_Brake);
+  Mouse.setPosition(s);
+  Mouse.Move(e);
+
+  s.y := 300;
+  e.y := 350;
+
+  Mouse.setMode(mouse_Human);
+  Mouse.setPosition(s);
+  Mouse.Move(e);
+
+  s.y := 500;
+  e.y := 550;
+
+  Mouse.setMode(mouse_Accurate);
+  Mouse.setPosition(s);
+  Mouse.Move(e);
+
+  // Mouse.Click(Point(245, 504), mouse_Left);
+
+  ShowBitmap(img);
+  FreeBitmap(img);
+end;
