@@ -6,8 +6,8 @@ type
   TMode = (g_circle, g_box, g_gauss);
 
 const
-  Tries = 10;
-  Mode = g_gauss;
+  Tries = 15000;
+  Mode = g_Circle;
   animated = False;
 
 var
@@ -32,8 +32,7 @@ begin
       Wait(1);
     end;
 
-    gaussPoint(mid.x, mid.y, 0.00, 360.0, rad, p.x, p.y);
-    DrawTPABitmap(img, [[p.x, p.y]], 643836);
+    DrawTPABitmap(img, [gaussPoint(Mid, 0.00, 360.0, rad)], 643836);
   end;
 end;
 
@@ -54,8 +53,7 @@ begin
       Wait(1);
     end;
 
-    gaussBox(p, box);
-    DrawTPABitmap(img, [p], 643836);
+    DrawTPABitmap(img, [gaussBox(Box)], 643836);
   end;
 end;
 

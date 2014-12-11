@@ -115,10 +115,10 @@ Example:
 *)
 procedure TTimeMarker.start();
 begin
-  Self.__prevMark := getTickCount64(); // used for adding time after a pause
+  if (Self.startTime = 0) then
+    Self.__prevMark := getTickCount64(); // used for adding time after a pause
 
-  // if it hasn't been started yet
-  if (not Self.paused) then
+  if (not Self.paused) and (Self.startTime = 0) then
   begin
     Self.startTime := getTickCount64();
     Self.time := 0;

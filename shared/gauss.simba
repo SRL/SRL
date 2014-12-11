@@ -84,33 +84,40 @@ Example:
       WriteLn(Format("gX, gY -> %d, %d", gX, gY);
     end;
 *)
-procedure gaussPoint(cX, cY: Integer; sAngle, eAngle: Extended; maxRad: Integer; out oX, oY: Integer);
+function gaussPoint(Center: TPoint; sAngle, eAngle: Extended; maxRad: Integer): TPoint;
 var
   angle: Extended;
   radius: Extended;
-  xShift, yShift: Integer;
+  xShift, yShift, t: Integer;
+  Valid: Boolean = False;
 begin
-
   if (eAngle < sAngle) then
-    swap(eAngle, sAngle);
+    Swap(eAngle, sAngle);
 
-  { random angle about the center }
-  angle := sAngle + (eAngle-sAngle)*_gaussRand()/2.0;
+  t := 0;
+  while ((not Valid) and (t < 100)) do
+  begin
+    { random angle about the center }
+    angle := sAngle + (eAngle-sAngle)*_gaussRand()/2.0;
 
-  { get normal pt about zero, where 68% lie within .5*maxRad }
-  radius := gaussRand(0, maxRad * 0.2);
+    { get normal pt about zero, where 68% lie within .5*maxRad }
+    radius := gaussRand(0, maxRad * 0.2);
 
-  { the shifting distance based on the radius and angle (both rand) }
-  xShift := round(radius * Cos(angle));
-  yShift := round(radius * Sin(angle));
+    { the shifting distance based on the radius and angle (both rand) }
+    xShift := Round(radius * Cos(angle));
+    yShift := Round(radius * Sin(angle));
 
-  oX := cX + xShift;
-  oY := cY + yShift;
+    Result.X := Center.X + xShift;
+    Result.Y := Center.Y + yShift;
+
+    valid := (Distance(Center.X, Center.Y, Result.X, Result.Y) <= maxRad);
+    Inc(t);
+  end;
 end;
 
 function gaussRangeExt(minI, maxI: Extended): Extended;
 var
-  Valid: Boolean;
+  Valid: Boolean = False;
   mean: Extended;
   dev: Extended;
   t: Integer;
@@ -125,7 +132,7 @@ begin
     Result := gaussRand(mean, dev);
     valid := ((Result >= minI) and (Result <= MaxI));
 
-    inc(t);
+    Inc(t);
   end;
 
   if (not Valid) then
@@ -137,13 +144,13 @@ begin
   Result := Round(gaussRangeExt(minI, maxI));
 end;
 
-procedure gaussBox(out p: TPoint; box: TBox);
+function gaussBox(const Box: TBox): TPoint;
 begin
-  p.x := gaussRangeInt(box.x1, box.x2);
-  p.y := gaussRangeInt(box.y1, box.y2);
+  Result.X := gaussRangeInt(Box.x1, Box.x2);
+  Result.Y := gaussRangeInt(Box.y1, Box.y2);
 
-  if (not PointInBox(p, box)) then
-    writeln('gaussBox', Format('Point invalid (%d, %d)', [p.x, p.y]));
+  if (not PointInBox(Result, box)) then
+    writeln('gaussBox', Format('Point invalid (%d, %d)', [Result.X, Result.Y]));
 end;
 
 function gaussRandom(maxExt: Integer): Integer;

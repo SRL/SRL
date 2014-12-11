@@ -1,9 +1,12 @@
+{$i srl/shared/gauss.simba}
 {$i srl/shared/mouse.simba}
 
 var
+  circle: TPointArray;
   img: Integer;
   w, h: Integer;
   s, e: TPoint;
+  b: TBox = [1, 600, 99, 699];
 
 procedure Hook(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
@@ -12,7 +15,7 @@ begin
   if (Mouse.getMode() = mouse_Brake) then
     c := 3453454
   else if (Mouse.getMode() = mouse_Human) then
-    c := 7675675;
+    c := 14811135;
   try FastSetPixel(img, X, Y, c); except end;
 end;
 
@@ -23,7 +26,7 @@ end;
 
 begin
   GetClientDimensions(w, h);
-  img := CreateBitmap(800, 700);
+  img := CreateBitmap(800, 900);
 
   Mouse.setOnMouseMove(@Hook);
   Mouse.setOnMouseEvent(@Mouse_Event);
@@ -50,6 +53,25 @@ begin
   Mouse.setMode(mouse_Accurate);
   Mouse.setPosition(s);
   Mouse.Move(e);
+
+  RectangleBitmapEx(img, b, 2654556, 0.50);
+  Mouse.setPosition(Point(b.X1, b.Y1));
+  Mouse.setMode(mouse_Human);
+  Mouse.Move(b);
+
+  s.y := 750;
+  e.y := 800;
+
+  Mouse.setMode(mouse_Human);
+  Mouse.setPosition(s);
+  Mouse.Miss(e, True);
+
+
+  circle := TPAFromCircle(200, 650, 45);
+  FillEllipse(circle);
+  DrawTPABitmap(img, circle, FastGetPixel(img, b.x2, b.y2));
+  Mouse.setPosition(Point(150, 600));
+  Mouse.Move(Point(200, 650), 45);
 
   // Mouse.Click(Point(245, 504), mouse_Left);
 

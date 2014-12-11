@@ -26,6 +26,3 @@ const
   clPink       = TColor($B3A2EA);
   clMedGray    = TColor($A4A0A0);
 
-const
-  mouse_None = -1;
-  mouse_Move = 3;
