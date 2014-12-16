@@ -1,0 +1,13 @@
+{$include_once shared.simba}
+{$include_once osr/osr.simba}
+
+{$IFDEF SMART}
+  {$include_once shared/smartbase.simba}
+  {$include_once osr/smart.simba}
+{$ENDIF}
+
+begin
+
+end;
+
+

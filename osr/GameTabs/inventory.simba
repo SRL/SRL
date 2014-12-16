@@ -1,0 +1,52 @@
+type 
+  TInventory = record(TInterfaceBase)
+    FSlots: TBoxArray;
+  end;
+ 
+var 
+  Inventory: TInventory;
+  
+{$IFNDEF CODEINSIGHT}
+procedure TInventory.__setup();
+var i:Int32;
+begin
+  self.FBounds := [558,211,725,462];
+  self.FSlots := self.FBounds.Partition(7, 4, -2);
+  for i:=0 to High(self.FSlots) do
+  begin
+    self.FSlots[i].x1 += 3;
+    self.FSlots[i].x2 -= 3;
+  end;
+end;
+{$ENDIF}
+
+
+function TInventory.Open(): Boolean;
+begin
+  Result := GameTab.Open(tabInventory);
+end;
+
+
+function TInventory.IsOpen(): Boolean;
+begin
+  Result := GameTab.IsOpen(tabInventory);
+end;
+
+
+function TInventory.IsFull(): Boolean;
+var
+  i:Int32;
+  b:TBox;
+begin
+  for i:=0 to High(self.FSlots) do
+  begin
+    b := self.FSlots[i];
+    if (CountColor($10000, b.x1,b.y1,b.x2,b.y2) = 0) then
+      Exit(False);
+  end;
+  Result := True;
+end;
+
+begin
+  Inventory.__setup();
+end;

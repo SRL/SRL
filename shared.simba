@@ -1,5 +1,11 @@
+{$include_once shared/globals.simba}
+{$include_once shared/gauss.simba}
+{$include_once shared/mouse.simba}
+{$include_once shared/keyboard.simba}
 {$include_once shared/wrappers.simba}
 
+
+{$include_once shared/types/TBox.simba}
 {$include_once shared/types/TStringArray.simba}
 {$include_once shared/types/TIntegerArray.simba}
 {$include_once shared/types/TExtendedArray.simba}
@@ -9,13 +15,6 @@
 {$include_once shared/onterminate.simba}
 {$include_once shared/srl.simba}
 {$include_once shared/time.simba}
-
-{$IFDEF SMART}
-  {$include_once shared/smartbase.simba}
-
-  {$IFDEF RS3} {$include_once rs3/smart.simba} {$ENDIF}
-  {$IFDEF OSR} {$include_once osr/smart.simba} {$ENDIF}
-{$ENDIF}
 
 begin
 
