@@ -1,11 +1,11 @@
 type
-  EGameTab = (
+  EGametab = (
     tabCombat,
     tabStats,
     tabQuests,
     tabInventory,
     tabEquipment,
-    tabprayer,
+    tabPrayer,
     tabMagic,
     tabClan,
     tabFriends,
@@ -16,12 +16,12 @@ type
     tabMusic
   );
 
-  TGameTab = type(pointer);
+  TGametab = type(pointer);
 
 var
-  GameTab: TGameTab;
+  Gametabs: TGametab;
 
-function TGameTab.getBounds(Tab:EGameTab): TBox;
+function TGametab.GetBounds(Tab:EGametab): TBox;
 var 
   row,col:Int32;
   B:TBox;
@@ -36,7 +36,7 @@ begin
   Result := B.Partition(1, 7, -3)[col];
 end;
 
-function TGameTab.IsOpen(Tab:EGameTab): Boolean;
+function TGametab.IsOpen(Tab:EGametab): Boolean;
 var
   B:TBox;
   _:Int32;
@@ -44,9 +44,11 @@ begin
   B := self.getBounds(Tab);
   if FindColorTolerance(_,_,1910383, B.x1,b.y1,b.x2,b.y2, 13) then
     Exit(True);
+  //if (Tab = tabInventory) and Bankscreen.IsOpen() then
+    //Exit(True);
 end;
 
-function TGameTab.Open(Tab:EGameTab): Boolean;
+function TGametab.Open(Tab:EGametab): Boolean;
 var
   t,i:Int32;
   B:TBox;
@@ -66,7 +68,7 @@ begin
 end;
 
 
-procedure TGameTab.Hover(Tab:EGameTab; Condition:Boolean=True);
+procedure TGametab.Hover(Tab:EGametab; Condition:Boolean=True);
 var
   t,i:Int32;
   B:TBox;
@@ -76,6 +78,16 @@ begin
     B := self.getBounds(Tab);
     Mouse.Move(B);
   end;
+end;
+
+
+function TGametab.GetCurrent(): EGametab;
+var i:Int32;
+begin
+  for i:=0 to High(EGameTab) do
+    if Self.IsOpen(EGameTab(i)) {or
+       ((EGameTab(i) = tabInventory) and Bankscreen.IsOpen())} then
+      Exit(EGameTab(i));
 end;
 
 

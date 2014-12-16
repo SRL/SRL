@@ -2,10 +2,36 @@ type
   TInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
   end;
- 
+
+{
+ procedure TInventory.__setup();
+ function TInventory.Open(): Boolean;
+ function TInventory.IsOpen(): Boolean;
+ function TInventory.PointToSlot(pt:TPoint): Int32;
+ function TInventory.IsFull(): Boolean;
+ function TInventory.IsVaildSlot(idx: Int32): Boolean;
+ function TInventory.GetSlotBox(idx:Int32): TBox;
+ function TInventory.SlotIsUsed(idx:Int32): Boolean;
+ function TInventory.GetUsedSlots(): TIntegerArray;
+}
+
 var 
   Inventory: TInventory;
-  
+
+const
+    //Column wise (Z-style) and "reversed" column wise (S-style)
+    DROP_PATTERN_REGULAR   = [0..27];
+    DROP_PATTERN_REGULAR_R = [3,2,1,0, 7,6,5,4, 11,10,9,8, 15,14,13,12, 19,18,17,16, 23,22,21,20, 27,26,25,24];
+
+    //Column wise (zigzag-style) and "reversed" version
+    DROP_PATTERN_SNAKE   = [0,1,2,3, 7,6,5,4, 8,9,10,11, 15,14,13,12, 16,17,18,19, 23,22,21,20, 24,25,26,27];
+    DROP_PATTERN_SNAKE_R = [3,2,1,0, 4,5,6,7, 11,10,9,8, 12,13,14,15, 19,18,17,16, 20,21,22,23, 27,26,25,24];
+
+    //by row (and "reversed")
+    DROP_PATTERN_TOPDOWN   = [0,4,8,12,16,20,24,  1,5,9,13,17,21,25,  2,6,10,14,18,22,26, 3,7,11,15,19,23,27];
+    DROP_PATTERN_TOPDOWN_R = [3,7,11,15,19,23,27, 2,6,10,14,18,22,26, 1,5,9,13,17,21,25,  0,4,8,12,16,20,24];
+
+
 {$IFNDEF CODEINSIGHT}
 procedure TInventory.__setup();
 var i:Int32;
@@ -23,13 +49,32 @@ end;
 
 function TInventory.Open(): Boolean;
 begin
-  Result := GameTab.Open(tabInventory);
+  Result := Gametabs.Open(tabInventory);
 end;
 
 
 function TInventory.IsOpen(): Boolean;
 begin
-  Result := GameTab.IsOpen(tabInventory);
+  Result := Gametabs.IsOpen(tabInventory);
+end;
+
+
+function TInventory.PointToSlot(pt:TPoint): Int32;
+var
+  x,y,w:Int32;
+const
+  SLOT_WIDTH = 42; //inc. padding
+  SLOT_HEIGHT= 36; //..
+begin
+  if not(PointInBox(Pt, Self.FBounds)) then
+    Exit(-1);
+
+  x := (Pt.x - Self.FBounds.x1) div SLOT_WIDTH;
+  y := (Pt.y - Self.FBounds.y1) div SLOT_HEIGHT;
+  w := (Self.FBounds.X2 - Self.FBounds.X1) + 1;
+  Result := (y * (w div SLOT_WIDTH)) + x;
+  if not(PointInBox(pt, Self.FSlots[Result])) then
+    Result := -1;
 end;
 
 
@@ -38,6 +83,9 @@ var
   i:Int32;
   b:TBox;
 begin
+  if not(self.Open()) then
+    Exit();
+
   for i:=0 to High(self.FSlots) do
   begin
     b := self.FSlots[i];
@@ -46,6 +94,63 @@ begin
   end;
   Result := True;
 end;
+
+
+function TInventory.IsVaildSlot(idx: Int32): Boolean;
+begin
+  Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
+end;
+
+
+function TInventory.GetSlotBox(idx:Int32): TBox;
+begin
+  if self.IsVaildSlot(idx) then
+    Result := Self.FSlots[idx];
+end;
+
+
+function TInventory.SlotIsUsed(idx:Int32): Boolean;
+var b:TBox;
+begin
+  if not(self.Open()) then
+    Exit();
+
+  b := self.FSlots[idx];
+  Result := CountColor($10000, b.x1,b.y1,b.x2,b.y2) > 0;
+end;
+
+
+function TInventory.GetUsedSlots(): TIntegerArray;
+var i:Int32;
+begin
+  if not(self.Open()) then
+    Exit();
+
+  for i:=0 to High(self.FSlots) do
+    if Self.IsSlotUsed(i) then
+      Result += i;
+end;
+
+
+procedure TInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+var i:Int32;
+begin
+  if not(self.Open()) then
+    Exit();
+
+  for i:=0 to High(slots) do
+  begin
+    if self.SlotIsUsed(slotArr[i]) then
+    begin
+      (*
+      Mouse.Move(B);
+      Optionbox.Open();
+      Optionbox.SelectOption('drop');
+      *)
+    end;
+  end;
+end;
+
 
 begin
   Inventory.__setup();
