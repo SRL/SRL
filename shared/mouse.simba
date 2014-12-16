@@ -1,0 +1,500 @@
+(*
+  Moving the mouse
+  ~~~~~~~~~~~~~~~~
+
+  Move the mouse to a x, y coord.
+   - Mouse.Move(100, 100);
+
+  Move the mouse to a point.
+   - Mouse.Move(Point(100, 100));
+
+  Move the mouse to a random (gauss) point in a box.
+  - Mouse.Move(IntToBox(0, 0, 100, 100));
+
+  Move the mouse to a random (gauss) point in a circle.
+  - Mouse.Move(Point(100, 100), 50);
+
+  Clicking the mouse
+  ~~~~~~~~~~~~~~~~~~
+
+  Vaild click types: mouse_Left, mouse_Right, mouse_Middle.
+
+  Click the mouse at the current position.
+   - Mouse.Click(mouse_Left);
+
+  Move and click the mouse to a x, y coord.
+   - Mouse.Click(100, 100, mouse_Left);
+
+  Move and click the mouse to a point.
+   - Mouse.Click(Point(100, 100), mouse_Right);
+
+  Move and click the mouse to a random (gauss) point in a box.
+  - Mouse.Click(IntToBox(0, 0, 100, 100), mouse_LEft);
+
+  Move and click the mouse to a random (gauss) point in a circle.
+  - Mouse.Click(Point(100, 100), 50, mouse_Right);
+*)
+
+type
+  TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
+
+type
+  TMouse = record
+  {$IFNDEF CODEINSIGHT}
+    FSpeed: Integer;
+    FMode: TMouseMode;
+    FGravity, FWind: array [0..2] of Integer;
+    FOnMouseMove: TMouseMoveEvent;
+    FOnMouseEvent: TMouseEvent;
+  {$ENDIF}
+ end;
+
+procedure TMouse.Init();
+begin
+  FSpeed := Random(22, 24);
+  FMode := mouse_Human;
+  FOnMouseMove := nil;
+  FOnMouseEvent := nil;
+
+  FGravity[Ord(Mouse_Human)] := 7;
+  FGravity[Ord(Mouse_Brake)] := 8;
+  FGravity[Ord(Mouse_Accurate)] := 14;
+
+  FWind[Ord(mouse_Human)] := 5;
+  FWind[Ord(mouse_Brake)] := 5;
+  FWind[Ord(mouse_Accurate)] := 3;
+end;
+
+procedure TMouse.ValidateButton(const Button: Integer);
+begin
+  if (not Button = mouse_Left) or (not Button = mouse_Right) or (not Button = mouse_Middle) then
+    RaiseException(erCustomError, 'TMouse.ValidateButton: Mouse button isn''t vaild, use (mouse_Left, mouse_Right, mouse_Middle');
+end;
+
+procedure TMouse.setPosition(const Target: TPoint);
+begin
+  if (@FOnMouseMove <> nil) then
+    FOnMouseMove(@Self, [], Target.X, Target.Y);
+
+  MoveMouse(Target.X, Target.Y);
+end;
+
+function TMouse.getPosition(): TPoint;
+begin
+  GetMousePos(Result.X, Result.Y);
+end;
+
+function TMouse.getMode(): TMouseMode;
+begin
+  Result := FMode;
+end;
+
+procedure TMouse.setMode(const NewMode: TMouseMode);
+begin
+  FMode := NewMode;
+end;
+
+function TMouse.getSpeed(): Integer;
+begin
+  Result := Self.FSpeed;
+end;
+
+procedure TMouse.setSpeed(const NewSpeed: Integer);
+begin
+  Self.FSpeed := NewSpeed;
+end;
+
+function TMouse.getGravity(const Mode: TMouseMode): Integer;
+begin
+  Result := Self.FGravity[Ord(Mode)];
+end;
+
+procedure TMouse.setGravity(const Mode: TMouseMode; const NewGravity: Integer);
+begin
+  Self.FGravity[Ord(Mode)] := NewGravity;
+end;
+
+function TMouse.getWind(const Mode: TMouseMode): Integer;
+begin
+  Result := Self.FWind[Ord(Mode)];
+end;
+
+procedure TMouse.setWind(const Mode: TMouseMode; const NewWind: Integer);
+begin
+  Self.FWind[Ord(Mode)] := NewWind;
+end;
+
+function TMouse.getOnMouseMove(): TMouseMoveEvent;
+begin
+  Result := @FOnMouseMove;
+end;
+
+procedure TMouse.setOnMouseMove(const Event: TMouseMoveEvent);
+begin
+  FOnMouseMove := @Event;
+end;
+
+function TMouse.getOnMouseEvent(): TMouseEvent;
+begin
+  Result := @FOnMouseEvent;
+end;
+
+procedure TMouse.setOnMouseEvent(const Event: TMouseEvent);
+begin
+  FOnMouseEvent := @Event;
+end;
+
+procedure TMouse.Hold(const Button: Integer);
+var
+  p: TPoint;
+begin
+  Self.ValidateButton(Button);
+
+  p := Self.GetPosition();
+  HoldMouse(p.x, p.y, Button);
+end;
+
+procedure TMouse.Release(const Button: Integer);
+var
+  p: TPoint;
+begin
+  Self.ValidateButton(Button);
+
+  p := Self.GetPosition();
+  ReleaseMouse(p.x, p.y, Button);
+end;
+
+{$IFNDEF CODEINSIGHT}
+procedure TMouse._MoveBrake(xs, ys, xe, ye, gravity, wind, targetArea: extended; double: boolean);
+const
+  sqrt2 := sqrt(2);
+  sqrt3 := sqrt(3);
+  sqrt5 := sqrt(5);
+var
+  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
+  lastX,lastY,tempSpeed,W,TDist, xsR, ysR: Integer;
+  t: UInt64;
+  PDist,maxStep,dModA,dModB,nModA,nModB: extended;
+begin
+  tempSpeed := Self.getSpeed();
+  TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
+  if (TDist < 1) then
+    TDist := 1;
+
+  dModA := 0.88;
+  dModB := 0.95;
+
+  if (TDist > 220) then
+  begin
+    nModA := 0.08;
+    nModB := 0.04;
+  end else if (TDist <= 220) then
+  begin
+    nModA := 0.20;
+    nModB := 0.10;
+  end;
+
+  t := GetTickCount64() + Random(9700, 10000);
+  repeat
+    if (GetTickCount64() > t) then
+      RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    dist := hypot(xs - xe, ys - ye);
+    wind := minE(wind, dist);
+    if (dist < 1) then
+      dist := 1;
+    PDist := (dist/TDist);
+    if (PDist < 0.01) then
+      PDist := 0.01;
+
+    if double then
+    begin
+      if (PDist <= dModA) then
+      begin
+        D := (round((round(dist)*0.3))/5);
+        if (D < 20) then
+          D := 20;
+
+      end else if (PDist > dModA) then
+      begin
+        if (PDist < dModB) then
+          D := randomRange(5, 8)
+        else if (PDist >= dModB) then
+          D := randomRange(3, 4);
+      end;
+    end;
+
+    if (PDist >= nModA) then
+    begin
+       D := (round((round(dist)*0.3))/5);
+      if (D < 20) then
+        D := 20;
+    end else if (PDist < nModA) then
+    begin
+      if (PDist >= nModB) then
+        D := randomRange(5, 8)
+      else if (PDist < nModB) then
+        D := randomRange(3, 4);
+    end;
+
+    if (D <= round(dist)) then
+      maxStep := D
+    else
+      maxStep := round(dist);
+
+    if dist >= targetArea then
+    begin
+      windX := windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windY := windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+    end else
+    begin
+      windX := windX / sqrt2;
+      windY := windY / sqrt2;
+    end;
+
+    veloX := veloX + windX;
+    veloY := veloY + windY;
+    veloX := veloX + gravity * (xe - xs) / dist;
+    veloY := veloY + gravity * (ye - ys) / dist;
+
+    if (hypot(veloX, veloY) > maxStep) then
+    begin
+      randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
+      veloMag := sqrt(veloX * veloX + veloY * veloY);
+      veloX := (veloX / veloMag) * randomDist;
+      veloY := (veloY / veloMag) * randomDist;
+    end;
+
+    lastX := round(xs);
+    lastY := round(ys);
+    xs := xs + veloX;
+    ys := ys + veloY;
+    xsR := Round(xs);
+    ysR := Round(ys);
+
+    if (lastX <> xsR) or (lastY <> ysR) then
+      Self.setPosition([xsR, ysR]);
+
+    W := (random((round(100/tempSpeed)))*6);
+    if (W < 4) then
+      W := 4;
+    if (double) then
+      if (PDist > dModA) then
+        W := round(W*2.5)
+    else
+      W := round(W*1.2);
+
+    Wait(W);
+    lastdist := dist;
+  until (hypot(xs - xe, ys - ye) < 1);
+
+  if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
+    Self.setPosition([Round(xe), Round(ye)]);
+
+  Self.setSpeed(tempSpeed);
+end;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure TMouse._MoveHuman(xs, ys, xe, ye, gravity, wind, targetArea: extended);
+const
+  sqrt2 := sqrt(2);
+  sqrt3 := sqrt(3);
+  sqrt5 := sqrt(5);
+var
+  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
+  lastX,lastY, tempSpeed,W,TDist, xsR, ysR: integer;
+  t: UInt64;
+  maxStep,rCnc: extended;
+begin
+  tempSpeed := Self.getSpeed();
+
+  TDist := distance(Round(xs), Round(ys), Round(xe), Round(ye));
+  t := GetTickCount64() + Random(9700, 10000);
+  repeat
+    if (GetTickCount64() > t) then
+      RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    dist := hypot(xs - xe, ys - ye);
+    wind := minE(wind, dist);
+    if (dist < 1) then
+      dist := 1;
+
+    D := (round((round(TDist)*0.3))/7);
+    if (D > 25) then
+      D := 25;
+    if (D < 5) then
+      D := 5;
+
+    rCnc := random(6);
+    if (rCnc = 1) then
+      D := randomRange(2,3);
+
+    if (D <= round(dist)) then
+      maxStep := D
+    else
+      maxStep := round(dist);
+
+    if dist >= targetArea then
+    begin
+      windX := windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windY := windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+    end else
+    begin
+      windX := windX / sqrt2;
+      windY := windY / sqrt2;
+    end;
+
+    veloX := veloX + windX;
+    veloY := veloY + windY;
+    veloX := veloX + gravity * (xe - xs) / dist;
+    veloY := veloY + gravity * (ye - ys) / dist;
+
+    if (hypot(veloX, veloY) > maxStep) then
+    begin
+      randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
+      veloMag := sqrt(veloX * veloX + veloY * veloY);
+      veloX := (veloX / veloMag) * randomDist;
+      veloY := (veloY / veloMag) * randomDist;
+    end;
+
+    lastX := round(xs);
+    lastY := round(ys);
+    xs := xs + veloX;
+    ys := ys + veloY;
+    xsR := Round(xs);
+    ysR := Round(ys);
+
+    if (lastX <> xsR) or (lastY <> ysR) then
+      Self.setPosition([xsR, ysR]);
+
+    W := (random((round(100/tempSpeed)))*6);
+    if (W < 4) then
+      W := 4;
+    W := round(W * 0.7);
+
+    Wait(W);
+    lastdist:= dist;
+  until (hypot(xs - xe, ys - ye) < 1);
+
+  if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
+    Self.setPosition([Round(xe), Round(ye)]);
+
+  Self.setSpeed(tempSpeed);
+end;
+{$ENDIF}
+
+procedure TMouse.Move(const Target: TPoint);
+var
+  RandSpeed: Extended;
+  p: TPoint;
+begin
+  RandSpeed := (Random(Self.getSpeed()) / 2.0 + Self.getSpeed()) / 10.0;
+  p := Self.getPosition();
+
+  case (Self.getMode()) of
+    mouse_Human:
+      Self._MoveHuman(p.X, p.Y, Target.X, Target.Y, FGravity[Ord(mouse_Human)], FWind[Ord(mouse_Human)], 10.0 * randSpeed);
+    mouse_Brake:
+      Self._MoveBrake(p.X, p.Y, Target.X, Target.Y, FGravity[Ord(mouse_Brake)], FWind[Ord(mouse_Brake)], 10.0 * randSpeed, False);
+    mouse_Accurate:
+      Self._MoveBrake(p.X, p.Y, Target.X, Target.Y, FGravity[Ord(mouse_Accurate)], FWind[Ord(mouse_Accurate)], 10.0 * randSpeed, False);
+  end;
+end;
+
+procedure TMouse.Move(const X, Y: Integer); overload;
+begin
+  Self.Move(Point(X, Y));
+end;
+
+procedure TMouse.Move(const Box: TBox); overload;
+begin
+  Self.Move(gaussBox(Box));
+end;
+
+procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
+begin
+  Self.Move(gaussPoint(Middle, 0.00, 360.0, Radius));
+end;
+
+procedure TMouse.Click(const Button: Integer);
+var
+  p: TPoint;
+begin
+  Self.ValidateButton(Button);
+  p := Self.getPosition();
+
+  if (Assigned(@FOnMouseEvent)) then
+    Self.FOnMouseEvent(@Self, Abs(Abs(not Button) - 2), [], p.X, p.Y);
+
+  Self.Hold(Button);
+  Wait(Random(60, 155));
+  Self.Release(Button);
+end;
+
+procedure TMouse.Click(const Target: TPoint; const Button: Integer); overload;
+var
+  p: TPoint;
+begin
+  Self.ValidateButton(Button);
+  p := Self.getPosition();
+
+  if (p.X <> Target.X) or (p.Y <> Target.Y) then
+    Self.Move(Target.X, Target.Y);
+
+  Self.Click(Button);
+end;
+
+procedure TMouse.Click(const X, Y: Integer; const Button: Integer); overload;
+begin
+  Self.ValidateButton(Button);
+  Self.Click(Point(X, Y), Button);
+end;
+
+procedure TMouse.Click(const Box: TBox; const Button: Integer); overload;
+begin
+  Self.Click(gaussBox(Box), Button);
+end;
+
+procedure TMouse.Click(const Middle: TPoint; const Radius, Button: Integer); overload;
+begin
+  Self.Click(gaussPoint(Middle, 0.00, 360.0, Radius), Button);
+end;
+
+procedure TMouse.Miss(const Target: TPoint; const Correct: Boolean = False; const WaitAfterMiss: Integer = 0);
+var
+  randSpeed: Extended;
+  x2,y2,tempSpeed,dist,mp, a: integer;
+  p: TPoint;
+begin
+  a := Self.getSpeed();
+  dist := Distance(p.X, p.Y, Target.X, Target.Y);
+  mp := round(dist / 150);
+  if (mp < 0) then
+    mp := 1;
+
+  randSpeed := (Random(a) / 2.0 + a) / 10.0;
+  Self.Move(Random(Target.x-(a*mp), Target.x+(a*mp)), Random(Target.y-(a*mp), Target.y+(a*mp)));
+
+  if (Correct) then
+  begin
+    Wait(WaitAfterMiss);
+    Self.Move(Target);
+  end;
+end;
+
+procedure TMouse.DragTo(const Target: TPoint; const Button: Integer = mouse_Left);
+begin
+  Self.ValidateButton(Button);
+
+  Self.Hold(Button);
+  Self.Move(Target);
+  Self.Release(Button);
+end;
+
+var
+  Mouse: TMouse;
+
+begin
+  Mouse.Init();
+end;

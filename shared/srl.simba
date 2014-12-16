@@ -1,0 +1,158 @@
+type
+  TDebug = (HEADER, FOOTER, HINT, FATAL, DEPRECATED, ERROR, DEBUG, SUB, WARNING);
+
+type
+  TSRLInternals = record
+    DebugFile, DebugLevel: Integer;
+    LogPath: String;
+ end;
+
+type
+  TSRL = record
+    GameVersion: String;
+    Internals: TSRLInternals;
+    DisableLog, DisableDebug: Boolean;
+ end;
+
+var
+  srl: TSRL;
+
+procedure TSRLInternals.CloseLogFile();
+begin
+  if (Self.DebugFile > -1) then
+    CloseFile(Self.DebugFile);
+end;
+
+function TSRLInternals.CreateLogFile(): Boolean;
+var
+  Name: String;
+begin
+  if (not DirectoryExists(Self.LogPath)) then
+    ForceDirectories(Self.LogPath);
+
+  Name := Self.LogPath + Format('%s(%s at %s).txt', [srl.GameVersion, FormatDateTime('dd-mm-yy', Now), FormatDateTime('hh-nn-ss', Now)]);
+
+  DebugFile := CreateFile(Name);
+  if (DebugFile > -1) then
+    CloseFile(DebugFile);
+
+  DebugFile := AppendFile(Name);
+  Result := DebugFile > -1;
+
+  if (Result) then
+    AddOnTerminate(@Self.CloseLogFile, True); // We need to call this last!
+end;
+
+procedure TSRL.Log(const s: String);
+begin
+  if (Self.Internals.DebugFile = -1) then
+    if (not Self.Internals.CreateLogFile()) then
+      Exit();
+
+  WriteFileString(Self.Internals.DebugFile, s + LineEnding);
+end;
+
+procedure TSRL.Writeln(s: String; const debugType: TDebug);
+begin
+  if (s = '') then
+    Exit();
+
+  case (debugType) of
+    TDebug.HINT:
+      s := 'HINT: ' + s;
+
+    TDebug.ERROR:
+      s := 'ERROR: ' + s;
+
+    TDebug.FATAL:
+      s := 'FATAL ERROR: ' + s;
+
+    TDebug.DEPRECATED:
+      s := 'DEPRECATED: ' + s;
+
+    TDebug.WARNING:
+      s := 'WARNING: ' + s;
+
+    TDebug.FOOTER:
+      Dec(Self.Internals.DebugLevel);
+
+    TDebug.SUB:
+      Inc(Self.Internals.DebugLevel);
+  end;
+
+  s := Replicate('--', Self.Internals.DebugLevel) + ' ' + s;
+
+  // check for header after the case because the debugMSG needs to
+  // be calculated BEFORE __debugLevel is changed
+  if (debugType = TDebug.HEADER) then
+    Inc(Self.Internals.DebugLevel);
+
+  // reset the debug level
+  if (debugType = TDebug.SUB) then
+    Dec(Self.Internals.DebugLevel);
+
+  if (not Self.DisableLog) then
+    Self.Log(s);
+
+  // print the fatal error and terminate the script
+  if (debugType = TDebug.FATAL) then
+  begin
+    _Write(s);
+    _WriteLn();
+    TerminateScript();
+  end;
+
+  if (Self.DisableDebug) then
+    Exit();
+
+  _Write(s);
+  _WriteLn();
+end;
+
+procedure TSRL.Writeln(const s: String); overload;
+begin
+  Self.Writeln(s, TDebug.DEBUG);
+end;
+
+function TSRL.Writeln(const s: String; TheResult: Variant; Footer: String = ''; debugType: TDebug = TDebug.DEBUG): Variant; overload;
+begin
+  Result := TheResult;
+
+  if (s <> '') then
+    Self.Writeln(s, debugType);
+
+  if (Footer <> '') then
+    Self.Writeln(Footer, TDebug.FOOTER);
+end;
+
+procedure TSRL.WriteFmt(const s: String; Args: TVariantArray; debugType: TDebug = TDebug.DEBUG);
+begin
+  Self.Writeln(Format(s, Args), debugType);
+end;
+
+function TSRL.WriteFmtEx(const s: String; Args: TVariantArray; TheResult: Variant; Footer: String = ''; debugType: TDebug = TDebug.DEBUG): Variant;
+begin
+  Result := TheResult;
+  Self.WriteFmt(s, Args, debugType);
+
+  if (Footer <> '') then
+    Self.WriteFmt(Footer, Args, TDebug.FOOTER);
+end;
+
+begin
+  with (srl.Internals) do
+  begin
+    LogPath := IncludePath + 'srl/logs/';
+    DebugFile := -1;
+    DebugLevel := 1;
+  end;
+
+  with (srl) do
+  begin
+    {$IFDEF RS3} GameVersion := 'RS3'; {$ENDIF}
+    {$IFDEF OSR} GameVersion := 'OSR'; {$ENDIF}
+  end;
+end;
+
+
+

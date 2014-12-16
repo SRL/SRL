@@ -1,0 +1,45 @@
+type
+  TProcedureOfObject = procedure() of object;
+
+{$IFNDEF CODEINSIGHT}
+var
+  _onTermProcs: array of TProcedureOfObject;
+  _onTermLastProc: TProcedureOfObject;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+procedure _onTerminate();
+var
+  i: Integer;
+begin
+  for i := 0 to High(_onTermProcs) do
+    _onTermProcs[i]();
+
+  if (@_onTermLastProc <> nil) then
+    _onTermLastProc();
+end;
+{$ENDIF}
+
+function AddOnTerminate(Proc: TProcedureOfObject; CallLast: Boolean = False): Boolean; overload;
+var
+  v: TVariantArray;
+  i: Integer;
+  tmp: TProcedureOfObject;
+begin
+  Result := True;
+
+  if (not CallLast) then
+    _onTermProcs += @Proc
+  else if (@_onTermLastProc = nil) then
+    _onTermLastProc := @Proc
+  else
+    _onTermProcs += @Proc;
+
+  GetScriptProp(SP_OnTerminate, v);
+  for i := 0 to High(v) do
+    if (v[i] = '_onTerminate') then
+      Exit();
+
+  AddOnTerminate('_onTerminate');
+end;
+

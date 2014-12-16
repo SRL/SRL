@@ -1,0 +1,18 @@
+{$loadlib SimpleOCR}
+var 
+  OCR: TSimpleOCR;
+  SmallFont, UpFont, NPCFont, StatFont: TFontSet;
+  
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
+begin
+  Self.SetFont(Font);
+  Result := Self.Recognize(B, Filter);
+end;
+  
+begin
+  SmallFont.Load('SmallChars07'); 
+  UpFont.Load('UpChars07_s'); 
+  NPCFont.Load('CharsNPC07'); 
+  StatFont.Load('StatChars07');
+  OCR.Init(UpFont); //just init it with W/E font.
+end;

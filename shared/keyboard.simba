@@ -1,0 +1,49 @@
+type
+  TKeyBoard = type TObject;
+
+procedure TKeyBoard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); overload;
+var
+  i: UInt32;
+begin
+  for i := 1 to Length(Text) do
+  begin
+    SendKeys(Text[i], KeyWait, KeyModWait);
+    Wait(KeyPressWait);
+  end;
+end;
+
+procedure TKeyBoard.Send(const Text: String); overload;
+begin
+  Self.Send(Text, Random(30, 60), Random(30, 60), Random(40, 85));
+end;
+
+procedure TKeyBoard.PressKey(const Key: Integer);
+begin
+  {$IFDEF SMART}
+  if (Key = 13) then
+    Key := 10;
+  {$ENDIF}
+
+  Self.KeyDown(Key);
+  Wait(15 + Random(65));
+  Self.KeyUp(Key);
+end;
+
+procedure TKeyBoard.KeyDown(const Key: Integer);
+begin
+  System.KeyDown(Key);
+end;
+
+procedure TKeyBoard.KeyUp(const Key: Integer);
+begin
+  System.KeyUp(Key);
+end;
+
+function TKeyBoard.isKeyDown(const Key: Integer): Boolean;
+begin
+  Result := System.isKeyDown(Key);
+end;
+
+var
+  Keyboard: TKeyBoard;
+

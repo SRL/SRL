@@ -1,0 +1,17 @@
+{$include_once shared.simba}
+
+{$include_once osr/Text.simba}
+{$include_once osr/Optionbox.simba}
+{$include_once osr/Gametabs.simba}
+
+
+{$IFDEF SMART}
+  {$include_once shared/smartbase.simba}
+  {$include_once osr/smart.simba}
+{$ENDIF}
+
+begin
+
+end;
+
+

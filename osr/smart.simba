@@ -1,0 +1,60 @@
+type
+  TSmart = record(TSmartBase)
+    World: Integer;
+  end;
+
+function TSmart.getSpawnParams(): Boolean;
+const
+  RS_URL = 'http://oldschool%d.runescape.com/';
+var
+  s: String;
+begin
+  if (Self.World <> 0) then
+    Self.Parameters.Root := Format(RS_URL, [Self.World])
+  else begin
+    s := Between('<span>(Old School', ')', GetPage('http://oldschool.runescape.com/slu'));
+    Self.World := StrToIntDef(ExtractFromStr(s, Numbers), -1);
+
+    if (Self.World = -1) then
+    begin
+      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2', TDebug.WARNING);
+      Self.World := 2;
+    end;
+
+    Self.Parameters.Root := Format(RS_URL, [Self.World]);
+  end;
+
+  Self.Parameters.Param := 'j1';
+  Result := True; // Can't really fail unlike the RS3 version
+end;
+
+function TSmart.Init(): Boolean; override;
+begin
+  {$IFDEF WINDOWS}
+  if (Self.FindJavaPath) and (Self.JavaPath = '') then // Hasnt been set already
+    if (not Self.LocateJavaPath(Self.JavaPath, True)) then
+      if (not Self.LocateJavaPath(Self.JavaPath, False)) then
+      begin
+        srl.Writeln('TSmart.Init() Failed to find java path, if you can''t enter a graphics mode set Smart.JavaPath to your java.exe' + LineEnding +
+                    'Make sure you have no empty java directorys, Looked in: ' + Self.JavaPath, TDebug.WARNING);
+        Self.JavaPath := '';
+      end;
+  {$ENDIF}
+
+  Result := inherited();
+
+  if (Result) then
+    AddOnTerminate(@Self.Free);
+end;
+
+var
+  Smart: TSmart;
+
+begin
+  Smart.FindJavaPath := True;
+  Smart.Width := 765;
+  Smart.Height := 503;
+  Smart.getParams := @Smart.getSpawnParams;
+end;
+
+

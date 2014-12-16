@@ -1,0 +1,133 @@
+procedure TPointArray.Append(const Value: TPoint);
+begin
+  Self += Value;
+end;
+
+procedure TPointArray.Insert(const Value: TPoint; Index: Integer);
+var
+  l: UInt32;
+begin
+  l := Length(Self);
+  if (l <= Index) then
+  begin
+    Self.Append(Value);
+    Exit();
+  end;
+
+  SetLength(Self, l + 1);
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
+  Self[Index] := Value;
+end;
+
+procedure TPointArray.Del(const Index: Integer; const Count: Integer = 1);
+begin
+  Delete(Self, Index, Count);
+end;
+
+function TPointArray.Len(): Integer;
+begin
+  Result := Length(Self);
+end;
+
+procedure TPointArray.Remove(const Value: TPoint; const All: Boolean = False);
+var
+  Arr: TIntegerArray;
+  i: Integer;
+begin
+  if (All) then
+    Arr := Self.FindAll(Value)
+  else begin
+    SetLength(Arr, 1);
+    Arr[0] := Self.Find(Value);
+  end;
+
+  for i := 0 to High(Arr) do
+    Self.Del(Arr[i]);
+end;
+
+function TPointArray.Pop(): TPoint;
+var
+  h: Integer;
+begin
+  h := High(Self);
+  Result := Self[h];
+  SetLength(Self, h);
+end;
+
+function TPointArray.Find(const Value: TPoint): Integer;
+begin
+  for Result := 0 to High(Self) do
+    if (Value.X = Self[Result].X) and (Value.Y = Self[Result].Y) then
+      Exit;
+
+  Result := -1;
+end;
+
+function TPointArray.FindAll(const Value: TPoint): TIntegerArray;
+var
+  i: UInt32;
+begin
+  for i := 0 to High(Self) do
+    if (Value.X = Self[i].X) and (Value.Y = Self[i].Y) then
+      Result += i;
+end
+
+function TPointArray.Reversed(): TPointArray;
+var
+  lo:PtrUInt;
+  p,r:^TPoint;
+begin
+  if (Length(Self) = 0) then
+    Exit();
+
+  SetLength(Result,length(self));
+  p := @Self[high(self)];
+  r := @Result[0];
+
+  lo := PtrUInt(@Self[0]);
+  while (lo<=PtrUInt(p)) do
+  begin
+    r^ := p^;
+    dec(p);
+    inc(r);
+  end;
+end;
+
+procedure TPointArray.Reverse();
+var
+  tmp:TPoint;
+  lo,hi:^TPoint;
+begin
+  if (Length(Self) = 0) then
+    Exit();
+
+  lo := @Self[0];
+  hi := @Self[High(self)];
+  while (PtrUInt(lo)<PtrUInt(hi)) do
+  begin
+    tmp := hi^;
+    hi^ := lo^;
+    lo^ := tmp;
+    dec(hi);
+    inc(lo);
+  end;
+end;
+
+function TPointArray.Combine(const Arr2: TPointArray): TPointArray;
+var
+  i, h, j: Integer;
+begin
+  if (Length(Arr2) = 0) then
+    Exit(Self);
+
+  Result := Self;
+  SetLength(Result, Length(Self) + Length(Arr2));
+
+  j := 0;
+  for i := Length(Self) to High(Arr2) + Length(Self) do
+  begin
+    Result[i] := Arr2[j];
+    Inc(j);
+  end;
+end;
+

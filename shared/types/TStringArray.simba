@@ -1,0 +1,132 @@
+procedure TStringArray.Append(const Value: String);
+begin
+  Self += Value;
+end;
+
+procedure TStringArray.Insert(const Value: String; Index: Integer);
+var
+  l: UInt32;
+begin
+  l := Length(Self);
+  if (l <= Index) then
+  begin
+    Self.Append(Value);
+    Exit();
+  end;
+
+  SetLength(Self, l + 1);
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
+  Self[Index] := Value;
+end;
+
+procedure TStringArray.Del(const Index: Integer; const Count: Integer = 1);
+begin
+  Delete(Self, Index, Count);
+end;
+
+function TStringArray.Len(): Integer;
+begin
+  Result := Length(Self);
+end;
+
+procedure TStringArray.Remove(const Value: String; const All: Boolean = False);
+var
+  Arr: TIntegerArray;
+  i: Integer;
+begin
+  if (All) then
+    Arr := Self.FindAll(Value)
+  else begin
+    SetLength(Arr, 1);
+    Arr[0] := Self.Find(Value);
+  end;
+
+  for i := 0 to High(Arr) do
+    Self.Del(Arr[i]);
+end;
+
+function TStringArray.Pop(): String;
+var
+  h: Integer;
+begin
+  h := High(Self);
+  Result := Self[h];
+  SetLength(Self, h);
+end;
+
+function TStringArray.Find(const Value: String): Integer;
+begin
+  for Result := 0 to High(Self) do
+    if (Value = Self[Result]) then
+      Exit;
+
+  Result := -1;
+end;
+
+function TStringArray.FindAll(const Value: String): TIntegerArray;
+var
+  i: UInt32;
+begin
+  for i := 0 to High(Self) do
+    if (Self[i] = Value) then
+      Result += i;
+end
+
+function TStringArray.Reversed(): TStringArray;
+var
+  lo:PtrUInt;
+  p,r:^String;
+begin
+  if (Length(Self) = 0) then
+    Exit();
+
+  SetLength(Result,length(self));
+  p := @Self[high(self)];
+  r := @Result[0];
+
+  lo := PtrUInt(@Self[0]);
+  while (lo<=PtrUInt(p)) do
+  begin
+    r^ := p^;
+    dec(p);
+    inc(r);
+  end;
+end;
+
+procedure TStringArray.Reverse();
+var
+  tmp:String;
+  lo,hi:^String;
+begin
+  if (Length(Self) = 0) then
+    Exit();
+
+  lo := @Self[0];
+  hi := @Self[High(self)];
+  while (PtrUInt(lo)<PtrUInt(hi)) do
+  begin
+    tmp := hi^;
+    hi^ := lo^;
+    lo^ := tmp;
+    dec(hi);
+    inc(lo);
+  end;
+end;
+
+function TStringArray.Combine(const Arr2: TStringArray): TStringArray;
+var
+  i, h, j: Integer;
+begin
+  if (Length(Arr2) = 0) then
+    Exit(Self);
+
+  Result := Self;
+  SetLength(Result, Length(Self) + Length(Arr2));
+
+  j := 0;
+  for i := Length(Self) to High(Arr2) + Length(Self) do
+  begin
+    Result[i] := Arr2[j];
+    Inc(j);
+  end;
+end;

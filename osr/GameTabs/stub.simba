@@ -1,0 +1,20 @@
+type
+  TInterfaceBase = record
+    FName: String;
+    FBounds: TBox;
+  end;
+ 
+procedure TInterfaceBase.setBounds(const NewBounds: TBox);
+begin
+  Self.FBounds := NewBounds;
+end;
+ 
+function TInterfaceBase.getBounds(): TBox;
+begin
+  Result := Self.FBounds;
+end;
+ 
+function TInterfaceBase.getMiddle(): TPoint;
+begin
+  Result := MiddleBox(Self.FBounds);
+end;
