@@ -127,7 +127,7 @@ begin
     Exit();
 
   for i:=0 to High(self.FSlots) do
-    if Self.IsSlotUsed(i) then
+    if Self.SlotIsUsed(i) then
       Result += i;
 end;
 
@@ -138,14 +138,14 @@ begin
   if not(self.Open()) then
     Exit();
 
-  for i:=0 to High(slots) do
+  for i:=0 to High(slotArr) do
   begin
     if self.SlotIsUsed(slotArr[i]) then
     begin
       (*
       Mouse.Move(B);
-      Optionbox.Open();
-      Optionbox.SelectOption('drop');
+      Optionsbox.Open();
+      Optionsbox.SelectOption('drop');
       *)
     end;
   end;

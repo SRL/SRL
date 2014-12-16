@@ -24,3 +24,72 @@ begin
       Result[idx].Expand(SizeMod);
     end;
 end;
+
+procedure TBox.GetDimensions(var w, h: integer);
+begin
+  w := Self.X2 - Self.X1 + 1;
+  h := Self.Y2 - Self.Y1 + 1;
+end;
+
+function TBox.EqualDimensions(const Other: TBox): Boolean;
+begin
+  Result := ((Self.X2 - Self.X1) = (Other.X2 - Other.X1)) and
+            ((Self.Y2 - Self.Y1) = (Other.Y2 - Other.Y1));
+end;
+
+function TBox.Width(): UInt32;
+begin
+  Result := Self.X2 - Self.X1 + 1;
+end;
+
+function TBox.Height(): UInt32;
+begin
+  Result := Self.Y2 - Self.Y1 + 1;
+end;
+
+function TBox.Middle(): TPoint;
+begin
+  Result := Point((Self.X2 + Self.X1) div 2, (Self.Y2 + Self.Y1) div 2);
+end;
+
+function TBox.Combine(b: TBox): TBox;
+begin
+  Result.X1 := Min(Min(b.X1, b.X2), Min(b.X1, b.X2));
+  Result.Y1 := Min(Min(b.Y1, b.Y2), Min(b.Y1, b.Y2));
+  Result.X2 := Max(Max(b.X1, b.X2), Max(b.X1, b.X2));
+  Result.Y2 := Max(Max(b.Y1, b.Y2), Max(b.Y1, b.Y2));
+end;
+
+function TBox.Overlap(b: TBox): boolean;
+begin
+  Result := not ((Self.X1 > b.X2) or (Self.X2 < b.X1) or (Self.Y1 > b.Y2) or (Self.Y2 < b.Y1));
+end;
+
+procedure TBox.Normalize();
+begin
+  if (Self.X1 > Self.X2) then
+    Swap(Self.X1, Self.X2)
+  else if (Self.Y1 > Self.Y2) then
+    Swap(Self.Y1, Self.Y2);
+end;
+
+procedure TBox.LimitTo(b: TBox);
+begin
+  Self.Normalize();
+
+  if (Self.X1 < b.X1) then Self.X1 := b.Y1;
+  if (Self.X1 > b.X2) then Self.X1 := b.Y2;
+  if (Self.X2 < b.X1) then Self.X2 := b.Y1;
+  if (Self.X2 > b.X2) then Self.X2 := b.Y2;
+
+  if (Self.Y1 < b.X1) then Self.Y1 := b.Y1;
+  if (Self.Y1 > b.X2) then Self.Y1 := b.Y2;
+  if (Self.Y2 < b.X1) then Self.Y2 := b.Y1;
+  if (Self.Y2 > b.X2) then Self.Y2 := b.Y2;
+end;
+
+function TBox.Equals(const CompareBox: TBox): Boolean;
+begin
+  Result := (Self.X1 = CompareBox.X1) and (Self.X2 = CompareBox.X2) and
+            (Self.Y1 = CompareBox.Y1) and (Self.Y2 = CompareBox.Y2);
+end;

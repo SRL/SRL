@@ -1,0 +1,133 @@
+type
+  TRSOption = record
+    FOption: String;
+    FBounds: TBox;
+  end;
+  TRSOptionArray = Array of TRSOption;
+
+  TRSOptionBox = record
+    FBounds: TBox;
+  end;
+
+
+var
+  OptionBox: TRSOptionBox;
+
+  BMP_ChooseOption: Int32;
+  BMP_ChooseOption_Width:Int32;
+  BMP_ChooseOption_Height:Int32;
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSOptionBox.__setup();
+begin
+  BMP_ChooseOption := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
+        'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
+  GetBitmapSize(BMP_ChooseOption, BMP_ChooseOption_Width, BMP_ChooseOption_Height);
+end;
+
+procedure __TRSOptionBox_Free(); begin FreeBitmap(BMP_ChooseOption); end;
+begin AddOnTerminate('__TRSOptionBox_Free'); end;
+{$ENDIF}
+
+
+function TRSOptionBox.__find(var Pos:TPoint): Boolean;
+var 
+  t: UInt32;
+begin
+  t := GetTimeRunning() + Random(1000,2000); //search for up to 2 sec
+  while GetTimeRunning() < t do
+  begin  
+    Result := FindBitmap(BMP_ChooseOption, pos.x, pos.y);
+    if Result then
+    begin
+      pos.y += BMP_ChooseOption_Height;
+      Exit;
+    end;
+  end;
+end;
+
+
+function TRSOptionBox.Active: Boolean;
+var _:Int32;
+begin
+  Result := FindBitmap(BMP_ChooseOption, _, _);
+end;
+
+
+function TRSOptionBox.Find(): Boolean;
+var
+  pt: TPoint;
+  B:TBox;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+begin
+  Self.FBounds := [0,0,0,0];
+  Result := Self.__find(pt);
+  if Result then
+  begin
+    B := GetClientBounds(True);
+    FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2);
+    ATPA := ClusterTPAEx(TPA,1,1);
+    SortATPAFrom(ATPA,pt);
+    if Length(ATPA) = 0 then 
+      RaiseException(erException,'No wai!! This is bullshit'); 
+      
+    Self.FBounds := GetTPABounds(ATPA[0]);
+    Self.FBounds.Expand(1);
+    //Self.FBounds.Y1 := (Self.FBounds.Y1 - BMP_ChooseOption_Height + 1);
+    Self.FBounds.LimitTo(GetClientBounds(False));
+  end;
+end;
+
+
+function TRSOptionBox.GetOptions(): TRSOptionArray;
+var
+  b: TBox;
+  i,bmp,oldT,T:Int32;
+begin
+  if not(self.Find()) then
+    Exit();
+
+  bmp := BitmapFromClient(FBounds.x1,FBounds.y1,FBounds.x2,FBounds.y2);
+  FastReplaceColor(bmp,4674653,0);
+  ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
+  //set image as target
+  oldT := GetImageTarget();
+  T := SetTargetBitmap(bmp);
+  SetImageTarget(T);
+
+  SetLength(Result, (FBounds.y2 - FBounds.y1 + 1) div 15);
+  for i:=0 to High(Result) do
+  begin
+    with B do
+    begin
+      x1 := 2;
+      y1 := i * 15 + 2;
+      x2 := (FBounds.x2 - FBounds.x1) - 2;
+      y2 := y1 + 15;
+    end;
+    Result[i].FOption := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
+
+    B.x1 += FBounds.x1;
+    B.y1 += FBounds.y1;
+    B.x2 += FBounds.x1;
+    B.y2 += FBounds.y1;
+    Result[i].FBounds := B;
+  end;
+  //return to old target
+  FreeTarget(T);
+  SetImageTarget(oldT);
+  FreeBitmap(bmp);
+end;
+
+
+function TRSOptionBox.Select(Options:TStringArray): Boolean;
+begin
+  //...
+end;
+
+begin
+  OptionBox.__setup();
+end;
+
+
