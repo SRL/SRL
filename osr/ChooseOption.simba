@@ -38,15 +38,14 @@ begin
     tryTime := Random(1500,2500);
 
   t := GetTimeRunning() + tryTime;
-  while GetTimeRunning() < t do
-  begin  
+  repeat
     Result := FindBitmap(BMP_ChooseOption, pos.x, pos.y);
     if Result then
     begin
       pos.y += BMP_ChooseOption_Height;
       Exit;
     end;
-  end;
+  until (GetTimeRunning() > t);
 end;
 
 
@@ -56,6 +55,18 @@ begin
   if tryTime < 0 then
     tryTime := Random(1500,2500);
   Result := self.__find(pt, tryTime);
+end;
+
+
+function TRSChooseOption.IsClosed(maxWaitTime:Int32=-1; IntervalMS:Int32=25): Boolean;
+var t:UInt32;
+begin
+  if maxWaitTime < 0 then
+    maxWaitTime := Random(1500,2500);
+  t := GetTimeRunning() + maxWaitTime;
+  while self.IsOpen(1) and (GetTimeRunning() < t) do
+    Wait(IntervalMS);
+  Result := not(self.IsOpen(1));
 end;
 
 
@@ -79,8 +90,7 @@ begin
       
     Self := GetTPABounds(ATPA[0]);
     Self.Expand(1);
-    //Self.Y1 := (Self.Y1 - BMP_ChooseOption_Height + 1);
-    Self.LimitTo(GetClientBounds(False));
+    Self.LimitTo(B);
   end;
 end;
 
@@ -92,6 +102,7 @@ var
 begin
   if not(self.Find()) then
     Exit();
+  WriteLn(Self,', ', GetClientBounds(True));
 
   bmp := BitmapFromClient(Self.x1,Self.y1,Self.x2,Self.y2);
   FastReplaceColor(bmp,4674653,0);
@@ -132,15 +143,48 @@ end;
 
 function TRSChooseOption.Close(): Boolean;
 var
-  wid,hei:Int32;
-  B:TBox;
+  i,minV,minI:Int32;
+  B,clientB:TBox;
+  pt:TPoint;
+  dist:Array [0..3] of Int32;
+const
+  MIN_MOUSE_OFFSET = 30;
+  RND = 40;
 begin
-  GetClientDimensions(wid, hei);
-  B := Self;
-  B.y1 -= BMP_ChooseOption_Height;
+  B := [Self.x1,self.y1-BMP_ChooseOption_Height,self.x2,self.y2];
+  B.Expand(MIN_MOUSE_OFFSET);
 
-  //move away from it preferably up.
+  clientB := GetClientBounds(True);
+  pt := Mouse.getPosition();
 
+  dist := [abs(pt.x - B.x1), abs(pt.y - B.y1), abs(pt.y - B.y2),abs(pt.x - B.x2)];
+  minv := Min(Min(dist[0],dist[2]),Min(dist[1],dist[3]));
+  if B.x1 < clientB.x1 then dist[0] := High(Int32); //left
+  if B.y1 < clientB.y1 then dist[1] := High(Int32); //top
+  if B.x2 > clientB.x2 then dist[2] := High(Int32); //right
+  if B.y2 > clientB.y2 then dist[3] := High(Int32); //bottom
+
+  for i:=0 to 3 do
+    if dist[i] < dist[minI] then
+      minI := i;
+
+  case minI of
+    0: pt := [B.x1-Random(RND), pt.y+Random(-RND,RND)]; //left
+    1: pt := [pt.x+Random(-RND,RND), B.y1-Random(RND)]; //top
+    2: pt := [B.x2+Random(RND), pt.y+Random(-RND,RND)]; //right
+    3: pt := [pt.x+Random(-RND,RND), B.y2+Random(RND)]; //bottom
+  end;
+  Mouse.Move(Point(
+      max(clientB.x1, min(pt.x, clientB.x2)),
+      max(clientB.y1, min(pt.y, clientB.y2))
+    ));
+
+  Result := self.IsClosed();
+  if not(Result) then
+  begin
+    self.Select(['Cancel']);
+    Result := self.IsClosed();
+  end;
 end;
 
 
