@@ -16,12 +16,12 @@ type
     tabMusic
   );
 
-  TGametab = type(pointer);
+  TRSGametab = type(pointer);
 
 var
-  Gametabs: TGametab;
+  Gametabs: TRSGametab;
 
-function TGametab.GetBounds(Tab:EGametab): TBox;
+function TRSGametab.GetBounds(Tab:EGametab): TBox;
 var 
   row,col:Int32;
   B:TBox;
@@ -36,7 +36,7 @@ begin
   Result := B.Partition(1, 7, -3)[col];
 end;
 
-function TGametab.IsOpen(Tab:EGametab): Boolean;
+function TRSGametab.IsOpen(Tab:EGametab): Boolean;
 var
   B:TBox;
   _:Int32;
@@ -48,7 +48,7 @@ begin
     //Exit(True);
 end;
 
-function TGametab.Open(Tab:EGametab): Boolean;
+function TRSGametab.Open(Tab:EGametab): Boolean;
 var
   t,i:Int32;
   B:TBox;
@@ -68,7 +68,7 @@ begin
 end;
 
 
-procedure TGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
 var
   t,i:Int32;
   B:TBox;
@@ -81,7 +81,7 @@ begin
 end;
 
 
-function TGametab.GetCurrent(): EGametab;
+function TRSGametab.GetCurrent(): EGametab;
 var i:Int32;
 begin
   for i:=0 to High(EGameTab) do

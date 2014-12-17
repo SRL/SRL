@@ -5,32 +5,35 @@ type
   end;
   TRSOptionArray = Array of TRSOption;
 
-  TRSOptionBox = record
+  TRSChooseOption = record
     FBounds: TBox;
   end;
 
 
 var
-  OptionBox: TRSOptionBox;
+  ChooseOption: TRSChooseOption;
 
   BMP_ChooseOption: Int32;
   BMP_ChooseOption_Width:Int32;
   BMP_ChooseOption_Height:Int32;
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSOptionBox.__setup();
+procedure TRSChooseOption.__setup();
 begin
   BMP_ChooseOption := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
   GetBitmapSize(BMP_ChooseOption, BMP_ChooseOption_Width, BMP_ChooseOption_Height);
 end;
 
-procedure __TRSOptionBox_Free(); begin FreeBitmap(BMP_ChooseOption); end;
-begin AddOnTerminate('__TRSOptionBox_Free'); end;
+procedure __TRSChooseOption_Free(); 
+begin 
+  FreeBitmap(BMP_ChooseOption); 
+end;
+
 {$ENDIF}
 
 
-function TRSOptionBox.__find(var Pos:TPoint): Boolean;
+function TRSChooseOption.__find(var Pos:TPoint): Boolean;
 var 
   t: UInt32;
 begin
@@ -47,14 +50,14 @@ begin
 end;
 
 
-function TRSOptionBox.Active: Boolean;
+function TRSChooseOption.Active: Boolean;
 var _:Int32;
 begin
   Result := FindBitmap(BMP_ChooseOption, _, _);
 end;
 
 
-function TRSOptionBox.Find(): Boolean;
+function TRSChooseOption.Find(): Boolean;
 var
   pt: TPoint;
   B:TBox;
@@ -80,7 +83,7 @@ begin
 end;
 
 
-function TRSOptionBox.GetOptions(): TRSOptionArray;
+function TRSChooseOption.GetOptions(): TRSOptionArray;
 var
   b: TBox;
   i,bmp,oldT,T:Int32;
@@ -121,13 +124,14 @@ begin
 end;
 
 
-function TRSOptionBox.Select(Options:TStringArray): Boolean;
+function TRSChooseOption.Select(Options:TStringArray): Boolean;
 begin
   //...
 end;
 
 begin
-  OptionBox.__setup();
+  ChooseOption.__setup();
+  AddOnTerminate('__TRSChooseOption_Free');
 end;
 
 
