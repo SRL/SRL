@@ -90,10 +90,10 @@ begin
   if (Self.X2 < b.X1) then Self.X2 := b.Y1;
   if (Self.X2 > b.X2) then Self.X2 := b.Y2;
 
-  if (Self.Y1 < b.X1) then Self.Y1 := b.Y1;
-  if (Self.Y1 > b.X2) then Self.Y1 := b.Y2;
-  if (Self.Y2 < b.X1) then Self.Y2 := b.Y1;
-  if (Self.Y2 > b.X2) then Self.Y2 := b.Y2;
+  if (Self.Y1 < b.Y1) then Self.Y1 := b.Y1;
+  if (Self.Y1 > b.Y2) then Self.Y1 := b.Y2;
+  if (Self.Y2 < b.Y1) then Self.Y2 := b.Y1;
+  if (Self.Y2 > b.Y2) then Self.Y2 := b.Y2;
 end;
 
 function TBox.Equals(const CompareBox: TBox): Boolean;
