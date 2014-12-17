@@ -28,7 +28,7 @@ end;
 
 function GaussRand(mean, dev: Extended): Extended;
 begin
-  result := mean + dev * _gaussRand();
+  result := mean + dev * __gaussRand();
 end;
 
 

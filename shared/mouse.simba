@@ -409,12 +409,12 @@ end;
 
 procedure TMouse.Move(const Box: TBox); overload;
 begin
-  Self.Move(gaussBox(Box));
+  Self.Move(GaussPoint(Box));
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
 begin
-  Self.Move(gaussPoint(Middle, 0.00, 360.0, Radius));
+  Self.Move(gaussPoint(Middle, Radius));
 end;
 
 procedure TMouse.Click(const Button: Integer);
@@ -453,12 +453,12 @@ end;
 
 procedure TMouse.Click(const Box: TBox; const Button: Integer); overload;
 begin
-  Self.Click(gaussBox(Box), Button);
+  Self.Click(GaussPoint(Box), Button);
 end;
 
 procedure TMouse.Click(const Middle: TPoint; const Radius, Button: Integer); overload;
 begin
-  Self.Click(gaussPoint(Middle, 0.00, 360.0, Radius), Button);
+  Self.Click(GaussPoint(Middle, Radius), Button);
 end;
 
 procedure TMouse.Miss(const Target: TPoint; const Correct: Boolean = False; const WaitAfterMiss: Integer = 0);
