@@ -5,10 +5,7 @@ type
   end;
   TOptionArray = Array of TOption;
 
-  TRSChooseOption = record
-    FBounds: TBox;
-  end;
-
+  TRSChooseOption = type TBox;
 
 var
   ChooseOption: TRSChooseOption;
@@ -69,7 +66,7 @@ var
   TPA:TPointArray;
   ATPA:T2DPointArray;
 begin
-  Self.FBounds := [0,0,0,0];
+  Self := [0,0,0,0];
   Result := Self.__find(pt);
   if Result then
   begin
@@ -80,10 +77,10 @@ begin
     if Length(ATPA) = 0 then 
       RaiseException(erException,'No wai!! This is bullshit'); 
       
-    Self.FBounds := GetTPABounds(ATPA[0]);
-    Self.FBounds.Expand(1);
-    //Self.FBounds.Y1 := (Self.FBounds.Y1 - BMP_ChooseOption_Height + 1);
-    Self.FBounds.LimitTo(GetClientBounds(False));
+    Self := GetTPABounds(ATPA[0]);
+    Self.Expand(1);
+    //Self.Y1 := (Self.Y1 - BMP_ChooseOption_Height + 1);
+    Self.LimitTo(GetClientBounds(False));
   end;
 end;
 
@@ -96,7 +93,7 @@ begin
   if not(self.Find()) then
     Exit();
 
-  bmp := BitmapFromClient(FBounds.x1,FBounds.y1,FBounds.x2,FBounds.y2);
+  bmp := BitmapFromClient(Self.x1,Self.y1,Self.x2,Self.y2);
   FastReplaceColor(bmp,4674653,0);
   ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
   //set image as target
@@ -104,18 +101,18 @@ begin
   T := SetTargetBitmap(bmp);
   SetImageTarget(T);
 
-  SetLength(Result, (FBounds.y2 - FBounds.y1 + 1) div 15);
+  SetLength(Result, (Self.y2 - Self.y1 + 1) div 15);
   for i:=0 to High(Result) do
   begin
     with B do
     begin
       x1 := 2;
       y1 := i * 15 + 2;
-      x2 := (FBounds.x2 - FBounds.x1) - 2;
+      x2 := (Self.x2 - Self.x1) - 2;
       y2 := y1 + 15;
     end;
     Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
-    B.Offset(Point(FBounds.x1, FBounds.y1));
+    B.Offset(Point(Self.x1, Self.y1));
     Result[i].bounds := B;
   end;
   //return to old target
@@ -134,8 +131,16 @@ end;
 
 
 function TRSChooseOption.Close(): Boolean;
+var
+  wid,hei:Int32;
+  B:TBox;
 begin
-  //...
+  GetClientDimensions(wid, hei);
+  B := Self;
+  B.y1 -= BMP_ChooseOption_Height;
+
+  //move away from it preferably up.
+
 end;
 
 
