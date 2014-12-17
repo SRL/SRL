@@ -124,9 +124,39 @@ begin
 end;
 
 
-function TRSChooseOption.Select(Options:TStringArray): Boolean;
+function TRSChooseOption.Open(): Boolean;
+var _:TPoint;
 begin
-  //...
+  Mouse.Click(mouse_right);
+  Result := self.__find(_);
+end;
+
+function TRSChooseOption.Select(SubStrings:TStringArray; CaseSensitive:Boolean=True): Boolean;
+var
+  Choices: TRSOptionArray;
+  i,j,L:Int32;
+begin
+  Choices := Self.GetOptions();
+  L := Length(Choices);
+  if L = 0 then
+    Exit(False);
+
+  for i:=0 to L-1 do
+    for j:=0 to High(SubStrings) do
+      case CaseSensitive of
+        True:
+          if Pos(SubStrings[j],Choices[i].FOption)<>0 then
+          begin
+            Mouse.Click(Choices[i].FBounds, mouse_left);
+            Exit(True);
+          end;
+        False:
+          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].FOption))<>0 then
+          begin
+            Mouse.Click(Choices[i].FBounds, mouse_left);
+            Exit(True);
+          end;
+        end;
 end;
 
 begin
