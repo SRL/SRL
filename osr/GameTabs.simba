@@ -90,3 +90,5 @@ begin
       Exit(EGameTab(i));
 end;
 
+
+{$include_once gametabs/inventory.simba}
