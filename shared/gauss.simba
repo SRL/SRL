@@ -9,6 +9,15 @@ var
   __gaussPoint: Extended = 0.4;
   __gaussRange: Extended = 0.3;
 
+  
+function TruncedGauss(Lo:Double=0; Hi:Double=1): Double;
+const LIMIT = 5.5;
+begin
+  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := MinE(Result, LIMIT);
+  Result := Result / LIMIT * (Hi-Lo) + Lo;
+end;
+  
 function _gaussPoly(r, rsqr: Extended): Extended;
 begin
   Result := __gauss_norm_0 * rsqr + __gauss_norm_1;
@@ -23,7 +32,7 @@ begin
   Result := sqrt(-2.0*ln(MaxE(Random(),3.72665E-6))) * cos(2.0*PI*Random());
 end;
 
-function gaussRand(mean, dev: Extended): Extended;
+function GaussRand(mean, dev: Extended): Extended;
 begin
   result := mean + dev * _gaussRand();
 end;
@@ -44,7 +53,7 @@ will lie within +/- 1*sigma, 95.4% within +/- 2.
     - by: Nava2
 
 *)
-function gauss(): Extended;
+function Gauss(): Extended;
 var
   r: Extended;
   i: Integer;
@@ -84,7 +93,7 @@ Example:
       WriteLn(Format("gX, gY -> %d, %d", gX, gY);
     end;
 *)
-function gaussPoint(Center: TPoint; sAngle, eAngle: Extended; maxRad: Integer): TPoint;
+function GaussPoint(Center: TPoint; sAngle, eAngle: Extended; maxRad: Integer): TPoint;
 var
   angle: Extended;
   radius: Extended;
@@ -115,7 +124,7 @@ begin
   end;
 end;
 
-function gaussRangeExt(minI, maxI: Extended): Extended;
+function GaussRangeExt(minI, maxI: Extended): Extended;
 var
   Valid: Boolean = False;
   mean: Extended;
@@ -139,12 +148,12 @@ begin
     RaiseException(erMathError, 'gaussRangeExt failure');
 end;
 
-function gaussRangeInt(minI, maxI: Integer): Integer;
+function GaussRangeInt(minI, maxI: Integer): Integer;
 begin
   Result := Round(gaussRangeExt(minI, maxI));
 end;
 
-function gaussBox(const Box: TBox): TPoint;
+function GaussBox(const Box: TBox): TPoint;
 begin
   Result.X := gaussRangeInt(Box.x1, Box.x2);
   Result.Y := gaussRangeInt(Box.y1, Box.y2);
@@ -153,7 +162,7 @@ begin
     writeln('gaussBox', Format('Point invalid (%d, %d)', [Result.X, Result.Y]));
 end;
 
-function gaussRandom(maxExt: Integer): Integer;
+function GaussRandom(maxExt: Integer): Integer;
 begin
   Result := gaussRangeInt(0, maxExt-1);
 end;
