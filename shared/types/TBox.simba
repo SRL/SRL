@@ -67,10 +67,10 @@ end;
 
 procedure TBox.Offset(pt:TPoint);
 begin
-  Result.X1 += pt.x;
-  Result.Y1 += pt.y;
-  Result.X2 += pt.x;
-  Result.Y2 += pt.y;
+  self.x1 += pt.x;
+  self.y1 += pt.y;
+  self.x2 += pt.x;
+  self.y2 += pt.y;
 end;
 
 procedure TBox.Normalize();

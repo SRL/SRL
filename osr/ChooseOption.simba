@@ -94,7 +94,7 @@ begin
   bmp := BitmapFromClient(FBounds.x1,FBounds.y1,FBounds.x2,FBounds.y2);
   FastReplaceColor(bmp,4674653,0);
   ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-  //set image as target
+  //set image as target (might be glitchy - time will tell)
   oldT := GetImageTarget();
   T := SetTargetBitmap(bmp);
   SetImageTarget(T);
@@ -110,11 +110,7 @@ begin
       y2 := y1 + 15;
     end;
     Result[i].FOption := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
-
-    B.x1 += FBounds.x1;
-    B.y1 += FBounds.y1;
-    B.x2 += FBounds.x1;
-    B.y2 += FBounds.y1;
+    B.Offset(Point(FBounds.x1, FBounds.y1));
     Result[i].FBounds := B;
   end;
   //return to old target
