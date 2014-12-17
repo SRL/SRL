@@ -1,9 +1,9 @@
 type
-  TRSOption = record
-    FOption: String;
-    FBounds: TBox;
+  TOption = record
+    str: String;
+    bounds: TBox;
   end;
-  TRSOptionArray = Array of TRSOption;
+  TOptionArray = Array of TOption;
 
   TRSChooseOption = record
     FBounds: TBox;
@@ -33,11 +33,14 @@ end;
 {$ENDIF}
 
 
-function TRSChooseOption.__find(var Pos:TPoint): Boolean;
+function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
   t: UInt32;
 begin
-  t := GetTimeRunning() + Random(1000,2000); //search for up to 2 sec
+  if tryTime < 0 then
+    tryTime := Random(1500,2500);
+
+  t := GetTimeRunning() + tryTime;
   while GetTimeRunning() < t do
   begin  
     Result := FindBitmap(BMP_ChooseOption, pos.x, pos.y);
@@ -50,10 +53,12 @@ begin
 end;
 
 
-function TRSChooseOption.Active: Boolean;
-var _:Int32;
+function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
+var pt:TPoint;
 begin
-  Result := FindBitmap(BMP_ChooseOption, _, _);
+  if tryTime < 0 then
+    tryTime := Random(1500,2500);
+  Result := self.__find(pt, tryTime);
 end;
 
 
@@ -83,7 +88,7 @@ begin
 end;
 
 
-function TRSChooseOption.GetOptions(): TRSOptionArray;
+function TRSChooseOption.GetOptions(): TOptionArray;
 var
   b: TBox;
   i,bmp,oldT,T:Int32;
@@ -94,7 +99,7 @@ begin
   bmp := BitmapFromClient(FBounds.x1,FBounds.y1,FBounds.x2,FBounds.y2);
   FastReplaceColor(bmp,4674653,0);
   ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-  //set image as target (might be glitchy - time will tell)
+  //set image as target
   oldT := GetImageTarget();
   T := SetTargetBitmap(bmp);
   SetImageTarget(T);
@@ -109,9 +114,9 @@ begin
       x2 := (FBounds.x2 - FBounds.x1) - 2;
       y2 := y1 + 15;
     end;
-    Result[i].FOption := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
+    Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
     B.Offset(Point(FBounds.x1, FBounds.y1));
-    Result[i].FBounds := B;
+    Result[i].bounds := B;
   end;
   //return to old target
   FreeTarget(T);
@@ -120,16 +125,23 @@ begin
 end;
 
 
-function TRSChooseOption.Open(): Boolean;
+function TRSChooseOption.Open(tryTime:Int32=-1): Boolean;
 var _:TPoint;
 begin
   Mouse.Click(mouse_right);
-  Result := self.__find(_);
+  Result := self.__find(_, tryTime);
 end;
 
-function TRSChooseOption.Select(SubStrings:TStringArray; CaseSensitive:Boolean=True): Boolean;
+
+function TRSChooseOption.Close(): Boolean;
+begin
+  //...
+end;
+
+
+function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Integer=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
 var
-  Choices: TRSOptionArray;
+  Choices: TOptionArray;
   i,j,L:Int32;
 begin
   Choices := Self.GetOptions();
@@ -141,18 +153,21 @@ begin
     for j:=0 to High(SubStrings) do
       case CaseSensitive of
         True:
-          if Pos(SubStrings[j],Choices[i].FOption)<>0 then
+          if Pos(SubStrings[j],Choices[i].str)<>0 then
           begin
-            Mouse.Click(Choices[i].FBounds, mouse_left);
+            Mouse.Click(Choices[i].bounds, mouseAction);
             Exit(True);
           end;
         False:
-          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].FOption))<>0 then
+          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str))<>0 then
           begin
-            Mouse.Click(Choices[i].FBounds, mouse_left);
+            Mouse.Click(Choices[i].bounds, mouse_left);
             Exit(True);
           end;
       end;
+
+  if AClose then
+    Self.Close();
 end;
 
 begin
