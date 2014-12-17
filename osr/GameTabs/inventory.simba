@@ -46,6 +46,20 @@ begin
 end;
 {$ENDIF}
 
+//given a pattern an a upper limit of "errors", it will swap around some values and return a "errorized" drop-pattern
+function TInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; MaxErrors:Int32=5): TIntegerArray;
+var i,j,h,errors:Integer;
+begin
+  Result := Copy(Pattern);
+  h := High(Pattern);
+  errors := Trunc(TruncedGauss(0,MaxErrors));
+  for i:=1 to Errors do
+  begin
+    j := RandomRange(1,h);
+    Swap(Result[j], Result[j-1]);
+  end;
+end;
+
 
 function TInventory.Open(): Boolean;
 begin
@@ -144,13 +158,28 @@ begin
   begin
     if self.SlotIsUsed(slotArr[i]) then
     begin
-      Mouse.Move(self.FSlots[slotArr[i]]);
-      //Check uptext?
-      ChooseOption.Open();
-      ChooseOption.Select(['Drop']);
-      //wait random?
+      if self.IsVaildSlot(slotArr[i]) then
+      begin
+        Mouse.Move(self.FSlots[slotArr[i]]);
+        //Check uptext?
+        ChooseOption.Open();
+        ChooseOption.Select(['Drop', 'drop', 'rop']);
+        wait(120 + random(100));
+      end else
+        {notify index out of range};
     end;
   end;
+end;
+
+procedure TInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+var
+  i:Int32;
+  ptrn:TIntegerArray;
+begin
+  for i:=0 to High(dropPattern) do
+    if not(InIntArray(ignoreSlots,dropPattern[i])) then
+      ptrn += dropPattern[i];
+  Self.DropItems(ptrn);
 end;
 
 
