@@ -105,7 +105,9 @@ end;
 function TInventory.GetSlotBox(idx:Int32): TBox;
 begin
   if self.IsVaildSlot(idx) then
-    Result := Self.FSlots[idx];
+    Result := Self.FSlots[idx]
+  else
+    {notify index out of range};
 end;
 
 
@@ -142,11 +144,10 @@ begin
   begin
     if self.SlotIsUsed(slotArr[i]) then
     begin
-      (*
       Mouse.Move(B);
-      Optionsbox.Open();
-      Optionsbox.SelectOption('drop');
-      *)
+      //Check uptext?
+      ChooseOption.Open();
+      ChooseOption.Select(['drop']);
     end;
   end;
 end;
