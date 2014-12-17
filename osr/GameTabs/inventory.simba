@@ -144,10 +144,11 @@ begin
   begin
     if self.SlotIsUsed(slotArr[i]) then
     begin
-      Mouse.Move(B);
+      Mouse.Move(self.FSlots[slotArr[i]]);
       //Check uptext?
       ChooseOption.Open();
-      ChooseOption.Select(['drop']);
+      ChooseOption.Select(['Drop']);
+      //wait random?
     end;
   end;
 end;
