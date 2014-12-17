@@ -65,6 +65,14 @@ begin
   Result := not ((Self.X1 > b.X2) or (Self.X2 < b.X1) or (Self.Y1 > b.Y2) or (Self.Y2 < b.Y1));
 end;
 
+procedure TBox.Offset(pt:TPoint);
+begin
+  Result.X1 += pt.x;
+  Result.Y1 += pt.y;
+  Result.X2 += pt.x;
+  Result.Y2 += pt.y;
+end;
+
 procedure TBox.Normalize();
 begin
   if (Self.X1 > Self.X2) then

@@ -156,7 +156,7 @@ begin
             Mouse.Click(Choices[i].FBounds, mouse_left);
             Exit(True);
           end;
-        end;
+      end;
 end;
 
 begin
