@@ -90,6 +90,3 @@ begin
       Exit(EGameTab(i));
 end;
 
-
-{$include_once gametabs/stub.simba}
-{$include_once gametabs/inventory.simba}

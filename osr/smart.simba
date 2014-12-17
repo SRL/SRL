@@ -44,7 +44,10 @@ begin
   Result := inherited();
 
   if (Result) then
+  begin
+    Wait(Random(500, 1000));
     AddOnTerminate(@Self.Free);
+  end;
 end;
 
 var

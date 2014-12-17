@@ -1,0 +1,240 @@
+const
+  Direction_North = 0;
+  Direction_East = 90;
+  Direction_South = 180;
+  Direction_West = 270;
+
+type
+  EMinimapOrb = (orbHP, orbPrayer, orbRun);
+
+type
+  TMMOrbInfo = record
+    TextBox: TBox;
+    Middle: TPoint;
+    Radius: Byte;
+ end;
+
+type
+  TMMCompassInfo = record
+    Middle: TPoint;
+    Bounds: TBox;
+    Radius: Byte;
+ end;
+
+  TMinimap = record (TInterfaceBase)
+    CompassInfo: TMMCompassInfo;
+    OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
+ end;
+
+var
+  Minimap: TMinimap;
+
+procedure TMinimap.__Setup();
+begin
+  with (Self) do
+  begin
+    setName('Minimap');
+    setStatic(True);
+    setBounds([570, 9, 716, 155]);
+
+    with (CompassInfo) do
+    begin
+      Bounds := [544, 3, 577, 37];
+      Middle := [561, 20];
+      Radius := 15;
+    end;
+
+    with (OrbInfo[Ord(orbHP)]) do
+    begin
+      Middle := [581, 136];
+      Radius := 15;
+      TextBox := [520, 55, 539, 68];
+    end;
+
+    with (OrbInfo[Ord(orbPrayer)]) do
+    begin
+      Middle := [581, 136];
+      Radius := 15;
+      TextBox := [521, 99, 540, 112];
+    end;
+
+    with (OrbInfo[Ord(orbRun)]) do
+    begin
+      Middle := [581, 136];
+      Radius := 11;
+      TextBox := [545, 135, 564, 148];
+    end;
+  end;
+end;
+
+function TMinimap._GetOrbValue(const orb: EMinimapOrb): Integer;
+const
+  IgnoreCols = [4938344, 0];
+  Font = 'StatChars07';
+var
+  ATPA: array [0..1] of TPointArray;
+  TextTPA: TPointArray;
+  i: Integer;
+begin
+  for i := 0 to High(IgnoreCols) do
+    FindColors(ATPA[i], IgnoreCols[i], OrbInfo[Ord(orb)].TextBox);
+
+  TextTPA := ReturnPointsNotInTPA(MergeATPA(ATPA), OrbInfo[Ord(orb)].TextBox);
+  Result := StrToIntDef(GetTextFromTPA(TextTPA, 1, 3, 100, Font), 0);
+end;
+
+function TMinimap.GetPrayerLevel(): Integer;
+begin
+  Result := Self._GetOrbValue(orbPrayer);
+end;
+
+function TMinimap.GetHPLevel(): Integer;
+begin
+  Result := Self._GetOrbValue(orbHP);
+end;
+
+function TMinimap.GetRunEnergy(): Integer;
+begin
+  Result := Self._GetOrbValue(orbRun);
+end;
+
+function TMinimap.isRunEnabled(const Time: UInt32 = 0): Boolean;
+const
+  Col = 6806252;
+  Tol = 15;
+  MinCount = 10;
+var
+  b: TBox;
+begin
+  with (Self.OrbInfo[Ord(orbRun)].Middle) do
+    b := [X - 6, Y - 6, X + 6, Y + 6];
+
+  if (Time = 0) then
+    Result := (CountColorTolerance(Col, b, Tol) > MinCount)
+  else
+    Result := WaitMinColorCount(Col, Tol, b, MinCount, Time);
+end;
+
+function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+begin
+  Result := True;
+
+  with (Self.OrbInfo[Ord(orbRun)]) do
+  begin
+    if (Enable) and (not Self.isRunEnabled()) then
+    begin
+      Mouse.Click(Middle, Radius, mouse_Left);
+      Result := Self.isRunEnabled(Random(600, 1000));
+    end
+    else
+    if (not Enable) and (Self.isRunEnabled()) then
+    begin
+      Mouse.Click(Middle, Radius, mouse_Left);
+      Result := not Self.isRunEnabled(Random(250, 500));
+    end;
+  end;
+
+  if (not Result) then
+    srl.WriteFmt(Self.getName() + '.ToggleRun(): Failed to %s run',
+                [BoolToStr(Enable, 'enable', 'disable')], TDebug.ERROR);
+end;
+
+{TODO - Use a bitmap!}
+function TMinimap.FindFlag(out p: TPoint): Boolean;
+const
+  PoleColor = 1127261;
+  FlagColor = 255;
+  LightPoleColor = 284358;
+var
+  TPA, TPAPoles: TPointArray;
+  ATPA, ATPAColumns: T2DPointArray;
+  i, j: Integer;
+begin
+  p := [-1, -1];
+  Freeze();
+
+  try
+    if (not FindColors(TPA, PoleColor, Self.getBounds())) then
+      Exit(False);
+
+    for i := 0 to High(TPA) do
+      if (GetColor(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetColor(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
+         (GetColor(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetColor(TPA[i].x, TPA[i].y + 1) = PoleColor) then
+           TPAPoles += TPA[i];
+
+    if (Length(TPAPoles) = 0) then
+      Exit(False);
+
+    ATPAColumns := FindTPAColumns(TPAPoles);
+    for i := 0 to High(ATPAColumns) do
+    begin
+      ATPA := SplitTPA(ATPAColumns[i], 1);
+
+      for j := 0 to High(ATPA) do
+        if (InRange(GetTPABounds(ATPA[j]).Height, 4, 20)) then
+        begin
+          Result := True;
+          p := ATPA[j][0];
+
+          while (p.y < Self.getBounds().Y2) and (GetColor(p) = PoleColor) do
+            Inc(p.y);
+
+          if (GetColor(p) <> PoleColor) then // Make sure we have the bottom of the pole
+            Dec(p.y);
+        end;
+    end;
+  finally
+    Unfreeze();
+  end;
+end;
+
+procedure TMinimap.WaitFlag(const Dist: UInt32 = 0);
+var
+  TimeOut: UInt64;
+  d, LastDist, SameDists: UInt32;
+  p: TPoint;
+begin
+  TimeOut := GetTickCount64() + Random(10000, 12000);
+  LastDist := 500;
+  SameDists := 0;
+
+  while (TimeOut > GetTickCount64()) and (Self.FindFlag(p)) do
+  begin
+    d := Distance(p, Self.getMiddle());
+    if (d <= Dist) then
+      Exit();
+
+    if (d = LastDist) then
+      Inc(SameDists)
+    else
+      SameDists := 0;
+
+    if (SameDists >= 20) then
+    begin
+      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 20 loops, exiting.. ', TDebug.WARNING);
+      Exit();
+    end;
+
+    LastDist := d;
+    Wait(Random(50, 100));
+  end;
+end;
+
+function TMinimap.GetCompassAngle(const AsDegrees: Boolean = True): Extended;
+begin
+
+end;
+
+function TMinimap.SetCompassAngle(const Degress: Extended): Boolean;
+begin
+
+end;
+
+
+begin
+  Minimap.__Setup();
+end;
+
+
+
+

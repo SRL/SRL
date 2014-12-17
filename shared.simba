@@ -3,7 +3,8 @@
 {$include_once shared/mouse.simba}
 {$include_once shared/keyboard.simba}
 {$include_once shared/wrappers.simba}
-
+{$include_once shared/text.simba}
+{$include_once shared/color.simba}
 
 {$include_once shared/types/TBox.simba}
 {$include_once shared/types/TStringArray.simba}
@@ -15,6 +16,7 @@
 {$include_once shared/onterminate.simba}
 {$include_once shared/srl.simba}
 {$include_once shared/time.simba}
+{$include_once shared/interfacebase.simba}
 
 begin
 

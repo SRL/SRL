@@ -104,7 +104,7 @@ var
 begin
   Result := False;
   Res := '';
-  writeln(Dir);
+
   if (Recursive) then
   begin
     Drive := Dir + ':/';
@@ -191,10 +191,11 @@ begin
   with (Self.Parameters) do
   begin
     if (JavaPath = '') then
+    begin
       JavaPath := 'java';
-
-    if (not Self.ShowConsole) then
-      JavaPath += 'w';
+      if (not Self.ShowConsole) then
+        JavaPath += 'w';
+    end;
 
     {$IFDEF WINDOWS}
     if (Pos('.exe', JavaPath) = 0) then
@@ -230,7 +231,7 @@ function TSmartBase.PairToExisting(): Boolean;
     i: Integer;
   begin
     for i := 0 to SmartGetClients(True) do
-      Result := Result + SmartGetAvailablePID(i);
+      Result += SmartGetAvailablePID(i);
   end;
 
 var
@@ -271,7 +272,7 @@ begin
     end;
   end;
 
-  srl.Writeln(Self.Name + '.PairToExisting(): Result = False');
+  srl.Writeln(Self.Name + '.PairToExisting(): Result = False', TDebug.FOOTER);
 end;
 
 function TSmartBase.Reload(): Boolean;

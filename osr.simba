@@ -1,9 +1,11 @@
+{$DEFINE OSR}
+
 {$include_once shared.simba}
 
 {$include_once osr/Text.simba}
 {$include_once osr/Optionbox.simba}
 {$include_once osr/Gametabs.simba}
-
+{$include_once osr/Minimap.simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}

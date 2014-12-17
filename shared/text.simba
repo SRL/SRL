@@ -1,0 +1,81 @@
+function FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
+var
+  img: Integer;
+begin
+  p := [-1, -1];
+
+  try
+    img := BitmapFromText(Text, Font);
+    Result := FindBitmapMaskTolerance(img, p, SearchBox, 30, 30);
+  finally
+    FreeBitmap(img);
+  end;
+end;
+
+function FindText(out Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+var
+  TPA, TPAText: TPointArray;
+  w, h: Integer;
+begin
+  if (not FindColorsTolerance(TPA, Color, SearchBox, Tolerance)) then
+    Exit(False);
+
+  TPAText := TPAFromText(Text, Font, w, h);
+  Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
+end;
+
+function MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
+var
+  TPA: TPointArray;
+  p: TPoint;
+begin
+  Result := FindText(p, Text, Font, SearchBox);
+
+  if (Result) then
+  begin
+    TPA := TPAFromText(Text, Font);
+    OffsetTPA(TPA, p);
+
+    Mouse.Move(GetTPABounds(TPA))
+    if (MouseAction <> mouse_Move) then
+      Mouse.Click(mouseAction);
+  end;
+end;
+
+function MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
+var
+  TPA, TPA2: TPointArray;
+  p: TPoint;
+  i: Integer;
+begin
+  Result := FindText(TPA2, Text, Font, Color, Tolerance, SearchBox);
+
+  if (Result) then
+  begin
+    p := TPA2[0];
+    TPA := TPAFromText(Text, Font);
+    OffsetTPA(TPA, p);
+
+    Mouse.Move(GetTPABounds(TPA))
+    if (MouseAction <> mouse_Move) then
+      Mouse.Click(mouseAction);
+  end;
+end;
+
+function GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
+var
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  if (Length(TPA) < 1) then
+    Exit('');
+
+  ATPA := ClusterTPAEx(TPA, MinVSpacing, HSpacing);
+  b := GetTPABounds(TPA);
+
+  SortATPAFromFirstPointX(ATPA, Point(b.X1, b.Y1));
+  Result := GetTextATPA(ATPA, MaxVSpacing, Font);
+end;
+
+
+

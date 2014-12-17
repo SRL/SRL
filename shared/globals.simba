@@ -1,4 +1,7 @@
 const
+  mouse_Move = 3;
+
+const
   VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
 
 const

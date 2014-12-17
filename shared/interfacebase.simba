@@ -1,0 +1,41 @@
+type
+  TInterfaceBase = record
+    FName: String;
+    FBounds: TBox;
+    FStatic: Boolean;
+  end;
+
+procedure TInterfaceBase.setName(const Name: String);
+begin
+  FName := Name;
+end;
+
+function TInterfaceBase.getName(): String;
+begin
+  Result := FName;
+end;
+
+procedure TInterfaceBase.setStatic(const Static: Boolean);
+begin
+  FStatic := Static;
+end;
+
+function TInterfaceBase.getStatic(): Boolean;
+begin
+  Result := FStatic;
+end;
+
+procedure TInterfaceBase.setBounds(const NewBounds: TBox);
+begin
+  Self.FBounds := NewBounds;
+end;
+ 
+function TInterfaceBase.getBounds(): TBox;
+begin
+  Result := Self.FBounds;
+end;
+ 
+function TInterfaceBase.getMiddle(): TPoint;
+begin
+  Result := MiddleBox(Self.FBounds);
+end;
