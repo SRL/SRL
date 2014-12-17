@@ -9,15 +9,7 @@ var
   __gaussPoint: Extended = 0.4;
   __gaussRange: Extended = 0.3;
 
-  
-function TruncedGauss(Lo:Double=0; Hi:Double=1): Double;
-const LIMIT = 5.5;
-begin
-  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
-  Result := MinE(Result, LIMIT);
-  Result := Result / LIMIT * (Hi-Lo) + Lo;
-end;
-  
+
 function _gaussPoly(r, rsqr: Extended): Extended;
 begin
   Result := __gauss_norm_0 * rsqr + __gauss_norm_1;
@@ -27,14 +19,41 @@ begin
   Result := Result * r;
 end;
 
-function _gaussRand(): Extended;
+{$IFNDEF CODEINSIGHT}
+function __gaussRand(): Extended;
 begin
-  Result := sqrt(-2.0*ln(MaxE(Random(),3.72665E-6))) * cos(2.0*PI*Random());
+  Result := sqrt(-2.0*ln(RandomE()))*cos(2.0*PI*RandomE());
 end;
+{$ENDIF}
 
 function GaussRand(mean, dev: Extended): Extended;
 begin
   result := mean + dev * _gaussRand();
+end;
+
+
+(*
+TruncedGauss
+~~~~~
+
+.. code-block:: pascal
+
+    function TruncedGauss(Lo:Double=0; Hi:Double=1): Double;
+
+First it generates a gaussian number, then truncates the number (gaussian doesn't live in a finite interval), 
+and then maps the number within given range [lo..hi] weighted towards `lo`
+
+.. note::
+
+    - by: slacky
+
+*)
+function TruncedGauss(lo:Double=0; hi:Double=1): Double;
+const LIMIT = 5.5;
+begin
+  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := MinE(Result, LIMIT);
+  Result := Result / LIMIT * (Hi-Lo) + Lo;
 end;
 
 (*
@@ -43,7 +62,7 @@ gauss
 
 .. code-block:: pascal
 
-    function gauss(): Extended;
+    function Gauss(): Extended;
 
 Calculates a standard normal value (N(0, 1)). By definition, 68.2% of points
 will lie within +/- 1*sigma, 95.4% within +/- 2.
@@ -66,101 +85,36 @@ begin
   result := _gaussPoly(r, r*r);
 end;
 
-(*
-gaussPoint
-~~~~~~~~~~~
 
-.. code-block:: pascal
-
-    procedure gaussPoint(cX, cY: Integer; sAngle, eAngle: Extended; maxRad: Integer; out oX, oY: Integer);
-
-Calculates a point about cX, cY with radius maxRad. The sangle and eangle are
-in radians. The point is returned in the reference parameters oX, oY.
-
-.. note::
-
-    - by: Nava2
-
-Example:
-
-.. code-block:: pascal
-
-    var
-      gX, gY: Integer;
-    begin
-      // get a gaussian pt in a circle:
-      gaussPoint(MMCX, MMCY, 0, math_2PI, MMX2-MMCX, gX, gY);
-      WriteLn(Format("gX, gY -> %d, %d", gX, gY);
-    end;
-*)
-function GaussPoint(Center: TPoint; sAngle, eAngle: Extended; maxRad: Integer): TPoint;
-var
-  angle: Extended;
-  radius: Extended;
-  xShift, yShift, t: Integer;
-  Valid: Boolean = False;
+function GaussRangeInt(minI, maxI: Integer): Integer;
 begin
-  if (eAngle < sAngle) then
-    Swap(eAngle, sAngle);
-
-  t := 0;
-  while ((not Valid) and (t < 100)) do
-  begin
-    { random angle about the center }
-    angle := sAngle + (eAngle-sAngle)*_gaussRand()/2.0;
-
-    { get normal pt about zero, where 68% lie within .5*maxRad }
-    radius := gaussRand(0, maxRad * 0.2);
-
-    { the shifting distance based on the radius and angle (both rand) }
-    xShift := Round(radius * Cos(angle));
-    yShift := Round(radius * Sin(angle));
-
-    Result.X := Center.X + xShift;
-    Result.Y := Center.Y + yShift;
-
-    valid := (Distance(Center.X, Center.Y, Result.X, Result.Y) <= maxRad);
-    Inc(t);
+  case Random(0,1) of
+    0: Result := Round((maxI+minI)/2.0 + TruncedGauss(0, (maxI-minI)/2));
+    1: Result := Round((maxI+minI)/2.0 - TruncedGauss(0, (maxI-minI)/2));
   end;
 end;
 
 function GaussRangeExt(minI, maxI: Extended): Extended;
-var
-  Valid: Boolean = False;
-  mean: Extended;
-  dev: Extended;
-  t: Integer;
 begin
-  { calculate the mean }
-  mean := (maxI+minI)/2.0;
-  dev  := abs(maxI-minI)/2.0 * __gaussRange;
-
-  t := 0;
-  while ((not Valid) and (t < 100)) do
-  begin
-    Result := gaussRand(mean, dev);
-    valid := ((Result >= minI) and (Result <= MaxI));
-
-    Inc(t);
+  case Random(0,1) of
+    0: Result := (maxI+minI)/2.0 + TruncedGauss(0, (maxI-minI)/2);
+    1: Result := (maxI+minI)/2.0 - TruncedGauss(0, (maxI-minI)/2);
   end;
-
-  if (not Valid) then
-    RaiseException(erMathError, 'gaussRangeExt failure');
 end;
 
-function GaussRangeInt(minI, maxI: Integer): Integer;
+
+function GaussPoint(center: TPoint; maxRad: Int32): TPoint;
 begin
-  Result := Round(gaussRangeExt(minI, maxI));
+  Result.X := GaussRangeInt(center.x-maxRad, center.x+maxRad);
+  Result.Y := GaussRangeInt(center.y-maxRad, center.y+maxRad);
 end;
 
-function GaussBox(const Box: TBox): TPoint;
+function GaussPoint(const Box: TBox): TPoint; overload;
 begin
-  Result.X := gaussRangeInt(Box.x1, Box.x2);
-  Result.Y := gaussRangeInt(Box.y1, Box.y2);
-
-  if (not PointInBox(Result, box)) then
-    writeln('gaussBox', Format('Point invalid (%d, %d)', [Result.X, Result.Y]));
+  Result.X := GaussRangeInt(Box.x1, Box.x2);
+  Result.Y := GaussRangeInt(Box.y1, Box.y2);
 end;
+
 
 function GaussRandom(maxExt: Integer): Integer;
 begin
