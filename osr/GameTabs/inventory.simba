@@ -9,7 +9,7 @@ type
  function TRSInventory.IsOpen(): Boolean;
  function TRSInventory.PointToSlot(pt:TPoint): Int32;
  function TRSInventory.IsFull(): Boolean;
- function TRSInventory.IsVaildSlot(idx: Int32): Boolean;
+ function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
  function TRSInventory.GetSlotBox(idx:Int32): TBox;
  function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
  function TRSInventory.GetUsedSlots(): TIntegerArray;
@@ -120,7 +120,7 @@ begin
 end;
 
 
-function TRSInventory.IsVaildSlot(idx: Int32): Boolean;
+function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
 begin
   Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
 end;
@@ -128,7 +128,7 @@ end;
 
 function TRSInventory.GetSlotBox(idx:Int32): TBox;
 begin
-  if self.IsVaildSlot(idx) then
+  if self.SlotIsVaild(idx) then
     Result := Self.FSlots[idx]
   else
     {notify index out of range};
@@ -167,7 +167,7 @@ begin
   for i:=0 to High(slotArr) do
     if self.SlotIsUsed(slotArr[i]) then
     begin
-      if self.IsVaildSlot(slotArr[i]) then
+      if self.SlotIsVaild(slotArr[i]) then
       begin
         Mouse.Move(self.FSlots[slotArr[i]]);
         //Check uptext?
