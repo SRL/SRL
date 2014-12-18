@@ -1,5 +1,5 @@
 {$include_once shared/globals.simba}
-{$include_once shared/gauss.simba}
+{$include_once shared/random.simba}
 {$include_once shared/mouse.simba}
 {$include_once shared/keyboard.simba}
 {$include_once shared/wrappers.simba}
