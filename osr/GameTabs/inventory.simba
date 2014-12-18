@@ -92,6 +92,15 @@ begin
 end;
 
 
+function TInventory.MouseSlot(idx:Int32): Int32;
+begin
+  if self.IsVaildSlot(idx) then
+    Mouse.Move(self.FSlots[idx])
+  else
+    {notify index out of range};
+end;
+
+
 function TInventory.IsFull(): Boolean;
 var
   i:Int32;
@@ -155,7 +164,6 @@ begin
     Exit();
 
   for i:=0 to High(slotArr) do
-  begin
     if self.SlotIsUsed(slotArr[i]) then
     begin
       if self.IsVaildSlot(slotArr[i]) then
@@ -163,12 +171,11 @@ begin
         Mouse.Move(self.FSlots[slotArr[i]]);
         //Check uptext?
         ChooseOption.Open();
-        ChooseOption.Select(['Drop', 'drop', 'rop']);
+        ChooseOption.Select(['Drop']);
         wait(120 + random(100));
       end else
         {notify index out of range};
     end;
-  end;
 end;
 
 procedure TInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
