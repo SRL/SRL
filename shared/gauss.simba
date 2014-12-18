@@ -5,12 +5,8 @@ const
   __gauss_norm_3 = 0.252408784;
   __gauss_norm_4 = 3.949846138;
 
-var
-  __gaussPoint: Extended = 0.4;
-  __gaussRange: Extended = 0.3;
-
-
-function _gaussPoly(r, rsqr: Extended): Extended;
+{$IFNDEF CODEINSIGHT}
+function __gaussPoly(r, rsqr: Extended): Extended;
 begin
   Result := __gauss_norm_0 * rsqr + __gauss_norm_1;
   Result := Result * rsqr + __gauss_norm_2;
@@ -19,13 +15,22 @@ begin
   Result := Result * r;
 end;
 
-{$IFNDEF CODEINSIGHT}
+
 function __gaussRand(): Extended;
 begin
-  Result := sqrt(-2.0*ln(RandomE()))*cos(2.0*PI*RandomE());
+  Result := Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random());
 end;
 {$ENDIF}
 
+(*
+GaussRand
+~~~~~
+.. code-block:: pascal
+
+  function GaussRand(mean, dev: Extended): Extended;
+
+Gaussian distribution. `dev` is the standard deviation.
+*)
 function GaussRand(mean, dev: Extended): Extended;
 begin
   result := mean + dev * __gaussRand();
@@ -35,18 +40,14 @@ end;
 (*
 TruncedGauss
 ~~~~~
-
 .. code-block:: pascal
 
-    function TruncedGauss(Lo:Double=0; Hi:Double=1): Double;
+  function TruncedGauss(Lo:Double=0; Hi:Double=1): Double;
 
-First it generates a gaussian number, then truncates the number (gaussian doesn't live in a finite interval), 
-and then maps the number within given range [lo..hi] weighted towards `lo`
+Generates a random gaussian number which is truncated and mapped within then 
+given range ``[lo..hi]`` weighted towards ``lo``
 
-.. note::
-
-    - by: slacky
-
+.. note:: by slacky
 *)
 function TruncedGauss(lo:Double=0; hi:Double=1): Double;
 const LIMIT = 5.5;
@@ -57,9 +58,8 @@ begin
 end;
 
 (*
-gauss
+Gauss
 ~~~~~
-
 .. code-block:: pascal
 
     function Gauss(): Extended;
@@ -68,9 +68,7 @@ Calculates a standard normal value (N(0, 1)). By definition, 68.2% of points
 will lie within +/- 1*sigma, 95.4% within +/- 2.
 
 .. note::
-
     - by: Nava2
-
 *)
 function Gauss(): Extended;
 var
@@ -82,10 +80,19 @@ begin
     r := r + (random(High(Integer))*1.0)/High(Integer);
 
   r := (r-6.0)/4.0 ;
-  result := _gaussPoly(r, r*r);
+  result := __gaussPoly(r, r*r);
 end;
 
 
+(*
+GaussRangeInt
+~~~~~
+.. code-block:: pascal
+
+  function GaussRangeInt(minI, maxI: Integer): Integer;
+
+Generates a random integer in the given range, weighted towards the mean.
+*)
 function GaussRangeInt(minI, maxI: Integer): Integer;
 begin
   case Random(0,1) of
@@ -94,6 +101,15 @@ begin
   end;
 end;
 
+(*
+GaussRangeExt
+~~~~~
+.. code-block:: pascal
+
+  function GaussRangeExt(minI, maxI: Extended): Extended;
+
+Generates a random float in the given range, weighted towards the mean.
+*)
 function GaussRangeExt(minI, maxI: Extended): Extended;
 begin
   case Random(0,1) of
@@ -102,13 +118,32 @@ begin
   end;
 end;
 
+(*
+GaussPoint
+~~~~~
+.. code-block:: pascal
 
+  function GaussPoint(center: TPoint; maxRad: Int32): TPoint;
+
+Generates a random TPoint which weights around ``center``, with a max distance 
+from center defined by ``maxRad``.
+*)
 function GaussPoint(center: TPoint; maxRad: Int32): TPoint;
 begin
   Result.X := GaussRangeInt(center.x-maxRad, center.x+maxRad);
   Result.Y := GaussRangeInt(center.y-maxRad, center.y+maxRad);
 end;
 
+(*
+GaussPoint (overload)
+~~~~~
+.. code-block:: pascal
+
+  function GaussPoint(const Box: TBox): TPoint; overload;
+
+Generates a random TPoint in the bounds of the given box, 
+the point weights towards the center of the box.
+*)
 function GaussPoint(const Box: TBox): TPoint; overload;
 begin
   Result.X := GaussRangeInt(Box.x1, Box.x2);
@@ -118,5 +153,5 @@ end;
 
 function GaussRandom(maxExt: Integer): Integer;
 begin
-  Result := gaussRangeInt(0, maxExt-1);
+  Result := GaussRangeInt(0, maxExt-1);
 end;
