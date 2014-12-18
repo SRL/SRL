@@ -62,6 +62,11 @@ begin
 end;
 
 
+function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
+begin
+  Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
+end;
+
 function TRSInventory.Open(): Boolean;
 begin
   Result := Gametabs.Open(tabInventory);
@@ -95,7 +100,7 @@ end;
 
 function TRSInventory.MouseSlot(idx:Int32): Int32;
 begin
-  if self.IsVaildSlot(idx) then
+  if self.SlotIsVaild(idx) then
     Mouse.Move(self.FSlots[idx])
   else
     {notify index out of range};
@@ -117,12 +122,6 @@ begin
       Exit(False);
   end;
   Result := True;
-end;
-
-
-function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
-begin
-  Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
 end;
 
 
