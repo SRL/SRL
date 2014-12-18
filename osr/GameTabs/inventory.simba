@@ -1,22 +1,22 @@
 type 
-  TInventory = record(TInterfaceBase)
+  TRSInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
   end;
 
 {
- procedure TInventory.__setup();
- function TInventory.Open(): Boolean;
- function TInventory.IsOpen(): Boolean;
- function TInventory.PointToSlot(pt:TPoint): Int32;
- function TInventory.IsFull(): Boolean;
- function TInventory.IsVaildSlot(idx: Int32): Boolean;
- function TInventory.GetSlotBox(idx:Int32): TBox;
- function TInventory.SlotIsUsed(idx:Int32): Boolean;
- function TInventory.GetUsedSlots(): TIntegerArray;
+ procedure TRSInventory.__setup();
+ function TRSInventory.Open(): Boolean;
+ function TRSInventory.IsOpen(): Boolean;
+ function TRSInventory.PointToSlot(pt:TPoint): Int32;
+ function TRSInventory.IsFull(): Boolean;
+ function TRSInventory.IsVaildSlot(idx: Int32): Boolean;
+ function TRSInventory.GetSlotBox(idx:Int32): TBox;
+ function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
+ function TRSInventory.GetUsedSlots(): TIntegerArray;
 }
 
 var 
-  Inventory: TInventory;
+  Inventory: TRSInventory;
 
 const
     //Column wise (Z-style) and "reversed" column wise (S-style)
@@ -33,7 +33,7 @@ const
 
 
 {$IFNDEF CODEINSIGHT}
-procedure TInventory.__setup();
+procedure TRSInventory.__setup();
 var i:Int32;
 begin
   self.FBounds := [558,211,725,462];
@@ -46,8 +46,9 @@ begin
 end;
 {$ENDIF}
 
+
 //given a pattern an a upper limit of "errors", it will swap around some values and return a "errorized" drop-pattern
-function TInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; MaxErrors:Int32=5): TIntegerArray;
+function TRSInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; MaxErrors:Int32=5): TIntegerArray;
 var i,j,h,errors:Integer;
 begin
   Result := Copy(Pattern);
@@ -61,19 +62,19 @@ begin
 end;
 
 
-function TInventory.Open(): Boolean;
+function TRSInventory.Open(): Boolean;
 begin
   Result := Gametabs.Open(tabInventory);
 end;
 
 
-function TInventory.IsOpen(): Boolean;
+function TRSInventory.IsOpen(): Boolean;
 begin
   Result := Gametabs.IsOpen(tabInventory);
 end;
 
 
-function TInventory.PointToSlot(pt:TPoint): Int32;
+function TRSInventory.PointToSlot(pt:TPoint): Int32;
 var
   x,y,w:Int32;
 const
@@ -92,7 +93,7 @@ begin
 end;
 
 
-function TInventory.MouseSlot(idx:Int32): Int32;
+function TRSInventory.MouseSlot(idx:Int32): Int32;
 begin
   if self.IsVaildSlot(idx) then
     Mouse.Move(self.FSlots[idx])
@@ -101,7 +102,7 @@ begin
 end;
 
 
-function TInventory.IsFull(): Boolean;
+function TRSInventory.IsFull(): Boolean;
 var
   i:Int32;
   b:TBox;
@@ -119,13 +120,13 @@ begin
 end;
 
 
-function TInventory.IsVaildSlot(idx: Int32): Boolean;
+function TRSInventory.IsVaildSlot(idx: Int32): Boolean;
 begin
   Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
 end;
 
 
-function TInventory.GetSlotBox(idx:Int32): TBox;
+function TRSInventory.GetSlotBox(idx:Int32): TBox;
 begin
   if self.IsVaildSlot(idx) then
     Result := Self.FSlots[idx]
@@ -134,7 +135,7 @@ begin
 end;
 
 
-function TInventory.SlotIsUsed(idx:Int32): Boolean;
+function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
 var b:TBox;
 begin
   if not(self.Open()) then
@@ -145,7 +146,7 @@ begin
 end;
 
 
-function TInventory.GetUsedSlots(): TIntegerArray;
+function TRSInventory.GetUsedSlots(): TIntegerArray;
 var i:Int32;
 begin
   if not(self.Open()) then
@@ -157,7 +158,7 @@ begin
 end;
 
 
-procedure TInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
 var i:Int32;
 begin
   if not(self.Open()) then
@@ -178,7 +179,8 @@ begin
     end;
 end;
 
-procedure TInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+
+procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 var
   i:Int32;
   ptrn:TIntegerArray;
