@@ -8,7 +8,7 @@ Runescape chat box.
 (*
 type TRSChatbox
 ~~~~~~~~~~~~~~~
-A type that stores functions and properties of the Runescape chat box interface.
+The type that holds functions and properties of the Runescape chat box interface.
 *)
 type 
   TRSChatbox = record(TInterfaceBase)
@@ -37,12 +37,12 @@ procedure TRSChatbox.__setup();
 var i:Int32;
 begin
   for i:=0 to 7 do
-    FLines.Append([10,345+(14*i),490,360+(14*i)+1]);
+    FLines.Append([10,345+(14*i),496,360+(14*i)+1]);
   FLines.Append([10,459,500,474]); //input-field
   
   with Self do
   begin
-    FBounds := [7,345,512,473];
+    FBounds := [7,345,512,474];
     FName := 'Chatbox';
     FStatic := True;
   end;
@@ -100,6 +100,8 @@ chatbox.FindTextOnLines
 Returns true if the text in 'txt' is found on the 'lines' of the chatbox.  The
 lines start with 0 being the bottom chat line.
 
+.. note:: by slacky
+
 Example:
 
 .. code-block:: pascal
@@ -115,6 +117,24 @@ begin
     if IsArrInStr(txt, Self.GetTextOnLine(lines[i], colors)) then
       Exit(True);
 end;
+
+
+(*
+chatbox.GetChatArea
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GetChatArea(): TBox;
+
+Returns a TBox which only covers the chat-area, does not include the scrollbar and input-field.
+
+.. note:: by slacky
+*)
+function TRSChatbox.GetChatArea(): TBox;
+begin
+  result := intToBox(self.x1, self.y1, self.x2-16, self.y2-16);
+end;
+
 
 begin
   chatbox.__setup();
