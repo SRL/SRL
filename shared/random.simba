@@ -31,7 +31,7 @@ GaussRand
 
 Gaussian distribution. `dev` is the standard deviation.
 *)
-function GaussRand(mean, dev: Extended): Extended;
+function TSRL.GaussRand(mean, dev: Extended): Extended;
 begin
   result := mean + dev * __gaussRand();
 end;
@@ -49,7 +49,7 @@ given range ``[lo..hi]`` weighted towards ``lo``
 
 .. note:: by slacky
 *)
-function TruncedGauss(lo:Double=0; hi:Double=1): Double;
+function TSRL.TruncedGauss(lo:Double=0; hi:Double=1): Double;
 const LIMIT = 5.5;
 begin
   Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
@@ -70,7 +70,7 @@ will lie within +/- 1*sigma, 95.4% within +/- 2.
 .. note::
     - by: Nava2
 *)
-function Gauss(): Extended;
+function TSRL.Gauss(): Extended;
 var
   r: Extended;
   i: Integer;
@@ -93,7 +93,7 @@ GaussRangeInt
 
 Generates a random integer in the given range, weighted towards the mean.
 *)
-function GaussRangeInt(minI, maxI: Integer): Integer;
+function TSRL.GaussRangeInt(minI, maxI: Integer): Integer;
 begin
   case Random(0,1) of
     0: Result := Round((maxI+minI)/2.0 + TruncedGauss(0, (maxI-minI)/2));
@@ -110,7 +110,7 @@ GaussRangeExt
 
 Generates a random float in the given range, weighted towards the mean.
 *)
-function GaussRangeExt(minI, maxI: Extended): Extended;
+function TSRL.GaussRangeExt(minI, maxI: Extended): Extended;
 begin
   case Random(0,1) of
     0: Result := (maxI+minI)/2.0 + TruncedGauss(0, (maxI-minI)/2);
@@ -128,7 +128,7 @@ GaussPoint
 Generates a random TPoint which weights around ``center``, with a max distance 
 from center defined by ``maxRad``.
 *)
-function GaussPoint(center: TPoint; maxRad: Int32): TPoint;
+function TSRL.GaussPoint(center: TPoint; maxRad: Int32): TPoint;
 begin
   Result.X := GaussRangeInt(center.x-maxRad, center.x+maxRad);
   Result.Y := GaussRangeInt(center.y-maxRad, center.y+maxRad);
@@ -144,14 +144,14 @@ GaussPoint (overload)
 Generates a random TPoint in the bounds of the given box, 
 the point weights towards the center of the box.
 *)
-function GaussPoint(const Box: TBox): TPoint; overload;
+function TSRL.GaussPoint(const Box: TBox): TPoint; overload;
 begin
   Result.X := GaussRangeInt(Box.x1, Box.x2);
   Result.Y := GaussRangeInt(Box.y1, Box.y2);
 end;
 
 
-function GaussRandom(maxExt: Integer): Integer;
+function TSRL.GaussRandom(maxExt: Integer): Integer;
 begin
   Result := GaussRangeInt(0, maxExt-1);
 end;

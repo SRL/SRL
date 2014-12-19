@@ -53,7 +53,7 @@ var i,j,h,errors:Integer;
 begin
   Result := Copy(Pattern);
   h := High(Pattern);
-  errors := Trunc(TruncedGauss(0,MaxErrors));
+  errors := Trunc(srl.TruncedGauss(0,MaxErrors));
   for i:=1 to Errors do
   begin
     j := RandomRange(1,h);
@@ -66,6 +66,7 @@ function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
 begin
   Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
 end;
+
 
 function TRSInventory.Open(): Boolean;
 begin

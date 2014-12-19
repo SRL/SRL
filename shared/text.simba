@@ -1,4 +1,4 @@
-function FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
+function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
 var
   img: Integer;
 begin
@@ -12,7 +12,7 @@ begin
   end;
 end;
 
-function FindText(out Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(out Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
 var
   TPA, TPAText: TPointArray;
   w, h: Integer;
@@ -24,7 +24,7 @@ begin
   Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
 end;
 
-function MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
+function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
 var
   TPA: TPointArray;
   p: TPoint;
@@ -42,7 +42,7 @@ begin
   end;
 end;
 
-function MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
+function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
 var
   TPA, TPA2: TPointArray;
   p: TPoint;
@@ -62,7 +62,7 @@ begin
   end;
 end;
 
-function GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
+function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
 var
   ATPA: T2DPointArray;
   b: TBox;

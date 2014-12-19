@@ -1,4 +1,4 @@
-function WaitMinColorCount(const Color, Tolerance: Integer; Area: TBox; MinCount, WaitTime: Integer): Boolean;
+function TSRL.WaitMinColorCount(const Color, Tolerance: Integer; Area: TBox; MinCount, WaitTime: Integer): Boolean;
 var
   TimeOut: UInt64;
 begin

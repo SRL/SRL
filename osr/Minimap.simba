@@ -80,7 +80,7 @@ begin
     FindColors(ATPA[i], IgnoreCols[i], OrbInfo[Ord(orb)].TextBox);
 
   TextTPA := ReturnPointsNotInTPA(MergeATPA(ATPA), OrbInfo[Ord(orb)].TextBox);
-  Result := StrToIntDef(GetTextFromTPA(TextTPA, 1, 3, 100, Font), 0);
+  Result := StrToIntDef(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 0);
 end;
 
 function TMinimap.GetPrayerLevel(): Integer;
@@ -112,7 +112,7 @@ begin
   if (Time = 0) then
     Result := (CountColorTolerance(Col, b, Tol) > MinCount)
   else
-    Result := WaitMinColorCount(Col, Tol, b, MinCount, Time);
+    Result := srl.WaitMinColorCount(Col, Tol, b, MinCount, Time);
 end;
 
 function TMinimap.ToggleRun(const Enable: Boolean): Boolean;

@@ -1,7 +1,7 @@
 type
   TTimeFormat = (Time_Formal, Time_Short, Time_Abbrev, Time_Bare, Time_FStop, Time_Formal_Long);
 
-function MsToTime(const MS: UInt64; const Format: TTimeFormat): String;
+function TSRL.MsToTime(const MS: UInt64; const Format: TTimeFormat): String;
 var
   STA: array [0..5] of TVariantArray;
   Time: TIntegerArray;
@@ -34,12 +34,12 @@ begin
       Result += PadZ(IntToStr(Time[i]), STA[Ord(Format)][tl+1]) + STA[Ord(Format)][i];
 end;
 
-function TimeRunning(TheType: TTimeFormat = Time_Formal_Long): String;
+function TSRL.TimeRunning(TheType: TTimeFormat = Time_Formal_Long): String;
 begin
   Result := MsToTime(GetTimeRunning(), TheType);
 end;
 
-function WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+function TSRL.WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
 var
   t: UInt64;
 begin
@@ -54,7 +54,7 @@ begin
   end;
 end;
 
-function WaitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
+function TSRL.WaitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean;
 var
   t: UInt64;
 begin
