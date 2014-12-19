@@ -48,22 +48,24 @@ begin
     //Exit(True);
 end;
 
-function TRSGametab.Open(Tab:EGametab): Boolean;
+function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
 var
-  t,i:Int32;
+  i:Int32;
+  t:UInt64;
   B:TBox;
 begin
   B := self.getBounds(Tab);
   if Self.IsOpen(Tab) then
     Exit(True);
 
-  for i:=1 to 3 do
+  for i:=1 to tries do
   begin
     Mouse.Click(B, 1);
-    t := GetTimeRunning() + Random(2500,3500);
-    while (GetTimeRunning() < t) do
+    t := GetTickCount64() + Random(1500,2500);
+    repeat
       if self.IsOpen(Tab) then
         Exit(True);
+    until (GetTickCount64() > t);
   end;
 end;
 
