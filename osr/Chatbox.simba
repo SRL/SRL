@@ -16,6 +16,14 @@ type
   end;
 
 (*
+var chatbox
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape chatbox interface.
+*)
+var
+  chatbox: TRSChatbox;
+
+(*
 const CHATBOX_COLORS
 ~~~~~~~~~~~
 constant that holds all the possible text-colors
@@ -23,14 +31,6 @@ constant that holds all the possible text-colors
 const
   CHATBOX_COLORS = [0,127,16711680,8323199];
 
-(*
-var chatbox
-~~~~~~~~~~~
-Variable that stores functions and properties of the Runescape chatbox interface.
-*)
-var
-  chatbox: TRSChatbox;
-  
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSChatbox.__setup();
