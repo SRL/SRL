@@ -132,7 +132,8 @@ Returns a TBox which only covers the chat-area, does not include the scrollbar a
 *)
 function TRSChatbox.GetChatArea(): TBox;
 begin
-  result := intToBox(self.x1, self.y1, self.x2-16, self.y2-16);
+  with self.FBounds do
+    result := [x1, y1, x2-16, y2-16];
 end;
 
 
