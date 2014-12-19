@@ -22,22 +22,21 @@ begin
   GetBitmapSize(BMP_ChooseOption, BMP_ChooseOption_Width, BMP_ChooseOption_Height);
 end;
 
-procedure __TRSChooseOption_Free(); 
+procedure TRSChooseOption.__free(); 
 begin 
   FreeBitmap(BMP_ChooseOption); 
 end;
-
 {$ENDIF}
 
 
 function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
-  t: UInt32;
+  t: UInt64;
 begin
   if tryTime < 0 then
     tryTime := Random(1500,2500);
 
-  t := GetTimeRunning() + tryTime;
+  t := GetTickCount64() + tryTime;
   repeat
     Result := FindBitmap(BMP_ChooseOption, pos.x, pos.y);
     if Result then
@@ -45,7 +44,7 @@ begin
       pos.y += BMP_ChooseOption_Height;
       Exit;
     end;
-  until (GetTimeRunning() > t);
+  until (GetTickCount64() > t);
 end;
 
 
@@ -59,12 +58,12 @@ end;
 
 
 function TRSChooseOption.IsClosed(maxWaitTime:Int32=-1; IntervalMS:Int32=25): Boolean;
-var t:UInt32;
+var t:UInt64;
 begin
   if maxWaitTime < 0 then
     maxWaitTime := Random(1500,2500);
-  t := GetTimeRunning() + maxWaitTime;
-  while self.IsOpen(1) and (GetTimeRunning() < t) do
+  t := GetTickCount64() + maxWaitTime;
+  while self.IsOpen(1) and (GetTickCount64() < t) do
     Wait(IntervalMS);
   Result := not(self.IsOpen(1));
 end;
@@ -221,7 +220,7 @@ end;
 
 begin
   ChooseOption.__setup();
-  AddOnTerminate('__TRSChooseOption_Free');
+  AddOnTerminate(@ChooseOption.__free);
 end;
 
 
