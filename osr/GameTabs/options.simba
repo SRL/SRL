@@ -18,6 +18,17 @@ type
  procedure TRSOptions.__setup();
  function TRSOptions.Open(): Boolean;
  function TRSOptions.IsOpen(): Boolean;
+ function TRSOptions.IsButtonBoxEnabled(B:TBox): Boolean;
+ function TRSOptions.ClickButtonBox(B:TBox; out enabled:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.GetCurrentTab(): EOptionsTab;
+ function TRSOptions.SetCurrentTab(tab: EOptionsTab; tryTime:Int32=2000): Boolean;
+ function TRSOptions.GetBrightness(): Int32;
+ function TRSOptions.SetBrightness(level: Int32; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleOrbs(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleRoofRemoval(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleRemainingXP(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleAcceptAid(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleRun(enable:Boolean; tryTime:Int32=2000): Boolean;
 }
 
 (*
@@ -37,7 +48,7 @@ A type that covers the internal tabs in TRSOptions: ``EOptionsTab = (optDisplay,
 type
   EOptionsTab = (optDisplay, optAudio, optChat, optControls);
 
-
+  
 {$IFNDEF CODEINSIGHT}
 procedure TRSOptions.__setup();
 var i:Int32;
@@ -53,7 +64,7 @@ begin
   //the four tabs (Display, Audio, Chat, Controls)
   Self.FTabs += TBox([553,206,592,245]);
   Self.FTabs += TBox([599,206,638,245]);
-  Self.FTabs += TBox([545,206,684,245]);
+  Self.FTabs += TBox([645,206,684,245]);
   Self.FTabs += TBox([691,206,730,245]);
 end;
 {$ENDIF}
@@ -86,22 +97,21 @@ begin
   Result := Gametabs.IsOpen(tabOptions);
 end;
 
-
+//helper: Checks if the given button (by bounds) is red/enabled 
 function TRSOptions.IsButtonBoxEnabled(B:TBox): Boolean;
-var count:Int32;
 begin
   if not(self.Open()) then
-    Exit();
-
+    Exit(False);
   Result := CountColorTolerance(1777019, B, 30) > 100;
 end;
 
-
-function TRSOptions.ToggleButtonBox(B:TBox; var enabled:Boolean; tryTime:Int32=2000): Boolean;
+//helper: Clicks the given button and returns True if it didn't fail
+function TRSOptions.ClickButtonBox(B:TBox; out enabled:Boolean; tryTime:Int32=2000): Boolean;
 var t:UInt64;
 begin
   if not(self.Open()) then
-    Exit();
+    Exit(False);
+
   enabled := not(Self.IsButtonBoxEnabled(B));
   mouse.click(B, mouse_left);
 
@@ -112,6 +122,19 @@ begin
     else
       Wait(25);
   until GetTickCount64() > t;
+end;
+
+//helper: Changes tab, and toggles the given button returns True if it didn't fail
+function TRSOptions.__toggleButton(button:TBox; tab:EOptionsTab; enable:Boolean; tryTime:Int32): Boolean;
+var
+  enabled:Boolean;
+begin
+  if not(self.SetCurrentTab(tab)) then
+    Exit(False);
+  if Self.IsButtonBoxEnabled(button) = enable then
+    Result := True
+  else
+    Result := self.ClickButtonBox(button, enabled, tryTime);
 end;
 
 
@@ -144,25 +167,24 @@ options.SetCurrentTab
 
 Sets the current tab to the given ``Tab``
 *)
-function TRSOptions.SetCurrentTab(Tab: EOptionsTab; tryTime:Int32=2000): Boolean;
+function TRSOptions.SetCurrentTab(tab: EOptionsTab; tryTime:Int32=2000): Boolean;
 var
   curr:EOptionsTab;
   t:UInt64;
   wasOpen:Boolean;
 begin
   wasOpen := self.IsOpen();
-  if not(self.Open()) then
+  if not(self.Open()) then 
     Exit();
-
   if not(wasOpen) then
     Wait(srl.GaussRangeInt(20,300));
 
-  if Self.GetCurrentTab() = Tab then Exit(True);
+  if Self.GetCurrentTab() = tab then Exit(True);
 
-  Mouse.Click(Self.FTabs[ord(Tab)], mouse_left);
+  Mouse.Click(Self.FTabs[ord(tab)], mouse_left);
   t := GetTickCount64()+tryTime;
   repeat
-    if Self.IsButtonBoxEnabled(FTabs[Tab]) then
+    if Self.IsButtonBoxEnabled(FTabs[ord(tab)]) then
       Exit(True)
     else
       Wait(25);
@@ -224,6 +246,7 @@ begin
   until GetTickCount64() > t;
 end;
 
+
 (*
 options.ToggleOrbs
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -234,16 +257,8 @@ options.ToggleOrbs
 Changes the state of the orb button to the given state.
 *)
 function TRSOptions.ToggleOrbs(enable:Boolean; tryTime:Int32=2000): Boolean;
-var
-  enabled:Boolean;
-  button:TBox = [567,326,604,363];
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
-    Exit(False);
-  if Self.IsButtonBoxEnabled(button) = enable then
-    Result := True
-  else
-    Result := self.ToggleButtonBox(button, enabled, tryTime);
+  Result := self.__toggleButton([567,326,604,363], optDisplay, enable, tryTime);
 end;
 
 (*
@@ -256,16 +271,8 @@ options.ToggleRoofRemoval
 Changes the state of the button to the given state.
 *)
 function TRSOptions.ToggleRoofRemoval(enable:Boolean; tryTime:Int32=2000): Boolean;
-var
-  enabled:Boolean;
-  button:TBox = [623,326,661,363];
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
-    Exit(False);
-  if Self.IsButtonBoxEnabled(button) = enable then
-    Result := True
-  else
-    Result := self.ToggleButtonBox(button, enabled, tryTime);
+  Result := self.__toggleButton([623,326,661,363], optDisplay, enable, tryTime);
 end;
 
 (*
@@ -278,16 +285,8 @@ options.ToggleRemainingXP
 Changes the state of the button to the given state.
 *)
 function TRSOptions.ToggleRemainingXP(enable:Boolean; tryTime:Int32=2000): Boolean;
-var
-  enabled:Boolean;
-  button:TBox = [680,326,718,363];
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
-    Exit(False);
-  if Self.IsButtonBoxEnabled(button) = enable then
-    Result := True
-  else
-    Result := self.ToggleButtonBox(button, enabled, tryTime);
+  Result := self.__toggleButton([680,326,718,363], optDisplay, enable, tryTime);
 end;
 
 (*
@@ -304,12 +303,10 @@ var
   enabled:Boolean;
   button:TBox = [566,425,604,464];
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
-    Exit(False);
   if Self.IsButtonBoxEnabled(button) = enable then
     Result := True
   else
-    Result := self.ToggleButtonBox(button, enabled, tryTime);
+    Result := self.ClickButtonBox(button, enabled, tryTime);
 end;
 
 (*
@@ -326,12 +323,68 @@ var
   enabled:Boolean;
   button:TBox = [622,425,661,464];
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
-    Exit(False);
   if Self.IsButtonBoxEnabled(button) = enable then
     Result := True
   else
-    Result := self.ToggleButtonBox(button, enabled, tryTime);
+    Result := self.ClickButtonBox(button, enabled, tryTime);
+end;
+
+
+(*
+options.ToggleChatEffects
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
+
+Changes the state of the button to the given state.
+*)
+function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
+begin
+  Result := self.__toggleButton([586,284,625,323], optChat, enable, tryTime);
+end;
+
+(*
+options.ToggleSplitPrivChat
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
+
+Changes the state of the button to the given state.
+*)
+function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
+begin
+  Result := self.__toggleButton([658,284,697,323], optChat, enable, tryTime);
+end;
+
+
+(*
+options.ToggleProfanityFilter
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
+
+Changes the state of the button to the given state.
+*)
+function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
+begin
+  Result := self.__toggleButton([586,347,625,386], optChat, enable, tryTime);
+end;
+
+(*
+options.ToggleTimeoutNotice
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
+
+Changes the state of the button for "Login/Logout notification timeout" to the given state.
+*)
+function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
+begin
+  Result := self.__toggleButton([658,347,697,386], optChat, enable, tryTime);
 end;
 
 
