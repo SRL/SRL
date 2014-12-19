@@ -3,7 +3,7 @@ type
     FSlots: TBoxArray;
   end;
 
-{
+{==| Table of Contents |=======================
  procedure TRSInventory.__setup();
  function TRSInventory.Open(): Boolean;
  function TRSInventory.IsOpen(): Boolean;
@@ -13,6 +13,8 @@ type
  function TRSInventory.GetSlotBox(idx:Int32): TBox;
  function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
  function TRSInventory.GetUsedSlots(): TIntegerArray;
+ procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+ procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 }
 
 var 
