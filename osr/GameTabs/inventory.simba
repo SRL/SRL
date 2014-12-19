@@ -16,7 +16,7 @@ type
 }
 
 var 
-  Inventory: TRSInventory;
+  inventory: TRSInventory;
 
 const
     //Column wise (Z-style) and "reversed" column wise (S-style)
@@ -42,6 +42,12 @@ begin
   begin
     self.FSlots[i].x1 += 3;
     self.FSlots[i].x2 -= 3;
+  end;
+  
+  with Self do
+  begin
+    FName := 'Inventory';
+    FStatic := True;
   end;
 end;
 {$ENDIF}
