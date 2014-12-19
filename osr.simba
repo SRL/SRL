@@ -3,6 +3,7 @@
 {$include_once shared.simba}
 
 {$include_once osr/Text.simba}
+{$include_once osr/Chatbox.simba}
 {$include_once osr/ChooseOption.simba}
 {$include_once osr/Gametabs.simba}
 {$include_once osr/Minimap.simba}

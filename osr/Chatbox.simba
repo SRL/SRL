@@ -1,0 +1,121 @@
+(*
+Chatbox
+=======
+The chatbox file holds functions and procedures that are used in the
+Runescape chat box.
+*)
+
+(*
+type TRSChatbox
+~~~~~~~~~~~~~~~
+A type that stores functions and properties of the Runescape chat box interface.
+*)
+type 
+  TRSChatbox = record(TInterfaceBase)
+    FLines: TBoxArray;
+  end;
+
+(*
+const CHATBOX_COLORS
+~~~~~~~~~~~
+constant that holds all the possible text-colors
+*)
+const
+  CHATBOX_COLORS = [0,127,16711680,8323199];
+
+(*
+var chatbox
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape chatbox interface.
+*)
+var
+  chatbox: TRSChatbox;
+  
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSChatbox.__setup();
+var i:Int32;
+begin
+  for i:=0 to 7 do
+    FLines.Append([10,345+(14*i),490,360+(14*i)+1]);
+  FLines.Append([10,459,500,474]); //input-field
+  
+  with Self do
+  begin
+    FBounds := [7,345,512,473];
+    FName := 'Chatbox';
+    FStatic := True;
+  end;
+end;
+{$ENDIF}
+
+
+(*
+chatbox.GetTextOnLine
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
+
+Returns the text at the given line ``[0..8]``. 8 is the last line (the input-field)
+
+.. note:: by slacky
+
+Example:
+.. code-block:: pascal
+
+    // returns the text at line 6
+    chatbox.GetTextOnLine(6);
+*)
+function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
+var
+  i,bmp: Int32;
+  textArr,temp: TPointArray;
+  B: TBox := Self.FLines[line];
+begin
+  for i:=0 to High(colors) do
+  begin
+    FindColorsTolerance(temp, colors[i], B.x1,B.y1,B.x2,B.y2, 0);
+    textArr := CombineTPA(textArr, temp);
+  end;
+  if Length(textArr) = 0 then 
+    Exit;
+
+  OffsetTPA(textArr, [-B.x1,-B.y1]);
+  BMP := CreateBitmap(B.x2-B.x1+1,B.y2-B.y1+2);
+  DrawTPABitmap(BMP,textArr,255);
+
+  Result := OCR.Recognize(BitmapToMatrix(bmp),TCompareRules([255]), SmallFont);
+  
+  FreeBitmap(bmp);
+end;
+
+(*
+chatbox.FindTextOnLines
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): boolean;
+
+Returns true if the text in 'txt' is found on the 'lines' of the chatbox.  The
+lines start with 0 being the bottom chat line.
+
+Example:
+
+.. code-block:: pascal
+
+    // returns true if "Hello" is found on the first 4 lines
+    chatbox.findTextOnLines(['Hello'], [0..3]);
+*)
+function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): Boolean;
+var
+  i: Int32;
+begin
+  for i:=0 to High(lines) do
+    if IsArrInStr(txt, Self.GetTextOnLine(lines[i], colors)) then
+      Exit(True);
+end;
+
+begin
+  chatbox.__setup();
+end;

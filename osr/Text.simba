@@ -2,17 +2,91 @@
 var 
   OCR: TSimpleOCR;
   SmallFont, UpFont, NPCFont, StatFont: TFontSet;
+
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1,75,True,55];
+  OCR_RULES_CHATBOX:TCompareRules = [-1,,,,-50,True];
+  OCR_RULES_BLUE:   TCompareRules = [16711680,10];     //navy blue
+  OCR_RULES_BLACK:  TCompareRules = [0,10];            //black
   
+//just a wrapper to simplefy usage
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
   Result := Self.Recognize(B, Filter);
 end;
-  
+
+function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
+begin
+  Self.SetFont(Font);
+  Result := Self.Recognize(AClient, Filter);
+end;
+
+//---------------------------------------------------------------------------  
+
+(*
+srl.GetUpText
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.GetUpText(): String;
+
+Returns the uptext (the text in the top-left corner)
+*)
+function TSRL.GetUpText(): String;
+var x:Int32;
+begin
+  Result := OCR.Recognize(TBox([7,7,465,25]), OCR_RULES_UPTEXT, UpFont);
+  if (x := Pos('more options',result)) <> 0 then
+    SetLength(result, x+length('more options')-1);
+end;
+
+(*
+srl.IsUpText
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.IsUpText(substrs:TStringArray): Boolean;
+
+Returns if the uptext contains any of the given strings.
+*)
+function TSRL.IsUpText(substrs:TStringArray): Boolean;
+var
+  uptext:String;
+  i:Int32;
+begin
+  uptext := OCR.Recognize(TBox([7,7,465,25]), OCR_RULES_UPTEXT, UpFont);
+  for i:=0 to High(substrs) do
+    if pos(substrs[i], uptext) > 0 then
+      Exit(True);
+end;
+
+
+(*
+srl.IsUpText (overload)
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.IsUpText(str:String): Boolean; overload;
+
+Returns if the uptext contains any of the given strings.
+*)
+function TSRL.IsUpText(str:String): Boolean; overload;
+begin
+  Result := self.IsUpText([str]);
+end;
+
+
 begin
   SmallFont.Load('SmallChars07'); 
   UpFont.Load('UpChars07_s'); 
   NPCFont.Load('CharsNPC07'); 
   StatFont.Load('StatChars07');
   OCR.Init(UpFont); //just init it with W/E font.
+  //freeing OCR and fonts is handeled automatically by lape
 end;
+
+
+
+
+
