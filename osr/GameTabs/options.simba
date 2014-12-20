@@ -118,14 +118,11 @@ begin
 
   enabled := not(Self.IsButtonBoxEnabled(B));
   mouse.click(B, mouse_left);
-
   t := GetTickCount64()+tryTime;
   repeat
-    if Self.IsButtonBoxEnabled(B) = enabled then
-      Exit(True)
-    else
-      Wait(25);
-  until GetTickCount64() > t;
+    Result := Self.IsButtonBoxEnabled(B) = enabled;
+    if not(Result) then Wait(25);
+  until (GetTickCount64() > t) or Result;
 end;
 
 //helper: Changes tab, and toggles the given button returns True if it didn't fail
