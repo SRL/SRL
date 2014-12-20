@@ -29,6 +29,10 @@ type
  function TRSOptions.ToggleRemainingXP(enable:Boolean; tryTime:Int32=2000): Boolean;
  function TRSOptions.ToggleAcceptAid(enable:Boolean; tryTime:Int32=2000): Boolean;
  function TRSOptions.ToggleRun(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
 }
 
 (*
