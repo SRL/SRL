@@ -101,8 +101,7 @@ begin
   b := [543,45,568,70];
   FindColorsTolerance(TPA,1250067,b,20);
   tb := GetTPABounds(TPA);
-  WriteLn([(tb.y2-tb.y1+1), (b.y2-b.y1+1)]);
-  Result := 100 - Ceil((tb.y2-tb.y1+1) / (b.y2-b.y1+1) * 100);
+  Result := 100 - Ceil((tb.y2-tb.y1) / (b.y2-b.y1) * 100);
 end;
 
 function TMinimap.GetRunEnergy(): Integer;
