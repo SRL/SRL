@@ -29,7 +29,7 @@ const CHATBOX_COLORS
 constant that holds all the possible text-colors
 *)
 const
-  CHATBOX_COLORS = [0,127,16711680,8323199];
+  CHATBOX_COLORS = [0,$7F,$FF0000,$7F007F];
 
 
 {$IFNDEF CODEINSIGHT}
@@ -134,6 +134,35 @@ function TRSChatbox.GetChatArea(): TBox;
 begin
   with self.FBounds do
     result := [x1, y1, x2-16, y2-16];
+end;
+
+
+(*
+chatbox.ClickContinue
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ClickContinue(): Boolean;
+
+Clicks the "Click here to continue"-text in the chatbox.
+Returns True if the text was found.
+
+.. note:: by slacky
+*)
+function TRSChatbox.ClickContinue(): Boolean;
+var
+  tpa:Array [0..2] of TPoint;
+begin
+  //match each word sepparatly to avoid whitespace-issues.
+  Result := srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
+            srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
+            srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds);
+  if Result then
+  begin
+    tpa[2].y += 15;
+    mouse.Click(GetTPABounds(tpa), mouse_left);
+    Exit();
+  end;
 end;
 
 
