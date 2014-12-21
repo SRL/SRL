@@ -279,59 +279,6 @@ begin
 end;
 
 (*
-TMufasaBitmap.drawRoundBox
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.drawRoundBox(const box: TBox; const roundness: integer; const fill: boolean; const color: TColor);
-
-Draws a box with "round" corners onto the TMufasaBitmap, parameter roundness
-will judge curved the corners are.
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: 19 July 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    tmb.drawRoundBox(intToBox(222, 222, 666, 666), 111, true, clOrange);
-
-*)
-procedure TMufasaBitmap.drawRoundBox(const box: TBox; const roundness: integer; const fill: boolean; const color: TColor);
-var
-  tmpTBitmap: TBitmap;
-  tmpMufasa: TMufasaBitmap;
-begin
-  tmpTBitmap.init();
-  tmpMufasa.init();
-
-  if (fill) then
-    tmpTBitmap.getCanvas().getBrush().setColor(color)
-  else begin
-    tmpTBitmap.getCanvas().getPen().setColor(color);
-    tmpTBitmap.getCanvas().getBrush().setColor(0)
-  end;
-
-  tmpTBitmap.setWidth(self.getWidth());
-  tmpTBitmap.setHeight(self.getHeight());
-
-  tmpTBitmap.getCanvas().RoundRect(box.x1, box.y1, box.x2, box.y2, roundness, roundness);
-
-  if (self.getTransparentColorSet()) then
-    tmpMufasa.SetTransparentColor(self.getTransparentColor());
-
-  tmpMufasa.loadFromTBitmap(tmpTBitmap);
-  tmpMufasa.drawTransparent(0, 0, self);
-
-  tmpTBitmap.free();
-  tmpMufasa.free();
-end;
-
-(*
 TMufasaBitmap.drawBitmap
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -537,34 +484,6 @@ begin
 end;
 
 (*
-TMufasaBitmap.drawText; overload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
-
-Same as TMufasaBitmap.drawText, but no shadow boolean (enabled), and no font
-parameter(will use statchars).
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: 19 July 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    tmb.drawText('hello world!', point(55, 55), clLime);
-
-*)
-procedure TMufasaBitmap.drawText(txt: string; pnt: TPoint; color: TColor); overload;
-begin
-  self.drawText(txt, pnt, 'StatChars', true, color);
-end;
-
-(*
 TMufasaBitmap.drawClippedText
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -604,6 +523,11 @@ begin
   self.drawTPA(tpa, color);
 end;
 
+procedure TMufasaBitmap.DrawText(txt: String; pt: TPoint; Color: TColor); overload;
+begin
+  Self.DrawText(txt, 'StatChars', pt, True, Color);
+end;
+
 (*
 TMufasaBitmap.drawTextArray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -640,7 +564,7 @@ begin
   end;
 
   for i := 0 to (l -1) do
-    self.drawText(txtArr[i], pnts[i], font, shadow, color);
+    self.drawText(txtArr[i], font, pnts[i], shadow, color);
 end;
 
 (*

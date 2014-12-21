@@ -8,7 +8,7 @@ type
     Image: TMufasaBitmap;
     Target: PtrUInt;
     PID, InitAttempts: Integer;
-    ForceSpawn, EnableDebug, _isDrawingSetup, ShowConsole, FindJavaPath: Boolean;
+    ForceSpawn, EnableDrawing, _isDrawingSetup, ShowConsole, FindJavaPath: Boolean;
     GetParams: function(): Boolean of object;
     Hook_After_Reload: procedure();
   end;
@@ -38,7 +38,7 @@ procedure TSmartBase.setDebug(const Enable: Boolean);
 begin
   SmartSetDebug(Self.Target, Enable);
 
-  if (Self.EnableDebug) and (Enable) and (not Self._isDrawingSetup) then
+  if (Self.EnableDrawing) and (Enable) and (not Self._isDrawingSetup) then
   begin
     Self.Image.Init(Client.getMBitmaps());
 
@@ -316,7 +316,7 @@ begin
   if (Self.getEnabled() = False) then
     Self.setEnabled(True);
 
-  if (Self.EnableDebug) then
+  if (Self.EnableDrawing) then
     Self.setDebug(True);
 
   srl.Writeln(Self.Name + '.Init(): Result = True', TDebug.FOOTER);

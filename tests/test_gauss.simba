@@ -7,7 +7,7 @@ type
 
 const
   Tries = 15000;
-  Mode = g_Circle;
+  Mode = g_Gauss;
   animated = False;
 
 var
@@ -32,7 +32,7 @@ begin
       Wait(1);
     end;
 
-    DrawTPABitmap(img, [gaussPoint(Mid, 0.00, 360.0, rad)], 643836);
+    DrawTPABitmap(img, [gaussPoint(Mid, rad)], 643836);
   end;
 end;
 
@@ -53,19 +53,32 @@ begin
       Wait(1);
     end;
 
-    DrawTPABitmap(img, [gaussBox(Box)], 643836);
+    DrawTPABitmap(img, [gaussPoint(Box)], 643836);
   end;
 end;
 
 procedure doGauss();
+
+  function AvgExtended(const tE: TExtendedArray): Extended;
+  var
+    i, h: Integer;
+  begin
+    Result := 0;
+    h := High(tE);
+    if h < 0 then Exit;
+    for i := 0 to h do
+      Result := (Result + tE[i]);
+    Result := Result / (H+1);
+  end;
+
 var
   a: array[0..Tries] of Extended;
   i: Integer;
 begin
   for i := 0 to High(a) do
-    a[i] := gauss;
+    a[i] := TruncedGauss;
 
-  Writeln(AverageExtended(a));
+  Writeln(AvgExtended(a));
 end;
 
 begin
