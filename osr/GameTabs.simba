@@ -45,7 +45,7 @@ begin
   if FindColorTolerance(_,_,1910383, B.x1,b.y1,b.x2,b.y2, 13) then
     Exit(True);
   if (Tab = tabInventory) then
-    Exit(GetCurrent = Tab);
+    Exit(Self.GetCurrent() = Tab);
 end;
 
 function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
