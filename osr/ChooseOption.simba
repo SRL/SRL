@@ -1,3 +1,10 @@
+(*
+ChooseOption
+=======
+The ChooseOption file holds functions and procedures that are related 
+to the runescape ChooseOption-menu
+*)
+
 type
   TOption = record
     str: String;
@@ -5,8 +12,19 @@ type
   end;
   TOptionArray = Array of TOption;
 
+(*
+type TRSChooseOption
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape ChooseOption-menu.
+*)
+type
   TRSChooseOption = type TBox;
 
+(*
+var inventory
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape ChooseOption-menu.
+*)
 var
   ChooseOption: TRSChooseOption;
 
@@ -26,9 +44,8 @@ procedure TRSChooseOption.__free();
 begin 
   FreeBitmap(BMP_ChooseOption); 
 end;
-{$ENDIF}
 
-
+//Finds the optionbox using a simple bitmap (works very well).
 function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
   t: UInt64;
@@ -46,8 +63,38 @@ begin
     end;
   until (GetTickCount64() > t);
 end;
+{$ENDIF}
 
 
+(*
+ChooseOption.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.Open(): Boolean;
+
+Opens the optionbox, returns true if it worked.
+
+.. note:: by slacky
+*)
+function TRSChooseOption.Open(tryTime:Int32=-1): Boolean;
+var _:TPoint;
+begin
+  Mouse.Click(mouse_right);
+  Result := self.__find(_, tryTime);
+end;
+
+(*
+ChooseOption.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.IsOpen(): Boolean;
+
+Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False``.
+
+.. note:: by slacky
+*)
 function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
 var pt:TPoint;
 begin
@@ -56,7 +103,17 @@ begin
   Result := self.__find(pt, tryTime);
 end;
 
+(*
+ChooseOption.IsClosed
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSChooseOption.IsClosed(): Boolean;
+
+Checks if the menu is closed, it repeats the check for a +/-2 sec if it's ``True``.
+
+.. note:: by slacky
+*)
 function TRSChooseOption.IsClosed(maxWaitTime:Int32=-1; IntervalMS:Int32=25): Boolean;
 var t:UInt64;
 begin
@@ -68,7 +125,18 @@ begin
   Result := not(self.IsOpen(1));
 end;
 
+(*
+ChooseOption.Find
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSChooseOption.Find(): Boolean;
+
+Is used internally to find the option-menu, and store the coordinates in the instance.
+Returns True if it's found.
+
+.. note:: by slacky
+*)
 function TRSChooseOption.Find(): Boolean;
 var
   pt: TPoint;
@@ -93,7 +161,17 @@ begin
   end;
 end;
 
+(*
+ChooseOption.GetOptions
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSChooseOption.GetOptions(): TOptionArray;
+
+Returns each option in the menu.
+
+.. note:: by slacky
+*)
 function TRSChooseOption.GetOptions(): TOptionArray;
 var
   b: TBox;
@@ -128,15 +206,18 @@ begin
   FreeBitmap(bmp);
 end;
 
+(*
+ChooseOption.Close
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-function TRSChooseOption.Open(tryTime:Int32=-1): Boolean;
-var _:TPoint;
-begin
-  Mouse.Click(mouse_right);
-  Result := self.__find(_, tryTime);
-end;
+  function TRSChooseOption.Close(): Boolean;
 
+Closes the optionbox by dragging the mouse away from it, if that 
+failed it clicks the "Close"-option.
 
+.. note:: by slacky
+*)
 function TRSChooseOption.Close(): Boolean;
 var
   i,minV,minI:Int32;
@@ -183,8 +264,23 @@ begin
   end;
 end;
 
+(*
+ChooseOption.Select
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Integer=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+  function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+
+By default it will click the given option, if not found the menu is closed.
+Returns true if the select-action was performed.
+- moves the mouse to the first match of the given options ``SubStrings``.
+- left-clicks it (``mouseAction:Int32=mouse_left;``)
+- if it's not found option-menu will be closed AClose (``AClose:Boolean=True;``)
+- search can be case insensitive (``CaseSensitive:Boolean=True``)
+  
+.. note:: by slacky
+*)
+function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
 var
   Choices: TOptionArray;
   i,j,L:Int32;
