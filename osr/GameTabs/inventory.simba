@@ -1,3 +1,15 @@
+(*
+Inventory
+=======
+The inventory file holds functions and procedures that are related 
+to the runescape inventory
+*)
+
+(*
+type TRSInventory
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape inventory gametab.
+*)
 type 
   TRSInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
@@ -17,6 +29,11 @@ type
  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 }
 
+(*
+var inventory
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape inventory gametab.
+*)
 var 
   inventory: TRSInventory;
 
@@ -69,25 +86,63 @@ begin
   end;
 end;
 
+(*
+inventory.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
-begin
-  Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
-end;
+  function TRSInventory.Open(): Boolean;
 
-
+Opens the interface
+*)
 function TRSInventory.Open(): Boolean;
 begin
   Result := Gametabs.Open(tabInventory);
 end;
 
 
+(*
+inventory.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.IsOpen(): Boolean;
+
+Checks if the interface is already open.
+*)
 function TRSInventory.IsOpen(): Boolean;
 begin
   Result := Gametabs.IsOpen(tabInventory);
 end;
 
+(*
+inventory.SlotIsVaild
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
+
+Returns true if the given slot is within a valid range.
+
+.. note:: by slacky
+*)
+function TRSInventory.SlotIsVaild(idx: Int32): Boolean;
+begin
+  Result := InRange(idx, Low(Self.FSlots), High(Self.FSlots));
+end;
+
+(*
+inventory.PointToSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.PointToSlot(pt:TPoint): Int32;
+
+Returns the slot-index under the given TPoint. 
+If it's not over a slot then -1 is returned
+
+.. note:: by slacky
+*)
 function TRSInventory.PointToSlot(pt:TPoint): Int32;
 var
   x,y,w:Int32;
@@ -106,7 +161,17 @@ begin
     Result := -1;
 end;
 
+(*
+inventory.MouseSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.MouseSlot(idx:Int32): Int32;
+
+Moves the moise over the given slot-index.
+
+.. note:: by slacky
+*)
 function TRSInventory.MouseSlot(idx:Int32): Int32;
 begin
   if self.SlotIsVaild(idx) then
@@ -115,7 +180,17 @@ begin
     {notify index out of range};
 end;
 
+(*
+inventory.IsFull
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.IsFull(): Boolean;
+
+Returns True if the inventory can't hold anymore items
+
+.. note:: by slacky
+*)
 function TRSInventory.IsFull(): Boolean;
 var
   i:Int32;
@@ -133,7 +208,17 @@ begin
   Result := True;
 end;
 
+(*
+inventory.GetSlotBox
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.GetSlotBox(idx:Int32): TBox;
+
+Returns the bounding box covering the given slot-index.
+
+.. note:: by slacky
+*)
 function TRSInventory.GetSlotBox(idx:Int32): TBox;
 begin
   if self.SlotIsVaild(idx) then
@@ -142,7 +227,17 @@ begin
     {notify index out of range};
 end;
 
+(*
+inventory.SlotIsUsed
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
+
+Returns true if the given slot is occupied.
+
+.. note:: by slacky
+*)
 function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
 var b:TBox;
 begin
@@ -153,7 +248,17 @@ begin
   Result := CountColor($10000, b.x1,b.y1,b.x2,b.y2) > 0;
 end;
 
+(*
+inventory.GetUsedSlots
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.GetUsedSlots(idx:Int32): TIntegerArray;
+
+Returns all the occupied slot-indices.
+
+.. note:: by slacky
+*)
 function TRSInventory.GetUsedSlots(): TIntegerArray;
 var i:Int32;
 begin
@@ -165,7 +270,28 @@ begin
       Result += i;
 end;
 
+(*
+inventory.DropItems
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+
+Drops the given items. It's order-sensitive which means unless you want it to 
+jump randomly all over the inventory dropping items, you give it a ordered drop-pattern.
+
+.. note:: by slacky
+
+Examples:
+.. code-block:: pascal
+
+    // drops all items in a "snake order" / "Z"-order
+    inventory.DropItems(DROP_PATTERN_SNAKE);
+
+.. code-block:: pascal
+
+    inventory.DropItems([0..3]); // drops the four first items
+*)
 procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
 var i:Int32;
 begin
@@ -187,7 +313,17 @@ begin
     end;
 end;
 
+(*
+inventory.DropItemsExcept
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+
+Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots``
+
+.. note:: by slacky
+*)
 procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 var
   i:Int32;

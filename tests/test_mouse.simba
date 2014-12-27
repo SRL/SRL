@@ -1,5 +1,4 @@
-{$i srl/shared/gauss.simba}
-{$i srl/shared/mouse.simba}
+{$i srl/shared.simba}
 
 var
   circle: TPointArray;

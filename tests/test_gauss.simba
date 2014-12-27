@@ -1,13 +1,12 @@
 program gauss_test;
-
-{$i srl/shared/gauss.simba}
+{$i srl/shared.simba}
 
 type
   TMode = (g_circle, g_box, g_gauss);
 
 const
   Tries = 15000;
-  Mode = g_Gauss;
+  Mode  = g_box;
   animated = False;
 
 var
@@ -32,7 +31,7 @@ begin
       Wait(1);
     end;
 
-    DrawTPABitmap(img, [gaussPoint(Mid, rad)], 643836);
+    DrawTPABitmap(img, [srl.GaussPoint(Mid, rad)], 643836);
   end;
 end;
 
@@ -43,7 +42,7 @@ var
   tpa: TPointArray;
   p: TPoint;
 begin
-  DrawTPABitmap(img, TPABorder(TPAFromBox(box)), 255);
+  DrawTPABitmap(img, EdgeFromBox(box), 255);
 
   for 0 to Tries do
   begin
@@ -53,7 +52,7 @@ begin
       Wait(1);
     end;
 
-    DrawTPABitmap(img, [gaussPoint(Box)], 643836);
+    DrawTPABitmap(img, [srl.GaussPoint(Box)], 643836);
   end;
 end;
 
@@ -76,21 +75,25 @@ var
   i: Integer;
 begin
   for i := 0 to High(a) do
-    a[i] := TruncedGauss;
+    a[i] := srl.TruncedGauss;
 
-  Writeln(AvgExtended(a));
+  Writeln('>>> ', AvgExtended(a));
 end;
 
 begin
-  img := CreateBitmap(500, 500);
-  ShowBitmap(img);
-
+  if Mode <> g_gauss then
+  begin
+    img := CreateBitmap(500, 500);
+    ShowBitmap(img);
+  end;
   case (Mode) of
     g_circle: doCircle();
     g_box: doBox();
     g_gauss: doGauss();
   end;
-
-  ShowBitmap(img);
-  FreeBitmap(img);
+  if Mode <> g_gauss then
+  begin
+    ShowBitmap(img);
+    FreeBitmap(img);
+  end;
 end.
