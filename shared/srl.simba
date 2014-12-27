@@ -12,6 +12,7 @@ type
     GameVersion: String;
     Internals: TSRLInternals;
     DisableLog, DisableDebug: Boolean;
+    DefaultClientBounds: TBox;
  end;
 
 var
@@ -151,6 +152,8 @@ begin
   begin
     {$IFDEF RS3} GameVersion := 'RS3'; {$ENDIF}
     {$IFDEF OSR} GameVersion := 'OSR'; {$ENDIF}
+
+    DefaultClientBounds := [0, 0, 764, 502];
   end;
 end;
 

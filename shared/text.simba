@@ -24,6 +24,15 @@ begin
   Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
 end;
 
+function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+var
+  tmp: TPointArray;
+begin
+  Result := Self.FindText(tmp, Text, Font, Color, Tolerance, SearchBox);
+  if (Result) then
+    p := tmp[0];
+end;
+
 function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
 var
   TPA: TPointArray;

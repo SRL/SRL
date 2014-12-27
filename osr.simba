@@ -7,6 +7,10 @@
 {$include_once osr/ChooseOption.simba}
 {$include_once osr/Gametabs.simba}
 {$include_once osr/Minimap.simba}
+{$include_once osr/Lobby.simba}
+{$include_once osr/LoginScreen.simba}
+{$include_once osr/Client.simba}
+{$include_once osr/Player.simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}

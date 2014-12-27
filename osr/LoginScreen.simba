@@ -1,0 +1,148 @@
+const
+  _LOGIN_TEXT_YELLOW = 65535;
+  _LOGIN_TEXT_WHITE = 16777215;
+
+type
+  TRSLoginScreen = record(TInterfaceBase)
+    LoginBox, PasswordBox, ResponseBox: TBox;
+ end;
+
+var
+  LoginScreen: TRSLoginScreen;
+
+procedure TRSLoginScreen.__Setup();
+begin
+  with (Self) do
+  begin
+    setName('Login screen');
+    setStatic(True);
+    setBounds(srl.DefaultClientBounds);
+
+    LoginBox := [312, 254, 550, 266];
+    PasswordBox := [341, 271, 550, 285];
+    ResponseBox := [210, 208, 550, 233];
+  end;
+end;
+
+function TRSLoginScreen.isOpen(): Boolean;
+var
+  TPA: TPointArray;
+begin
+  Freeze(); // Why return data twice? :)
+
+  try
+    Result := srl.FindText(TPA, 'Welcome to RuneScape', 'UpChars07', _LOGIN_TEXT_YELLOW, 0, Self.getBounds()) or
+              srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
+
+    Result := Result and (Length(TPA) = 1);
+  finally
+    Unfreeze();
+  end;
+end;
+
+function TRSLoginScreen.isLoginOpen(): Boolean;
+var
+  TPA: TPointArray;
+  Timeout: UInt64;
+begin
+  Result := False;
+  Timeout := GetTickCount64() + Random(3500, 4500);
+
+  while (not Result) and (Timeout > GetTickCount64()) do
+  begin
+    Result := srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
+    Result := Result and (Length(TPA) = 1);
+
+    Wait(Random(100, 200));
+  end;
+end;
+
+function TRSLoginScreen.EnterDetails(Login, Pass: String; ClickLogin: Boolean = True): Boolean;
+
+  function CursorInBox(b: TBox): Boolean;
+  begin
+    Result := srl.WaitMinColorCount(_LOGIN_TEXT_YELLOW, 5, b, 5, Random(1450, 1900));
+  end;
+
+  function SwitchCursor(): Boolean;
+  begin
+    Keyboard.PressKey(VK_TAB);
+    Wait(Random(200, 500));
+  end
+
+const
+  _LOGIN_BTN_OFFSET_Y = 300;
+var
+  Timeout: UInt64 := GetTickCount64() + Random(7500, 8000);
+  b: TBox;
+begin
+  // ! ! !
+
+  if (not Self.isLoginOpen()) then
+    if (not srl.MouseText('Existing User', 'UpChars07', Self.getBounds(), mouse_Left)) then
+      Exit(False);
+
+  if (not Self.isLoginOpen()) then
+    Exit(False);
+
+  // Enter login
+  if (not CursorInBox(Self.LoginBox)) then
+    SwitchCursor();
+
+  if (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 0) then // Chars to delete
+  begin
+    while (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 0) and (Timeout > GetTickCount64()) do
+      Keyboard.PressKey(VK_BACK);
+    Wait(Random(250, 650));
+  end;
+
+  Keyboard.Send(Login);
+  Wait(Round(srl.TruncedGauss(100, 700)));
+  Keyboard.PressKey(VK_ENTER);
+
+  // Enter Password
+  if (not CursorInBox(Self.PasswordBox)) then
+    SwitchCursor();
+
+  if (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 0) then // Chars to delete
+  begin
+    while (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 0) and (Timeout > GetTickCount64()) do
+      Keyboard.PressKey(VK_BACK);
+    Wait(Random(250, 650));
+  end;
+
+  Keyboard.Send(Pass);
+  Wait(Round(srl.TruncedGauss(100, 1000)));
+  Result := True;
+
+  if (ClickLogin) then
+  begin
+    b := Self.getBounds();
+    b.Y1 := _LOGIN_BTN_OFFSET_Y;
+
+    if (Random(5) = 0) then
+    begin
+      if (not srl.MouseText('Login', 'UpChars07', b, mouse_Left)) then
+        Keyboard.PressKey(VK_ENTER);  // Backup
+    end else
+      Keyboard.PressKey(VK_ENTER);
+  end;
+end;
+
+function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
+begin
+  if (not Self.isOpen()) then
+    Exit(False);
+
+  Result := srl.MouseText('Click to switch', 'StatChars07', clWhite, 0, Self.getBounds(), mouse_Left);
+end;
+
+function TRSLoginScreen.GetLoginResponse(): String;
+begin
+  with (Self.ResponseBox) do
+    Result := GetTextAtEx(X1, Y1, X2, Y2, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s');
+end;
+
+begin
+  LoginScreen.__Setup();
+end;

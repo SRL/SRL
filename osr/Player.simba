@@ -1,0 +1,56 @@
+type
+  TPlayer = record
+    LoginName: String;
+    DisplayName: String;
+    Password: String;
+    BankPin: Integer;
+    isMember: Boolean;
+    isActive: Boolean;
+    World: Integer;
+
+    Data: Pointer;
+    Variants: array [0..49] of Variant;
+  end;
+
+function TPlayer.LoginToLobby(): Boolean;
+var
+  Str: String;
+begin
+  Result := False;
+
+  if (srl.isLoggedIn()) then
+    Exit(True)
+  else if (Lobby.isOpen()) then
+    Exit(True);
+
+  if (not LoginScreen.isOpen()) then
+    Exit(False);
+
+  if (not LoginScreen.EnterDetails(Self.LoginName, Self.Password)) then
+    Exit(False);
+
+  while (True) do { timeout }
+  begin
+    Str := Trim(LoginScreen.GetLoginResponse());
+
+    if (Str <> '') and (LoginScreen.isOpen()) then
+      if (Str <> 'Connecting to server...') and (Str <> 'Enter your username/email & password.') then
+      begin
+        Writeln('we got a login msg! | ', Str);
+        TerminateScript;
+      end;
+
+    if (Lobby.isOpen()) then
+    begin
+      Writeln('Yea!');
+      Exit(True);
+    end;
+
+    Wait(Random(300, 1000));
+  end;
+end;
+
+function TPlayer.Login(): Boolean;
+begin
+  Result := Self.LoginToLobby() and Lobby.Play();
+end;

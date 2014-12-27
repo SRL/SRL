@@ -1,0 +1,58 @@
+type
+  TRSLobby = type TInterfaceBase;
+
+var
+  Lobby: TRSLobby;
+
+procedure TRSLobby.__Setup();
+begin
+  with (Self) do
+  begin
+    setName('Lobby');
+    setStatic(True);
+    setBounds(srl.DefaultClientBounds);
+  end;
+end;
+
+function TRSLobby.isOpen(const WaitTime: UInt32 = 0): Boolean;
+var
+  TPA: TPointArray;
+  TimeOut: UInt64;
+begin
+  TimeOut := GetTickCount64() + WaitTime;
+
+  while (TimeOut >= GetTickCount64()) and (not Result) do
+  begin
+    Result := srl.FindText(TPA, 'CLICK HERE TO PLAY', 'UpChars07_s', clWhite, 0, Self.getBounds());
+    Result := (Result) and (Length(TPA) = 1);
+
+    Wait(Random(50, 100));
+  end;
+end;
+
+function TRSLobby.Play(): Boolean;
+var
+  p: TPoint;
+begin
+  if (not Self.isOpen()) then
+    Exit(False);
+
+  Result := srl.FindText(p, 'CLICK HERE TO PLAY', 'UpChars07_s', clWhite, 0, Self.getBounds());
+
+  if (Result) then
+  begin
+    Wait(Round(srl.TruncedGauss(250, 1000)));
+
+    p := srl.GaussPoint(TBox([p.x - 86, p.y - 38, p.x + 135, p.y + 45]));
+    p.x := Min(p.x + Random(12, 22), p.x + 135);
+
+    Mouse.Click(p, mouse_Left);
+    Wait(Random(500, 800));
+  end;
+end;
+
+begin
+  Lobby.__Setup();
+end;
+
+

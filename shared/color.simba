@@ -5,9 +5,24 @@ begin
   Result := False;
   TimeOut := GetTickCount64() + WaitTime;
 
-  while (TimeOut > GetTickCount64()) and (not Result) do
+  while (TimeOut >= GetTickCount64()) and (not Result) do
   begin
     Result := CountColorTolerance(Color, Area, Tolerance) >= MinCount;
+    if (not Result) then
+      Wait(Random(50, 100));
+  end;
+end;
+
+function TSRL.WaitColor(Color: Integer; p: TPoint; WaitTime: Integer): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + WaitTime;
+
+  while (TimeOut >= GetTickCount64()) and (not Result) do
+  begin
+    Result := GetColor(p) = Color;
     if (not Result) then
       Wait(Random(50, 100));
   end;
