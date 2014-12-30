@@ -12,45 +12,143 @@ type
     Variants: array [0..49] of Variant;
   end;
 
+type
+  TPlayerArray = array of TPlayer;
+
+var
+  Players: TPlayerArray;
+  CurrentPlayer: Byte = 0;
+
+function TPlayerArray.GetActive(): UInt32;
+var
+  i: Integer;
+begin
+  Result := 0;
+
+  for i := 0 to High(Self) do
+    if (Self[i].isActive) then
+      Inc(Result);
+end;
+
+procedure TPlayerArray.SwitchTo(Player: Integer; Active: Boolean = True);
+begin
+  Self[CurrentPlayer].isActive := Active;
+
+  if (Self.getActive() = 0) then
+    srl.Writeln('All players inactive', TDebug.FATAL);
+
+  CurrentPlayer := Player;
+end;
+
+function TPlayerArray.Next(Active: Boolean = True): Boolean;
+var
+  i: Byte;
+begin
+  for i := 0 to High(Self) do
+    if (Self[i].isActive) and (Self[i].LoginName <> Self[CurrentPlayer].LoginName) then
+    begin
+      Self.SwitchTo(i, Active);
+      Exit();
+    end;
+
+  srl.Writeln('All players inactive...', TDebug.FATAL);
+end;
+
+function TPlayer._HandleResponse(Response: String; var Attempts: UInt32): Boolean;
+type
+  TResponse = record
+    Text: String;
+    MaxAttempts, WaitTime: UInt32;
+    Proc: procedure() of object;
+ end;
+var
+  Responses: array [0..2] of TResponse;
+  i: Integer;
+begin
+  Result := False;
+  Responses := [['Invalid username/email or password.', 2, 1000, nil],
+                ['Please enter your', 2, 1000, nil],
+                ['Error connecting to server.', 20, 8000, nil]];
+
+  Inc(Attempts);
+
+  for i := 0 to High(Responses) do
+    with (Responses[i]) do
+      if (Pos(Response, Text) > 0) then
+      begin
+        srl.Writeln('Response found: ' + Text + ' handling...');
+        Wait(WaitTime + Random(1000));
+
+        if (@Proc <> nil) then
+          Proc();
+
+        if (Attempts >= MaxAttempts) then
+          Exit(srl.Writeln('Max attempts reached for response', False))
+        else
+          Exit(True);
+      end;
+
+  srl.WriteFmt('Response: %s isn''t supported', [Response], TDebug.WARNING);
+end;
+
 function TPlayer.LoginToLobby(): Boolean;
 var
-  Str: String;
+  Response: String;
+  Attempts, LoginAttempts: UInt32;
+  TimeOut: UInt64;
 begin
+  srl.Writeln('TPlayer.LoginToLobby()', TDebug.HEADER);
   Result := False;
 
   if (srl.isLoggedIn()) then
-    Exit(True)
+    Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
   else if (Lobby.isOpen()) then
-    Exit(True);
+    Exit(srl.Writeln('Player already in lobby!', True, 'TPlayer.LoginToLobby(): Result = True'));
 
-  if (not LoginScreen.isOpen()) then
-    Exit(False);
+  if (not LoginScreen.isOpen(Random(5000, 6000))) then
+    Exit(srl.Writeln('Login screen isn''t open, is client loaded?', False, 'TPlayer.LoginToLobby(): Result = False'));
 
-  if (not LoginScreen.EnterDetails(Self.LoginName, Self.Password)) then
-    Exit(False);
+  LoginAttempts := 0;
+  Attempts := 0;
 
-  while (True) do { timeout }
+  while (LoginAttempts < 10) do
   begin
-    Str := Trim(LoginScreen.GetLoginResponse());
+    srl.WriteFmt('Attempt: %d', [Attempts])
 
-    if (Str <> '') and (LoginScreen.isOpen()) then
-      if (Str <> 'Connecting to server...') and (Str <> 'Enter your username/email & password.') then
-      begin
-        Writeln('we got a login msg! | ', Str);
-        TerminateScript;
-      end;
+    if (srl.isLoggedIn()) then
+      Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
+    else if (Lobby.isOpen()) then
+      Exit(srl.Writeln('Player already in lobby!', True, 'TPlayer.LoginToLobby(): Result = True'));
 
-    if (Lobby.isOpen()) then
+    if (not LoginScreen.isOpen(Random(5000, 6000))) then
+      Exit(srl.Writeln('Login screen isn''t open, is client loaded?', False, 'TPlayer.LoginToLobby(): Result = False'));
+
+    if (LoginScreen.EnterLoginInfo(Self.LoginName, Self.Password)) then
     begin
-      Writeln('Yea!');
-      Exit(True);
-    end;
+      srl.Writeln('Entered login info, waiting for a response...');
 
-    Wait(Random(300, 1000));
+      Response := LoginScreen._WaitResponse();
+
+      if (Response = 'lobby') then
+        Exit(srl.Writeln('Response found: Lobby is open', True, 'TPlayer.LoginToLobby(): Result = True'))
+      else if (Response <> '') then
+        if (not Self._HandleResponse(Response, Attempts)) then
+          Exit(srl.Writeln('Failed to handle login response', False, 'TPlayer.LoginToLobby(): Result = False'));
+    end else begin
+      srl.Writeln('Failed to enter login info', TDebug.WARNING);
+      Inc(LoginAttempts);
+    end;
   end;
+
+  if (LoginAttempts = 10) then
+    srl.Writeln('Max login attempts reached', TDebug.WARNING);
+
+  srl.Writeln('TPlayer.LoginToLobby(): Result = False', TDebug.FOOTER);
 end;
 
 function TPlayer.Login(): Boolean;
 begin
+  srl.Writeln('TPlayer.Login()', TDebug.HEADER);
   Result := Self.LoginToLobby() and Lobby.Play();
+  srl.Writeln('TPlayer.Login(): Result = ' + BoolToStr(Result), TDebug.FOOTER);
 end;

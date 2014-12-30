@@ -1,0 +1,20 @@
+{$DEFINE SMART}
+{$i srl/osr.simba}
+
+begin
+  Smart.EnableDrawing := True;
+  Smart.Init();
+
+  SetLength(Players, 1);
+
+  with (Players[0]) do
+  begin
+    LoginName := 'test';
+    Password := 'test1';
+    isActive := True;
+  end;
+
+  Players[CurrentPlayer].Login();
+end.
+
+

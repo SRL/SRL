@@ -147,14 +147,6 @@ begin
     DebugFile := -1;
     DebugLevel := 1;
   end;
-
-  with (srl) do
-  begin
-    {$IFDEF RS3} GameVersion := 'RS3'; {$ENDIF}
-    {$IFDEF OSR} GameVersion := 'OSR'; {$ENDIF}
-
-    DefaultClientBounds := [0, 0, 764, 502];
-  end;
 end;
 
 

@@ -24,20 +24,26 @@ begin
   end;
 end;
 
-function TRSLoginScreen.isOpen(): Boolean;
+function TRSLoginScreen.isOpen(const WaitTime: UInt32 = 0): Boolean;
 var
   TPA: TPointArray;
+  TimeOut: UInt64;
 begin
-  Freeze(); // Why return data twice? :)
+  Result := False;
+  TimeOut := GetTickCount64() + WaitTime;
 
-  try
-    Result := srl.FindText(TPA, 'Welcome to RuneScape', 'UpChars07', _LOGIN_TEXT_YELLOW, 0, Self.getBounds()) or
-              srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
+  repeat
+    Freeze(); // Why return data twice? :)
 
-    Result := Result and (Length(TPA) = 1);
-  finally
-    Unfreeze();
-  end;
+    try
+      Result := srl.FindText(TPA, 'Welcome to RuneScape', 'UpChars07', _LOGIN_TEXT_YELLOW, 0, Self.getBounds()) or
+                srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
+
+      Result := Result and (Length(TPA) = 1);
+    finally
+      Unfreeze();
+    end;
+  until (Result) or (GetTickCount64() >= TimeOut);
 end;
 
 function TRSLoginScreen.isLoginOpen(): Boolean;
@@ -57,7 +63,33 @@ begin
   end;
 end;
 
-function TRSLoginScreen.EnterDetails(Login, Pass: String; ClickLogin: Boolean = True): Boolean;
+function TRSLoginScreen.GetCursor(): Byte;
+var
+  TimeOut: UInt64;
+begin
+  TimeOut := GetTickCount64() + Random(3000, 4000);
+
+  repeat
+    if (CountColor(_LOGIN_TEXT_YELLOW, Self.LoginBox) > 10) then
+      Exit(0);
+    if (CountColor(_LOGIN_TEXT_YELLOW, Self.PasswordBox) > 10) then
+      Exit(1);
+
+    Wait(Random(33, 66));
+  until (GetTickCount64() > TimeOut);
+end;
+
+procedure TRSLoginScreen.SetCursor(const New: Integer);
+begin
+  if (Self.GetCursor() <> New) then
+    while (Self.GetCursor() <> New) do
+    begin
+      Keyboard.PressKey(VK_BACK);
+      Wait(Random(350, 650));
+    end;
+end;
+
+function TRSLoginScreen.EnterLoginInfo(Login, Pass: String; ClickLogin: Boolean = True): Boolean;
 
   function CursorInBox(b: TBox): Boolean;
   begin
@@ -140,7 +172,59 @@ end;
 function TRSLoginScreen.GetLoginResponse(): String;
 begin
   with (Self.ResponseBox) do
-    Result := GetTextAtEx(X1, Y1, X2, Y2, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s');
+    Result := Trim(GetTextAtEx(X1, Y1, X2, Y2, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+end;
+
+{*
+TRSLoginScreen._WaitResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLoginScreen._WaitResponse(): String;
+
+Waits up to 12 seconds for a login response to appear. Will return the response.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 30 December 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+*}
+function TRSLoginScreen._WaitResponse(): String;
+const
+  VAILD_CONNECTING = 'Connecting to server...';
+  VAILD_ENTER_INFO = 'Enter your username/email & password.';
+var
+  TimeOut: UInt64;
+  Response: String;
+begin
+  TimeOut := GetTickCount64() + Random(13000, 15000);
+
+  while (TimeOut > GetTickCount64()) do
+  begin
+    Response := Self.GetLoginResponse();
+
+    if (Self.isOpen()) and (Response <> '') then
+      if (Response <> VAILD_CONNECTING) and (Response <> VAILD_ENTER_INFO) then
+      begin
+        Wait(250);
+
+        if (Self.GetLoginResponse() = Response) then
+          Exit(Response);
+      end;
+
+    if (Lobby.isOpen()) then
+      Exit('lobby');
+
+    Wait(Random(500, 1000));
+  end;
+
+  srl.Writeln('No response found after 10 seconds', TDebug.WARNING);
 end;
 
 begin
