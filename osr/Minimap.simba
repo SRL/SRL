@@ -1,8 +1,8 @@
 const
-  Direction_North = 0;
-  Direction_East = 90;
-  Direction_South = 180;
-  Direction_West = 270;
+  DIR_NORTH = 0.00;
+  DIR_EAST  = 90.0;
+  DIR_SOUTH = 180.0;
+  DIR_WEST  = 270.0;
 
 type
   EMinimapOrb = (orbHP, orbPrayer, orbRun);
@@ -39,7 +39,7 @@ begin
 
     with (CompassInfo) do
     begin
-      Bounds := [544, 3, 577, 37];
+      Bounds := [544, 3, 579, 38];
       Middle := [561, 20];
       Radius := 15;
     end;
@@ -150,7 +150,6 @@ begin
                 [BoolToStr(Enable, 'enable', 'disable')], TDebug.ERROR);
 end;
 
-{TODO - Use a bitmap!}
 function TMinimap.FindFlag(out p: TPoint): Boolean;
 const
   PoleColor = 1127261;
@@ -159,19 +158,21 @@ const
 var
   TPA, TPAPoles: TPointArray;
   ATPA, ATPAColumns: T2DPointArray;
-  i, j: Integer;
+  i, j, Img: Integer;
 begin
   p := [-1, -1];
-  Freeze();
+  Img := BitmapFromClient(Self.getBounds());
+  SetBitmapName(Img, 'Find flag bitmap');
 
   try
-    if (not FindColors(TPA, PoleColor, Self.getBounds())) then
+    if (not FindColorsBitmap(Img, TPA, PoleColor)) then
       Exit(False);
 
-    for i := 0 to High(TPA) do
-      if (GetColor(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetColor(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
-         (GetColor(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetColor(TPA[i].x, TPA[i].y + 1) = PoleColor) then
-           TPAPoles += TPA[i];
+    with GetMufasaBitmap(Img) do
+      for i := 0 to High(TPA) do
+          if (GetPixel(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetPixel(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
+             (GetPixel(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetPixel(TPA[i].x, TPA[i].y + 1) = PoleColor) then
+                TPAPoles += TPA[i];
 
     if (Length(TPAPoles) = 0) then
       Exit(False);
@@ -187,16 +188,19 @@ begin
           Result := True;
           p := ATPA[j][0];
 
-          while (p.y < Self.getBounds().Y2) and (GetColor(p) = PoleColor) do
+          while (p.y < (Self.getBounds().Height - 1)) and (FastGetPixel(Img, p.x, p.y) = PoleColor) do
             Inc(p.y);
 
-          if (GetColor(p) <> PoleColor) then // Make sure we have the bottom of the pole
+          if (FastGetPixel(Img, p.x, p.y) <> PoleColor) then // Make sure we have the bottom of the pole
             Dec(p.y);
         end;
     end;
   finally
-    Unfreeze();
+    FreeBitmap(Img);
   end;
+
+  Inc(p.x, Self.GetBounds().X1);
+  Inc(p.y, Self.GetBounds().Y1);
 end;
 
 procedure TMinimap.WaitFlag(const Dist: UInt32 = 0);
@@ -232,15 +236,113 @@ begin
 end;
 
 function TMinimap.GetCompassAngle(const AsDegrees: Boolean = True): Extended;
-begin
 
+  function varMax(D: Array[0..2] of Single; a, b: Int32): Int32;
+  begin
+    if D[a] < D[b] then
+      Exit(b)
+    else
+      Exit(a);
+  end;
+
+const
+  PI_OVER_2 = PI / 2;
+var
+  i: Int32;
+  D: Array[0..2] of Single;
+  TPA, Dots: TPointArray;
+  ATPA: T2DPointArray;
+begin
+  if (not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 45)) then
+    Exit(srl.Writeln('Failed to find red compass dots color', 0.00, '', TDebug.WARNING));
+
+  ATPA := SplitTPA(TPA, 6);                                                     // group the dots
+  for i := 0 to High(ATPA) do                                                   // extract the 3 dots
+    if (Length(ATPA[i]) <= 3) then
+    begin
+      SortTPAFrom(ATPA[i], Point(561, 20));
+      Dots += ATPA[i][High(ATPA[i])];
+    end;
+
+  for i := 0 to 2 do                                                            // compute distance between each pair
+    D[i] := Distance(Dots[i].x,Dots[i].y, Dots[(i+1) mod 3].x,Dots[(i+1) mod 3].y);
+
+  i := varMax(D, varMax(D, 0, 1), varMax(D, varMax(D, 1, 2), varMax(D, 2, 0))); // find pair with largest distance between.
+  i := (i + 2) mod 3;                                                           // we know it's not i, and not i+1 (so it must be i+2)
+  Result := FixRad(ArcTan2((Dots[i].Y - Self.CompassInfo.Middle.Y),
+                            Dots[i].X - Self.CompassInfo.Middle.X) - PI_OVER_2);
+  if (AsDegrees) then
+    Result := Round(Degrees(Result)) mod 360;
 end;
 
-function TMinimap.SetCompassAngle(const Degress: Extended): Boolean;
+function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 2): Boolean;
+
+  function Compass_Distance(Angle, Target: Extended): Extended;
+  begin
+    if (Abs(Target - Angle) < 180) then
+    begin
+      Result := Target - Angle;
+      Exit;
+    end;
+
+    if (Target > Angle) then
+      Result := Target - Angle - 360
+    else
+      Result := Target - Angle + 360;
+  end;
+
+  procedure Key(Left: Boolean);
+  begin
+    case (Left) of
+      True:
+        if (not isKeyDown(VK_LEFT)) then
+        begin
+          if (isKeyDown(VK_RIGHT)) then
+            KeyUp(VK_RIGHT);
+          KeyDown(VK_LEFT)
+        end;
+      False:
+        if (not isKeyDown(VK_RIGHT)) then
+        begin
+          if (isKeyDown(VK_LEFT)) then
+            KeyUp(VK_LEFT);
+          KeyDown(VK_RIGHT)
+        end;
+    end;
+  end;
+
+var
+  TimeOut: UInt64;
+  CurrentAngle, AngleDistance: Extended;
+  Left: Boolean;
 begin
+  Angle := FixD(Angle);
+  CurrentAngle := Self.GetCompassAngle();
+  if (CurrentAngle = Angle) then
+    Exit(True);
 
+  TimeOut := GetTickCount64() + Random(13000, 17000);
+  while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < TimeOut) do
+  begin
+    AngleDistance := CurrentAngle - Angle;
+    Left := ((AngleDistance > 0) and (abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (abs(AngleDistance) > 180));
+    Key(Left);
+
+    CurrentAngle := Self.GetCompassAngle();
+    Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
+    if (Result) then
+      Break();
+
+    Wait(Random(15, 30));
+  end;
+
+  if (Left) then
+    KeyUp(VK_LEFT)
+  else
+    KeyUp(VK_RIGHT);
+
+  Wait(Random(270, 420));
 end;
-
 
 begin
   Minimap.__Setup();

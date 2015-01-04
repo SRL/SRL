@@ -1,189 +1,256 @@
+{$IFNDEF CODEINSIGHT}
 const
   _LOGIN_TEXT_YELLOW = 65535;
   _LOGIN_TEXT_WHITE = 16777215;
+{$ENDIF}
+
+{$IFNDEF CODEINSIGHT}
+const
+  _LOGIN_BOX_LOGIN = 0;
+  _LOGIN_BOX_PASSWORD = 1;
+{$ENDIF}
 
 type
   TRSLoginScreen = record(TInterfaceBase)
-    LoginBox, PasswordBox, ResponseBox: TBox;
+    LoginBox, PasswordBox, ResponseBox, WorldBox, ExistingUserBox: TBox;
  end;
 
 var
   LoginScreen: TRSLoginScreen;
 
+{*
+TRSLoginScreen.__Setup
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  procedure TRSLoginScreen.__Setup();
+
+Setups the login screen, Called at the end of the file on compile.
+
+Example:
+
+.. code-block:: pascal
+
+    LoginScreen.__Setup();
+*}
+{$IFNDEF CODEINSIGHT}
 procedure TRSLoginScreen.__Setup();
 begin
   with (Self) do
   begin
-    setName('Login screen');
-    setStatic(True);
-    setBounds(srl.DefaultClientBounds);
+    SetName('Login screen');
+    SetStatic(True);
+    SetBounds(srl.DefaultClientBounds);
 
     LoginBox := [312, 254, 550, 266];
     PasswordBox := [341, 271, 550, 285];
     ResponseBox := [210, 208, 550, 233];
+    WorldBox := [12, 464, 99, 496];
+    ExistingUserBox := [390, 272, 529, 307];
   end;
 end;
+{$ENDIF}
 
+(*
+TRSLoginScreen.isOpen
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.isOpen(const WaitTime: UInt32 = 0): Boolean;
+
+Waits up to 'WaitTime' for login screen to open.
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(BoolToStr(LoginScreen.isOpen()));
+*)
 function TRSLoginScreen.isOpen(const WaitTime: UInt32 = 0): Boolean;
 var
-  TPA: TPointArray;
+  p: TPoint;
   TimeOut: UInt64;
 begin
-  Result := False;
   TimeOut := GetTickCount64() + WaitTime;
+  Result := False;
 
   repeat
-    Freeze(); // Why return data twice? :)
+    if (srl.FindText(p, 'Click to switch', 'StatChars07', _LOGIN_TEXT_WHITE, 1, Self.WorldBox)) then
+      Exit(True);
 
-    try
-      Result := srl.FindText(TPA, 'Welcome to RuneScape', 'UpChars07', _LOGIN_TEXT_YELLOW, 0, Self.getBounds()) or
-                srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
-
-      Result := Result and (Length(TPA) = 1);
-    finally
-      Unfreeze();
-    end;
-  until (Result) or (GetTickCount64() >= TimeOut);
+    Wait(Random(50, 150));
+  until (GetTickCount64() >= TimeOut);
 end;
 
-function TRSLoginScreen.isLoginOpen(): Boolean;
+(*
+TRSLoginScreen.isLoginOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.isLoginOpen(): Boolean;
+
+Waits up to 'WaitTime' for the screen to change to where you can enter login input.
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(BoolToStr(LoginScreen.isLoginOpen()));
+*)
+function TRSLoginScreen.isLoginOpen(const WaitTime: UInt32 = 0): Boolean;
 var
-  TPA: TPointArray;
-  Timeout: UInt64;
+  p: TPoint;
+  TimeOut: UInt64;
 begin
+  TimeOut := GetTickCount64() + WaitTime;
   Result := False;
-  Timeout := GetTickCount64() + Random(3500, 4500);
 
-  while (not Result) and (Timeout > GetTickCount64()) do
-  begin
-    Result := srl.FindText(TPA, 'Login:', 'UpChars07', _LOGIN_TEXT_WHITE, 0, Self.getBounds());
-    Result := Result and (Length(TPA) = 1);
+  repeat
+    if (Self.isOpen()) and (srl.FindText(p, 'Login:', 'UpChars07_s', _LOGIN_TEXT_WHITE, 1, Self.GetBounds())) then
+      Exit(True);
 
-    Wait(Random(100, 200));
-  end;
+    Wait(Random(50, 150));
+  until (GetTickCount64() >= TimeOut);
 end;
 
+(*
+TRSLoginScreen.GetCursor
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.GetCursor(): Byte;
+
+Returns what box the blinking cursor is in.
+
+Example:
+
+.. code-block:: pascal
+
+    Writeln('The cursor is in box: ', LoginScreen.GetCursor());
+*)
 function TRSLoginScreen.GetCursor(): Byte;
 var
   TimeOut: UInt64;
 begin
-  TimeOut := GetTickCount64() + Random(3000, 4000);
+  TimeOut := GetTickCount64() + Random(2000, 3000);
 
   repeat
     if (CountColor(_LOGIN_TEXT_YELLOW, Self.LoginBox) > 10) then
-      Exit(0);
+      Exit(_LOGIN_BOX_LOGIN);
     if (CountColor(_LOGIN_TEXT_YELLOW, Self.PasswordBox) > 10) then
-      Exit(1);
+      Exit(_LOGIN_BOX_PASSWORD);
 
-    Wait(Random(33, 66));
+    Wait(Random(50, 100));
   until (GetTickCount64() > TimeOut);
 end;
 
-procedure TRSLoginScreen.SetCursor(const New: Integer);
-begin
-  if (Self.GetCursor() <> New) then
-    while (Self.GetCursor() <> New) do
-    begin
-      Keyboard.PressKey(VK_BACK);
-      Wait(Random(350, 650));
-    end;
-end;
-
-function TRSLoginScreen.EnterLoginInfo(Login, Pass: String; ClickLogin: Boolean = True): Boolean;
-
-  function CursorInBox(b: TBox): Boolean;
-  begin
-    Result := srl.WaitMinColorCount(_LOGIN_TEXT_YELLOW, 5, b, 5, Random(1450, 1900));
-  end;
-
-  function SwitchCursor(): Boolean;
-  begin
-    Keyboard.PressKey(VK_TAB);
-    Wait(Random(200, 500));
-  end
-
-const
-  _LOGIN_BTN_OFFSET_Y = 300;
-var
-  Timeout: UInt64 := GetTickCount64() + Random(7500, 8000);
-  b: TBox;
-begin
-  // ! ! !
-
-  if (not Self.isLoginOpen()) then
-    if (not srl.MouseText('Existing User', 'UpChars07', Self.getBounds(), mouse_Left)) then
-      Exit(False);
-
-  if (not Self.isLoginOpen()) then
-    Exit(False);
-
-  // Enter login
-  if (not CursorInBox(Self.LoginBox)) then
-    SwitchCursor();
-
-  if (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 0) then // Chars to delete
-  begin
-    while (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 0) and (Timeout > GetTickCount64()) do
-      Keyboard.PressKey(VK_BACK);
-    Wait(Random(250, 650));
-  end;
-
-  Keyboard.Send(Login);
-  Wait(Round(srl.TruncedGauss(100, 700)));
-  Keyboard.PressKey(VK_ENTER);
-
-  // Enter Password
-  if (not CursorInBox(Self.PasswordBox)) then
-    SwitchCursor();
-
-  if (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 0) then // Chars to delete
-  begin
-    while (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 0) and (Timeout > GetTickCount64()) do
-      Keyboard.PressKey(VK_BACK);
-    Wait(Random(250, 650));
-  end;
-
-  Keyboard.Send(Pass);
-  Wait(Round(srl.TruncedGauss(100, 1000)));
-  Result := True;
-
-  if (ClickLogin) then
-  begin
-    b := Self.getBounds();
-    b.Y1 := _LOGIN_BTN_OFFSET_Y;
-
-    if (Random(5) = 0) then
-    begin
-      if (not srl.MouseText('Login', 'UpChars07', b, mouse_Left)) then
-        Keyboard.PressKey(VK_ENTER);  // Backup
-    end else
-      Keyboard.PressKey(VK_ENTER);
-  end;
-end;
-
-function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
-begin
-  if (not Self.isOpen()) then
-    Exit(False);
-
-  Result := srl.MouseText('Click to switch', 'StatChars07', clWhite, 0, Self.getBounds(), mouse_Left);
-end;
-
-function TRSLoginScreen.GetLoginResponse(): String;
-begin
-  with (Self.ResponseBox) do
-    Result := Trim(GetTextAtEx(X1, Y1, X2, Y2, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
-end;
-
-{*
-TRSLoginScreen._WaitResponse
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(*
+TRSLoginScreen.SetCursor
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function TRSLoginScreen._WaitResponse(): String;
+  procedure TRSLoginScreen.SetCursor(const New: Integer);
 
-Waits up to 12 seconds for a login response to appear. Will return the response.
+Sets the blinking cursor to the 'New' box.
+Use consts _LOGIN_BOX_LOGIN or LOGIN_BOX_PASSWORD.
+
+Example:
+
+.. code-block:: pascal
+
+    LoginScreen.SetCursor(1);
+*)
+procedure TRSLoginScreen.SetCursor(const New: Integer);
+begin
+  if (Self.GetCursor() = New) then
+    Exit();
+
+  while (Self.GetCursor() <> New) do
+  begin
+    Keyboard.PressKey(VK_BACK);
+    Wait(Random(350, 650));
+  end;
+end;
+
+(*
+TRSLoginScreen.EnterLoginInfo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.EnterLoginInfo(Login, Pass: String): Boolean;
+
+Enters username and password into the login screen, Will also login to the game.
+
+Example:
+
+.. code-block:: pascal
+
+    if (LoginScreen.EnterLoginInfo('user', 'pass')) then
+      srl.Writeln('Success!');
+*)
+function TRSLoginScreen.EnterLoginInfo(Login, Pass: String): Boolean;
+var
+  Timeout: UInt64 := GetTickCount64() + Random(7500, 8000);
+  Clear: array [0..1] of Boolean;
+begin
+  Result := True;
+
+  if (not Self.isOpen(Random(700, 1000))) then
+    Exit(False);
+
+  if (not Self.isLoginOpen()) then
+  begin
+    Mouse.Click(Self.ExistingUserBox, mouse_Left);
+
+    if (not Self.isLoginOpen(Random(2000, 3000))) then
+      Exit(False);
+  end;
+
+  Clear[_LOGIN_BOX_LOGIN] := CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox);
+  Clear[_LOGIN_BOX_PASSWORD] := CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox);
+
+  { Login }
+  if (Self.GetCursor() <> _LOGIN_BOX_LOGIN) then
+    Self.SetCursor(_LOGIN_BOX_LOGIN);
+
+  if (Clear[_LOGIN_BOX_LOGIN]) then
+    while (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 5) and (Timeout > GetTickCount64()) do
+    begin
+      Keyboard.PressKey(VK_BACK);
+      Wait(Random(30, 120));
+    end;
+
+  Keyboard.Send(Login, VK_ENTER);
+
+  { Password }
+  if (Self.GetCursor() <> _LOGIN_BOX_PASSWORD) then
+    Self.SetCursor(_LOGIN_BOX_PASSWORD);
+
+  if (Clear[_LOGIN_BOX_PASSWORD]) then
+    while (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 5) and (Timeout > GetTickCount64()) do
+    begin
+      Keyboard.PressKey(VK_BACK);
+      Wait(Random(30, 120));
+    end;
+
+  Keyboard.Send(Pass, VK_ENTER);
+end;
+
+(*
+TRSLoginScreen.OpenWorldSwitcher
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
+
+Opens the world switcher.
 
 .. note::
 
@@ -194,8 +261,57 @@ Example:
 
 .. code-block:: pascal
 
-*}
-function TRSLoginScreen._WaitResponse(): String;
+  LoginScreen.OpenWorldSwitcher();
+*)
+function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
+begin
+  Result := Self.isOpen();
+  if (not Result) then
+    Exit(srl.Writeln('Cannot open world switcher, login screen isn''t open', False));
+
+  Mouse.Click(Self.WorldBox, mouse_Left);
+  Wait(Random(500, 1000));
+end;
+
+(*
+TRSLoginScreen.GetResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.GetResponse(): String;
+
+Returns the login response (ie: Error connecting to server);
+
+Example:
+
+.. code-block:: pascal
+
+  LoginScreen.OpenWorldSwitcher();
+*)
+function TRSLoginScreen.GetResponse(): String;
+begin
+  Result := Trim(GetTextAtEx(Self.ResponseBox, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+end;
+
+(*
+TRSLoginScreen.WaitResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.WaitResponse(): String;
+
+Waits for a login response (see GetResponse) to appear up to 15 seconds,
+if Lobby screen is detected will return 'lobby'.
+
+Example:
+
+.. code-block:: pascal
+
+  LoginScreen.OpenWorldSwitcher();
+*)
+function TRSLoginScreen.WaitResponse(): String;
 const
   VAILD_CONNECTING = 'Connecting to server...';
   VAILD_ENTER_INFO = 'Enter your username/email & password.';
@@ -203,28 +319,29 @@ var
   TimeOut: UInt64;
   Response: String;
 begin
+  Result := '';
   TimeOut := GetTickCount64() + Random(13000, 15000);
 
   while (TimeOut > GetTickCount64()) do
   begin
-    Response := Self.GetLoginResponse();
+    Response := Self.GetResponse();
 
     if (Self.isOpen()) and (Response <> '') then
       if (Response <> VAILD_CONNECTING) and (Response <> VAILD_ENTER_INFO) then
       begin
         Wait(250);
 
-        if (Self.GetLoginResponse() = Response) then
+        if (Self.GetResponse() = Response) then
           Exit(Response);
       end;
 
     if (Lobby.isOpen()) then
       Exit('lobby');
 
-    Wait(Random(500, 1000));
+    Wait(Random(300, 600));
   end;
 
-  srl.Writeln('No response found after 10 seconds', TDebug.WARNING);
+  srl.Writeln('No response found: Timed out', TDebug.WARNING);
 end;
 
 begin

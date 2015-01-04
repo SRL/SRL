@@ -20,6 +20,13 @@ begin
   Self.Send(Text, Random(30, 60), Random(30, 60), Random(40, 85));
 end;
 
+procedure TKeyBoard.Send(const Text: String; KeyPressAfter: Integer); overload;
+begin
+  Self.Send(Text);
+  srl.GaussWait(30, 120, True);
+  Self.PressKey(KeyPressAfter);
+end;
+
 procedure TKeyBoard.PressKey(Key: Integer);
 begin
   {$IFDEF SMART}

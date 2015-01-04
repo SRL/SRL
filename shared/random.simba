@@ -155,3 +155,11 @@ function TSRL.GaussRandom(maxExt: Integer): Integer;
 begin
   Result := GaussRangeInt(0, maxExt-1);
 end;
+
+procedure TSRL.GaussWait(Min, Max: UInt32; Trunced: Boolean = False);
+begin
+  if (Trunced) then
+    Wait(Round(Self.TruncedGauss(Min, Max)))
+  else
+    Wait(Self.GaussRangeInt(Min, Max));
+end;

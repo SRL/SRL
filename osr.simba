@@ -19,6 +19,7 @@ end;
 {$include_once osr/LoginScreen.simba}
 {$include_once osr/Client.simba}
 {$include_once osr/Player.simba}
+{$include_once osr/Players.Simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}
