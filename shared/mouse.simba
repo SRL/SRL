@@ -49,19 +49,19 @@ type
   {$ENDIF}
  end;
 
-procedure TMouse.Init();
+procedure TMouse.__Setup();
 begin
-  FSpeed := Random(22, 24);
+  FSpeed := Random(21, 23);
   FMode := mouse_Human;
   FOnMouseMove := nil;
   FOnMouseEvent := nil;
 
-  FGravity[Ord(Mouse_Human)] := 7;
+  FGravity[Ord(Mouse_Human)] := 8;
   FGravity[Ord(Mouse_Brake)] := 8;
   FGravity[Ord(Mouse_Accurate)] := 14;
 
-  FWind[Ord(mouse_Human)] := 5;
-  FWind[Ord(mouse_Brake)] := 5;
+  FWind[Ord(mouse_Human)] := 4;
+  FWind[Ord(mouse_Brake)] := 4;
   FWind[Ord(mouse_Accurate)] := 3;
 end;
 
@@ -496,5 +496,5 @@ var
   Mouse: TMouse;
 
 begin
-  Mouse.Init();
+  Mouse.__Setup();
 end;

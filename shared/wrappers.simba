@@ -874,4 +874,9 @@ begin
   Result := (Point1.X = Point2.X) and (Point1.Y = Point2.Y);
 end;
 
+function GetTextAtEx(const SearchBox: TBox; MinV, MaxV, HSpacing, Color, Tol: Integer; const Font: String): String; overload;
+begin
+  Result := GetTextAtEx(SearchBox.X1, SearchBox.Y1, SearchBox.X2, SearchBox.Y2, MinV, MaxV, HSpacing, Color, Tol, Font);
+end;
+
 {$f+}

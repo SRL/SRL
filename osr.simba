@@ -2,6 +2,14 @@
 
 {$include_once shared.simba}
 
+begin
+  with (srl) do
+  begin
+    GameVersion := 'OSR';
+    DefaultClientBounds := [0, 0, 764, 502];
+  end;
+end;
+
 {$include_once osr/Text.simba}
 {$include_once osr/Chatbox.simba}
 {$include_once osr/ChooseOption.simba}
@@ -11,14 +19,11 @@
 {$include_once osr/LoginScreen.simba}
 {$include_once osr/Client.simba}
 {$include_once osr/Player.simba}
+{$include_once osr/Players.Simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}
   {$include_once osr/smart.simba}
 {$ENDIF}
-
-begin
-
-end;
 
 

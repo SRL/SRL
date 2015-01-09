@@ -12,7 +12,7 @@ begin
   end;
 end;
 
-function TSRL.FindText(out Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
 var
   TPA, TPAText: TPointArray;
   w, h: Integer;
@@ -20,6 +20,7 @@ begin
   if (not FindColorsTolerance(TPA, Color, SearchBox, Tolerance)) then
     Exit(False);
 
+  SetLength(Matches, 0);
   TPAText := TPAFromText(Text, Font, w, h);
   Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
 end;
