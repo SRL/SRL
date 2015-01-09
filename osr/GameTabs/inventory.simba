@@ -13,6 +13,7 @@ The type that holds functions and properties of the Runescape inventory gametab.
 type 
   TRSInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
+    LowSlot, HighSlot: Byte;
   end;
 
 {==| Table of Contents |=======================
@@ -67,6 +68,8 @@ begin
   begin
     FName := 'Inventory';
     FStatic := True;
+    LowSlot := 0;
+    HighSlot := 27;
   end;
 end;
 {$ENDIF}

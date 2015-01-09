@@ -1,0 +1,115 @@
+(*
+MainScreen
+==========
+
+This file holds functions and procedures that are used for the mainscreen.
+
+ * Ouputs a global variable 'MainScreen' that should be used to call these methods.
+
+.. code-block:: pascal
+
+    srl.Writeln(MainScreen.GetUpText());
+*)
+type
+  TRSMainScreen = record(TInterfaceBase)
+    UpTextArea: TBox;
+ end;
+
+var
+  MainScreen: TRSMainScreen;
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSMainScreen.__Setup();
+begin
+  with Self do
+  begin
+    SetName('Mainscreen');
+    SetStatic(True);
+    SetBounds([4, 4, 515, 337]);
+
+    UpTextArea := [7, 7, 465, 25];
+  end;
+end;
+{$ENDIF}
+
+(*
+TRSMainScreen.GetUpText
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainScreen.GetUpText(): String;
+
+Returns the current uptext (Text in top left of the screen).
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(MainScreen.GetUpText());
+*)
+function TRSMainScreen.GetUpText(): String;
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 75, True, 55];
+var
+  x: Int32;
+begin
+  Result := OCR.Recognize(Self.UpTextArea, OCR_RULES_UPTEXT, UpFont);
+  if (x := Pos('more options', Result)) <> 0 then
+    SetLength(Result, x + length('more options') - 1);
+
+  {$IFDEF UPTEXT_DEBUG}
+    srl.Writeln('UpText found: ' + Result);
+  {$ENDIF}
+end;
+
+(*
+TRSMainScreen.IsUpText
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSMainScreen.GetUpText(): String;
+
+Returns the current uptext (Text in top left of the screen).
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(MainScreen.GetUpText());
+*)
+function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 260): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (IsArrInStr(SubStrs, Self.GetUpText())) then
+      Exit(True);
+
+    Wait(Random(35, 95));
+  end;
+end;
+
+function TRSMainScreen.IsUpText(Str: String; WaitTime: UInt32 = 270): Boolean; overload;
+begin
+  Result := Self.IsUpText([Str], WaitTime);
+end;
+
+function TRSMainScreen.GetPlayerBox(): TBox;
+begin
+
+end;
+
+procedure TRSMainScreen.FilterPlayerBox(var TPA: TPointArray);
+begin
+  TPA := ClearTPAFromTPA(TPA, TPAFromBox(Self.GetPlayerBox()));
+end;
+
+begin
+  MainScreen.__Setup();
+end;

@@ -148,6 +148,8 @@ begin
     DebugFile := -1;
     DebugLevel := 1;
   end;
+
+  srl.DisableLog := True;
 end;
 
 

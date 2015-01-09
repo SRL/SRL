@@ -27,3 +27,73 @@ begin
       Wait(Random(50, 100));
   end;
 end;
+
+(*
+type TColorSettings
+~~~~~~~~~~~~~~~~~~~
+
+A record that provides easy access to the Simba CTS settings.
+*)
+type
+  TColorSettings = record
+    CTS: Integer;
+    Modifier: record
+      Hue, Saturation, Sensitivity: Extended;
+    end;
+ end;
+
+function TSRL.ColorSetting(_CTS: Byte; _Hue, _Saturation: Extended): TColorSettings;
+begin
+  Result := TColorSettings([_CTS, [_Hue, _Saturation]]);
+end;
+
+procedure TColorSettings.Retrieve();
+begin
+  Self.CTS := GetToleranceSpeed();
+
+  with Self.Modifier do
+  begin
+    Sensitivity := GetToleranceSpeed3Modifier();
+    GetToleranceSpeed2Modifiers(Hue, Saturation);
+  end;
+end;
+
+procedure TColorSettings.Apply();
+begin
+  SetColorToleranceSpeed(Self.CTS);
+
+  with Self.Modifier do
+  begin
+    SetToleranceSpeed2Modifiers(Hue, Saturation);
+    SetToleranceSpeed3Modifier(Sensitivity);
+  end;
+end;
+
+function FindColorsTolerance(var TPA: TPointArray; Color: Integer; SearchArea: TBox; Tolerance: Integer; cs: TColorSettings): Boolean; overload;
+var
+  tmp: TColorSettings;
+begin
+  tmp.Retrieve();
+  cs.Apply();
+
+  try
+    Result := FindColorsTolerance(TPA, Color, SearchArea, Tolerance);
+  finally
+    tmp.Apply();
+  end;
+end;
+
+function CountColorTolerance(Color: Integer; SearchArea: TBox; Tolerance: Integer; cs: TColorSettings): Integer; overload;
+var
+  tmp: TColorSettings;
+begin
+  tmp.Retrieve();
+  cs.Apply();
+
+  try
+    Result := CountColorTolerance(Color, SearchArea, Tolerance);
+  finally
+    tmp.Apply();
+  end;
+end;
+
