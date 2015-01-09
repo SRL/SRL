@@ -39,7 +39,7 @@ begin
 
     with (CompassInfo) do
     begin
-      Bounds := [544, 3, 579, 38];
+      Bounds := [545, 4, 576, 36];
       Middle := [561, 20];
       Radius := 15;
     end;
@@ -235,45 +235,29 @@ begin
   end;
 end;
 
-function TMinimap.GetCompassAngle(const AsDegrees: Boolean = True): Extended;
 
-  function varMax(D: Array[0..2] of Single; a, b: Int32): Int32;
-  begin
-    if D[a] < D[b] then
-      Exit(b)
-    else
-      Exit(a);
-  end;
-
-const
-  PI_OVER_2 = PI / 2;
+function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 var
-  i: Int32;
-  D: Array[0..2] of Single;
-  TPA, Dots: TPointArray;
-  ATPA: T2DPointArray;
+  north,south: TPoint;
+  M:TPoint := Self.CompassInfo.Middle;
+  TPA:TPointArray;
 begin
-  if (not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 45)) then
+  if not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 20) then
+    Exit(srl.Writeln('Failed to find the `N` in the compass', 0.00, '', TDebug.WARNING));
+
+  FilterPointsDist(TPA, 8,15, M.x,M.y);
+  north := MiddleTPA(SplitTPA(TPA,3)[0]);
+  south := RotatePoint(north,PI, M.x,M.y);
+  if not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 20) then
     Exit(srl.Writeln('Failed to find red compass dots color', 0.00, '', TDebug.WARNING));
-
-  ATPA := SplitTPA(TPA, 6);                                                     // group the dots
-  for i := 0 to High(ATPA) do                                                   // extract the 3 dots
-    if (Length(ATPA[i]) <= 3) then
-    begin
-      SortTPAFrom(ATPA[i], Point(561, 20));
-      Dots += ATPA[i][High(ATPA[i])];
-    end;
-
-  for i := 0 to 2 do                                                            // compute distance between each pair
-    D[i] := Distance(Dots[i].x,Dots[i].y, Dots[(i+1) mod 3].x,Dots[(i+1) mod 3].y);
-
-  i := varMax(D, varMax(D, 0, 1), varMax(D, varMax(D, 1, 2), varMax(D, 2, 0))); // find pair with largest distance between.
-  i := (i + 2) mod 3;                                                           // we know it's not i, and not i+1 (so it must be i+2)
-  Result := FixRad(ArcTan2((Dots[i].Y - Self.CompassInfo.Middle.Y),
-                            Dots[i].X - Self.CompassInfo.Middle.X) - PI_OVER_2);
-  if (AsDegrees) then
-    Result := Round(Degrees(Result)) mod 360;
+  
+  FilterPointsDist(TPA, 0,6, south.x,south.y);
+  SortTPAFrom(TPA,M);
+  Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2));
+  if AsDegrees then
+    Result := Degrees(Result);
 end;
+
 
 function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 2): Boolean;
 
