@@ -165,6 +165,18 @@ begin
   end;
 end;
 
+
+(*
+chatbox.HandleLevelUp
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.HandleLevelUp(): Boolean;
+
+Clicks the "Click here to continue" if text containing `Congratulations` was found
+
+.. note:: by olly
+*)
 function TRSChatbox.HandleLevelUp(): Boolean;
 const
   C_CHAR_POS: TPoint = [107, 383];
