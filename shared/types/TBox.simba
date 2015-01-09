@@ -4,7 +4,15 @@ begin
   Self.Y1 := Self.Y1 - SizeMod;
   Self.X2 := Self.X2 + SizeMod;
   Self.Y2 := Self.Y2 + SizeMod;
-end;  
+end;
+
+procedure TBox.Expand(WidMod,HeiMod: Int32); overload;
+begin
+  Self.X1 := Self.X1 - WidMod;
+  Self.Y1 := Self.Y1 - HeiMod;
+  Self.X2 := Self.X2 + WidMod;
+  Self.Y2 := Self.Y2 + HeiMod;
+end;
  
 function TBox.Partition(Rows, Cols: Int32; SizeMod:Int32=0): TBoxArray;
 var
