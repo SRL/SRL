@@ -33,6 +33,25 @@ begin
     end;
 end;
 
+function TBox.PartitionEx(Rows, Cols: Int32; WidMod, HeiMod:Int32): TBoxArray;
+var
+  idx,x,y,BoxW,BoxH: Int32;
+begin
+  SetLength(Result, Cols * Rows);
+  BoxW := (Self.x2 - Self.x1 + 1) div Cols;
+  BoxH := (Self.y2 - Self.y1 + 1) div Rows;
+  for y:=0 to Rows-1 do
+    for x:=0 to Cols-1 do
+    begin
+      idx := (Y * Cols) + X;
+      Result[idx].x1 := Self.x1 + (BoxW * x);
+      Result[idx].y1 := Self.y1 + (BoxH * y);
+      Result[idx].x2 := Self.x1 + (BoxW * x) + BoxW-1;
+      Result[idx].y2 := Self.y1 + (BoxH * y) + BoxH-1;
+      Result[idx].Expand(WidMod, HeiMod);
+    end;
+end;
+
 procedure TBox.GetDimensions(var w, h: integer);
 begin
   w := Self.X2 - Self.X1 + 1;
