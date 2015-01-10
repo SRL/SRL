@@ -54,6 +54,15 @@ begin
   SetLength(Self, h);
 end;
 
+procedure TStringArray.Extend(const Arr: TStringArray);
+var i,len:Int32;
+begin
+  len := Length(Self);
+  SetLength(Self, len+Length(Arr));
+  for i:=0 to High(Arr) do
+    Self[len+i] := Arr[i];
+end; 
+
 function TStringArray.Find(const Value: String): Integer;
 begin
   for Result := 0 to High(Self) do

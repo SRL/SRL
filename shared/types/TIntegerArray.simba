@@ -54,6 +54,14 @@ begin
   SetLength(Self, h);
 end;
 
+procedure TIntegerArray.Extend(Arr:TIntegerArray);
+var L:Int32;
+begin
+  L := Length(Self);
+  SetLength(Self, Length(Arr) + L);
+  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
+end; 
+
 function TIntegerArray.Find(const Value: Integer): Integer;
 begin
   for Result := 0 to High(Self) do

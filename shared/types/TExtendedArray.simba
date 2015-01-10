@@ -54,6 +54,14 @@ begin
   SetLength(Self, h);
 end;
 
+procedure TExtendedArray.Extend(Arr:TExtendedArray);
+var L:Int32;
+begin
+  L := Length(Self);
+  SetLength(Self, Length(Arr) + L);
+  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Extended));
+end; 
+
 function TExtendedArray.Find(const Value: Extended): Integer;
 begin
   for Result := 0 to High(Self) do

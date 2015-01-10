@@ -54,6 +54,14 @@ begin
   SetLength(Self, h);
 end;
 
+procedure TBoolArray.Extend(Arr:TBoolArray);
+var L:Int32;
+begin
+  L := Length(Self);
+  SetLength(Self, Length(Arr) + L);
+  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Boolean));
+end; 
+
 function TBoolArray.Find(const Value: Boolean): Integer;
 begin
   for Result := 0 to High(Self) do

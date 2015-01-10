@@ -54,6 +54,14 @@ begin
   SetLength(Self, h);
 end;
 
+procedure TPointArray.Extend(Arr:TPointArray);
+var L:Int32;
+begin
+  L := Length(Self);
+  SetLength(Self, Length(Arr) + L);
+  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TPoint));
+end; 
+
 function TPointArray.Find(const Value: TPoint): Integer;
 begin
   for Result := 0 to High(Self) do
