@@ -120,6 +120,23 @@ end;
 
 
 (*
+chatbox.GetLastMessage
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
+
+Returns the text at the last line in the chatbox
+
+.. note:: by slacky
+*)
+function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
+begin
+  Result := Self.GetTextOnLine(High(Self.FLines)-1, colors);
+end;
+
+
+(*
 chatbox.GetChatArea
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
