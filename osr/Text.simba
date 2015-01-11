@@ -7,17 +7,33 @@ const
   OCR_RULES_CHATBOX:TCompareRules = [-1,,,,-50,True];
   OCR_RULES_BLUE:   TCompareRules = [16711680,10];     //navy blue
   OCR_RULES_BLACK:  TCompareRules = [0,10];            //black
+
   
-//just a wrapper to simplefy usage
+//override to keep up with simbas target
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
+begin
+  Self.ClientID := ExportImageTarget();
+  Result := Inherited(B, Filter);
+end;
+
+function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
+begin
+  Self.ClientID := ExportImageTarget();
+  Result := Inherited(AClient, Filter);
+end;
+
+//overloads which takes a fontset.
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
+  Self.ClientID := ExportImageTarget();
   Result := Self.Recognize(B, Filter);
 end;
 
 function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
+  Self.ClientID := ExportImageTarget();
   Result := Self.Recognize(AClient, Filter);
 end;
 
