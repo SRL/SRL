@@ -1,0 +1,107 @@
+(*
+Logout
+=======
+The file holds functions and procedures that are in the logout-tab.
+*)
+
+(*
+type TRSLogout
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape logout-tab.
+*)  
+type 
+  TRSLogout = record(TInterfaceBase)
+    LogoutButton: TBox;
+  end;
+
+{==| Table of Contents |=======================
+ procedure TRSLogout.__setup();
+ function TRSLogout.Open(): Boolean;
+ function TRSLogout.IsOpen(): Boolean;
+ function TRSLogout.ClickLogout(attempts:Int32=3; tryTime:Int32=20000): Boolean;
+}
+
+(*
+var logout
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape logout interface.
+*)
+var 
+  logout: TRSLogout;
+
+  
+{$IFNDEF CODEINSIGHT}
+procedure TRSLogout.__setup();
+var i:Int32;
+begin
+  with Self do
+  begin
+    FName := 'Logout';
+    FStatic := True;
+    FBounds := [550,206,733,464];
+    LogoutButton := [572,361,709,390];
+  end;
+end;
+{$ENDIF}
+
+(*
+combat.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.Open(): Boolean;
+
+Opens the interface
+*)
+function TRSLogout.Open(): Boolean;
+begin
+  Result := Gametabs.Open(tabLogout);
+end;
+
+(*
+combat.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSOptions.IsOpen(): Boolean;
+
+Checks if the interface is already open.
+*)
+function TRSLogout.IsOpen(): Boolean;
+begin
+  Result := Gametabs.IsOpen(tabLogout);
+end;
+
+(*
+logout.ClickLogout
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.ClickLogout(attemts:Int32=3; tryTime:Int32=20000): Boolean;
+
+Clicks the logout button, by default retires 3 times over 20 seconds.
+*)
+function TRSLogout.ClickLogout(attemts:Int32=3; tryTime:Int32=20000): Boolean;
+var 
+  state:boolean;
+  t:UInt64;
+begin
+  if not(self.Open()) then
+    Exit(False);
+  
+  for 1 to attemts do
+  begin
+    mouse.click(Self.LogoutButton, mouse_left);
+    t := GetTickCount64() + (tryTime div attemts);
+    repeat
+      if (CountColorTolerance(1777019, Self.LogoutButton, 30) < 100) then
+        Exit(True)
+      else
+        Wait(25);
+    until GetTickCount64() > t;
+  end;
+end;
+
+begin
+  logout.__setup();
+end;

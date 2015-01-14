@@ -96,3 +96,6 @@ end;
 {$include_once gametabs/inventory.simba}
 {$include_once gametabs/options.simba}
 {$include_once gametabs/combat.simba}
+{$include_once gametabs/equipment.simba}
+{$include_once gametabs/logout.simba}
+

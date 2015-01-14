@@ -1,0 +1,78 @@
+(*
+Equipment
+=======
+The file holds functions and procedures that are used for controlling equipment.
+*)
+
+(*
+type TRSEquipment
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape equipment interface.
+*)  
+type 
+  TRSEquipment = record(TInterfaceBase)
+    FBoxes: TBoxArray;
+  end;
+
+{==| Table of Contents |=======================
+ procedure TRSEquipment.__setup();
+ function TRSEquipment.Open(): Boolean;
+ function TRSEquipment.IsOpen(): Boolean;
+}
+
+(*
+var equipment
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape equipment interface.
+*)
+var 
+  equipment: TRSEquipment;
+
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSEquipment.__setup();
+var i:Int32;
+begin
+  with Self do
+  begin
+    FName := 'Equipment';
+    FStatic := True;
+    FBounds := [550,206,733,464];
+    FBoxes := [];
+  end;
+end;
+{$ENDIF}
+
+(*
+equipment.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.Open(): Boolean;
+
+Opens the interface
+*)
+function TRSEquipment.Open(): Boolean;
+begin
+  Result := Gametabs.Open(tabEquipment);
+end;
+
+(*
+equipment.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.IsOpen(): Boolean;
+
+Checks if the interface is already open.
+*)
+function TRSEquipment.IsOpen(): Boolean;
+begin
+  Result := Gametabs.IsOpen(tabEquipment);
+end;
+
+
+
+begin
+  equipment.__setup();
+end;
