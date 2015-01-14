@@ -16,24 +16,16 @@ begin
   Result := Inherited(B, Filter);
 end;
 
-function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
-begin
-  Self.ClientID := ExportImageTarget();
-  Result := Inherited(AClient, Filter);
-end;
-
 //overloads which takes a fontset.
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
-  Self.ClientID := ExportImageTarget();
   Result := Self.Recognize(B, Filter);
 end;
 
 function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
-  Self.ClientID := ExportImageTarget();
   Result := Self.Recognize(AClient, Filter);
 end;
 
