@@ -18,7 +18,9 @@ type TRSChooseOption
 The type that holds functions and properties of the Runescape ChooseOption-menu.
 *)
 type
-  TRSChooseOption = type TBox;
+  TRSChooseOption = record 
+    Bounds:TBox;
+  end;
 
 (*
 var inventory
@@ -144,7 +146,7 @@ var
   TPA:TPointArray;
   ATPA:T2DPointArray;
 begin
-  Self := [0,0,0,0];
+  Self.Bounds := [0,0,0,0];
   Result := Self.__find(pt);
   if Result then
   begin
@@ -155,9 +157,9 @@ begin
     if Length(ATPA) = 0 then 
       RaiseException(erException,'No wai!! This is bullshit'); 
       
-    Self := GetTPABounds(ATPA[0]);
-    Self.Expand(1);
-    Self.LimitTo(B);
+    Self.Bounds := GetTPABounds(ATPA[0]);
+    Self.Bounds.Expand(1);
+    Self.Bounds.LimitTo(B);
   end;
 end;
 
@@ -180,30 +182,30 @@ begin
   if not(self.Find()) then
     Exit();
 
-  bmp := BitmapFromClient(Self.x1,Self.y1,Self.x2,Self.y2);
-  FastReplaceColor(bmp,4674653,0);
-  ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-  
-  oldT := GetImageTarget(); //set image as target
-  newT := SetTargetBitmap(bmp);
-
-  SetLength(Result, (Self.y2 - Self.y1 + 1) div 15);
-  for i:=0 to High(Result) do
+  with self.Bounds do
   begin
-    with B do
+    bmp := BitmapFromClient(x1,y1,x2,y2);
+    FastReplaceColor(bmp,4674653,0);
+    ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
+    
+    oldT := GetImageTarget(); //set image as target
+    newT := SetTargetBitmap(bmp);
+
+    SetLength(Result, (y2 - y1 + 1) div 15);
+    for i:=0 to High(Result) do
     begin
-      x1 := 2;
-      y1 := i * 15 + 2;
-      x2 := (Self.x2 - Self.x1) - 2;
-      y2 := y1 + 15;
+      B.x1 := 2;
+      B.y1 := i * 15 + 2;
+      B.x2 := (x2 - x1) - 2;
+      B.y2 := B.y1 + 15;
+      Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
+      B.Offset(Point(x1, y1));
+      Result[i].bounds := B;
     end;
-    Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
-    B.Offset(Point(Self.x1, Self.y1));
-    Result[i].bounds := B;
+    SetImageTarget(oldT);  //reset target
+    FreeTarget(newT);
+    FreeBitmap(bmp);
   end;
-  SetImageTarget(oldT);  //reset target
-  FreeTarget(newT);
-  FreeBitmap(bmp);
 end;
 
 (*
@@ -228,7 +230,8 @@ const
   MIN_MOUSE_OFFSET = 30;
   RND = 40;
 begin
-  B := [Self.x1,self.y1-BMP_ChooseOption_Height,self.x2,self.y2];
+  with self.bounds do
+    B := [x1,y1-BMP_ChooseOption_Height,x2,y2];
   B.Expand(MIN_MOUSE_OFFSET);
 
   clientB := GetClientBounds(True);
