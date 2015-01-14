@@ -19,6 +19,8 @@ type
  function TRSCombat.Open(): Boolean;
  function TRSCombat.IsOpen(): Boolean;
  function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSCombat.GetCombatLevel(): Int32;
+ function TRSCombat.GetWeapon(): String;
 }
 
 (*
@@ -72,7 +74,7 @@ combat.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.Open(): Boolean;
+  function TRSCombat.Open(): Boolean;
 
 Opens the interface
 *)
@@ -86,7 +88,7 @@ combat.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.IsOpen(): Boolean;
+  function TRSCombat.IsOpen(): Boolean;
 
 Checks if the interface is already open.
 *)
@@ -100,7 +102,7 @@ combat.ToggleButton
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+  function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the given button ``btn`` (if needed) to the given state ``enable``.
 *)
