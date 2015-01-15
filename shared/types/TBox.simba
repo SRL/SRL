@@ -16,39 +16,41 @@ end;
  
 function TBox.Partition(Rows, Cols: Int32; SizeMod:Int32=0): TBoxArray;
 var
-  idx,x,y,BoxW,BoxH: Int32;
+  idx,x,y: Int32;
+  BoxW,BoxH:Single;
 begin
   SetLength(Result, Cols * Rows);
-  BoxW := (Self.x2 - Self.x1 + 1) div Cols;
-  BoxH := (Self.y2 - Self.y1 + 1) div Rows;
+  BoxW := (Self.x2 - Self.x1 + 1) / Cols;
+  BoxH := (Self.y2 - Self.y1 + 1) / Rows;
   for y:=0 to Rows-1 do
     for x:=0 to Cols-1 do
-    begin  
+    begin
       idx := (Y * Cols) + X;
-      Result[idx].x1 := Self.x1 + (BoxW * x);
-      Result[idx].y1 := Self.y1 + (BoxH * y);
-      Result[idx].x2 := Self.x1 + (BoxW * x) + BoxW-1;
-      Result[idx].y2 := Self.y1 + (BoxH * y) + BoxH-1;
+      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x));
+      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y));
+      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1);
+      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1);
       Result[idx].Expand(SizeMod);
     end;
 end;
 
 function TBox.PartitionEx(Rows, Cols: Int32; WidMod, HeiMod:Int32): TBoxArray;
 var
-  idx,x,y,BoxW,BoxH: Int32;
+  idx,x,y: Int32;
+  BoxW,BoxH:Single;
 begin
   SetLength(Result, Cols * Rows);
-  BoxW := (Self.x2 - Self.x1 + 1) div Cols;
-  BoxH := (Self.y2 - Self.y1 + 1) div Rows;
+  BoxW := (Self.x2 - Self.x1 + 1) / Cols;
+  BoxH := (Self.y2 - Self.y1 + 1) / Rows;
   for y:=0 to Rows-1 do
     for x:=0 to Cols-1 do
     begin
       idx := (Y * Cols) + X;
-      Result[idx].x1 := Self.x1 + (BoxW * x);
-      Result[idx].y1 := Self.y1 + (BoxH * y);
-      Result[idx].x2 := Self.x1 + (BoxW * x) + BoxW-1;
-      Result[idx].y2 := Self.y1 + (BoxH * y) + BoxH-1;
-      Result[idx].Expand(WidMod, HeiMod);
+      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x));
+      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y));
+      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1);
+      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1);
+      Result[idx].Expand(widMod, heiMod);
     end;
 end;
 
