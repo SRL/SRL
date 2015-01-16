@@ -54,6 +54,12 @@ begin
   end;
 end;
 
+function TSmartBase.GetImage(): PtrUInt;
+begin
+  if (Self.Target <> 0) then
+    Result := PtrUInt(SmartImageArray(Self.Target));
+end;
+
 procedure TSmartBase.setEnabled(const Enable: Boolean);
 begin
   SmartSetEnabled(Self.Target, Enable);

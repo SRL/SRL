@@ -83,6 +83,20 @@ begin
   end;
 end;
 
+function FindColorTolerance(out x, y: Integer; Color: Integer; SearchArea: TBox; Tolerance: Integer; cs: TColorSettings): Boolean; overload;
+var
+  tmp: TColorSettings;
+begin
+  tmp.Retrieve();
+  cs.Apply();
+
+  try
+    Result := FindColorTolerance(x, y, Color, SearchArea, Tolerance);
+  finally
+    tmp.Apply();
+  end;
+end;
+
 function CountColorTolerance(Color: Integer; SearchArea: TBox; Tolerance: Integer; cs: TColorSettings): Integer; overload;
 var
   tmp: TColorSettings;

@@ -5,7 +5,8 @@ const
   DIR_WEST  = 270.0;
 
 type
-  EMinimapOrb = (orbHP, orbPrayer, orbRun);
+  EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun);
+  EMinimapDotType = (MMDotPlayer, MMDotItem);
 
 type
   TMMOrbInfo = record
@@ -24,18 +25,25 @@ type
   TMinimap = record (TInterfaceBase)
     CompassInfo: TMMCompassInfo;
     OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
+    MaskBMP: Integer;
  end;
 
 var
   Minimap: TMinimap;
 
+procedure TMinimap.__Free();
+begin
+  if (BitmapExists(Self.MaskBMP)) then
+    FreeBitmap(Self.MaskBMP);
+end;
+
 procedure TMinimap.__Setup();
 begin
   with (Self) do
   begin
-    setName('Minimap');
-    setStatic(True);
-    setBounds([570, 9, 716, 155]);
+    SetName('Minimap');
+    SetStatic(True);
+    SetBounds([570, 9, 716, 157]);
 
     with (CompassInfo) do
     begin
@@ -44,26 +52,48 @@ begin
       Radius := 15;
     end;
 
-    with (OrbInfo[Ord(orbHP)]) do
+    with (OrbInfo[Ord(MMOrbHP)]) do
     begin
-      Middle := [581, 136];
-      Radius := 15;
+      Middle := [555, 57];
+      Radius := 13;
       TextBox := [520, 55, 539, 68];
     end;
 
-    with (OrbInfo[Ord(orbPrayer)]) do
+    with (OrbInfo[Ord(MMOrbPrayer)]) do
     begin
       Middle := [581, 136];
       Radius := 15;
       TextBox := [521, 99, 540, 112];
     end;
 
-    with (OrbInfo[Ord(orbRun)]) do
+    with (OrbInfo[Ord(MMOrbRun)]) do
     begin
       Middle := [581, 136];
       Radius := 11;
       TextBox := [545, 135, 564, 148];
     end;
+
+    AddOnTerminate(@Self.__Free);
+
+    Self.MaskBMP := BitmapFromString(147, 147, 'meJzt3V1u01AYBuHsf8kQCqqQ' +
+                   'UmiC4/jnzJkyzwo+v3PhG0u+XL6On4vo6/5ry2n2oJ/sazqvVwXPM' +
+                   'LJXBfdje92j95gd3ec5eqG50DW2oDeD0fPvRe8HoCc/Er3lOPTSx6' +
+                   'MXPR098LnodU9BjzoOvfRh6CEZ9Op70fuR6O23o5fj0QVeRg82F7r' +
+                   'GWvROM6KbPEcvNC+6zBJ6m9nRfR6gJzGhW32gl/Chi72jN7CqmlfV' +
+                   'vKrmVTWvwklVzatqXlXzqppX4aSq5lU1r6p5FU6qal6Fk6qaV+Gkq' +
+                   'uZVNa/CSVXNq3BSVfMqnFThpKrmVTipwklVzatwUoWTKpxU1bwKJ1' +
+                   'U4qapJFU6qcEa94KQKJ1U4qcJJFU6qcFKFkyqcVOGkCidVOKnCSRV' +
+                   'Oqk8XjC5/o8/JWoWTKpxU4aQKJ1U4qcsd+qI8d1+tcAqFkyqcVOGk' +
+                   'CidVOKmH4Wo3uX9VK9zkCie1EK5201quVrhpFU7qabjaTWhNtcJNq' +
+                   'HBbvL3RF/TfgS1+XK/sAeurFe5P12/f2QNeCle7Gzbcq9UKd6MLVz' +
+                   'vctmqFw20OVzvQnmq1o+yvVrvxjqpWuMEODFe7YY6tVrsxzqhWu7O' +
+                   'dV618JxmQrHaHG1mtdkcZX618O4HJbugNfOhin9F7zI7u8wQ9z4zo' +
+                   'JmvRO82FrvEyejAeXWA7ejkSvf0B6AlHo/c+Er3lOPTSp6BHPRe97' +
+                   'unogY9HLzoOvfSR6C0B9OR70fuR6O23o5ebAh3hNfRac6FrrEXvNC' +
+                   'O6yXP0QvOiyyyht5kd3ecxehUHutJn9B4mdKsP9BI+dLF39AZWVfO' +
+                   'qmlfVpAonVTivqkkVTqpwXlXzqppaybyq9tsv47Li7Q==');
+
+    SetBitmapName(Self.MaskBMP, 'Minimap mask');
   end;
 end;
 
@@ -85,28 +115,29 @@ end;
 
 function TMinimap.GetPrayerLevel(): Integer;
 begin
-  Result := Self._GetOrbValue(orbPrayer);
+  Result := Self._GetOrbValue(MMOrbPrayer);
 end;
 
 function TMinimap.GetHPLevel(): Integer;
 begin
-  Result := Self._GetOrbValue(orbHP);
+  Result := Self._GetOrbValue(MMOrbHP);
 end;
 
-function TMinimap.GetHPPercent(): Integer;
+function TMinimap.GetHPPercent(): Byte;
 var
-  tb, b:TBox;
-  TPA:TPointArray;
+  tb, b: TBox;
+  TPA: TPointArray;
 begin
-  b := [543,45,568,70];
-  FindColorsTolerance(TPA,1250067,b,20);
+  with Minimap.OrbInfo[ord(MMOrbHP)] do
+    b := [Middle.X - Radius, Middle.Y - Radius, Middle.X + Radius, Middle.Y + Radius];
+  FindColorsTolerance(TPA, 1250067, b, 20);
   tb := GetTPABounds(TPA);
-  Result := 100 - Ceil((tb.y2-tb.y1) / (b.y2-b.y1) * 100);
+  Result := 100 - Ceil((tb.y2 - tb.y1) / (b.y2 - b.y1) * 100);
 end;
 
 function TMinimap.GetRunEnergy(): Integer;
 begin
-  Result := Self._GetOrbValue(orbRun);
+  Result := Self._GetOrbValue(MMOrbRun);
 end;
 
 function TMinimap.isRunEnabled(const Time: UInt32 = 0): Boolean;
@@ -117,7 +148,7 @@ const
 var
   b: TBox;
 begin
-  with (Self.OrbInfo[Ord(orbRun)].Middle) do
+  with (Self.OrbInfo[Ord(MMOrbRun)].Middle) do
     b := [X - 6, Y - 6, X + 6, Y + 6];
 
   if (Time = 0) then
@@ -130,7 +161,7 @@ function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
 begin
   Result := True;
 
-  with (Self.OrbInfo[Ord(orbRun)]) do
+  with (Self.OrbInfo[Ord(MMOrbRun)]) do
   begin
     if (Enable) and (not Self.isRunEnabled()) then
     begin
@@ -203,13 +234,29 @@ begin
   Inc(p.y, Self.GetBounds().Y1);
 end;
 
+function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
+var
+  TimeOut: UInt64;
+  p: TPoint;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + WaitTime;
+
+  repeat
+    if (Self.FindFlag(p)) then
+      Exit(True);
+
+    Wait(Random(50, 200));
+  until (GetTickCount64() > TimeOut);
+end;
+
 procedure TMinimap.WaitFlag(const Dist: UInt32 = 0);
 var
   TimeOut: UInt64;
   d, LastDist, SameDists: UInt32;
   p: TPoint;
 begin
-  TimeOut := GetTickCount64() + Random(10000, 12000);
+  TimeOut := GetTickCount64() + Random(23000, 25000);
   LastDist := 500;
   SameDists := 0;
 
@@ -235,7 +282,6 @@ begin
   end;
 end;
 
-
 function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 var
   north,south: TPoint;
@@ -257,7 +303,6 @@ begin
   if AsDegrees then
     Result := Degrees(Result);
 end;
-
 
 function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 2): Boolean;
 
@@ -309,7 +354,7 @@ begin
   while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < TimeOut) do
   begin
     AngleDistance := CurrentAngle - Angle;
-    Left := ((AngleDistance > 0) and (abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (abs(AngleDistance) > 180));
+    Left := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
     Key(Left);
 
     CurrentAngle := Self.GetCompassAngle();
@@ -320,6 +365,9 @@ begin
     Wait(Random(15, 30));
   end;
 
+  if (GetTickCount64() >= TimeOut) then
+    srl.Writeln('TRSMinimap.SetCompassAngle(): Setting angle timed out', TDebug.WARNING);
+
   if (Left) then
     KeyUp(VK_LEFT)
   else
@@ -328,10 +376,81 @@ begin
   Wait(Random(270, 420));
 end;
 
+function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+const
+  DOT_COL_DIFF = [1, 1];
+begin
+
+end;
+
+function TMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+begin
+
+end;
+
+function TMinimap.isPointOn(pt: TPoint): Boolean;
+var
+  p: TPoint;
+begin
+  Result := False;
+
+  if (PointInBox(pt, Self.getBounds())) then
+  begin
+    p := [pt.X - Self.GetBounds().X1, pt.Y - Self.GetBounds().Y1];
+    if (GetMufasaBitmap(Self.MaskBMP).PointInBitmap(p.X, p.Y)) then
+      Result := FastGetPixel(Self.MaskBMP, p.X, p.Y) <> $FFFFFF;
+  end;
+end;
+
+procedure TMinimap.FilterPoints(var TPA: TPointArray);
+var
+  FilterTPA: TPointArray;
+begin
+  if (FindColorsBitmap(Self.MaskBMP, FilterTPA, clBlack)) then
+    TPA := ClearTPAFromTPA(TPA, FilterTPA);
+end;
+
+function TMinimap.FindDTMs(const DTM: Integer; out Matches: TPointArray; Step: Extended = 1.00; Range: UInt32 = 25): Boolean;
+
+  function GetSearchAngles(TheAngle, TheRange: Extended): T2DExtendedArray;
+  var
+    StartA, EndA: Extended;
+  begin
+    StartA := (TheAngle - TheRange);
+    EndA := (TheAngle + TheRange);
+
+    if (StartA < 0.00) then
+    begin
+      Result += TExtendedArray([360 + StartA, 360]);
+      Result += TExtendedArray([0, 0 + EndA]);
+    end else if (EndA > 360.0) then
+    begin
+      Result += TExtendedArray([StartA, 360]);
+      Result += TExtendedArray([0, 0 + Abs(EndA - 360)]);
+    end else
+      Result += TExtendedArray([StartA, EndA]);
+  end;
+
+var
+  SearchAngles, FoundAngles, tmp: T2DExtendedArray;
+  i: integer;
+  TPA: TPointArray;
+begin
+  SetLength(Matches, 0);
+  SearchAngles := GetSearchAngles(Self.GetCompassAngle(), Range);
+
+  for i := 0 to High(SearchAngles) do
+    with Self.GetBounds() do
+      if (findDTMsRotatedSE(DTM, TPA, X1, Y1, X2, Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
+      begin
+        Insert(tmp, FoundAngles, Length(FoundAngles));
+        AppendTPA(Matches, TPA);
+      end;
+
+  Self.FilterPoints(Matches);
+  Result := Length(Matches) > 0;
+end;
+
 begin
   Minimap.__Setup();
 end;
-
-
-
-

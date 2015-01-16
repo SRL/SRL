@@ -172,7 +172,7 @@ begin
 
   while (Self.GetCursor() <> New) do
   begin
-    Keyboard.PressKey(VK_BACK);
+    Keyboard.PressKey(VK_TAB);
     Wait(Random(350, 650));
   end;
 end;
@@ -201,7 +201,7 @@ var
 begin
   Result := True;
 
-  if (not Self.isOpen(Random(700, 1000))) then
+  if (not Self.isLoginOpen()) and (not Self.isOpen(Random(700, 1000))) then
     Exit(False);
 
   if (not Self.isLoginOpen()) then
@@ -320,11 +320,13 @@ var
   Response: String;
 begin
   Result := '';
-  TimeOut := GetTickCount64() + Random(13000, 15000);
+  TimeOut := GetTickCount64() + Random(10000, 12000);
 
   while (TimeOut > GetTickCount64()) do
   begin
     Response := Self.GetResponse();
+    if (Response = VAILD_CONNECTING) then // We will wait forever while 'Connecting to server...' is visible
+      TimeOut := GetTickCount64() + Random(10000, 12000);
 
     if (Self.isOpen()) and (Response <> '') then
       if (Response <> VAILD_CONNECTING) and (Response <> VAILD_ENTER_INFO) then

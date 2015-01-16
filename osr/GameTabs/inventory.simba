@@ -338,6 +338,30 @@ begin
   Self.DropItems(ptrn);
 end;
 
+function TRSInventory.FindItems(const Mask: TMask; Tolerance: Byte = 30; ContourTolerance: Byte = 30; MaxToFind: Byte = 28): TIntegerArray;
+var
+  i: Integer;
+  p: TPoint;
+begin
+  for i := Self.LowSlot to Self.HighSlot do
+    if (FindMaskTolerance(Mask, p.x, p.y, Self.GetSlotBox(i), Tolerance, ContourTolerance)) then
+    begin
+      Result += i;
+      if (Length(Result) = MaxToFind) then
+        Break;
+    end;
+end;
+
+function TRSInventory.FindItem(const Mask: TMask; Tolerance: Byte = 30; ContourTolerance: Byte = 30): Integer;
+var
+  a: TIntegerArray;
+begin
+  Result := -1; // not found
+  a := Self.FindItems(Mask, Tolerance, ContourTolerance, 1);
+  if (Length(a) > 0) then
+    Result := a[Low(a)];
+end;
+
 
 begin
   Inventory.__setup();

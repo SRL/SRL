@@ -79,7 +79,7 @@ begin
     else if (Lobby.isOpen()) then
       Exit(srl.Writeln('Player already in lobby!', True, 'TPlayer.LoginToLobby(): Result = True'));
 
-    if (not LoginScreen.isOpen(Random(5000, 6000))) then
+    if (not LoginScreen.isLoginOpen(Random(5000, 6000))) then
       Exit(srl.Writeln('Login screen isn''t open, is client loaded?', False, 'TPlayer.LoginToLobby(): Result = False'));
 
     if (LoginScreen.EnterLoginInfo(Self.LoginName, Self.Password)) then
