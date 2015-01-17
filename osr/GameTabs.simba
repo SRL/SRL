@@ -16,13 +16,13 @@ type
     tabMusic
   );
 
-  TRSGametab = type(pointer);
+  TRSGametab = type Pointer;
 
 var
   Gametabs: TRSGametab;
 
 function TRSGametab.GetBounds(Tab:EGametab): TBox;
-var 
+var
   row,col:Int32;
   B:TBox;
 begin
@@ -43,8 +43,8 @@ var
 begin
   B := self.getBounds(Tab);
   if FindColorTolerance(_,_,1910383, B.x1,b.y1,b.x2,b.y2, 13) then
-    Exit(True);
-  if (Tab = tabInventory) then
+    Exit(True)
+  else if (Tab = tabInventory) then
     Exit(Self.GetCurrent() = Tab);
 end;
 
