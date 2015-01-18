@@ -7,6 +7,39 @@ var
   s, e: TPoint;
   b: TBox = [1, 600, 99, 699];
 
+const
+  dyn_Target: TPoint = [600, 100];
+var
+  dyn_Moved: Boolean = False;
+
+procedure Dynamic_Hook_OnMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  if (dyn_Moved) then
+    FastSetPixel(img, X, Y, 255)
+  else
+    FastSetPixel(img, X, Y, 15773440);
+end;
+
+procedure Dynamic_Hook(Sender: TObject; var xs, ys, xe, ye: Extended);
+begin
+  if (Distance(Round(xs), Round(ys), dyn_Target.x, dyn_Target.y) < 200) then
+  begin
+    dyn_Moved := True;
+    ye := 500 + Random(-100, 100);
+  end;
+end;
+
+procedure Test_Dynamic;
+begin
+  Mouse.setMode(mouse_Brake);
+  Mouse.setOnMouseMove(@Dynamic_Hook_OnMove);
+  Mouse.SetOnSplineCreate(@Dynamic_Hook);
+
+  MoveMouse(100, 100);
+  Mouse.Move(dyn_Target);
+end;
+
+
 procedure Hook(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var
   c: Integer = 255;
@@ -24,7 +57,14 @@ begin
 end;
 
 begin
-  GetClientDimensions(w, h);
+  img := CreateBitmap(800, 800);
+
+  Test_Dynamic();
+
+  ShowBitmap(img);
+  FreeBitmap(img);
+
+  {GetClientDimensions(w, h);
   img := CreateBitmap(800, 900);
 
   Mouse.setOnMouseMove(@Hook);
@@ -75,5 +115,5 @@ begin
   // Mouse.Click(Point(245, 504), mouse_Left);
 
   ShowBitmap(img);
-  FreeBitmap(img);
+  FreeBitmap(img); }
 end;

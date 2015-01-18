@@ -37,6 +37,7 @@
 
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
+  TCreateSplineEvent = procedure(Sender: TObject; var xs, ys, xe, ye: Extended);
 
 type
   TMouse = record
@@ -46,6 +47,7 @@ type
     FGravity, FWind: array [0..2] of Integer;
     FOnMouseMove: TMouseMoveEvent;
     FOnMouseEvent: TMouseEvent;
+    FOnCreateSpline: TCreateSplineEvent;
   {$ENDIF}
  end;
 
@@ -53,8 +55,10 @@ procedure TMouse.__Setup();
 begin
   FSpeed := Random(21, 23);
   FMode := mouse_Human;
+
   FOnMouseMove := nil;
   FOnMouseEvent := nil;
+  FOnCreateSpline := nil;
 
   FGravity[Ord(Mouse_Human)] := 8;
   FGravity[Ord(Mouse_Brake)] := 8;
@@ -71,7 +75,7 @@ begin
     RaiseException(erCustomError, 'TMouse.ValidateButton: Mouse button isn''t vaild, use (mouse_Left, mouse_Right, mouse_Middle');
 end;
 
-procedure TMouse.setPosition(const Target: TPoint);
+procedure TMouse.SetPosition(const Target: TPoint);
 begin
   if (@FOnMouseMove <> nil) then
     FOnMouseMove(@Self, [], Target.X, Target.Y);
@@ -79,69 +83,79 @@ begin
   MoveMouse(Target.X, Target.Y);
 end;
 
-function TMouse.getPosition(): TPoint;
+function TMouse.GetPosition(): TPoint;
 begin
   GetMousePos(Result.X, Result.Y);
 end;
 
-function TMouse.getMode(): TMouseMode;
+function TMouse.GetMode(): TMouseMode;
 begin
   Result := FMode;
 end;
 
-procedure TMouse.setMode(const NewMode: TMouseMode);
+procedure TMouse.SetMode(const NewMode: TMouseMode);
 begin
   FMode := NewMode;
 end;
 
-function TMouse.getSpeed(): Integer;
+function TMouse.GetSpeed(): Integer;
 begin
   Result := Self.FSpeed;
 end;
 
-procedure TMouse.setSpeed(const NewSpeed: Integer);
+procedure TMouse.SetSpeed(const NewSpeed: Integer);
 begin
   Self.FSpeed := NewSpeed;
 end;
 
-function TMouse.getGravity(const Mode: TMouseMode): Integer;
+function TMouse.GetGravity(const Mode: TMouseMode): Integer;
 begin
   Result := Self.FGravity[Ord(Mode)];
 end;
 
-procedure TMouse.setGravity(const Mode: TMouseMode; const NewGravity: Integer);
+procedure TMouse.SetGravity(const Mode: TMouseMode; const NewGravity: Integer);
 begin
   Self.FGravity[Ord(Mode)] := NewGravity;
 end;
 
-function TMouse.getWind(const Mode: TMouseMode): Integer;
+function TMouse.GetWind(const Mode: TMouseMode): Integer;
 begin
   Result := Self.FWind[Ord(Mode)];
 end;
 
-procedure TMouse.setWind(const Mode: TMouseMode; const NewWind: Integer);
+procedure TMouse.SetWind(const Mode: TMouseMode; const NewWind: Integer);
 begin
   Self.FWind[Ord(Mode)] := NewWind;
 end;
 
-function TMouse.getOnMouseMove(): TMouseMoveEvent;
+function TMouse.GetOnMouseMove(): TMouseMoveEvent;
 begin
-  Result := @FOnMouseMove;
+  Result := @Self.FOnMouseMove;
 end;
 
-procedure TMouse.setOnMouseMove(const Event: TMouseMoveEvent);
+procedure TMouse.SetOnMouseMove(const Event: TMouseMoveEvent);
 begin
-  FOnMouseMove := @Event;
+  Self.FOnMouseMove := @Event;
 end;
 
-function TMouse.getOnMouseEvent(): TMouseEvent;
+function TMouse.GetOnMouseEvent(): TMouseEvent;
 begin
-  Result := @FOnMouseEvent;
+  Result := @Self.FOnMouseEvent;
 end;
 
-procedure TMouse.setOnMouseEvent(const Event: TMouseEvent);
+procedure TMouse.SetOnMouseEvent(const Event: TMouseEvent);
 begin
-  FOnMouseEvent := @Event;
+  Self.FOnMouseEvent := @Event;
+end;
+
+function TMouse.GetOnSplineCreate(): TCreateSplineEvent;
+begin
+  Result := @Self.FOnCreateSpline;
+end;
+
+procedure TMouse.SetOnSplineCreate(const Event: TCreateSplineEvent);
+begin
+  Self.FOnCreateSpline := @Event;
 end;
 
 procedure TMouse.Hold(const Button: Integer);
@@ -175,8 +189,10 @@ var
   lastX,lastY,tempSpeed,W,TDist, xsR, ysR: Integer;
   t: UInt64;
   PDist,maxStep,dModA,dModB,nModA,nModB: extended;
+  Event: Boolean;
 begin
   tempSpeed := Self.getSpeed();
+  Event := Assigned(@FOnCreateSpline);
   TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
   if (TDist < 1) then
     TDist := 1;
@@ -198,6 +214,9 @@ begin
   repeat
     if (GetTickCount64() > t) then
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    if (Event) then
+      FOnCreateSpline(@Self, xs, ys, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -306,14 +325,19 @@ var
   lastX,lastY, tempSpeed,W,TDist, xsR, ysR: integer;
   t: UInt64;
   maxStep,rCnc: extended;
+  Event: Boolean;
 begin
   tempSpeed := Self.getSpeed();
+  Event := Assigned(@FOnCreateSpline);
 
   TDist := distance(Round(xs), Round(ys), Round(xe), Round(ye));
   t := GetTickCount64() + Random(9700, 10000);
   repeat
     if (GetTickCount64() > t) then
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    if (Event) then
+      FOnCreateSpline(@Self, xs, ys, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -374,7 +398,7 @@ begin
     W := round(W * 0.7);
 
     Wait(W);
-    lastdist:= dist;
+    lastdist := dist;
   until (hypot(xs - xe, ys - ye) < 1);
 
   if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
@@ -407,9 +431,12 @@ begin
   Self.Move(Point(X, Y));
 end;
 
-procedure TMouse.Move(const Box: TBox); overload;
+procedure TMouse.Move(const Box: TBox; const Gauss: Boolean = True); overload;
 begin
-  Self.Move(srl.GaussPoint(Box));
+  if (Gauss) then
+    Self.Move(srl.GaussPoint(Box))
+  else
+    Self.Move(TBox([Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)]));
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
