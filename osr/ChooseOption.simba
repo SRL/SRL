@@ -198,7 +198,7 @@ begin
       B.y1 := i * 15 + 2;
       B.x2 := (x2 - x1) - 2;
       B.y2 := B.y1 + 15;
-      Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07');
+      Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07_s');
       B.Offset(Point(x1, y1));
       Result[i].bounds := B;
     end;

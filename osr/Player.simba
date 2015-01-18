@@ -107,8 +107,6 @@ end;
 
 function TPlayer.Login(): Boolean;
 begin
-  Writeln(Self);
-
   srl.Writeln('TPlayer.Login()', TDebug.HEADER);
   Result := False;
 
