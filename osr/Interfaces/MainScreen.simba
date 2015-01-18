@@ -11,6 +11,15 @@ This file holds functions and procedures that are used for the mainscreen.
     srl.Writeln(MainScreen.GetUpText());
 *)
 type
+  THPBar = record
+    Bounds: TBox;
+    Percent: Extended;
+ end;
+
+type
+  THPBarArray = array of THPBar;
+
+type
   TRSMainScreen = record(TInterfaceBase)
     UpTextArea: TBox;
  end;
@@ -169,9 +178,11 @@ MainScreen.FindHPBars
 
 .. code-block:: pascal
 
-    function TRSMainScreen.FindHPBars(Area: TBox): TBoxArray;
+    function TRSMainScreen.FindHPBars(Area: TBox): THPBarArray;
 
-Returns all hitpoint bars in the TBox 'Area'.
+Returns a THPBarArray of all hitpoint bars found in the area 'Area'.
+  * THPBar.Bounds is the bounds of the found hitpoint bar
+  * THPBar.Percent is the percent of health in the hitpoint bar.
 
 Example:
 
@@ -179,7 +190,7 @@ Example:
 
     Bars := MainScreen.FindHPBars(MainScreen.GetBounds());
 *)
-function TRSMainScreen.FindHPBars(Area: TBox): TBoxArray;
+function TRSMainScreen.FindHPBars(const Area: TBox): THPBarArray;
 
   function _FixHPBars(var Bars: T2DIntArray; TPA: TPointArray): TPointArray;
   var i: Int32;
@@ -192,7 +203,7 @@ function TRSMainScreen.FindHPBars(Area: TBox): TBoxArray;
         Bars[TPA[i].y][TPA[i].x] := 255;
   end;
 
-  procedure _FindHPBars(var Bars: T2DIntArray; var Result: TBoxArray);
+  procedure _FindHPBars(var Bars: T2DIntArray; var Result: THPBarArray);
   const
     W = 29;
     H = 4;
@@ -216,23 +227,23 @@ function TRSMainScreen.FindHPBars(Area: TBox): TBoxArray;
             if Bars[yy][x] = $00FF00 then
             begin
               bad := True;
-              break;
+              Break;
             end;
 
           if (not bad) then
           begin
             Bars[y][x] := $00FF00;
-            Result += TBox([x, y, x + W, y + H]);
+            Result += THPBar([TBox([x, y, x + W, y + H]), 0.00]);
           end;
         end;
   end;
 
 const
-  COLOR_BARS = [$00FF00,$0000FF];
+  COLOR_BARS = [$00FF00, $0000FF];
   COLOR_SPLATS = [16728128, 11339523, 5571843, 192, 197503, 65889, $FFFFFF, 0];
 var
-  i, j: Int32;
-  tmp, TPA, splats: TPointArray;
+  i: Int32;
+  tmp, TPA, Splats: TPointArray;
   Mat: T2DIntArray;
   B: TBox;
 begin
@@ -246,31 +257,37 @@ begin
     for i := 0 to High(COLOR_SPLATS) do
       if (FindColors(tmp, COLOR_SPLATS[i], Area)) then
         Insert(tmp, Splats, Length(Splats) + 1);
+
+    if (Length(TPA) < 10) then
+      Exit;
+
+    B := GetTPABounds(TPA);
+    OffsetTPA(Splats, Point(-B.X1+1,-B.Y1+1));
+    SetLength(Mat, B.Height()+2, B.Width()+2);
+    for i := 0 to High(TPA) do
+      Mat[(TPA[i].y-B.Y1)+1][(TPA[i].x-B.X1)+1] := 255;
+
+    _FixHPBars(Mat, Splats);
+    _FindHPBars(Mat, Result);
+
+    for i := High(Result) downto 0 do
+    begin
+      if (Mat[Result[i].Bounds.Y1, Result[i].Bounds.X1] = 0) or
+         (Mat[Result[i].Bounds.Y1, Result[i].Bounds.X2] = 0) or
+         (Mat[Result[i].Bounds.Y2, Result[i].Bounds.X2] = 0) or
+         (Mat[Result[i].Bounds.Y2, Result[i].Bounds.X1] = 0) then
+       Delete(Result, i, 1)
+      else
+        with Result[i] do
+        begin
+          Area.Offset([B.X1-1, B.Y1-1]);
+
+          if (FindColors(TPA, $00FF00, Area)) then
+            Percent := (GetTPABounds(TPA).Width / 30) * 100;
+        end;
+    end;
   finally
     Unfreeze();
-  end;
-
-  if (Length(TPA) < 10) then
-    Exit;
-
-  B := GetTPABounds(TPA);
-  OffsetTPA(Splats, Point(-B.X1+1,-B.Y1+1));
-  SetLength(Mat, B.Height()+2, B.Width()+2);
-  for i := 0 to High(TPA) do
-    Mat[(TPA[i].y-B.Y1)+1][(TPA[i].x-B.X1)+1] := 255;
-
-  _FixHPBars(Mat, Splats);
-  _FindHPBars(Mat, Result);
-
-  for i := High(Result) downto 0 do
-  begin
-    if (Mat[Result[i].y1, Result[i].x1] = 0) or
-       (Mat[Result[i].y1, Result[i].x2] = 0) or
-       (Mat[Result[i].y2, Result[i].x2] = 0) or
-       (Mat[Result[i].y2, Result[i].x1] = 0) then
-      Result.Del(i)
-    else
-      Result[i].Offset([B.x1-1,B.y1-1]);
   end;
 end;
 
