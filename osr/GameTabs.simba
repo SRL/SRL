@@ -45,13 +45,17 @@ end;
 function TRSGametab.IsOpen(Tab:EGametab): Boolean;
 var
   B:TBox;
-  _:Int32;
+  i:Int32;
 begin
-  B := self.getBounds(Tab);
-  if FindColorTolerance(_,_,1910383, B.x1,b.y1,b.x2,b.y2, 13) then
+  if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
     Exit(True)
   else if (Tab = tabInventory) then
-    Exit(Self.GetCurrent() = Tab);
+  begin
+    for i:=0 to High(Self.Tabs) do
+      if CountColorTolerance(1910383, Self.Tabs[i], 13) > 0 then
+        Exit(False);
+    Exit(True);
+  end;
 end;
 
 function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
@@ -95,7 +99,6 @@ begin
   for i:=0 to High(EGameTab) do
     if Self.IsOpen(EGameTab(i)) then
       Exit(EGameTab(i));
-  Result := tabInventory; //assume tab inventory.
 end;
 
 
