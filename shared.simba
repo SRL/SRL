@@ -18,6 +18,7 @@
 {$include_once shared/types/TExtendedArray.simba}
 {$include_once shared/types/TBoolArray.simba}
 {$include_once shared/types/TBoxArray.simba}
+{$include_once shared/types/TPointArray.simba}
 
 begin
 
