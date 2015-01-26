@@ -280,9 +280,9 @@ begin
       else
         with Result[i] do
         begin
-          Area.Offset([B.X1-1, B.Y1-1]);
+          Bounds.Offset([B.X1-1, B.Y1-1]);
 
-          if (FindColors(TPA, $00FF00, Area)) then
+          if (FindColors(TPA, $00FF00, Bounds)) then
             Percent := (GetTPABounds(TPA).Width / 30) * 100;
         end;
     end;
