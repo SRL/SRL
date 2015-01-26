@@ -20,6 +20,11 @@ The type that holds functions and properties of the Runescape ChooseOption-menu.
 type
   TRSChooseOption = record 
     Bounds:TBox;
+    {$IFNDEF CODEINSIGHT}
+    BoxBitmap: Int32;
+    BoxBitmap_Width:Int32;
+    BoxBitmap_Height:Int32;
+    {$ENDIF}
   end;
 
 (*
@@ -30,21 +35,17 @@ Variable that stores functions and properties of the Runescape ChooseOption-menu
 var
   ChooseOption: TRSChooseOption;
 
-  BMP_ChooseOption: Int32;
-  BMP_ChooseOption_Width:Int32;
-  BMP_ChooseOption_Height:Int32;
-
 {$IFNDEF CODEINSIGHT}
 procedure TRSChooseOption.__setup();
 begin
-  BMP_ChooseOption := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
+  BoxBitmap := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
-  GetBitmapSize(BMP_ChooseOption, BMP_ChooseOption_Width, BMP_ChooseOption_Height);
+  GetBitmapSize(BoxBitmap, BoxBitmap_Width, BoxBitmap_Height);
 end;
 
 procedure TRSChooseOption.__free(); 
 begin 
-  FreeBitmap(BMP_ChooseOption); 
+  FreeBitmap(BoxBitmap); 
 end;
 
 //Finds the optionbox using a simple bitmap (works very well).
@@ -57,10 +58,10 @@ begin
 
   t := GetTickCount64() + tryTime;
   repeat
-    Result := FindBitmap(BMP_ChooseOption, pos.x, pos.y);
+    Result := FindBitmap(BoxBitmap, pos.x, pos.y);
     if Result then
     begin
-      pos.y += BMP_ChooseOption_Height;
+      pos.y += BoxBitmap_Height;
       Exit;
     end;
   until (GetTickCount64() > t);
@@ -93,7 +94,7 @@ ChooseOption.IsOpen
 
   function TRSChooseOption.IsOpen(): Boolean;
 
-Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False``.
+Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False`` (expecting it to open).
 
 .. note:: by slacky
 *)
@@ -112,7 +113,7 @@ ChooseOption.IsClosed
 
   function TRSChooseOption.IsClosed(): Boolean;
 
-Checks if the menu is closed, it repeats the check for a +/-2 sec if it's ``True``.
+Checks if the menu is closed, it repeats the check for a +/-2 sec if it's ``True`` (expecting it to close).
 
 .. note:: by slacky
 *)
@@ -230,8 +231,11 @@ const
   MIN_MOUSE_OFFSET = 30;
   RND = 40;
 begin
+  if self.IsClosed() then
+    Exit(True);
+
   with self.bounds do
-    B := [x1,y1-BMP_ChooseOption_Height,x2,y2];
+    B := [x1,y1-BoxBitmap_Height,x2,y2];
   B.Expand(MIN_MOUSE_OFFSET);
 
   clientB := GetClientBounds(True);
@@ -277,7 +281,7 @@ ChooseOption.Select
 By default it will click the given option, if not found the menu is closed.
 Returns true if the select-action was performed.
 - moves the mouse to the first match of the given options ``SubStrings``.
-- left-clicks it (``mouseAction:Int32=mouse_left;``)
+- left-clicks it ``mouseAction:Int32=mouse_left;``
 - if it's not found option-menu will be closed AClose (``AClose:Boolean=True;``)
 - search can be case insensitive (``CaseSensitive:Boolean=True``)
   

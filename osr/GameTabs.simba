@@ -16,36 +16,46 @@ type
     tabMusic
   );
 
-  TRSGametab = type Pointer;
+  TRSGametab = record
+    Tabs: TBoxArray;
+  end;
 
 var
   Gametabs: TRSGametab;
+  
+procedure TRSGametab.__setup();
+var 
+  Upper,Lower:TBox;
+begin
+  with Self do
+  begin
+    Upper := [527,168,760,204];
+    Lower := [527,466,760,502];
+    
+    Tabs := Upper.Partition(1, 7, -3);
+    Tabs.Extend(Lower.Partition(1, 7, -3));
+  end;
+end;
 
 function TRSGametab.GetBounds(Tab:EGametab): TBox;
-var
-  row,col:Int32;
-  B:TBox;
 begin
-  col := Ord(Tab) mod 7;
-  row := Ord(Tab) div 7;
-  case Row of
-    0: B := [527,168,760,204];
-    1: B := [527,466,760,502]; 
-    else Exit; //(it's impossible)
-  end;
-  Result := B.Partition(1, 7, -3)[col];
+  Result := Self.Tabs[Ord(Tab)];
 end;
 
 function TRSGametab.IsOpen(Tab:EGametab): Boolean;
 var
   B:TBox;
-  _:Int32;
+  i:Int32;
 begin
-  B := self.getBounds(Tab);
-  if FindColorTolerance(_,_,1910383, B.x1,b.y1,b.x2,b.y2, 13) then
+  if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
     Exit(True)
   else if (Tab = tabInventory) then
-    Exit(Self.GetCurrent() = Tab);
+  begin
+    for i:=0 to High(Self.Tabs) do
+      if CountColorTolerance(1910383, Self.Tabs[i], 13) > 0 then
+        Exit(False);
+    Exit(True);
+  end;
 end;
 
 function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
@@ -89,7 +99,11 @@ begin
   for i:=0 to High(EGameTab) do
     if Self.IsOpen(EGameTab(i)) then
       Exit(EGameTab(i));
-  Result := tabInventory; //assume tab inventory.
+end;
+
+
+begin
+  Gametabs.__setup();
 end;
 
 {$include_once gametabs/combat.simba}

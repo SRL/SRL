@@ -431,8 +431,11 @@ begin
   Self.Move(Point(X, Y));
 end;
 
-procedure TMouse.Move(const Box: TBox; const Gauss: Boolean = True); overload;
+procedure TMouse.Move(const Box: TBox; ForcedMove:Boolean=False; Gauss:Boolean=True); overload;
 begin
+  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
+    Exit();
+
   if (Gauss) then
     Self.Move(srl.GaussPoint(Box))
   else
