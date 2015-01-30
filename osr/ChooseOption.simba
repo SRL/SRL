@@ -87,6 +87,26 @@ begin
   Result := self.__find(_, tryTime);
 end;
 
+
+(*
+ChooseOption.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.Open(Box:TBox): Boolean; overload;
+
+Opens the optionbox, returns true if it worked.
+
+.. note:: by slacky
+*)
+function TRSChooseOption.Open(Box:TBox; tryTime:Int32=-1): Boolean; overload;
+var _:TPoint;
+begin
+  Mouse.Click(Box, mouse_right);
+  Result := self.__find(_, tryTime);
+end;
+
+
 (*
 ChooseOption.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
