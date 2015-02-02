@@ -6,7 +6,7 @@ const
 
 type
   EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun);
-  EMinimapDotType = (MMDotPlayer, MMDotItem);
+  EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
 
 type
   TMMOrbInfo = record
@@ -377,15 +377,38 @@ begin
 end;
 
 function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
-const
-  DOT_COL_DIFF = [1, 1];
+const { aligned with EMinimapDotType }
+  DOT_COL_DIFF = [1907997, 23, 4369];
+var
+  img, i: Integer;
+  TPA: TPointArray;
 begin
+  img := BitmapFromClient(Self.GetBounds());
 
+  try
+    if (not FindColorsBitmap(img, TPA, 65536)) then
+      Exit;
+
+    for i := 0 to High(TPA) do
+      if (TPA[i].X > 0) and (TPA[i].Y > 0) then
+        if (FastGetPixel(img, TPA[i].X-1, TPA[i].Y-1) -
+            FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
+          Result += Point(TPA[i].X, TPA[i].Y - 2);
+
+    if (Length(Result) > 0) then
+    begin
+      OffsetTPA(Result, Point(Self.GetBounds().X1, Self.GetBounds().Y1));
+      if (SortFromPlayer) then
+        SortTPAFrom(Result, Self.GetMiddle());
+    end;
+  finally
+    FreeBitmap(img);
+  end;
 end;
 
 function TMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
 begin
-
+  Result := Length(Self.GetDots(DotType, False)) >= MinCount;
 end;
 
 function TMinimap.isPointOn(pt: TPoint): Boolean;
@@ -397,8 +420,8 @@ begin
   if (PointInBox(pt, Self.getBounds())) then
   begin
     p := [pt.X - Self.GetBounds().X1, pt.Y - Self.GetBounds().Y1];
-    if (GetMufasaBitmap(Self.MaskBMP).PointInBitmap(p.X, p.Y)) then
-      Result := FastGetPixel(Self.MaskBMP, p.X, p.Y) <> $FFFFFF;
+    if (GetMufasaBitmap(Self.MaskBMP).PointInBitmap(p.x, p.y)) then
+      Result := FastGetPixel(Self.MaskBMP, p.x, p.y) <> $FFFFFF;
   end;
 end;
 
@@ -441,7 +464,7 @@ begin
 
   for i := 0 to High(SearchAngles) do
     with Self.GetBounds() do
-      if (findDTMsRotatedSE(DTM, TPA, X1, Y1, X2, Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
+      if (FindDTMsRotatedSE(DTM, TPA, X1, Y1, X2, Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
       begin
         Insert(tmp, FoundAngles, Length(FoundAngles));
         AppendTPA(Matches, TPA);

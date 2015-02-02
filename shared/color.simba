@@ -260,3 +260,6 @@ type
     Settings: TColorSettings;
  end;
 
+type
+  TColorExArray = array of TColorEx;
+
