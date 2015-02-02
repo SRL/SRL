@@ -481,8 +481,13 @@ begin
   Self.Click(Point(X, Y), Button);
 end;
 
-procedure TMouse.Click(const Box: TBox; const Button: Integer); overload;
+procedure TMouse.Click(const Box: TBox; const Button: Integer; ForcedMove:Boolean=False); overload;
 begin
+  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
+  begin
+    Self.Click(Button);
+    Exit();
+  end;
   Self.Click(srl.GaussPoint(Box), Button);
 end;
 
