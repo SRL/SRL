@@ -1,0 +1,51 @@
+function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint;
+begin
+  if (Gauss) then
+  begin
+    Result.X := Self.X + srl.GaussRangeInt(Min, Max);
+    Result.Y := Self.Y + srl.GaussRangeInt(Min, Max);
+  end else begin
+    Result.X := Self.X + System.Random(Min, Max);
+    Result.Y := Self.Y + System.Random(Min, Max);
+  end;
+end;
+
+function TPoint.Random(XMin, XMax: Integer; YMin, YMax: Integer; Gauss: Boolean = False): TPoint; overload;
+begin
+  if (Gauss) then
+  begin
+    Result.X := Self.X + srl.GaussRangeInt(XMin, XMax);
+    Result.Y := Self.Y + srl.GaussRangeInt(YMin, YMax);
+  end else begin
+    Result.X := Self.X + System.Random(XMin, XMax);
+    Result.Y := Self.Y + System.Random(YMin, YMax);
+  end;
+end;
+
+procedure TPoint.Offset(p: TPoint);
+begin
+  Self.X := Self.X + p.X;
+  Self.X := Self.X + p.Y;
+end;
+
+function TPoint.isInBox(const Box: TBox): Boolean;
+begin
+  Exit(PointInBox(Self, Box));
+end;
+
+function TPoint.isInCircle(Mid: TPoint; Radius: UInt32): Boolean;
+begin
+  Exit(Distance(Self, Mid) <= Radius);
+end;
+
+function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint;
+begin
+  Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
+end;
+
+function TPoint.Equals(Other: TPoint): Boolean;
+begin
+  Result := (Self.X = Other.X) and (Self.Y = Other.Y);
+end;
+
+
