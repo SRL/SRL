@@ -3,7 +3,7 @@ type
     World: Integer;
   end;
 
-function TSmart.getSpawnParams(): Boolean;
+function TSmart.GetSpawnParams(): Boolean;
 const
   RS_URL = 'http://oldschool%d.runescape.com/';
 var
@@ -57,7 +57,7 @@ begin
   Smart.FindJavaPath := True;
   Smart.Width := 765;
   Smart.Height := 503;
-  Smart.getParams := @Smart.getSpawnParams;
+  Smart.getParams := @Smart.GetSpawnParams;
 end;
 
 

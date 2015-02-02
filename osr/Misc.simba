@@ -1,3 +1,50 @@
+type
+  EClickType = (ctNone,ctRed,ctYellow);
+
+function TSRL.GetClickType(Area: TBox): EClickType;
+var
+  BMP: Int32;
+  TPA: TPointArray;
+begin
+  Result := ctNone;
+  BMP := BitmapFromClient(Area); { Freeze also works, tho returning 196 pixels rather than 383528 seems better! }
+
+  try
+    if (FindColorsBitmap(BMP, TPA, $010000)) then
+    begin
+      Result := ctRed;
+      if (FindColorsBitmap(BMP, TPA, $00FFFF)) then
+        if (Length(TPA) > 4) then
+          Result := ctYellow;
+    end;
+  finally
+    FreeBitmap(BMP);
+  end;
+end;
+
+function TMouse.Click(Target: EClickType): Boolean; overload;
+var
+  p: TPoint;
+  t: UInt64;
+  ct: EClickType;
+begin
+  Result := False;
+
+  Self.Click(mouse_Left);
+
+  p := Self.GetPosition();
+  t := GetTickCount64() + Random(100, 150);
+
+  while (t > GetTickCount64()) do
+  begin
+    ct := srl.GetClickType(Box(p.x - 7, p.y - 7, p.x + 7, p.y + 7));
+    if (ct <> ctNone) then
+      Exit(ct = Target);
+
+    Wait(Random(10, 25));
+  end;
+end;
+
 function TSRL.GetXPAtLevel(level:Int32): Int32;
 var
   total:Double;
@@ -8,12 +55,12 @@ begin
 	Result := Floor(total / 4);
 end;
 
-
 function TSRL.GetLevelAtXP(XP:UInt32): Int32;
 var 
   total:Double;
 begin
-  while (total < XP*4+1) and (Result+=1) do
+  while (total < XP*4+1) and (Result+=1) do // breaks ci keep it last in the file !
     total += Floor(Result + 300 * 2 ** (Result / 7));
   Result -= 1;
-end;  
+end;
+
