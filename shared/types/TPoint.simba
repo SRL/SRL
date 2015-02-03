@@ -28,12 +28,12 @@ begin
   Self.X := Self.X + p.Y;
 end;
 
-function TPoint.isInBox(const Box: TBox): Boolean;
+function TPoint.InBox(const Box: TBox): Boolean;
 begin
   Exit(PointInBox(Self, Box));
 end;
 
-function TPoint.isInCircle(Mid: TPoint; Radius: UInt32): Boolean;
+function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean;
 begin
   Exit(Distance(Self, Mid) <= Radius);
 end;
