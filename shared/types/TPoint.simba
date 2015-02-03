@@ -4,7 +4,8 @@ begin
   begin
     Result.X := Self.X + srl.GaussRangeInt(Min, Max);
     Result.Y := Self.Y + srl.GaussRangeInt(Min, Max);
-  end else begin
+  end else 
+  begin
     Result.X := Self.X + System.Random(Min, Max);
     Result.Y := Self.Y + System.Random(Min, Max);
   end;
@@ -16,7 +17,8 @@ begin
   begin
     Result.X := Self.X + srl.GaussRangeInt(XMin, XMax);
     Result.Y := Self.Y + srl.GaussRangeInt(YMin, YMax);
-  end else begin
+  end else 
+  begin
     Result.X := Self.X + System.Random(XMin, XMax);
     Result.Y := Self.Y + System.Random(YMin, YMax);
   end;
@@ -25,22 +27,32 @@ end;
 procedure TPoint.Offset(p: TPoint);
 begin
   Self.X := Self.X + p.X;
-  Self.X := Self.X + p.Y;
+  Self.Y := Self.Y + p.Y;
 end;
 
-function TPoint.InBox(const Box: TBox): Boolean;
+function TPoint.InBox(Box: TBox): Boolean;
 begin
-  Exit(PointInBox(Self, Box));
+  Result := PointInBox(Self, Box);
 end;
 
 function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean;
 begin
-  Exit(Distance(Self, Mid) <= Radius);
+  Result := Distance(Self.x, Self.y, Mid.x, Mid.y) <= Radius;
+end;
+
+function TPoint.DistanceTo(P:TPoint): Extended;
+begin
+  Result := Distance(Self.x, Self.y, P.x, P.y);
 end;
 
 function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint;
 begin
   Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
+end;
+
+function TPoint.Magnitude(): Extended;
+begin
+  Result := Sqrt(Sqr(Self.x) + Sqr(Self.y));
 end;
 
 function TPoint.Equals(Other: TPoint): Boolean;
