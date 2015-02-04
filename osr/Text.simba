@@ -30,10 +30,10 @@ begin
 end;
 
 begin
-  SmallFont.Load(FontPath+'SmallChars07'); 
-  UpFont.Load(FontPath+'UpChars07_s'); 
-  NPCFont.Load(FontPath+'CharsNPC07'); 
-  StatFont.Load(FontPath+'StatChars07');
+  SmallFont.Load('SmallChars07'); 
+  UpFont.Load('UpChars07_s'); 
+  NPCFont.Load('CharsNPC07'); 
+  StatFont.Load('StatChars07');
   OCR.Init(UpFont); //just init it with W/E font.
   //freeing OCR and fonts is handeled automatically by lape
 end;
