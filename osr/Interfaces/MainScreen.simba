@@ -59,7 +59,7 @@ Example:
 *)
 function TRSMainScreen.GetUpText(): String;
 const
-  OCR_RULES_UPTEXT: TCompareRules = [-1, 75, True, 55];
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
 var
   x: Int32;
 begin
