@@ -13,7 +13,7 @@ type
     Hook_After_Reload: procedure();
   end;
 
-{function TSmartBase.getHWND(): PtrUInt;
+function TSmartBase.getHWND(): PtrUInt;
 var
   a: TSysProcArr := Client.getIOManager().GetProcesses();
   c: TChildWindowArr;
@@ -32,7 +32,7 @@ begin
     end;
 
   srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd', TDebug.ERROR);
-end;}
+end;
 
 procedure TSmartBase.setDebug(const Enable: Boolean);
 begin
