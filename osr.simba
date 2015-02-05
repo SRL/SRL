@@ -22,6 +22,7 @@ end;
 {$include_once osr/Player.simba}
 {$include_once osr/Players.Simba}
 {$include_once osr/Interfaces/MainScreen.simba}
+{$include_once osr/Interfaces/BankScreen.simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}

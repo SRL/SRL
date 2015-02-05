@@ -1,0 +1,134 @@
+type
+  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbClose);
+
+type
+  TRSBankScreen = record (TInterfaceBase)
+    fSlots: TBoxArray;
+    fButtons: array [0..High(EBankButton)] of TBox;
+ end;
+
+var
+  BankScreen: TRSBankScreen;
+
+procedure TRSBankScreen.__Setup();
+begin
+  with Self do
+  begin
+    SetBounds(Box(16, 6, 503, 336));
+    SetName('Bankscreen');
+    SetStatic(True);
+
+    fSlots := Box(66, 82, 448, 296).PartitionEx(6,8,-7,-2);
+
+    with Self.GetBounds() do
+    begin
+      fButtons[bbSwap] := Box(X1 + 6, Y2 - 25, X1 + 88, Y2 - 6);
+      fButtons[bbInsert] := Box(X1 + 91, Y2 - 25, X1 + 173, Y2 - 6);
+      fButtons[bbItem] := Box(X1 + 186, Y2 - 25, X1 + 268, Y2 - 6);
+      fButtons[bbNote] := Box(X1 + 272, Y2 - 25, X1 + 353, Y2 - 6);
+
+      fButtons[bbSearch] := Box(X2 - 122, Y2 - 40, X2 - 89, Y2 - 7);
+      fButtons[bbDepositInv] := Box(X2 - 76, Y2 - 40, X2 - 43, Y2 - 7);
+      fButtons[bbDepositWorn] := Box(X2 - 40, Y2 - 40, X2 - 7, Y2 - 7);
+      fButtons[bbClose] := Box(X2 - 27, Y1 + 7, X2 - 7, Y1 + 27);
+    end;
+  end;
+end;
+
+function TRSBankScreen.ClickButton(btn: EBankButton; clickType: Integer = mouse_Left): Boolean;
+begin
+  Result := Self.isOpen();
+
+  if (Result) then
+    Mouse.Click(Self.fButtons[btn], clickType);
+end;
+
+procedure TRSBankScreen._Debug();
+var
+  BMP, i: Integer;
+begin
+  BMP := BitmapFromClient(GetClientBounds());
+
+  for i := 0 to High(fButtons) do
+    DrawTPABitmap(BMP, EdgeFromBox(fButtons[i]), 255);
+  for i := 0 to High(fSlots) do
+    DrawTPABitmap(BMP, EdgeFromBox(fSlots[i]), $00FF00);
+
+  ShowBitmap(BMP);
+  FreeBitmap(BMP);
+end;
+
+function TRSBankScreen._Find(): Boolean;
+const
+  TEXT_COL = 2070783;
+var
+  p: TPoint;
+begin
+  Result := srl.FindText(p, 'Note', 'SmallChars', TEXT_COL, 0, Self.fButtons[bbNote]);
+end;
+
+function TRSBankScreen.isOpen(WaitTime: UInt32 = 0): Boolean;
+var
+  t: UInt64;
+begin
+  t := GetTickCount64() + WaitTime;
+
+  repeat
+    if (Self._Find()) then
+      Exit(True)
+    else if (WaitTime > 0) then
+      Wait(Random(25, 50));
+  until (GetTickCount64() >= t);
+end;
+
+function TRSBankScreen.DepositAll(): Boolean;
+begin
+  if (Inventory.Count = 0) then
+    Exit(True);
+  if (not Self.isOpen()) then
+    Exit(False);
+
+  Result := Self.ClickButton(bbDepositInv);
+end;
+
+{ Scrolls up to the top of the bank, so slots are aligned.}
+procedure TRSBankScreen.FixSlots();
+var
+  t: UInt64;
+begin
+  if (not Self.isOpen()) then
+    Exit;
+
+ t := GetTickCount64() + Random(7000, 8000);
+ while (GetColor(491, 99) <> 65536) and (t > GetTickCount64()) do
+ { Add mouse scroll helper thing to mouse.simba} ;
+
+end;
+
+function TRSBankScreen.Close(): Boolean;
+var
+  t: UInt64;
+begin
+  if (not Self.isOpen()) then
+    Exit(True);
+
+  Self.ClickButton(bbClose);
+
+  t := GetTickCount64() + Random(4000, 5000);
+  while (t > GetTickCount64()) do
+  begin
+    if (not Self.isOpen()) then
+      Exit(True);
+
+    Wait(Random(100, 200));
+  end;
+end;
+
+function TRSBankScreen.GetSlotBox(Slot: UInt32): TBox;
+begin
+  Result := fSlots[Slot]; // range check.
+end;
+
+begin
+  BankScreen.__Setup();
+end;

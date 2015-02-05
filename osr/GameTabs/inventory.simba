@@ -362,6 +362,11 @@ begin
     Result := a[Low(a)];
 end;
 
+function TRSInventory.Count(): Byte;
+begin
+  Result := Length(Self.GetUsedSlots());
+end;
+
 
 begin
   Inventory.__setup();
