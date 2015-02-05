@@ -7,7 +7,7 @@ var
   TPA: TPointArray;
 begin
   Result := ctNone;
-  BMP := BitmapFromClient(Area); { Freeze also works, tho returning 196 pixels rather than 383528 seems better! }
+  BMP := BitmapFromClient(Area); { Freeze also works, tho returning 196 pixels rather than 384795 seems better! }
 
   try
     if (FindColorsBitmap(BMP, TPA, $010000)) then
@@ -50,9 +50,9 @@ var
   total:Double;
   i:Int32;
 begin
-	for i:=1 to level-1 do
-		total += Floor(i + 300 * 2 ** (i / 7));
-	Result := Floor(total / 4);
+  for i:=1 to level-1 do
+    total += Floor(i + 300 * 2 ** (i / 7));
+  Result := Floor(total / 4);
 end;
 
 function TSRL.GetLevelAtXP(XP:UInt32): Int32;
