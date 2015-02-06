@@ -1,3 +1,52 @@
+(*
+TPASplitRows
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TPASplitRows(Arr:TPointArray; dist:Int32): T2DPointArray;
+  
+Splits a TPA ``Arr`` into TPAs of each row, it then proceeds to further split the rows
+in to separate TPAs when the given distance ``dist`` is less than the distance between the points
+Same output as ``SplitTPAEx(TPA,dist,0)``, but generally faster.
+
+.. note:: by slacky
+*)
+function TPASplitRows(Arr:TPointArray; dist:Int32): T2DPointArray;
+var
+  TPA,tmp:TPointArray;
+  i,ii,j,n,s,h,l:Int32 = 0;
+begin
+  TPA := Copy(arr);
+  SortTPAByY(TPA,True);
+  SetLength(Result, Length(TPA));
+  l := Length(TPA);
+  while i < l do
+  begin
+    s := 0;
+    i := j;
+    inc(j);
+    while (j < l) and (TPA[j].y = TPA[j-1].y) do Inc(j);
+
+    if j-i > 1 then
+    begin
+      tmp := Copy(TPA,i,j-i);
+      SortTPAByX(tmp,True);
+      h := High(tmp);
+      for ii:=1 to h do
+        if (tmp[ii].x-tmp[ii-1].x > dist) or (ii = h) then
+        begin
+          Result[Inc(n)-1] := Copy(tmp, s, ii-s+(ord(ii = h) and 1));
+          s := ii;
+        end;
+    end else if j-i = 1 then
+      Result[Inc(n)-1] := [TPA[i]];
+  end;
+  SetLength(Result, n);
+end;
+
+
+//--| Type helpers |----------------------------------------------------------->
+//----------------------------------------------------------------------------->
 procedure TPointArray.Append(const Value: TPoint);
 begin
   Self += Value;
