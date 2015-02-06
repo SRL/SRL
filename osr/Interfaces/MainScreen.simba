@@ -316,13 +316,13 @@ Example:
 }
 function TRSMainscreen.GetText(color:Int32): TMSTextArray;
 var
-  w,h,i,j:Int32;
+  w,h,i,j: Int32;
   TPA: TPointArray;
   clusters,lines: T2DPointArray;
-  text:String;
-  b:TBox;
+  text: String;
+  b: TBox;
 begin
-  if FindColorsTolerance(TPA, color, mainscreen.GetBounds(), 0) then
+  if FindColorsTolerance(TPA, color, self.FBounds, 0) then
   begin
     clusters := TPASplitRows(TPA, 7);  //think SplitTPAEx(TPA,7,0);
     SetLength(lines, Length(clusters));
