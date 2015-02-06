@@ -14,15 +14,18 @@ type
   THPBar = record
     Bounds: TBox;
     Percent: Extended;
- end;
-
-type
+  end;
   THPBarArray = array of THPBar;
+  
+  TMSText = record 
+    Bounds: TBox; 
+    Text: String; 
+  end;
+  TMSTextArray = Array of TMSText;  
 
-type
   TRSMainScreen = record(TInterfaceBase)
     UpTextArea: TBox;
- end;
+  end;
 
 var
   MainScreen: TRSMainScreen;
@@ -290,6 +293,67 @@ begin
     Unfreeze();
   end;
 end;
+
+{
+MainScreen.GetText
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSMainscreen.GetText(color:Int32): TMSTextArray;
+
+Returns a TMSTextArray containing all the text (of given color) on the mainscreen.
+  * TMSText.Bounds is the bounds is the textarea
+  * TMSText.Text is the text it self.
+
+Example:
+
+.. code-block:: pascal
+
+    msText := Mainscreen.GetText(65535);
+    WriteLn(msText);
+
+.. note:: by slacky
+}
+function TRSMainscreen.GetText(color:Int32): TMSTextArray;
+var
+  w,h,i,j:Int32;
+  TPA: TPointArray;
+  clusters,lines: T2DPointArray;
+  text:String;
+  b:TBox;
+begin
+  if FindColorsTolerance(TPA, color, mainscreen.GetBounds(), 0) then
+  begin
+    clusters := TPASplitRows(TPA, 7);  //think SplitTPAEx(TPA,7,0);
+    SetLength(lines, Length(clusters));
+    for i:=0 to High(clusters) do
+    begin
+      b := GetTPABounds(clusters[i]);
+      if (B.x2-B.x1+1 > 3) then
+        lines[inc(j)-1] := clusters[i];
+    end;
+    SetLength(lines, j);
+  end;
+  if Length(lines) = 0 then Exit;
+
+  Clusters := ClusterTPAEx(MergeATPA(lines),10,1);
+  for i:=0 to High(Clusters) do
+  begin
+    B := GetTPABounds(Clusters[i]);
+    if (B.x2-B.x1+1 < 6) or (B.y2-B.y1+1 < 6) then
+      Continue;
+    B.x2 += 1;
+    B.y2 := B.y1 + 13;
+    text := GetTextAtEx(B, 0,3, 4, color, 0, 'UpChars07_s');
+    if Length(text) > 0 then
+    begin
+      SetLength(Result, Length(Result) + 1);
+      Result[High(Result)].Text := Text;
+      Result[High(Result)].Bounds := B;
+    end;
+  end;
+end;
+
 
 begin
   MainScreen.__Setup();
