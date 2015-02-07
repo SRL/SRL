@@ -1,15 +1,31 @@
+(*
+BankScreen
+==========
+This file stores all methods that are used in the bankscreen-iterface.
+All methods here are called with the bankscreen ``BankScreen`` variable.
+
+.. code-block:: pascal
+
+    Writeln(BankScreen.IsOpen());
+*)
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbMenu, bbClose);
 
-type
   TRSBankScreen = record (TInterfaceBase)
     fSlots: TBoxArray;
     fButtons: array [0..High(EBankButton)] of TBox;
- end;
+  end;
 
 var
   BankScreen: TRSBankScreen;
 
+
+const
+   WITHDRAW_ALL = -1;
+   WITHDRAW_ALL_BUT_ONE = -2;
+
+
+{$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
 begin
   with Self do
@@ -36,22 +52,8 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
-function TRSBankScreen.ClickButton(btn: EBankButton; clickType: Integer = mouse_Left): Boolean;
-begin
-  Result := Self.IsOpen();
-
-  if (Result) then
-    Mouse.Click(Self.fButtons[btn], clickType);
-end;
-
-// Checks if the given button is red/toggled
-function TRSBankScreen.IsToggled(btn: EBankButton; minMatch:Int32=50): Boolean;
-begin
-  Result := Self.IsOpen();
-  if Result then
-    Result := CountColorTolerance(1777019, Self.fButtons[btn], 30) > minMatch;
-end;
 
 function TRSBankScreen._ExpectText(txt:String; B:TBox; font:TFontSet; cfg:TCompareRules; maxWait:Int32=6000): Boolean;
 var
@@ -64,6 +66,7 @@ begin
     else
       Wait(20);
 end;
+
 
 procedure TRSBankScreen._Debug();
 var
@@ -89,6 +92,15 @@ begin
   Result := srl.FindText(p, 'Rearrange mode', 'SmallChars', TEXT_COL, 0, Box(54,295,154,314));
 end;
 
+(*
+BankScreen.IsOpen
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.IsOpen(): Boolean;
+
+returns True if the bankscreen is open
+*)
 function TRSBankScreen.IsOpen(WaitTime: UInt32 = 0): Boolean;
 var
   t: UInt64;
@@ -103,11 +115,31 @@ begin
   until (GetTickCount64() >= t);
 end;
 
+
+(*
+BankScreen.Open
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.Open(): Boolean;
+
+Opens the bankscreen.
+*)
 function TRSBankScreen.Open(): Boolean;
 begin
   RaiseException('Not implmented yet');
 end;
 
+
+(*
+BankScreen.Close
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.Close(): Boolean;
+
+Closes the bankscreen, returns True on success
+*)
 function TRSBankScreen.Close(): Boolean;
 var
   t: UInt64;
@@ -127,6 +159,42 @@ begin
   end;
 end;
 
+
+(*
+BankScreen.ClickButton
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.ClickButton(btn: EBankButton; clickType: Integer = mouse_Left): Boolean;
+
+Toggles the button
+*)
+function TRSBankScreen.ClickButton(btn: EBankButton; clickType: Integer = mouse_Left): Boolean;
+begin
+  Result := Self.IsOpen();
+
+  if (Result) then
+    Mouse.Click(Self.fButtons[btn], clickType);
+end;
+
+
+(*
+BankScreen.IsToggled
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.IsToggled(btn: EBankButton; minMatch:Int32=50): Boolean;
+
+Checks if the given button is red/toggled
+*)
+function TRSBankScreen.IsToggled(btn: EBankButton; minMatch:Int32=50): Boolean;
+begin
+  Result := Self.IsOpen();
+  if Result then
+    Result := CountColorTolerance(1777019, Self.fButtons[btn], 30) > minMatch;
+end;
+
+
 { Scrolls up to the top of the bank, so slots are aligned.}
 procedure TRSBankScreen.FixSlots();
 var
@@ -141,12 +209,38 @@ begin
 
 end;
 
+
 function TRSBankScreen.GetSlotBox(Slot: UInt32): TBox;
 begin
   if InRange(Slot, 0,High(Self.FSlots)) then
     Result := fSlots[Slot]; // range check.
 end;
 
+
+(*
+BankScreen.ItemIn
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.ItemIn(Slot: UInt32): Boolean;
+
+Returns True if there's an item in the given slot.
+*)
+function TRSBankScreen.ItemIn(Slot: UInt32): Boolean;
+begin
+  Result := CountColor($010000, self.GetSlotBox(slot)) <> 0;
+end;
+
+
+(*
+BankScreen.DepositAll
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.DepositAll(): Boolean;
+
+Depositis your inventory
+*)
 function TRSBankScreen.DepositAll(): Boolean;
 begin
   if (Inventory.Count = 0) then
@@ -155,6 +249,16 @@ begin
   Result := Self.ClickButton(bbDepositInv);
 end;
 
+
+(*
+BankScreen.RearrangeMode
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
+
+Changes the way items are moved around, valid options are ``bbSwap`` and ``bbInsert``.
+*)
 function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
 begin
   if not(mode in [bbSwap,bbInsert]) then
@@ -163,6 +267,16 @@ begin
   Result := self.IsToggled(mode) or Self.ClickButton(mode);
 end;
 
+
+(*
+BankScreen.WithdrawAs
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
+
+Changes the way items are withdrawn. Valid options are ``bbItem`` and ``bbNote``
+*)
 function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
 begin
   if not(mode in [bbItem,bbNote]) then
@@ -171,9 +285,19 @@ begin
   Result := self.IsToggled(mode) or Self.ClickButton(mode);
 end;
 
+
+(*
+BankScreen.Search
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.Search(item:String): Boolean;
+
+Search for an item using the search option in the bank.
+*)
 function TRSBankScreen.Search(item:String): Boolean;
 const
-  TEXT_AREA:TBox = [70,394,434,412];
+  TEXT_AREA:TBox = [70,394,450,412];
 begin
   if (not Self.IsOpen()) then
     Exit(False);
@@ -182,6 +306,65 @@ begin
   Result := self._ExpectText('Show items',TEXT_AREA,UpFont,FontSetting(0,2));
 
   keyboard.Send(item,VK_RETURN);
+end;
+
+
+(*
+BankScreen.Withdraw
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.Withdraw(slot:Int32; amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
+
+Withdraw items from your bank.
+* Will be expanded with examples...
+*)
+function TRSBankScreen.Withdraw(slot:Int32; amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
+var
+  b:TBox;
+  options:TOptionArray;
+const
+  TEXT_AREA:TBox = [200,394,450,412];
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+  b := self.GetSlotBox(slot);
+  if not self.ItemIn(slot) then
+    Exit(False);
+
+  self.WithdrawAs(withdrawMode);
+  wait(srl.GaussRangeInt(90,170));
+  mouse.Move(b);
+  wait(srl.GaussRangeInt(90,170));
+
+  if (upText <> []) and not(Mainscreen.IsUptext(upText)) then
+    Exit(False);
+
+  if (amount = 1) then
+  begin
+    Mouse.Click(mouse_left);
+    Exit(True);
+  end else
+  begin
+    ChooseOption.Open();
+
+    if amount = WITHDRAW_ALL then
+      Result := ChooseOption.Select(['Withdraw-All'])
+
+    else if amount = WITHDRAW_ALL_BUT_ONE then
+      Result := ChooseOption.Select(['Withdraw-All-but-one'])
+
+    else if ChooseOption.Select(['Withdraw-'+ToString(amount)],,False) then
+      Result := True
+
+    else if ChooseOption.Select(['Withdraw-X']) and
+       self._ExpectText('Enter amount',TEXT_AREA,UpFont,FontSetting(0,2)) then
+    begin
+      keyboard.Send(ToString(amount),VK_RETURN);
+
+      Result := True;
+    end;
+  end;
 end;
 
 begin
