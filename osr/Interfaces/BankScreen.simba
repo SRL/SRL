@@ -239,7 +239,7 @@ BankScreen.DepositAll
 
   function TRSBankScreen.DepositAll(): Boolean;
 
-Depositis your inventory
+Depositis your inventory by clicking the deposit inventory button
 *)
 function TRSBankScreen.DepositAll(): Boolean;
 begin
@@ -247,6 +247,69 @@ begin
     Exit(True);
   
   Result := Self.ClickButton(bbDepositInv);
+end;
+
+(*
+ Depeosit a single item, or all of it's kind from inventory.
+*)
+function TRSBankScreen.DepositItem(slot:Int32; depositAll:Boolean): Boolean;
+begin
+  if not(self.IsOpen()) or (not InRange(slot,0,27)) then
+    Exit();
+
+  Result := not inventory.SlotIsUsed(slot);
+  if not(Result) then
+  begin
+    Mouse.Move(inventory.GetSlotBox(slot));
+    Wait(srl.GaussRangeInt(30,70));
+    if depositAll then
+    begin
+      ChooseOption.Open();
+      Exit(ChooseOption.Select(['Deposit-All']));
+    end else
+    begin
+      Mouse.Click(mouse_left);
+      Result := True;
+    end;
+  end;
+end;
+
+
+(*
+ Deposit all your items, retries two times.
+*)
+function TRSBankScreen.Deposit(slotArr:TIntegerArray): Boolean;
+var
+  i,j:Int32;
+  t:UInt64;
+begin
+  if not(self.IsOpen()) then
+    Exit();
+
+  for j:=0 to 1 do
+  begin
+    Result := True;
+    for i:=0 to High(slotArr) do
+      if inventory.SlotIsUsed(slotArr[i]) then
+      begin
+        self.DepositItem(slotArr[i], False);
+        Wait(srl.GaussRangeInt(6,25));
+      end;
+
+    for i:=0 to High(slotArr) do
+      if InRange(slotArr[i],0,27) then
+      begin
+        t := GetTickCount64() + 200;
+        repeat
+          Result := not(inventory.SlotIsUsed(slotArr[i]));
+        until (GetTickCount64() > t) or Result;
+      end;
+
+    if Result then
+      Break
+    else
+      Wait(srl.GaussRangeInt(180,265)); //wait a bit before round 2
+  end;
 end;
 
 
@@ -314,12 +377,35 @@ BankScreen.Withdraw
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSBankScreen.Withdraw(slot:Int32; amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
+  function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
 
-Withdraw items from your bank.
-* Will be expanded with examples...
+Withdraws the the amount ``amount`` from the bank slot ``slot``. If it fails to withdraw it will return False
+
+Extra vaild constants for ``amount`` are:
+
+   - ``WITHDRAW_AMOUNT_ALL = -1;``
+   - ``WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;``
+
+
+.. note:: by slacky
+
+Example:
+
+.. code-block:: pascal
+
+    // withdraw 28 items from slot 1 if uptext matches
+    bankscreen.Withdraw(1, 28, ['Iron']);
+
+    // withdraw 500 items as notes from slot 1 if uptext matches
+    bankscreen.Withdraw(1, 500, ['Iron'], bbNote);
+
+    // withdraw all items from slot 10 if uptext matches
+    bankscreen.Withdraw(10, WITHDRAW_AMOUNT_ALL, ['Iron']);
+
+    // withdraw 28 items from slot 1 and will *ignore* uptext
+    bankscreen.Withdraw(1, 28);
 *)
-function TRSBankScreen.Withdraw(slot:Int32; amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
+function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
 var
   b:TBox;
   options:TOptionArray;
@@ -333,9 +419,9 @@ begin
     Exit(False);
 
   self.WithdrawAs(withdrawMode);
-  wait(srl.GaussRangeInt(90,170));
+  Wait(srl.GaussRangeInt(90,170));
   mouse.Move(b);
-  wait(srl.GaussRangeInt(90,170));
+  Wait(srl.GaussRangeInt(90,170));
 
   if (upText <> []) and not(Mainscreen.IsUptext(upText)) then
     Exit(False);
@@ -366,6 +452,7 @@ begin
     end;
   end;
 end;
+
 
 begin
   BankScreen.__Setup();
