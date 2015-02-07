@@ -302,17 +302,13 @@ begin
     Exit();
 
   for i:=0 to High(slotArr) do
-    if self.SlotIsUsed(slotArr[i]) then
+    if self.SlotIsVaild(slotArr[i]) and self.SlotIsUsed(slotArr[i]) then
     begin
-      if self.SlotIsVaild(slotArr[i]) then
-      begin
-        Mouse.Move(self.FSlots[slotArr[i]]);
-        //Check uptext?
-        ChooseOption.Open();
-        ChooseOption.Select(['Drop']);
-        wait(120 + random(100));
-      end else
-        {notify index out of range};
+      Mouse.Move(self.FSlots[slotArr[i]]);
+      //Check uptext?
+      ChooseOption.Open();
+      ChooseOption.Select(['Drop']);
+      wait(120 + random(100));
     end;
 end;
 
