@@ -44,6 +44,158 @@ begin
   SetLength(Result, n);
 end;
 
+(*
+ConnectTPA
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function ConnectTPA(TPA:TPointArray): TPointArray;
+  
+Fills a line between all the points (by their order), can be used to get the edges 
+around a polygon
+
+Example:
+.. code-block:: pascal
+
+    shape := ConnectTPA(ConvexHull(TPA));
+*)
+function ConnectTPA(TPA:TPointArray): TPointArray;
+var line:TPointArray; i:Int32;
+begin
+  for i:=0 to High(TPA)-1 do
+  begin
+    line := TPAFromLine(TPA[i].x, TPA[i].y, TPA[i+1].x, TPA[i+1].y);
+    Result := CombineTPA(Result, line);
+  end;
+  line := TPAFromLine(TPA[High(TPA)].x, TPA[High(TPA)].y, TPA[0].x, TPA[0].y);
+  Result := CombineTPA(Result, line);
+end;
+
+(*
+ConvexHull
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function ConvexHull(TPA:TPointArray): TPointArray;
+  
+Computes the convex hull around the given TPA. Imagine placing a rubber band around the
+points, the points which strech the band are the points returned by this function.
+
+See: http://en.wikipedia.org/wiki/Convex_hull for more information.
+*)
+function ConvexHull(const TPA:TPointArray): TPointArray;
+var
+  pts: TPointArray;
+  h,i,k,u: Int32;
+  function CrossProd(var r, p, q: TPoint): Int32;
+  begin //cross-product of rp and rq vectors.
+    Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
+  end;
+begin
+  if High(TPA) <= 2 then Exit(pts);
+  pts := Copy(TPA);
+  SortTPAByX(pts,True);
+
+  H := High(pts);
+  SetLength(result, 2 * (h+1));
+  for i:=0 to h do
+  begin
+    while (k >= 2) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+      Dec(k);
+    result[inc(k)-1] := pts[i];
+  end;
+
+  u := k+1;
+  for i:=h-1 downto 0 do
+  begin
+    while (k >= u) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+      Dec(k);
+    result[inc(k)-1] := pts[i];
+  end;
+  SetLength(result, k);
+end;
+
+(*
+MinAreaRect
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function MinAreaRect(TPA:TPointArray): TPointArray;
+  
+Computes the minimum bounding box (defined by area) around the given shape.
+Four points (which are in order) are always returned.
+
+See: http://en.wikipedia.org/wiki/Minimum_bounding_box for more information.
+*)
+function MinAreaRect(TPA:TPointArray): TPointArray;
+var
+  l,i,ii,j,c: Int32;
+  x,y,cosA,cosAP,cosAM: Double;
+  xl,yl,xh,yh,area,angle: Double;
+  angles, best: Array of Double;
+  added: Boolean;
+  
+  function Modulo(X,Y:Double): Double;
+  begin
+    Result := X - Floor(X / Y) * Y;
+  end;
+const
+  HALF_PI := PI / 2;
+begin
+  SetLength(Result, 4);
+  if Length(TPA) <= 1 then Exit;
+  TPA := ConvexHull(TPA);
+  L := High(TPA);
+  SetLength(angles, L);
+
+  j := 0;
+  for i:=0 to (L-1) do
+  begin
+    angles[j] := High(Int32);
+    added := False;
+    angle := Abs(Modulo(ArcTan2(TPA[i+1].y-TPA[i].y, TPA[i+1].x-TPA[i].x), HALF_PI));
+    for c:=0 to j do
+      if (angles[c] = angle) then
+        added := True;
+
+    if not(added) then
+      angles[Inc(j)-1] := angle;
+  end;
+
+  SetLength(best, 2);
+  best[1] := High(Int32);
+  for i:=0 to j-1 do
+  begin
+    CosA  := Cos(Angles[i]);
+    CosAP := Cos(Angles[i] + HALF_PI);
+    CosAM := Cos(Angles[i] - HALF_PI);
+    xl := (CosA*TPA[0].x) + (CosAM*TPA[0].y);
+    yl := (CosAP*TPA[0].x) + (CosA*TPA[0].y);
+    xh := xl;
+    yh := yl;
+
+    for ii:=0 to L do
+    begin
+      x := (CosA * TPA[ii].x) + (CosAM * TPA[ii].y);
+      y := (CosAP * TPA[ii].x) + (CosA * TPA[ii].y);
+      if (x > xh) then xh := x
+      else if (x < xl) then xl := x;
+      if (y > yh) then yh := y
+      else if (y < yl) then yl := y;
+    end;
+
+    if (xh-xl)*(yh-yl) < best[1] then
+    begin
+      best[0] := angles[i];       //angle
+      best[1] := (xh-xl)*(yh-yl); //area
+      Result[0] := Point(Round((cosAP*yl) + (cosA*xh)), Round((cosA*yl) + (cosAM*xh)));
+      Result[1] := Point(Round((cosAP*yl) + (cosA*xl)), Round((cosA*yl) + (cosAM*xl)));
+      Result[2] := Point(Round((cosAP*yh) + (cosA*xl)), Round((cosA*yh) + (cosAM*xl)));
+      Result[3] := Point(Round((cosAP*yh) + (cosA*xh)), Round((cosA*yh) + (cosAM*xh)));
+    end;
+  end;
+end;
+
 
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
