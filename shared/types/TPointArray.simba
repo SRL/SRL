@@ -197,6 +197,16 @@ begin
 end;
 
 
+function MinAreaRectEx(TPA:TPointArray; out W,H:Int32): TPointArray;
+begin
+  Result := MinAreaRect(TPA);
+  W := Round(Distance(Result[0], Result[3]));
+  H := Round(Distance(Result[0], Result[1]));
+  if (W < H) then
+    Swap(W, H);
+end;
+
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure TPointArray.Append(const Value: TPoint);
