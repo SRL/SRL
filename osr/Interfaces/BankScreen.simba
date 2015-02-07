@@ -1,5 +1,5 @@
 type
-  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbClose);
+  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbMenu, bbClose);
 
 type
   TRSBankScreen = record (TInterfaceBase)
@@ -30,6 +30,8 @@ begin
       fButtons[bbSearch] := Box(X2 - 122, Y2 - 40, X2 - 89, Y2 - 7);
       fButtons[bbDepositInv] := Box(X2 - 76, Y2 - 40, X2 - 43, Y2 - 7);
       fButtons[bbDepositWorn] := Box(X2 - 40, Y2 - 40, X2 - 7, Y2 - 7);
+
+      fButtons[bbMenu] := Box(X2 - 36, Y1 + 42, X2 - 12, Y1 + 66);
       fButtons[bbClose] := Box(X2 - 27, Y1 + 7, X2 - 7, Y1 + 27);
     end;
   end;
@@ -37,10 +39,30 @@ end;
 
 function TRSBankScreen.ClickButton(btn: EBankButton; clickType: Integer = mouse_Left): Boolean;
 begin
-  Result := Self.isOpen();
+  Result := Self.IsOpen();
 
   if (Result) then
     Mouse.Click(Self.fButtons[btn], clickType);
+end;
+
+// Checks if the given button is red/toggled
+function TRSBankScreen.IsToggled(btn: EBankButton; minMatch:Int32=50): Boolean;
+begin
+  Result := Self.IsOpen();
+  if Result then
+    Result := CountColorTolerance(1777019, Self.fButtons[btn], 30) > minMatch;
+end;
+
+function TRSBankScreen._ExpectText(txt:String; B:TBox; font:TFontSet; cfg:TCompareRules; maxWait:Int32=6000): Boolean;
+var
+  t:UInt64;
+begin
+  t := GetTickCount64() + maxWait;
+  while GetTickCount64() < t do
+    if Pos(txt, ocr.Recognize(B, cfg, font)) <> 0 then
+      Exit(True)
+    else
+      Wait(20);
 end;
 
 procedure TRSBankScreen._Debug();
@@ -67,7 +89,7 @@ begin
   Result := srl.FindText(p, 'Note', 'SmallChars', TEXT_COL, 0, Self.fButtons[bbNote]);
 end;
 
-function TRSBankScreen.isOpen(WaitTime: UInt32 = 0): Boolean;
+function TRSBankScreen.IsOpen(WaitTime: UInt32 = 0): Boolean;
 var
   t: UInt64;
 begin
@@ -81,14 +103,28 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.DepositAll(): Boolean;
+function TRSBankScreen.Open(): Boolean;
 begin
-  if (Inventory.Count = 0) then
-    Exit(True);
-  if (not Self.isOpen()) then
-    Exit(False);
+  RaiseException('Not implmented yet');
+end;
 
-  Result := Self.ClickButton(bbDepositInv);
+function TRSBankScreen.Close(): Boolean;
+var
+  t: UInt64;
+begin
+  if (not Self.IsOpen()) then
+    Exit(True);
+
+  Self.ClickButton(bbClose);
+
+  t := GetTickCount64() + Random(4000, 5000);
+  while (t > GetTickCount64()) do
+  begin
+    if (not Self.IsOpen()) then
+      Exit(True);
+
+    Wait(Random(100, 200));
+  end;
 end;
 
 { Scrolls up to the top of the bank, so slots are aligned.}
@@ -96,7 +132,7 @@ procedure TRSBankScreen.FixSlots();
 var
   t: UInt64;
 begin
-  if (not Self.isOpen()) then
+  if (not Self.IsOpen()) then
     Exit;
 
  t := GetTickCount64() + Random(7000, 8000);
@@ -105,28 +141,47 @@ begin
 
 end;
 
-function TRSBankScreen.Close(): Boolean;
-var
-  t: UInt64;
-begin
-  if (not Self.isOpen()) then
-    Exit(True);
-
-  Self.ClickButton(bbClose);
-
-  t := GetTickCount64() + Random(4000, 5000);
-  while (t > GetTickCount64()) do
-  begin
-    if (not Self.isOpen()) then
-      Exit(True);
-
-    Wait(Random(100, 200));
-  end;
-end;
-
 function TRSBankScreen.GetSlotBox(Slot: UInt32): TBox;
 begin
-  Result := fSlots[Slot]; // range check.
+  if InRange(Slot, 0,High(Self.FSlots)) then
+    Result := fSlots[Slot]; // range check.
+end;
+
+function TRSBankScreen.DepositAll(): Boolean;
+begin
+  if (Inventory.Count = 0) then
+    Exit(True);
+  
+  Result := Self.ClickButton(bbDepositInv);
+end;
+
+function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
+begin
+  if not(mode in [bbSwap,bbInsert]) then
+    RaiseException('Invalid rearrange mode: '+ToString(mode));
+    
+  Result := Self.ClickButton(mode);
+end;
+
+function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
+begin
+  if not(mode in [bbItem,bbNote]) then
+    RaiseException('Invalid withdraw mode: '+ToString(mode));
+
+  Result := Self.ClickButton(mode);
+end;
+
+function TRSBankScreen.Search(item:String): Boolean;
+const
+  TEXT_AREA:TBox = [70,394,434,412];
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+  if not(self.IsToggled(bbSearch) or Self.ClickButton(bbSearch)) then
+    Exit(False);
+  Result := self._ExpectText('Show items',TEXT_AREA,UpFont,FontSetting(0,2));
+
+  keyboard.Send(item,VK_RETURN);
 end;
 
 begin

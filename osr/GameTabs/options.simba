@@ -101,7 +101,7 @@ begin
   Result := Gametabs.IsOpen(tabOptions);
 end;
 
-//helper: Checks if the given button (by bounds) is red/enabled 
+//Checks if the given button (by bounds) is red/enabled 
 function TRSOptions.IsButtonBoxEnabled(B:TBox): Boolean;
 begin
   if not(self.Open()) then
