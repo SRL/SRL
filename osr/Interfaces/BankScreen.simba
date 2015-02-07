@@ -86,7 +86,7 @@ const
 var
   p: TPoint;
 begin
-  Result := srl.FindText(p, 'Note', 'SmallChars', TEXT_COL, 0, Self.fButtons[bbNote]);
+  Result := srl.FindText(p, 'Rearrange mode', 'SmallChars', TEXT_COL, 0, Box(54,295,154,314));
 end;
 
 function TRSBankScreen.IsOpen(WaitTime: UInt32 = 0): Boolean;
@@ -159,8 +159,8 @@ function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
 begin
   if not(mode in [bbSwap,bbInsert]) then
     RaiseException('Invalid rearrange mode: '+ToString(mode));
-    
-  Result := Self.ClickButton(mode);
+
+  Result := self.IsToggled(mode) or Self.ClickButton(mode);
 end;
 
 function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
@@ -168,7 +168,7 @@ begin
   if not(mode in [bbItem,bbNote]) then
     RaiseException('Invalid withdraw mode: '+ToString(mode));
 
-  Result := Self.ClickButton(mode);
+  Result := self.IsToggled(mode) or Self.ClickButton(mode);
 end;
 
 function TRSBankScreen.Search(item:String): Boolean;
