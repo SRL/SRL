@@ -9,14 +9,35 @@ const
   OCR_RULES_BLACK:  TCompareRules = [0,10];            //black
 
   
-//override to keep up with simbas target
+// FontSetting - General purpose
+function FontSetting(color, tolerance:Int32=0; useShadow:Boolean=False;
+                     shadowMaxLight, threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  Result := [color,tolerance,useShadow,shadowMaxLight,threshold,threshInv];
+end;
+
+// FontSetting - Shadow
+function FontSettingShd(color:Int32=-1; tolerance:Int32=0; shadowMaxLight:Int32=0): TCompareRules;
+begin
+  Result := [color,tolerance,True,shadowMaxLight];
+end;
+
+// FontSetting - Threshold
+function FontSettingTrh(threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  Result := [-1,0,False,0,threshold,threshInv];
+end;
+
+ 
+  
+// override to keep up with simbas target
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
 begin
   Self.ClientID := ExportImageTarget();
   Result := Inherited(B, Filter);
 end;
 
-//overloads which takes a fontset.
+// overloads which takes a fontset.
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
