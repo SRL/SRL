@@ -38,7 +38,7 @@ Example:
 *)
 function Modulo(X, Y: Integer): Integer; overload;
 begin
-  Result := Round(X - Floor(X / Y) * Y);
+  Result := X - Floor(X / Y) * Y;
 end;
 
 (*
