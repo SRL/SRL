@@ -259,6 +259,8 @@ var
   Dot: Extended;
 begin
   h := High(Points);
+  if (h < 0) then
+    Exit;
   Count := 0;
 
   for i := 0 to h do
