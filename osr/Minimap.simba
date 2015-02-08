@@ -282,6 +282,58 @@ begin
   end;
 end;
 
+(*
+Minimap.WaitFlagEx
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+
+Extra WaitFlag method that Waits for the flag to disapear but will return if the
+position we walked to is where the flag was first clicked.
+
+  - Useful to know if you were able to walk into a room or not (blocked entrance, etc).
+  - MaxDist param is default, but is the max distance the flag can move else we result False.
+
+Example:
+
+.. code-block:: pascal
+
+    if (Minimap.WaitFlagEx()) then
+      srl.Writeln('We have walked to the position succesfully')
+    else
+      srl.Writeln('We have finished walking, but the flag moved alot so we didnt hit our target pos');
+*)
+function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+var
+  OldPt, NewPt: TPoint;
+  t: UInt64;
+  Found: Boolean;
+begin
+  Result := True;
+
+  t := GetTickCount64() + Random(2500, 3500);
+  while (not (Found := Self.FindFlag(OldPt))) and (t > GetTickCount64()) do
+    Wait(Random(25, 50));
+
+  if (not Found) then
+    Exit(False);
+
+  t := GetTickCount64() + Random(22000, 24000);
+  while (FindFlag(NewPt)) and (t > GetTickCount64()) do
+  begin
+    if (Distance(OldPt, NewPt) > MaxDist) then
+    begin
+      Self.WaitFlag();
+      Exit(False);
+    end;
+
+    OldPt := NewPt;
+    Wait(Random(25, 50));
+  end;
+end;
+
 function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 var
   north,south: TPoint;
@@ -473,6 +525,7 @@ begin
   Self.FilterPoints(Matches);
   Result := Length(Matches) > 0;
 end;
+
 
 begin
   Minimap.__Setup();
