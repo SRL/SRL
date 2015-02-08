@@ -5,6 +5,7 @@
 
 {$include_once shared/srl.simba}
 {$include_once shared/random.simba}
+{$include_once shared/math.simba}
 {$include_once shared/mouse.simba}
 {$include_once shared/keyboard.simba}
 {$include_once shared/time.simba}
