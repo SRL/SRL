@@ -235,12 +235,12 @@ begin
 end;
 
 (*
-FilterPointsRect
-~~~~~~~~~~~~~~~~
+ExtractPointsRect
+~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    procedure FilterPointsRect(var Points: TPointArray; const A, B, C, D: TPoint);
+    procedure ExtractPointsRect(var Points: TPointArray; const A, B, C, D: TPoint);
 
 Removes all points not in the rect (defined by four points).
 
@@ -248,11 +248,11 @@ Example:
 
 .. code-block:: pascal
 
-    FilterPointsRect(TPA, mbr[0], mbr[1], mbr[2], mbr[3]);
+    ExtractPointsRect(TPA, mbr[0], mbr[1], mbr[2], mbr[3]);
 
 .. note:: by slacky
 *)
-procedure FilterPointsRect(var Points: TPointArray; const A, B, C, D: TPoint);
+procedure ExtractPointsRect(var Points: TPointArray; const A, B, C, D: TPoint);
 var
   i, h, Count: UInt32;
   Vec: TPoint;
