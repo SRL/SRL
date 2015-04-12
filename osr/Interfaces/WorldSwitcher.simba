@@ -1,0 +1,89 @@
+type
+  TRSWorldSwitcher = type TInterfaceBase;
+
+var
+  WorldSwitcher: TRSWorldSwitcher;
+
+procedure TRSWorldSwitcher.__Setup();
+begin
+  with Self do
+  begin
+    SetName('World switcher');
+    SetStatic(True);
+    SetBounds(srl.DefaultClientBounds);
+  end;
+end;
+
+function TRSWorldSwitcher.isOpen(WaitTime: Integer = 0): Boolean;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount64() + WaitTime;
+
+  repeat
+    if (WaitTime > 0) then
+      Wait(Random(50, 100));
+
+    if (GetColor(146, 6) = 1682881) and (not srl.isLoggedIn()) then
+      Exit(True);
+  until (GetTickCount64() >= t);
+end;
+
+function TRSWorldSwitcher.FixWorld(wo: Integer): Integer;
+var
+  w: String;
+begin
+  w := IntToStr(wo);
+  if (Length(w) = 3) then
+    w := Copy(w, 2, Length(w));
+
+  if (w[1] = '0') then
+    w := Copy(w, 2, Length(w));
+
+  Result := StrToInt(w);
+end;
+
+function TRSWorldSwitcher.SelectWorld(wo: Integer): Boolean;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+  b: TBox;
+  p: TPoint;
+begin
+  Result := False;
+  if (not FindColors(TPA, clBlack, Self.GetBounds())) then
+    Exit;
+
+  srl.Writeln('WorldSwitcher.SelectWorld: Searching for world ' + toString(wo));
+
+  { Pretty much get everything black, remove the biggest (the background)
+    and then a simple cluster so we have text :) }
+  ATPA := FloodFillTPA(TPA);
+  SortATPASize(ATPA, True);
+  TPA := MergeATPA(Copy(ATPA, 1, Length(ATPA) - 1));
+  ATPA := ClusterTPAEx(TPA, 5, 1);
+
+  for i := 0 to High(ATPA) do
+    if (srl.FindText(p, toString(wo), 'UpChars07_s', clBlack, 0, TBox(b := GetTPABounds(ATPA[i])))) then
+    begin
+      b.Expand(-2, 3); { Adjust the bounds so it's the whole button }
+      b.X2 += 60;
+      Mouse.click(b, mouse_Left);
+      Wait(Random(200, 500));
+      Exit(True);
+    end;
+end;
+
+procedure TRSWorldSwitcher.Close;
+begin
+  Mouse.Click(Point(734, 12).Random(-5, 5), mouse_Left);
+  Wait(Random(500, 1000));
+end;
+
+begin
+  WorldSwitcher.__Setup();
+end;
+
+

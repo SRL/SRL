@@ -265,12 +265,15 @@ Example:
 *)
 function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
 begin
+  if (WorldSwitcher.isOpen()) then
+    Exit(True);
+
   Result := Self.isOpen();
   if (not Result) then
     Exit(srl.Writeln('Cannot open world switcher, login screen isn''t open', False));
 
   Mouse.Click(Self.WorldBox, mouse_Left);
-  Wait(Random(500, 1000));
+  Result := WorldSwitcher.isOpen(Random(4000, 6000));
 end;
 
 (*
@@ -344,6 +347,16 @@ begin
   end;
 
   srl.Writeln('No response found: Timed out', TDebug.WARNING);
+end;
+
+function TRSLoginScreen.GetCurrentWorld(): Integer;
+var
+  b: TBox;
+begin
+  with Self.WorldBox do
+    b := Box(X1, Y1, X2, Y2 - (Height div 2)); { World info is only in top half }
+
+  Result := StrToIntDef(ExtractFromStr(GetTextAtEx(b, 0, 3, 3, $FFFFFF, 0, 'UpChars07_s'), Numbers), -1);
 end;
 
 begin

@@ -106,11 +106,42 @@ begin
 end;
 
 function TPlayer.Login(): Boolean;
+var
+  Tries: Integer = 0;
 begin
   srl.Writeln('TPlayer.Login()', TDebug.HEADER);
   Result := False;
 
-  if (Self.LoginToLobby()) then
+  if (Lobby.isOpen()) then
+    if (Lobby.Play()) then
+      if (srl.isLoggedIn(Random(6000, 8000))) then
+      begin
+        srl.Writeln('TPlayer.Login(): Result = True (Already in lobby)', TDebug.FOOTER);
+        Exit(True);
+      end;
+
+  if (Self.World <> 0) then
+  begin
+    srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
+
+    if (LoginScreen.GetCurrentWorld() <> Self.World) then
+    begin
+      while (Tries < 10) do
+        if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
+          if (WorldSwitcher.SelectWorld(Self.World)) then
+            Break;
+
+      if (Tries = 10) then
+      begin
+        srl.Writeln('Failed to select world');
+        Result := False;
+      end else
+        srl.Writeln('Succesfully selected our world...');
+    end else
+      srl.Writeln('Already on our world');
+  end;
+
+  if (Tries < 10) and (Self.LoginToLobby()) then
   begin
     srl.Writeln('In lobby, entering the game...');
     if (Lobby.Play()) then
