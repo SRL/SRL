@@ -105,7 +105,7 @@ begin
     if (IsArrInStr(SubStrs, Self.GetUpText())) then
       Exit(True);
 
-    Wait(Random(35, 95));
+    Wait(Random(35, 75));
   end;
 end;
 
@@ -354,6 +354,22 @@ begin
   end;
 end;
 
+procedure TRSMainScreen.SetAngle(Highest: Boolean);
+begin
+  if (Highest) then
+    Keyboard.KeyDown(VK_UP)
+  else
+    Keyboard.KeyDown(VK_DOWN);
+
+  Wait(1200 + Random(400));
+
+  if (Highest) then
+    Keyboard.KeyUp(VK_UP)
+  else
+    Keyboard.KeyUp(VK_DOWN);
+
+  Wait(700 + Random(300));
+end;
 
 begin
   MainScreen.__Setup();

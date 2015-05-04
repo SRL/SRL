@@ -45,7 +45,7 @@ begin
 
     LoginBox := [312, 254, 550, 266];
     PasswordBox := [341, 271, 550, 285];
-    ResponseBox := [210, 208, 550, 233];
+    ResponseBox := [210, 190, 550, 233];
     WorldBox := [12, 464, 99, 496];
     ExistingUserBox := [390, 272, 529, 307];
   end;
@@ -290,11 +290,25 @@ Example:
 
 .. code-block:: pascal
 
-  LoginScreen.OpenWorldSwitcher();
+  Writeln(LoginScreen.GetResponse);
 *)
 function TRSLoginScreen.GetResponse(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+  b: TBox;
 begin
-  Result := Trim(GetTextAtEx(Self.ResponseBox, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+  if (FindColors(TPA, _LOGIN_TEXT_YELLOW, Self.ResponseBox)) then
+  begin
+    ATPA := ClusterTPAEx(TPA, Self.ResponseBox.Width, 1);
+    SortATPAFromFirstPointY(ATPA, Point(Self.ResponseBox.X1, Self.ResponseBox.Y1));
+    for i := 0 to High(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      Result += Trim(GetTextAtEx(b, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+    end;
+  end;
 end;
 
 (*

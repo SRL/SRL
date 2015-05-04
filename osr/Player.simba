@@ -12,6 +12,37 @@ type
     Variants: array [0..49] of Variant;
   end;
 
+procedure TPlayer._SwitchToMembers;
+var
+  Tries: Integer;
+begin
+  srl.Writeln('Switching player to member state');
+  Self.isMember := True;
+  Self.World := WorldSwitcher.MembersWorlds[Random(Length(WorldSwitcher.MembersWorlds))];
+
+  if (LoginScreen.GetCurrentWorld() <> Self.World) then
+  begin
+    while (Tries < 10) do
+    begin
+      if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
+        WorldSwitcher.SelectWorld(Self.World);
+
+      if (LoginScreen.isOpen(Random(3000, 5000))) then
+        if (LoginScreen.getCurrentWorld() = Self.World) then
+        begin
+          srl.Writeln('Succefully selected our world');
+          Break;
+        end else
+          srl.Writeln('Weird missclick world bug? will try again');
+    end;
+
+    if (Tries = 10) then
+      srl.Writeln('Failed to select world')
+    else
+      srl.Writeln('Worldswitch was succesfull');
+  end;
+end;
+
 function TPlayer._HandleResponse(Response: String; var Attempts: UInt32): Boolean;
 type
   TResponse = record
@@ -20,26 +51,33 @@ type
     Proc: procedure() of object;
  end;
 var
-  Responses: array [0..3] of TResponse;
+  Responses: array [0..6] of TResponse;
   i: Integer;
 begin
   Result := False;
   Responses := [['Invalid username/email or password.', 2, 1000, nil],
                 ['Please enter your', 2, 1000, nil],
                 ['Error connecting to server.', 20, 8000, nil],
-                ['Please enter your username/email address.', 5, 1000, nil]];
+                ['Please enter your username/email address.', 5, 1000, nil],
+                ['You are standing in a members-only area.', 0, 1000, @Self._SwitchToMembers],
+                ['Your account is already logged in', 5, 60000, nil],
+                ['Login server offline.', 15, 60000 * 2, nil]];
 
   Inc(Attempts);
 
   for i := 0 to High(Responses) do
     with (Responses[i]) do
-      if (Pos(Response, Text) > 0) then
+      if (Pos(Text, Response) > 0) then
       begin
         srl.Writeln('Response found: ' + Text + ' handling...');
-        Wait(WaitTime + Random(1000));
+        srl.WriteFmt('Waiting %d ms...', [WaitTime]);
+        Wait(WaitTime + Random(2500));
 
         if (@Proc <> nil) then
+        begin
           Proc();
+          Exit(True);
+        end;
 
         if (Attempts >= MaxAttempts) then
           Exit(srl.Writeln('Max attempts reached for response', False))
@@ -47,7 +85,7 @@ begin
           Exit(True);
       end;
 
-  srl.WriteFmt('Response: %s isn''t supported', [Response], TDebug.FATAL);
+  srl.WriteFmt('Response: "%s" isn''t supported', [Response], TDebug.FATAL);
 end;
 
 function TPlayer.LoginToLobby(): Boolean;
@@ -112,6 +150,13 @@ begin
   srl.Writeln('TPlayer.Login()', TDebug.HEADER);
   Result := False;
 
+  if (srl.isLoggedIn()) then
+  begin
+    srl.Writeln('We are already logged in!');
+    srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+    Exit(True);
+  end;
+
   if (Lobby.isOpen()) then
     if (Lobby.Play()) then
       if (srl.isLoggedIn(Random(6000, 8000))) then
@@ -120,23 +165,39 @@ begin
         Exit(True);
       end;
 
-  if (Self.World <> 0) then
+  if (Self.World <> 0) or (InIntArray(WorldSwitcher.PVPWorlds, LoginScreen.GetCurrentWorld())) then
   begin
+    if (InIntArray(WorldSwitcher.PVPWorlds, LoginScreen.GetCurrentWorld())) then
+    begin
+      srl.Writeln('We are on a PVP world, going to pick a non pvp world...');
+      Self.World := WorldSwitcher.MembersWorlds[Random(Length(WorldSwitcher.MembersWorlds))];
+    end;
+
+
     srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
 
     if (LoginScreen.GetCurrentWorld() <> Self.World) then
     begin
       while (Tries < 10) do
+      begin
         if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
-          if (WorldSwitcher.SelectWorld(Self.World)) then
+          WorldSwitcher.SelectWorld(Self.World);
+
+        if (LoginScreen.isOpen(Random(3000, 5000))) then
+          if (LoginScreen.getCurrentWorld() = Self.World) then
+          begin
+            srl.Writeln('Succefully selected our world');
             Break;
+          end else
+            srl.Writeln('Weird missclick world bug? will try again');
+      end;
 
       if (Tries = 10) then
       begin
         srl.Writeln('Failed to select world');
         Result := False;
       end else
-        srl.Writeln('Succesfully selected our world...');
+        srl.Writeln('Worldswitch was succesfull');
     end else
       srl.Writeln('Already on our world');
   end;

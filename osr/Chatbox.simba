@@ -171,9 +171,9 @@ var
   tpa:Array [0..2] of TPoint;
 begin
   //match each word sepparatly to avoid whitespace-issues.
-  Result := srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
-            srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
-            srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds);
+  Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
+             srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
+             srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds));
   if Result then
   begin
     tpa[2].y += 15;
@@ -206,6 +206,145 @@ begin
       Exit(Self.ClickContinue());
 end;
 
+type
+  TChatOption = record
+    Text: String;
+    b: TBox;
+ end;
+
+function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i, j: Integer;
+  b: TBox;
+  s: String;
+begin
+  SetLength(ATPA, Length(TextColors));
+  for i := 0 to High(ATPA) do
+    FindColors(ATPA[i], TextColors[i], Self.FBounds);
+  TPA := MergeATPA(ATPA);
+
+  if (Length(TPA) < 10) then
+    Exit;
+
+  ATPA := ClusterTPAEx(TPA, 15, 1);
+  for i := 0 to High(ATPA) do
+  begin
+    b := GetTPABounds(ATPA[i]);
+    b.Expand(1);
+    for j := 0 to High(TextColors) do
+    begin
+      s := OCR.Recognize(b, TCompareRules([TextColors[j]]), NPCFont);
+      if (s <> '') then
+        Result += TChatOption([s, GetTPABounds(ATPA[i])]);
+    end;
+  end;
+end;
+
+function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+var
+  opts: array of TChatOption;
+  i: Integer;
+begin
+  Result := False;
+
+  opts := Self.GetOptions(TextColors);
+  for i := 0 to High(opts) do
+  begin
+    if (IsArrInStr(Text, opts[i].Text)) then
+    begin
+      Mouse.Click(opts[i].b, mouse_Left);
+      Exit(True);
+    end;
+  end;
+end;
+
+function TRSChatbox.ClickOption(const Text: TStringArray; WaitTime: Integer; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean; overload;
+var
+  t: UInt64;
+begin
+  t := GetTickCount64() + (WaitTime + Random(200));
+  repeat
+    if (Self.ClickOption(Text, TextColors)) then
+      Exit(True);
+    Wait(Random(50, 150));
+  until (GetTickCount64() >= t);
+end;
+
+function TRSChatbox.PleaseWait(): Boolean;
+var
+  tpa:Array [0..1] of TPoint;
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount64() + Random(1500, 2000);
+
+  while (not Result) and (t > GetTickCount64()) do
+  begin
+    Result := (srl.FindText(tpa[0], 'Please',   'CharsNPC07', self.FBounds) and
+               srl.FindText(tpa[1], 'wait',    'CharsNPC07', self.FBounds));
+    Wait(Random(50, 100));
+  end;
+
+  if (Result) then
+  begin
+    t := GetTickCount64() + Random(4000, 5000);
+    while (t > GetTickCount64()) do
+    begin
+      if not (srl.FindText(tpa[0], 'Please',   'CharsNPC07', self.FBounds) and
+              srl.FindText(tpa[1], 'wait',    'CharsNPC07', self.FBounds)) then
+        begin
+          Wait(Random(300, 500));
+          Exit;
+        end;
+
+      Wait(Random(50, 100));
+    end;
+  end;
+end;
+
+function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+var
+  opts: array of TChatOption;
+  i, c: Integer;
+  t: UInt64;
+  b: Boolean = False;
+begin
+  Result := False;
+
+  repeat
+    opts := Self.GetOptions(TextColors);
+    for i := 0 to High(opts) do
+    begin
+      if (IsArrInStr(Option, opts[i].Text)) then
+      begin
+        if (ClickOption) then
+          Mouse.Click(opts[i].b, mouse_Left);
+        Exit(True);
+      end;
+    end;
+
+    t := GetTickCount64() + Random(1000, 1500);
+    while (t > GetTickCount64()) do
+    begin
+      if (ClickContinue()) then
+      begin
+        b := True;
+        Break;
+      end else
+        b := False;
+
+      Wait(Random(50, 100));
+    end;
+
+    if (b = False) then
+      Exit(False);
+
+    self.PleaseWait();
+    Wait(Random(150, 300));
+  until (not srl.isLoggedIn());
+end;
 
 begin
   chatbox.__setup();

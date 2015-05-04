@@ -1,16 +1,42 @@
 type
-  TRSWorldSwitcher = type TInterfaceBase;
+  TRSWorldSwitcher = record(TInterfaceBase)
+    FreeWorlds, MembersWorlds, PVPWorlds: TIntegerArray;
+ end;
 
 var
   WorldSwitcher: TRSWorldSwitcher;
 
 procedure TRSWorldSwitcher.__Setup();
+var
+  i: Integer;
 begin
   with Self do
   begin
     SetName('World switcher');
     SetStatic(True);
     SetBounds(srl.DefaultClientBounds);
+
+    PVPWorlds := [325, 337];
+
+    MembersWorlds := [320, 343, 366,
+                      302, 321, 344, 367,
+                      303, 322, 345, 368,
+                      304, {325,} 346, 369,
+                      305, 349, 370,
+                      306, 327, 350, 373,
+                      328, 351, 374,
+                      309, 329, 352, 375,
+                      310, 330, 353, 376,
+                      311, 333, 354, 377,
+                      312, 334, 357, 378,
+                      313, 358,
+                      314, 336, 359,
+                      {337,} 360,
+                      317, 338, 361,
+                      318, 341, 362,
+                      319, 342, 365];
+
+    FreeWorlds := [301, 308, 316, 335, 381, 382, 383, 384, 393, 394];
   end;
 end;
 
@@ -74,6 +100,8 @@ begin
       Wait(Random(200, 500));
       Exit(True);
     end;
+
+  srl.Writeln('Failed to find and select world');
 end;
 
 procedure TRSWorldSwitcher.Close;
