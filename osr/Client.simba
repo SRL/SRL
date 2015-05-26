@@ -1,4 +1,4 @@
-function TSRL.isLoggedIn(WaitTime: Integer = 0): Boolean;
+function TSRL.isLoggedIn(WaitTime: Integer = 0): Boolean;  {fix wait time}
 begin
   if (WaitTime = 0) then
     Result := GetColor(426, 486) = $FFFFFF
@@ -14,5 +14,9 @@ begin
   TimeOut := GetTickCount64() + WaitTime;
 
   while (not Result) and (TimeOut >= GetTickCount64()) do
+  begin
+    if (WorldSwitcher.isOpen()) then
+      WorldSwitcher.Close();
     Result := (Self.isLoggedIn()) or (LoginScreen.isOpen()) or (Lobby.isOpen());
+  end;
 end;

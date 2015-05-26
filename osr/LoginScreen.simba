@@ -45,7 +45,7 @@ begin
 
     LoginBox := [312, 254, 550, 266];
     PasswordBox := [341, 271, 550, 285];
-    ResponseBox := [210, 208, 550, 233];
+    ResponseBox := [210, 190, 550, 233];
     WorldBox := [12, 464, 99, 496];
     ExistingUserBox := [390, 272, 529, 307];
   end;
@@ -265,12 +265,15 @@ Example:
 *)
 function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
 begin
+  if (WorldSwitcher.isOpen()) then
+    Exit(True);
+
   Result := Self.isOpen();
   if (not Result) then
     Exit(srl.Writeln('Cannot open world switcher, login screen isn''t open', False));
 
   Mouse.Click(Self.WorldBox, mouse_Left);
-  Wait(Random(500, 1000));
+  Result := WorldSwitcher.isOpen(Random(4000, 6000));
 end;
 
 (*
@@ -287,11 +290,25 @@ Example:
 
 .. code-block:: pascal
 
-  LoginScreen.OpenWorldSwitcher();
+  Writeln(LoginScreen.GetResponse);
 *)
 function TRSLoginScreen.GetResponse(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+  b: TBox;
 begin
-  Result := Trim(GetTextAtEx(Self.ResponseBox, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+  if (FindColors(TPA, _LOGIN_TEXT_YELLOW, Self.ResponseBox)) then
+  begin
+    ATPA := ClusterTPAEx(TPA, Self.ResponseBox.Width, 1);
+    SortATPAFromFirstPointY(ATPA, Point(Self.ResponseBox.X1, Self.ResponseBox.Y1));
+    for i := 0 to High(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      Result += Trim(GetTextAtEx(b, 0, 3, 3, _LOGIN_TEXT_YELLOW, 0, 'UpChars07_s'));
+    end;
+  end;
 end;
 
 (*
@@ -344,6 +361,16 @@ begin
   end;
 
   srl.Writeln('No response found: Timed out', TDebug.WARNING);
+end;
+
+function TRSLoginScreen.GetCurrentWorld(): Integer;
+var
+  b: TBox;
+begin
+  with Self.WorldBox do
+    b := Box(X1, Y1, X2, Y2 - (Height div 2)); { World info is only in top half }
+
+  Result := StrToIntDef(ExtractFromStr(GetTextAtEx(b, 0, 3, 3, $FFFFFF, 0, 'UpChars07_s'), Numbers), -1);
 end;
 
 begin

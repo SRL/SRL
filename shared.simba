@@ -1,3 +1,5 @@
+{$DEFINE SRL}
+
 {$include_once shared/globals.simba}
 {$include_once shared/onterminate.simba}
 {$include_once shared/interfacebase.simba}

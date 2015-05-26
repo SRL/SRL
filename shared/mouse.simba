@@ -470,7 +470,10 @@ begin
   p := Self.getPosition();
 
   if (p.X <> Target.X) or (p.Y <> Target.Y) then
+  begin
     Self.Move(Target.X, Target.Y);
+    Wait(16 + Random(70));
+  end;
 
   Self.Click(Button);
 end;
