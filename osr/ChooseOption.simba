@@ -174,10 +174,11 @@ begin
     B := GetClientBounds(True);
     FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2);
     ATPA := ClusterTPAEx(TPA,1,1);
-    SortATPAFrom(ATPA,pt);
+    SortATPAFromFirstPoint(ATPA, pt);
+    
     if Length(ATPA) = 0 then 
       RaiseException(erException,'No wai!! This is bullshit'); 
-      
+    
     Self.Bounds := GetTPABounds(ATPA[0]);
     Self.Bounds.Expand(1);
     Self.Bounds.LimitTo(B);
@@ -202,7 +203,7 @@ var
 begin
   if not(self.Find()) then
     Exit();
-
+  
   with self.Bounds do
   begin
     bmp := BitmapFromClient(x1,y1,x2,y2);
