@@ -10,6 +10,7 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
 *)
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbMenu, bbClose);
+  EBankType = (btNPCBlue, btNPCGray, btNPCGrey);
 
   TRSBankScreen = record (TInterfaceBase)
     fSlots: TBoxArray;
@@ -115,6 +116,82 @@ begin
   until (GetTickCount64() >= t);
 end;
 
+function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray): Boolean;
+const
+  COLOR_SKIN: TColorEx = [5603764, 18, [2, [0.02, 0.70]]];
+var
+  TPASkin, TPA, temp: TPointArray;
+  ATPASkin, ATPA: T2DPointArray;
+  i, W, H: Integer;
+  b: TBox;
+begin
+  SetLength(Points, 0);
+  if (not FindColorsTolerance(TPASkin, COLOR_SKIN.Color, Mainscreen.getBounds(), COLOR_SKIN.Tolerance, COLOR_SKIN.Settings)) then
+    Exit(False);
+
+  ATPASkin := ClusterTPAEx(TPASkin, 5, 5);
+  for i := 0 to High(ATPASkin) do
+    if (Length(ATPASkin[i]) < 300) then
+    begin
+      b := GetTPABounds(ATPASkin[i]);
+      b.Expand(4, MainScreen.getBounds());
+
+      if (FindColorsTolerance(temp, Color.Color, b, Color.Tolerance, Color.Settings)) then
+        TPA.Extend(temp);
+    end;
+
+  if (Length(TPA) < 10) then
+    Exit(False);
+
+  ATPA := ClusterTPAEx(TPA, 6, 6);
+  SortATPAFromMidPoint(ATPA, Mainscreen.getMiddle());
+  for i := 0 to High(ATPA) do
+  begin
+    TPA := MinAreaRectEx(ATPA[i], W, H);
+    if (W >= 10) and (H >= 10) then
+      Points += ATPA[i];
+  end;
+
+  Result := Length(Points) > 0;
+end;
+
+function TRSBankScreen._OpenNPC(Color: TColorEx): Boolean;
+const
+  UpText = ['Bank bank booth', 'Talk-to Banker', 'Bank Banker'];
+  Option = ['Bank bank booth', 'Bank Banker'];
+var
+  ATPA: T2DPointArray;
+  i: Integer;
+  p: TPoint;
+begin
+  Result := False;
+  if (Self.FindNPCs(Color, ATPA)) then
+  begin
+    for i := 0 to High(ATPA) do
+    begin
+      if (Random(5) = 0) then
+        p := ATPA[i][Random(Length(ATPA[i]))]
+      else
+        p := MiddleTPA(ATPA[i]).Random(-4, 4);
+
+      Mouse.Move(p);
+      if (MainScreen.IsUpText(UpText, 500)) then
+      begin
+        if (ChooseOption.Open()) then
+          if (ChooseOption.Select(Option)) then
+          begin
+            if (Minimap.isFlagPresent(Random(300, 400))) then
+              Minimap.WaitFlag();
+
+            Result := BankScreen.IsOpen(Random(4000, 6000));
+            if (Result) then
+              Exit(True);
+          end;
+      end;
+    end;
+  end;
+end;
+
 
 (*
 BankScreen.Open
@@ -125,9 +202,18 @@ BankScreen.Open
 
 Opens the bankscreen.
 *)
-function TRSBankScreen.Open(): Boolean;
+function TRSBankScreen.Open(Typ: EBankType): Boolean;
+const
+  COLOR_NPC_GRAY: TColorEx = [6513771, 9, [2, [0.35, 0.10]]];
+  COLOR_NPC_BLUE: TColorEx  = [4533549, 15, [2, [0.75, 0.96]]];
 begin
-  RaiseException('Not implmented yet');
+  if (Self.isOpen()) then
+    Exit(True);
+
+  case Typ of
+    btNPCGray, btNPCGrey: Result := Self._OpenNPC(COLOR_NPC_GRAY);
+    btNPCBlue: Result := Self._OpenNPC(COLOR_NPC_BLUE);
+  end;
 end;
 
 
