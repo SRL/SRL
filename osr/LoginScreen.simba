@@ -206,6 +206,7 @@ begin
 
   if (not Self.isLoginOpen()) then
   begin
+    srl.Writeln('Opening login...');
     Mouse.Click(Self.ExistingUserBox, mouse_Left);
 
     if (not Self.isLoginOpen(Random(2000, 3000))) then

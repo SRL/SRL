@@ -45,6 +45,16 @@ begin
   Self.Y2 += HeiMod;
 end;
 
+procedure TBox.Expand(SizeMod: Int32; MaxBounds: TBox); overload;
+begin
+  Self.X1 -= SizeMod;
+  Self.Y1 -= SizeMod;
+  Self.X2 += SizeMod;
+  Self.Y2 += SizeMod;
+
+  Self.LimitTo(MaxBounds);
+end;
+
 function TBox.Combine(b: TBox): TBox;
 begin
   Result.X1 := Min(Min(b.X1, b.X2), Min(b.X1, b.X2));
