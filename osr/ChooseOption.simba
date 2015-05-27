@@ -198,7 +198,7 @@ Returns each option in the menu.
 function TRSChooseOption.GetOptions(): TOptionArray;
 var
   b: TBox;
-  i,bmp,oldT,newT:Int32;
+  i,bmp,bmp2:Int32;
 begin
   if not(self.Find()) then
     Exit();
@@ -208,9 +208,6 @@ begin
     bmp := BitmapFromClient(x1,y1,x2,y2);
     FastReplaceColor(bmp,4674653,0);
     ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-    
-    oldT := GetImageTarget(); //set image as target
-    newT := SetTargetBitmap(bmp);
 
     SetLength(Result, (y2 - y1 + 1) div 15);
     for i:=0 to High(Result) do
@@ -219,12 +216,16 @@ begin
       B.y1 := i * 15 + 2;
       B.x2 := (x2 - x1) - 2;
       B.y2 := B.y1 + 15;
-      Result[i].str := GetTextAt(B.x1,B.y1+1, 0,3,2, 255, 0,150,'UpChars07_s');
+      if B.y2 <= y2-y1 then
+      begin
+        bmp2 := CopyBitmap(bmp);
+        CropBitmap(bmp2, B.x1,B.y1,B.x2,B.y2);
+        Result[i].str := ocr.Recognize(BitmapToMatrix(bmp2),FontSetting(255,1));
+        FreeBitmap(bmp2);
+      end;
       B.Offset(Point(x1, y1));
       Result[i].bounds := B;
     end;
-    SetImageTarget(oldT);  //reset target
-    FreeTarget(newT);
     FreeBitmap(bmp);
   end;
 end;

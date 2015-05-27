@@ -34,7 +34,7 @@ end;
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
 begin
   Self.ClientID := ExportImageTarget();
-  Result := Inherited(B, Filter);
+  Result := Inherited(B, Filter, MaxWalk);
 end;
 
 // overloads which takes a fontset.
@@ -50,11 +50,21 @@ begin
   Result := Self.Recognize(AClient, Filter);
 end;
 
+function TSimpleOCR.ExpectText(txt:String; B:TBox; font:TFontSet; setting:TCompareRules; maxWait:Int32=6000): Boolean;
+var
+  t:UInt32;
 begin
-  SmallFont.Load('SmallChars07'); 
-  UpFont.Load('UpChars07_s'); 
-  NPCFont.Load('CharsNPC07'); 
-  StatFont.Load('StatChars07');
+  t := GetTimeRunning() + maxWait;
+  while GetTimeRunning() < t do
+    if Pos(txt, ocr.Recognize(B, setting, font)) <> 0 then
+      Exit(True);
+end; 
+
+begin
+  SmallFont.Load(FontPath+'SmallChars07'); 
+  UpFont.Load(FontPath+'UpChars07_s'); 
+  NPCFont.Load(FontPath+'CharsNPC07'); 
+  StatFont.Load(FontPath+'StatChars07');
   OCR.Init(UpFont); //just init it with W/E font.
   //freeing OCR and fonts is handeled automatically by lape
 end;
