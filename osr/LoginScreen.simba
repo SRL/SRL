@@ -136,7 +136,7 @@ function TRSLoginScreen.GetCursor(): Byte;
 var
   TimeOut: UInt64;
 begin
-  TimeOut := GetTickCount64() + Random(2000, 3000);
+  TimeOut := GetTickCount64() + Random(2500, 3500);
 
   repeat
     if (CountColor(_LOGIN_TEXT_YELLOW, Self.LoginBox) > 10) then
@@ -196,7 +196,7 @@ Example:
 *)
 function TRSLoginScreen.EnterLoginInfo(Login, Pass: String): Boolean;
 var
-  Timeout: UInt64 := GetTickCount64() + Random(7500, 8000);
+  Timeout: UInt64 := GetTickCount64() + Random(10000, 12000);
   Clear: array [0..1] of Boolean;
 begin
   Result := True;

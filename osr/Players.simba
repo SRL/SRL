@@ -90,18 +90,20 @@ TPlayerArray.GetCurrent
 
     function TPlayerArray.GetCurrent(): TPlayer;
 
-Returns the currently used player.
+Returns a pointer to the currently used player.
+- Derefrence "Players.GetCurrent()^" to get a TPlayer
 
 Example:
 
 .. code-block:: pascal
 
-    srl.Writeln(Players.GetCurrent().LoginName);
+    srl.Writeln(Players.GetCurrent()^.LoginName);
+    Players.GetCurrent()^.isActive := False;
 *)
-function TPlayerArray.GetCurrent(): TPlayer;
+function TPlayerArray.GetCurrent(): PPlayer;
 begin
   if (InRange(FCurrent, Low(FPlayers), High(FPlayers))) then
-    Result := FPlayers[FCurrent]
+    Result := @FPlayers[FCurrent]
   else
     srl.Writeln('No current player set', TDebug.FATAL);
 end;
@@ -193,7 +195,7 @@ Example:
 *)
 procedure TPlayerArray.SwitchTo(PlayerIndex: Integer; IsActive: Boolean = True);
 begin
-  Self.GetCurrent().isActive := IsActive;
+  Self.GetCurrent()^.isActive := IsActive;
   Self.FPlayers[PlayerIndex].isActive := True;
 
   Self.SetCurrent(PlayerIndex);
@@ -224,7 +226,7 @@ begin
 
   if (Result) then
     for i := 0 to Self.GetCount() - 1 do
-      if (Self.FPlayers[i].LoginName <> Self.getCurrent().LoginName) and (Self.FPlayers[i].isActive) then
+      if (Self.FPlayers[i].LoginName <> Self.getCurrent()^.LoginName) and (Self.FPlayers[i].isActive) then
       begin
         Self.SetCurrent(i);
         Break;

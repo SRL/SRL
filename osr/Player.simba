@@ -110,7 +110,7 @@ begin
 
   while (LoginAttempts < 10) do
   begin
-    srl.WriteFmt('Attempt: %d', [Attempts])
+    srl.WriteFmt('Attempt: %d [Login: %d]', [Attempts, LoginAttempts]);
 
     if (srl.isLoggedIn()) then
       Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
@@ -137,7 +137,7 @@ begin
     end;
   end;
 
-  if (LoginAttempts = 10) then
+  if (LoginAttempts >= 10) then
     srl.Writeln('Max login attempts reached', TDebug.WARNING);
 
   srl.Writeln('TPlayer.LoginToLobby(): Result = False', TDebug.FOOTER);
@@ -173,13 +173,19 @@ begin
       Self.World := WorldSwitcher.MembersWorlds[Random(Length(WorldSwitcher.MembersWorlds))];
     end;
 
-
     srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
 
     if (LoginScreen.GetCurrentWorld() <> Self.World) then
     begin
       while (Tries < 10) do
       begin
+        if (srl.isLoggedIn()) then
+        begin
+          srl.Writeln('We have randomly logged in!');
+          srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+          Exit(True);
+        end;
+
         if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
           WorldSwitcher.SelectWorld(Self.World);
 
@@ -190,6 +196,8 @@ begin
             Break;
           end else
             srl.Writeln('Weird missclick world bug? will try again');
+
+        Inc(Tries);
       end;
 
       if (Tries = 10) then

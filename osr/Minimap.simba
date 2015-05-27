@@ -271,9 +271,9 @@ begin
     else
       SameDists := 0;
 
-    if (SameDists >= 20) then
+    if (SameDists >= 60) then
     begin
-      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 20 loops, exiting.. ', TDebug.WARNING);
+      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 60 loops, exiting.. ', TDebug.WARNING);
       Exit();
     end;
 
@@ -341,7 +341,7 @@ var
   TPA:TPointArray;
 begin
   if not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 20) then
-    Exit(srl.Writeln('Failed to find the `N` in the compass', 0.00, '', TDebug.WARNING));
+     Exit(srl.Writeln('Failed to find the `N` in the compass', 0.00, '', TDebug.WARNING));
 
   FilterPointsDist(TPA, 8,15, M.x,M.y);
   north := MiddleTPA(SplitTPA(TPA,3)[0]);
@@ -350,13 +350,17 @@ begin
     Exit(srl.Writeln('Failed to find red compass dots color', 0.00, '', TDebug.WARNING));
   
   FilterPointsDist(TPA, 0,6, south.x,south.y);
-  SortTPAFrom(TPA,M);
-  Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2));
+  SortTPAFrom(TPA, M);
+  if (Length(TPA) > 0) then
+    Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2))
+  else
+    srl.Writeln('Failed to find compass dial color', TDebug.WARNING);
+
   if AsDegrees then
     Result := Degrees(Result);
 end;
 
-function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 2): Boolean;
+function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 3): Boolean;
 
   function Compass_Distance(Angle, Target: Extended): Extended;
   begin
@@ -376,18 +380,14 @@ function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 2): Bool
   begin
     case (Left) of
       True:
-        if (not isKeyDown(VK_LEFT)) then
         begin
-          if (isKeyDown(VK_RIGHT)) then
-            KeyUp(VK_RIGHT);
-          KeyDown(VK_LEFT)
+          KeyUp(VK_RIGHT);
+          KeyDown(VK_LEFT);
         end;
       False:
-        if (not isKeyDown(VK_RIGHT)) then
         begin
-          if (isKeyDown(VK_LEFT)) then
-            KeyUp(VK_LEFT);
-          KeyDown(VK_RIGHT)
+          KeyUp(VK_LEFT);
+          KeyDown(VK_RIGHT);
         end;
     end;
   end;
@@ -402,7 +402,7 @@ begin
   if (CurrentAngle = Angle) then
     Exit(True);
 
-  TimeOut := GetTickCount64() + Random(13000, 17000);
+  TimeOut := GetTickCount64() + Random(9000, 11000);
   while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < TimeOut) do
   begin
     AngleDistance := CurrentAngle - Angle;
@@ -420,10 +420,8 @@ begin
   if (GetTickCount64() >= TimeOut) then
     srl.Writeln('TRSMinimap.SetCompassAngle(): Setting angle timed out', TDebug.WARNING);
 
-  if (Left) then
-    KeyUp(VK_LEFT)
-  else
-    KeyUp(VK_RIGHT);
+  KeyUp(VK_LEFT);
+  KeyUp(VK_RIGHT);
 
   Wait(Random(270, 420));
 end;

@@ -37,8 +37,8 @@ begin
 
   {$IFDEF SMART}
   if (Players.GetCount() > 0) then
-    if (Players.GetCurrent().World <> 0) then
-      Smart.World := WorldSwitcher.FixWorld(Players.GetCurrent().World);
+    if (Players.GetCurrent()^.World <> 0) then
+      Smart.World := WorldSwitcher.FixWorld(Players.GetCurrent()^.World);
 
   Smart.Init();
   {$ENDIF}
