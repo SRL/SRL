@@ -108,9 +108,9 @@ begin
   LoginAttempts := 0;
   Attempts := 0;
 
-  while (LoginAttempts < 10) do
+  while (LoginAttempts < 20) do
   begin
-    srl.WriteFmt('Attempt: %d', [Attempts])
+    srl.WriteFmt('Attempt: %d [Login: %d]', [Attempts, LoginAttempts]);
 
     if (srl.isLoggedIn()) then
       Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
@@ -137,7 +137,7 @@ begin
     end;
   end;
 
-  if (LoginAttempts = 10) then
+  if (LoginAttempts >= 10) then
     srl.Writeln('Max login attempts reached', TDebug.WARNING);
 
   srl.Writeln('TPlayer.LoginToLobby(): Result = False', TDebug.FOOTER);

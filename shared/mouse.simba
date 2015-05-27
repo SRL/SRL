@@ -37,7 +37,7 @@
 
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
-  TCreateSplineEvent = procedure(Sender: TObject; var xs, ys, xe, ye: Extended);
+  TCreateSplineEvent = procedure(Sender: TObject; var xe, ye: Extended);
 
 type
   TMouse = record
@@ -216,7 +216,7 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnCreateSpline(@Self, xs, ys, xe, ye);
+      FOnCreateSpline(@Self, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -337,7 +337,7 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnCreateSpline(@Self, xs, ys, xe, ye);
+      FOnCreateSpline(@Self, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
