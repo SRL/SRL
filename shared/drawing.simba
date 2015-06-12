@@ -825,5 +825,72 @@ begin
     self.drawBox(box, false, boxColor);
 end;
 
+procedure TMufasaBitmap.DrawTPARainbow(TPA: TPointArray);
+var
+  i, h, x, w: Integer;
+  fraction, m: Double;
+  r, g, b, mt: Byte;
+  ptr: PRGB32;
+begin
+  h := High(TPA);
+  if (h < 0) then
+    Exit;
+
+  w := Self.getWidth();
+  ptr := Self.getData();
+
+  for i := 0 to High(TPA) do
+  begin
+    fraction := i / h;
+    if (fraction <= 0) then
+      m := 0
+    else if (fraction >= 1) then
+      m := 6
+    else
+      m := fraction * 6;
+
+    x := TPA[i].Y * w + TPA[i].X;
+    mt := (round(frac(m) * $FF));
+    case Trunc(m) of
+    0:
+      begin
+        ptr[x]^.R := $FF;
+        ptr[x]^.G := mt;
+        ptr[x]^.B := 0;
+      end;
+    1:
+      begin
+        ptr[x]^.R := $FF - mt;
+        ptr[x]^.G := $FF;
+        ptr[x]^.B := 0;
+      end;
+    2:
+      begin
+        ptr[x]^.R := 0;
+        ptr[x]^.G := $FF;
+        ptr[x]^.B := mt;
+      end;
+    3:
+      begin
+        ptr[x]^.R := 0;
+        ptr[x]^.G := $FF - mt;
+        ptr[x]^.B := $FF;
+      end;
+    4:
+      begin
+        ptr[x]^.R := mt;
+        ptr[x]^.G := 0;
+        ptr[x]^.B := $FF;
+      end;
+    5:
+      begin
+        ptr[x]^.R := $FF;
+        ptr[x]^.G := 0;
+        ptr[x]^.B := $FF - mt;
+       end;
+    end;
+  end;
+end;
+
 
 {$f+}

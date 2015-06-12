@@ -363,6 +363,42 @@ begin
   Result := Length(Self.GetUsedSlots());
 end;
 
+function TRSInventory.GetActiveSlot(): Byte;
+var
+  i: Integer;
+  b: TBox;
+begin
+  Result := -1;
+  for i := 0 to High(Self.FSlots) do
+  begin
+    b := self.FSlots[i];
+    if (CountColor(16777215, b.x1,b.y1,b.x2,b.y2) > 10) then
+      Exit(i);
+  end;
+end;
+
+function TRSInventory.ActivateSlot(const Slot: Integer): Boolean;
+var
+  a: Byte;
+begin
+  Result := False;
+  if (Slot = -1) and ((a := Self.GetActiveSlot()) > -1) then
+  begin
+    Self.MouseSlot(a);
+    Mouse.Click(mouse_Left);
+    Result := True;
+  end else
+  begin
+    a := Self.GetActiveSlot();
+    if (a = Slot) then
+      Exit(True);
+    Self.ActivateSlot(-1); // un-activate a slot if needed
+    Self.MouseSlot(Slot);
+    if (ChooseOption.Open()) then
+      Result := ChooseOption.Select(['Use']);
+  end;
+end;
+
 
 begin
   Inventory.__setup();

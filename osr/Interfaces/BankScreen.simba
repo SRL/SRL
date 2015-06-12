@@ -526,7 +526,7 @@ begin
     else if amount = WITHDRAW_ALL_BUT_ONE then
       Result := ChooseOption.Select(['Withdraw-All-but-one'])
 
-    else if ChooseOption.Select(['Withdraw-'+ToString(amount)],,False) then
+    else if ChooseOption.Select(['Withdraw-'+ToString(amount)+' '],,False) then  // space after amount so it can't find "2" in 28
       Result := True
 
     else if ChooseOption.Select(['Withdraw-X']) and

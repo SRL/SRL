@@ -81,7 +81,7 @@ MainScreen.IsUpText
 
 .. code-block:: pascal
 
-    function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 260): Boolean;
+    function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
 
 Returns True if any of the strings in 'SubStrs' is in the uptext. Will search up to 'WaitTime'
 which by default is 260.
@@ -93,12 +93,12 @@ Example:
     if (MainScreen.IsUpText(['Attack Chicken', 'ack Chicken'])) then
       Mouse.Click(mouse_Left);
 *)
-function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 260): Boolean;
+function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
 var
   TimeOut: UInt64;
 begin
   Result := False;
-  TimeOut := GetTickCount64() + (WaitTime + Random(50));
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
 
   while (TimeOut >= GetTickCount64()) do
   begin
@@ -115,7 +115,7 @@ MainScreen.IsUpText; overload
 
 .. code-block:: pascal
 
-    function TRSMainScreen.IsUpText(Str: String; WaitTime: UInt32 = 270): Boolean; overload;
+    function TRSMainScreen.IsUpText(Str: String; WaitTime: UInt32 = 350): Boolean; overload;
 
 Returns True if any of the string 'Str' is in the uptext. Will search up to 'WaitTime'
 which by default is 270.
@@ -127,7 +127,7 @@ Example:
     if (MainScreen.IsUpText('Attack Chicken')) then
       Mouse.Click(mouse_Left);
 *)
-function TRSMainScreen.IsUpText(Str: String; WaitTime: UInt32 = 270): Boolean; overload;
+function TRSMainScreen.IsUpText(Str: String; WaitTime: UInt32 = 350): Boolean; overload;
 begin
   Result := Self.IsUpText([Str], WaitTime);
 end;
@@ -314,7 +314,7 @@ Example:
 
 .. note:: by slacky
 }
-function TRSMainscreen.GetText(color:Int32): TMSTextArray;
+function TRSMainScreen.GetText(color:Int32): TMSTextArray;
 var
   w,h,i,j: Int32;
   TPA: TPointArray;
@@ -369,6 +369,17 @@ begin
     Keyboard.KeyUp(VK_DOWN);
 
   Wait(700 + Random(300));
+end;
+
+procedure TRSMainScreen.WaitWhileLoading(MaxWait: UInt64 = 10000);
+var
+  p: TPoint;
+  t: UInt64;
+begin
+  t := GetTickCount64() + MaxWait + Random(500);
+  if (srl.FindText(p, 'lease wait', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50))) then
+    while (t > GetTickCount64()) and (srl.FindText(p, 'lease wait', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50))) do
+      Wait(Random(200, 500));
 end;
 
 begin

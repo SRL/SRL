@@ -12,8 +12,9 @@ end;
 
 {$include_once osr/Misc.simba}
 {$include_once osr/Text.simba}
-{$include_once osr/Chatbox.simba}
 {$include_once osr/ChooseOption.simba}
+{$include_once osr/Chatbox.simba}
+{$include_once osr/Interfaces/MainScreen.simba}
 {$include_once osr/Gametabs.simba}
 {$include_once osr/Minimap.simba}
 {$include_once osr/Interfaces/WorldSwitcher.simba}
@@ -22,7 +23,6 @@ end;
 {$include_once osr/Client.simba}
 {$include_once osr/Player.simba}
 {$include_once osr/Players.Simba}
-{$include_once osr/Interfaces/MainScreen.simba}
 {$include_once osr/Interfaces/BankScreen.simba}
 
 {$IFDEF SMART}

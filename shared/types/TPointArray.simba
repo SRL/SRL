@@ -284,6 +284,18 @@ begin
   SetLength(Result, Count);
 end;
 
+procedure ExpandRect(var Rect: TPointArray; Percent: Integer);
+var
+  i, CenterX, CenterY: Integer;
+begin
+  MiddleTPAEx(Rect, CenterX, CenterY);
+  for i := 0 to High(Rect) do
+  begin
+    Rect[i].X := Round((Rect[i].X - CenterX) * (1 + Percent / 100) + CenterX);
+    Rect[i].Y := Round((Rect[i].Y - CenterY) * (1 + Percent / 100) + CenterY);
+  end;
+end;
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure TPointArray.Append(const Value: TPoint);

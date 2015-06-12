@@ -56,8 +56,11 @@ var
 begin
   t := GetTimeRunning() + maxWait;
   while GetTimeRunning() < t do
+  begin
+    Wait(Random(25, 75));
     if Pos(txt, ocr.Recognize(B, setting, font)) <> 0 then
       Exit(True);
+  end;
 end; 
 
 begin
@@ -65,7 +68,7 @@ begin
   UpFont.Load(FontPath+'UpChars07_s'); 
   NPCFont.Load(FontPath+'CharsNPC07'); 
   StatFont.Load(FontPath+'StatChars07');
-  OCR.Init(UpFont); //just init it with W/E font.
+  OCR.Init(SmallFont); //just init it with W/E font.
   //freeing OCR and fonts is handeled automatically by lape
 end;
 

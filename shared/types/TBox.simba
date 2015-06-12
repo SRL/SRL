@@ -3,6 +3,27 @@ begin
   Result := [x1,y1,x2,y2];
 end;
 
+function GridBox(Slot, Columns, Rows, w, h, diffX, diffY: Integer; Start: TPoint): TBox;
+begin
+  if (Slot > (Columns * Rows)) then
+    Exit;
+
+  Result.X1 := (Start.x + ((Slot mod Columns) * diffX) - (w div 2));
+  Result.Y1 := (Start.y + ((Slot div Columns) * diffY) - (h div 2));
+  Result.X2 := (Result.X1 + w);
+  Result.Y2 := (Result.Y1 + h);
+end;
+
+function Grid(Columns, Rows, w, h, diffX, diffY: integer; Start: TPoint): TBoxArray;
+var
+  i: Integer;
+begin
+  SetLength(Result, (Columns * Rows));
+
+  for i := 0 to High(Result) do
+    Result[i] := GridBox(i, Columns, Rows, w, h, diffX, diffY, Start);
+end;
+
 procedure TBox.GetDimensions(out w, h: integer);
 begin
   w := Self.X2 - Self.X1 + 1;

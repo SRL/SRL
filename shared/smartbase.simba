@@ -27,7 +27,7 @@ begin
       c := Client.getIOManager().GetChildWindows(a[i].Handle);
 
       for j := 0 to High(c) do
-        if (c[j].Width >= Self.Width) and (c[j].Height >= Self.Height) then
+        if (c[j].Width = Self.Width) and (c[j].Height = Self.Height) then
           Exit(c[j].Handle);
     end;
 

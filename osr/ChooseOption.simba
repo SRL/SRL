@@ -221,7 +221,7 @@ begin
       begin
         bmp2 := CopyBitmap(bmp);
         CropBitmap(bmp2, B.x1,B.y1,B.x2,B.y2);
-        Result[i].str := ocr.Recognize(BitmapToMatrix(bmp2),FontSetting(255,1));
+        Result[i].str := ocr.Recognize(BitmapToMatrix(bmp2),FontSetting(255,1), UpFont);
         FreeBitmap(bmp2);
       end;
       B.Offset(Point(x1, y1));
@@ -338,6 +338,11 @@ begin
 
   if AClose then
     Self.Close();
+end;
+
+function TRSChooseOption.Select(Option: String; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
+begin
+  Result := Self.Select([Option], mouseAction, AClose, CaseSensitive);
 end;
 
 begin

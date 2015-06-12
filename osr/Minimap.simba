@@ -346,7 +346,7 @@ begin
   FilterPointsDist(TPA, 8,15, M.x,M.y);
   north := MiddleTPA(SplitTPA(TPA,3)[0]);
   south := RotatePoint(north,PI, M.x,M.y);
-  if not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 20) then
+  if not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25) then
     Exit(srl.Writeln('Failed to find red compass dots color', 0.00, '', TDebug.WARNING));
   
   FilterPointsDist(TPA, 0,6, south.x,south.y);
@@ -360,7 +360,172 @@ begin
     Result := Degrees(Result);
 end;
 
-function TMinimap.SetCompassAngle(Angle: Extended; Tolerance: Integer = 3): Boolean;
+function TMinimap.MouseSetCompassAngle(Angle: Extended): Boolean;
+
+  procedure MoveRotate(xs, ys, xe, ye, Angle: Extended);
+  const
+    sqrt2 := sqrt(2);
+    sqrt3 := sqrt(3);
+    sqrt5 := sqrt(5);
+  var
+    veloX, veloY, windX, windY, veloMag, dist, randomDist, lastDist, D, compassDist: Extended;
+    TargetArea, Wind, Gravity: Extended;
+    lastX, lastY, Speed, W, TDist, rnd_xs, rnd_ys, maxDist, rand: Integer;
+    maxStep, rCnc: Extended;
+    t: UInt64;
+  begin
+    Speed := Mouse.GetSpeed();
+    Gravity := Mouse.GetGravity(mouse_Human);
+    Wind := Mouse.GetWind(mouse_Human);
+    TargetArea := 10.0 * ((Random(Speed) / 2.0 + Speed) / 10.0);
+    Rand := Random(25, 40);
+    MaxDist := 15;
+    TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
+    t := GetTickCount64() + Random(7000, 8500);
+    Mouse.Hold(mouse_Middle);
+
+    repeat
+      if (GetTickCount64() > t) then
+        Break;
+
+      dist := hypot(xs - xe, ys - ye);
+      wind := minE(wind, dist);
+      if (dist < 1) then
+        dist := 1;
+
+      D := (Round((Round(TDist)*0.3))/7);
+      if (D > maxDist) then
+        D := maxDist;
+      if (D < 4) then
+        D := 4;
+
+      rCnc := random(6);
+      if (rCnc = 1) then
+        D := Random(2, 3);
+
+      if (D <= Round(dist)) then
+        maxStep := D
+      else
+        maxStep := round(dist);
+
+      if (dist >= targetArea) then
+      begin
+        windX := windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+        windY := windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      end else
+      begin
+        windX := windX / sqrt2;
+        windY := windY / sqrt2;
+      end;
+
+      veloX := veloX + windX;
+      veloY := veloY + windY;
+      veloX := veloX + gravity * (xe - xs) / dist;
+      veloY := veloY + gravity * (ye - ys) / dist;
+
+      if (hypot(veloX, veloY) > maxStep) then
+      begin
+        randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
+        veloMag := sqrt(veloX * veloX + veloY * veloY);
+        veloX := (veloX / veloMag) * randomDist;
+        veloY := (veloY / veloMag) * randomDist;
+      end;
+
+      lastX := round(xs);
+      lastY := round(ys);
+      xs := xs + veloX;
+      ys := ys + veloY;
+      rnd_xs := Round(xs);
+      rnd_ys := Round(ys);
+
+      if (lastX <> rnd_xs) or (lastY <> rnd_ys) then
+        Mouse.SetPosition(Point(rnd_xs, rnd_ys));
+
+      W := (Random((round(100/Speed)))*6);
+      if (W < 4) then
+        W := 4;
+      W := Round(W * 0.4);
+
+      Wait(W);
+      LastDist := dist;
+      CompassDist := Abs(DeltaAngle(Minimap.GetCompassAngle(), Angle));
+
+      if (CompassDist < Rand) then
+        maxDist := Random(6, 9) // Small steps now
+      else
+        maxDist := 15; // Default
+
+      if (CompassDist <= 5) then
+        Break;
+    until (Hypot(xs - xe, ys - ye) < 1);
+
+    Mouse.Release(mouse_Middle);
+    Wait(Random(90, 220));
+  end;
+
+var
+  CurrentAngle, AngleDistance: Extended;
+  CompassDist: Extended;
+  mp, p: TPoint;
+  Left: Boolean;
+  t: UInt64;
+  old: Integer;
+begin
+  Result := False;
+
+  Angle := FixD(Angle);
+  CurrentAngle := Self.GetCompassAngle();
+  CompassDist := Abs(DeltaAngle(CurrentAngle, Angle));
+  if (CompassDist <= 3) then
+    Exit(True);
+
+  t := GetTickCount64() + Random(5000, 7000);
+  while (CompassDist > 5) and (t > GetTickCount64()) do
+  begin
+    AngleDistance := CurrentAngle - Angle;
+    Left := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
+    mp := Mouse.GetPosition();
+
+    if (not Left) then { Move the mouse left to right }
+    begin
+      if (not PointInBox(mp, GetClientBounds())) then  { We need to start the click on the client }
+        Mouse.Move(Box(625, 0, 764, 400),, False);
+      if ((mp.x - 100) > 120) and (mp.y < 400) then { Enough space to move left }
+        { nothing }
+      else begin{ We need to move our mouse to the right side }
+        Mouse.Move(Box(625, 0, 764, 400),, False);
+        mp := Mouse.GetPosition();
+      end;
+
+      { Create a point on the left side of the screen, under the current mouse pos }
+      p.x := Random(0, 95);
+      p.y := Random(mp.y + 65, 503);
+    end else
+    begin { Move the mouse right to left }
+      if (not PointInBox(mp, GetClientBounds())) then { We need to start the click on the client }
+        Mouse.Move(Box(0, 0, 125, 400))
+      else if ((mp.x + 100) < 640) and (mp.y < 400) then { Enough space to move right }
+        { nothing }
+      else begin { We need to move our mouse to the left side }
+        Mouse.Move(Box(0, 0, 125, 400),, False);
+        mp := Mouse.GetPosition();
+      end;
+
+      { Create a point on the right side of the screern, under the current mouse pos }
+      p.x := Random(660, 764);
+      p.y := Random(mp.y + 65, 503);
+    end;
+
+    MoveRotate(mp.x, mp.y, p.x, p.y, Angle);
+    Wait(Random(40, 140));
+    CurrentAngle := Self.GetCompassAngle();
+    CompassDist := Abs(DeltaAngle(CurrentAngle, Angle));
+  end;
+
+  Result := CompassDist < 5;
+end;
+
+function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 3): Boolean;
 
   function Compass_Distance(Angle, Target: Extended): Extended;
   begin
@@ -397,6 +562,9 @@ var
   CurrentAngle, AngleDistance: Extended;
   Left: Boolean;
 begin
+  if (UseMouse) then
+    Exit(Self.MouseSetCompassAngle(Angle));
+
   Angle := FixD(Angle);
   CurrentAngle := Self.GetCompassAngle();
   if (CurrentAngle = Angle) then
@@ -522,6 +690,43 @@ begin
 
   Self.FilterPoints(Matches);
   Result := Length(Matches) > 0;
+end;
+
+function TMinimap.GetBlackColor(): Integer;
+var
+  TPA: TPointArray;
+  i, Max, Count: Integer;
+  Colors: TIntegerArray;
+begin
+  FindColorsTolerance(TPA, 0, Self.GetBounds(), 3, ColorSetting(2, 100, 100));
+  Self.FilterPoints(TPA);
+  if (Length(TPA) = 0) then
+    Exit(-1);
+
+  Max := 0;
+  Colors := GetColors(TPA);
+  ClearSameIntegers(Colors);
+  for i := 0 to High(Colors) do
+  begin
+    Count := CountColor(Colors[i], Self.GetBounds());
+    if (Count > Max) then
+    begin
+      Max := Count;
+      Result := Colors[i];
+    end;
+  end;
+end;
+
+function TMinimap.GetColorPercent(Color: Integer; Tolerance: Integer = 0): Integer;
+var
+  TPA: TPointArray;
+  Max: Integer;
+begin
+  FindColorsBitmap(Self.MaskBMP, TPA, $FFFFFF);
+  Max := Length(TPA);
+  FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
+  Self.FilterPoints(TPA);
+  Result := Round((Length(TPA) / Max) * 100);
 end;
 
 

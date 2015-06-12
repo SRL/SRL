@@ -37,7 +37,7 @@
 
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
-  TCreateSplineEvent = procedure(Sender: TObject; var xs, ys, xe, ye: Extended);
+  TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended);
 
 type
   TMouse = record
@@ -47,7 +47,7 @@ type
     FGravity, FWind: array [0..2] of Integer;
     FOnMouseMove: TMouseMoveEvent;
     FOnMouseEvent: TMouseEvent;
-    FOnCreateSpline: TCreateSplineEvent;
+    FOnMouseChangeDestEvent: TMouseChangeDestEvent;
   {$ENDIF}
  end;
 
@@ -58,10 +58,10 @@ begin
 
   FOnMouseMove := nil;
   FOnMouseEvent := nil;
-  FOnCreateSpline := nil;
+  FOnMouseChangeDestEvenT := nil;
 
-  FGravity[Ord(Mouse_Human)] := 8;
-  FGravity[Ord(Mouse_Brake)] := 8;
+  FGravity[Ord(Mouse_Human)] := 7;
+  FGravity[Ord(Mouse_Brake)] := 7;
   FGravity[Ord(Mouse_Accurate)] := 14;
 
   FWind[Ord(mouse_Human)] := 4;
@@ -148,14 +148,14 @@ begin
   Self.FOnMouseEvent := @Event;
 end;
 
-function TMouse.GetOnSplineCreate(): TCreateSplineEvent;
+function TMouse.GetOnChangeDestEvent(): TMouseChangeDestEvent;
 begin
-  Result := @Self.FOnCreateSpline;
+  Result := @Self.FOnMouseChangeDestEvent;
 end;
 
-procedure TMouse.SetOnSplineCreate(const Event: TCreateSplineEvent);
+procedure TMouse.SetOnChangeDestEven(const Event: TMouseChangeDestEvent);
 begin
-  Self.FOnCreateSpline := @Event;
+  Self.FOnMouseChangeDestEvent := @Event;
 end;
 
 procedure TMouse.Hold(const Button: Integer);
@@ -192,7 +192,7 @@ var
   Event: Boolean;
 begin
   tempSpeed := Self.getSpeed();
-  Event := Assigned(@FOnCreateSpline);
+  Event := Assigned(@FOnMouseChangeDestEvent);
   TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
   if (TDist < 1) then
     TDist := 1;
@@ -216,7 +216,7 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnCreateSpline(@Self, xs, ys, xe, ye);
+      FOnMouseChangeDestEvent(@Self, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -328,7 +328,7 @@ var
   Event: Boolean;
 begin
   tempSpeed := Self.getSpeed();
-  Event := Assigned(@FOnCreateSpline);
+  Event := Assigned(@FOnMouseChangeDestEvent);
 
   TDist := distance(Round(xs), Round(ys), Round(xe), Round(ye));
   t := GetTickCount64() + Random(9700, 10000);
@@ -337,7 +337,7 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnCreateSpline(@Self, xs, ys, xe, ye);
+      FOnMouseChangeDestEvent(@Self, xe, ye);
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -439,7 +439,7 @@ begin
   if (Gauss) then
     Self.Move(srl.GaussPoint(Box))
   else
-    Self.Move(TBox([Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)]));
+    Self.Move(Point(Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)));
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
@@ -528,6 +528,44 @@ begin
   Self.Hold(Button);
   Self.Move(Target);
   Self.Release(Button);
+end;
+
+procedure TMouse.Scroll(Target: TPoint; scrolls: Integer; Down: Boolean);
+var
+  c: Integer = 0;
+  p: TPoint;
+begin
+  Self.Move(Target);
+  p := Self.GetPosition();
+
+  repeat
+    if (Down) then
+      scrollMouse(p.x, p.y, 1)
+    else
+      scrollMouse(p.x, p.y, -1);
+
+    Wait(16 + Random(220));
+    Inc(c);
+  until(c >= Scrolls);
+end;
+
+procedure TMouse.Scroll(Box: TBox; scrolls: Integer; Down: Boolean); overload;
+var
+  c: Integer = 0;
+  p: TPoint;
+begin
+  Self.Move(Box);
+  p := Self.GetPosition();
+
+  repeat
+    if (Down) then
+      scrollMouse(p.x, p.y, 1)
+    else
+      scrollMouse(p.x, p.y, -1);
+
+    Wait(16 + Random(220));
+    Inc(c);
+  until(c >= Scrolls);
 end;
 
 var

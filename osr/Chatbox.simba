@@ -11,8 +11,11 @@ type TRSChatbox
 The type that holds functions and properties of the Runescape chat box interface.
 *)
 type 
+  EChatTab = (ctAll, ctGame, ctPublic, ctPrivate, ctClan, ctTrade);
+
   TRSChatbox = record(TInterfaceBase)
     FLines: TBoxArray;
+    FTabs: TBoxArray;
   end;
 
 (*
@@ -21,7 +24,7 @@ var chatbox
 Variable that stores functions and properties of the Runescape chatbox interface.
 *)
 var
-  chatbox: TRSChatbox;
+  Chatbox: TRSChatbox;
 
 (*
 const CHATBOX_COLORS
@@ -29,17 +32,18 @@ const CHATBOX_COLORS
 constant that holds all the possible text-colors
 *)
 const
-  CHATBOX_COLORS = [0,$7F,$FF0000,$7F007F];
-
+  CHATBOX_COLORS = [0, $7F, $FF0000, $7F007F];
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSChatbox.__setup();
+procedure TRSChatbox.__Setup();
 var i:Int32;
 begin
-  for i:=0 to 7 do
-    FLines.Append([10,345+(14*i),496,360+(14*i)+1]);
-  FLines.Append([10,459,500,474]); //input-field
-  
+  for i := 0 to 7 do
+    FLines.Append([10,344+(14*i),496,360+(14*i)+1]);
+  FLines.Append([10,458,500,474]); //input-field
+
+  FTabs := Grid(6, 1, 50, 15, 66, 0, Point(33, 490));
+
   with Self do
   begin
     FBounds := [7,345,512,474];
@@ -86,7 +90,6 @@ begin
   DrawTPABitmap(BMP,textArr,255);
 
   Result := OCR.Recognize(BitmapToMatrix(bmp),TCompareRules([255]), SmallFont);
-  
   FreeBitmap(bmp);
 end;
 
@@ -346,6 +349,30 @@ begin
   until (not srl.isLoggedIn());
 end;
 
+function TRSChatbox.GetDisplayName(): String;
+var
+  s: String;
+  p: Integer;
 begin
-  chatbox.__setup();
+  s := Self.GetTextOnLine(High(Self.FLines), [$000000]);
+  if ((p := Pos(':', s)) > 0) then
+    Result := Copy(s, 1, p - 1);
+end;
+
+function TRSChatbox.ClickTab(tab: EChatTab; Option: String = ''): Boolean;
+begin
+  Result := True;
+
+  if (Option = '') then
+    Mouse.Click(FTabs[ord(tab)], mouse_Left)
+  else
+  begin
+    Mouse.Move(FTabs[ord(tab)]);
+    if (not ChooseOption.Open()) or (not ChooseOption.Select(Option)) then
+      Exit(False);
+  end;
+end;
+
+begin
+  Chatbox.__Setup();
 end;
