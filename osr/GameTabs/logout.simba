@@ -3,10 +3,9 @@ Logout
 =======
 The file holds functions and procedures that are in the logout-tab.
 *)
-
-type
-  TRSLogoutWorldSwitcher = type TInterfaceBase;
-
+const 
+  WS_IS_OPEN:UInt8 = 127;  
+  
 (*
 type TRSLogout
 ~~~~~~~~~~~~~~~
@@ -14,8 +13,10 @@ The type that holds functions and properties of the Runescape logout-tab.
 *)
 type
   TRSLogout = record(TInterfaceBase)
-    WorldSwitcher: TRSLogoutWorldSwitcher;
-    LogoutButton: TBox;
+    btnWorldSwitch: TBox;
+    btnLogout: TBox;
+    btnLogoutWS: TBox; //not used yet
+    btnExitWS: TBox;
   end;
 
 {==| Table of Contents |=======================
@@ -42,39 +43,127 @@ begin
     FName := 'Logout';
     FStatic := True;
     FBounds := [550,206,733,464];
-    LogoutButton := [575,405,708,431];
+    
+    btnWorldSwitch := [575,346,708,375];
+    btnLogout := [575,405,708,431];
+    btnLogoutWS := [0,0,0,0];
+    btnExitWS := [716, 207, 734, 225];
   end;
 end;
 {$ENDIF}
 
 (*
-combat.Open
+logout.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.Open(): Boolean;
+  function TRSLogout.Open(): Boolean;
 
 Opens the interface
 *)
 function TRSLogout.Open(): Boolean;
 begin
   Result := Gametabs.Open(tabLogout);
-  if (Result) and (Self.WorldSwitcher.isOpen()) then
-    WorldSwitcher.Close();
 end;
 
 (*
-combat.IsOpen
+logout.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.IsOpen(): Boolean;
+  function TRSLogout.IsOpen(): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSLogout.IsOpen(): Boolean;
+function TRSLogout.IsOpen(WaitTime:Int32=0): Boolean;
+var p:TPoint;
 begin
-  Result := Gametabs.IsOpen(tabLogout) and (not Self.WorldSwitcher.isOpen());
+  Result := Gametabs.IsOpen(tabLogout);
+  
+  if Result and not(srl.FindText(p, 'Switcher', 'UpChars07_s', Self.FBounds)) then
+    if self.WSIsOpen(Random(450,900)) then
+      Result := WS_IS_OPEN;
+end;
+
+(*
+logout.WSIsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.WSIsOpen(): Boolean;
+
+Checks if the sub-interface: "world switcher" is open.
+*)
+function TRSLogout.WSIsOpen(WaitTime:Int32=0): Boolean;
+var
+  t: UInt64;
+  p: TPoint;
+begin
+  if (WaitTime = 0) then
+    Exit(srl.FindText(p, 'Current world', 'UpChars07_s', Self.GetBounds()));
+
+  t := GetTickCount64() + WaitTime;
+  repeat
+    if (srl.FindText(p, 'Current world', 'UpChars07_s', Self.GetBounds())) then
+      Exit(True);
+    Wait(Random(50, 100));
+  until (GetTickCount64() > t);
+
+  Result := False;
+end;
+
+(*
+logout.OpenWS
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.OpenWS(): Boolean;
+
+Opens the sub-interface (World Switcher)
+*)
+function TRSLogout.OpenWS(): Boolean;
+var 
+  t:UInt64;
+begin
+  if not(self.Open()) then
+    Exit();
+  Result := UInt8(self.IsOpen()) = WS_IS_OPEN;
+  
+  if not(Result) then
+  begin
+    mouse.Click(Self.BtnWorldSwitch, mouse_left);
+    t := GetTickCount64() + Random(500,1000);
+    repeat
+      if self.WSIsOpen() then Exit(True);
+      Wait(75);
+    until (GetTickCount64() > t);
+  end;
+end;
+
+(*
+logout.CloseWS
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.CloseWS(): Boolean;
+
+Closes the sub-interface (World Switcher), does nothing if it's not open.
+*)
+procedure TRSLogout.CloseWS();
+var
+  p: TPoint;
+  t:UInt64;
+begin
+  if UInt8(self.IsOpen()) = WS_IS_OPEN then
+  begin
+    Mouse.Click(BtnExitWS, mouse_Left);
+    t := GetTickCount64() + Random(400,900);
+    repeat
+      if srl.FindText(p, 'Switcher', 'UpChars07_s', Self.FBounds) then
+        break;
+      Wait(75);
+    until (t >= GetTickCount64());
+  end;
 end;
 
 (*
@@ -89,61 +178,31 @@ Clicks the logout button, by default retires 3 times over 20 seconds.
 function TRSLogout.ClickLogout(attemts:Int32=3; tryTime:Int32=20000): Boolean;
 var 
   state:boolean;
-  t,r:UInt64;
+  t,seed:UInt64;
 begin
-  if not(self.Open()) then
-    Exit(False);
-
-  r := 3153;
-  Inc(tryTime, attemts * r div 2);
+  if not(self.Open()) then Exit();
+  self.CloseWS();
+  
+  seed := 3153;
+  Inc(tryTime, attemts * seed div 2);
   for 1 to attemts do
   begin
-    mouse.click(Self.LogoutButton, mouse_left);
+    mouse.click(Self.BtnLogout, mouse_left);
     t := GetTickCount64() + (tryTime div attemts);
     repeat
-      if (CountColorTolerance(1777019, Self.LogoutButton, 30) < 100) then
+      if (CountColorTolerance(1777019, Self.BtnLogout, 30) < 100) then
         Exit(True)
       else
         Wait(25);
     until GetTickCount64() > t;
-    Wait(srl.GaussRangeInt(0,r));
+    Wait(srl.GaussRangeInt(0,seed));
   end;
 end;
 
-{$IFNDEF CODEINSIGHT}
-procedure TRSLogoutWorldSwitcher.__Setup();
-var i:Int32;
-begin
-  with Self do
-  begin
-    FName := 'Logout world switcher';
-    FStatic := True;
-    FBounds := [550, 206, 733, 464];
-  end;
-end;
-{$ENDIF}
+(*
 
-function TRSLogoutWorldSwitcher.isOpen(WaitTime: Integer = 0): Boolean;
-var
-  t: UInt64;
-  p: TPoint;
-begin
-  if (not Gametabs.IsOpen(tabLogout)) then
-    Exit(False);
-  if (WaitTime = 0) then
-    Exit(srl.FindText(p, 'Current world', 'UpChars07_s', Self.GetBounds()));
-
-  t := GetTickCount64() + WaitTime;
-  repeat
-    if (srl.FindText(p, 'Current world', 'UpChars07_s', Self.GetBounds())) then
-      Exit(True);
-    Wait(Random(50, 100));
-  until (GetTickCount64() > t);
-
-  Result := False;
-end;
-
-function TRSLogoutWorldSwitcher.ClickWorld(World: Integer): Boolean;
+*)
+function TRSLogout.ClickWorld(World: Integer): Boolean;
 
   // 302 to 2
   function ShortWorld(wo: Integer): Integer;
@@ -203,38 +262,32 @@ begin
   end;
 end;
 
-function TRSLogoutWorldSwitcher.SwitchToWorld(World: Integer): Boolean;
-var
-  opts: array of TChatOption;
-  t: UInt64;
+(*
+logout.SwitchToWorld
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.SwitchToWorld(World: Integer): Boolean;
+
+Jumps to the given world.
+*)
+function TRSLogout.SwitchToWorld(World: Integer): Boolean;
 begin
-  if (not Self.Open()) then
+  WriteLn(0); 
+  if (not Self.OpenWS()) then
     Exit(False);
+  WriteLn(1);  
   if (not ClickWorld(World)) then
     Exit(False);
-
+  WriteLn(2);
   Result := True;
   Chatbox.ClickOption(['Yes.'], Random(2000, 2500));
+  Chatbox.PleaseWait();
   Mainscreen.WaitWhileLoading();
+  Wait(srl.GaussRangeInt(150,500));
 end;
 
-function TRSLogoutWorldSwitcher.Open(): Boolean;
-begin
-  if (not Self.isOpen()) then
-    if (Logout.Open()) then
-      if (not Self.isOpen()) then
-        srl.MouseText('World Switcher', 'UpChars07_s', Self.getBounds(), mouse_Left);
-
-  Result := Self.isOpen(Random(3000, 4000));
-end;
-
-procedure TRSLogoutWorldSwitcher.Close();
-begin
-  Mouse.Click(Box(716, 207, 734, 225), mouse_Left);
-  Wait(Random(250, 500));
-end;
 
 begin
   logout.__Setup();
-  logout.WorldSwitcher.__Setup();
 end;

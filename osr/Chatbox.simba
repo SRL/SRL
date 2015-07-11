@@ -281,7 +281,7 @@ var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64() + Random(1500, 2000);
+  t := GetTickCount64() + Random(1500, 2500);
 
   while (not Result) and (t > GetTickCount64()) do
   begin
