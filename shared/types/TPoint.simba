@@ -40,9 +40,9 @@ begin
   Result := Distance(Self.x, Self.y, Mid.x, Mid.y) <= Radius;
 end;
 
-function TPoint.DistanceTo(P:TPoint): Extended;
+function TPoint.DistanceTo(Other:TPoint): Extended;
 begin
-  Result := Distance(Self.x, Self.y, P.x, P.y);
+  Result := Distance(Self.x, Self.y, other.x, other.y);
 end;
 
 function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint;
@@ -57,14 +57,12 @@ end;
 
 function TPoint.Equals(Other: TPoint): Boolean;
 begin
-  Result := (Self.X = Other.X) and (Self.Y = Other.Y);
+  Result := (self.X = other.X) and (self.Y = other.Y);
 end;
 
-function TPoint.AngleTo(pt2: TPoint): Extended;
+function TPoint.AngleBetween(Other: TPoint): Extended;
 begin
-  Result := ((ArcTan2((pt2.Y - self.Y), (pt2.X - self.X)) * (180.0 / Pi)) + 90.0);
-  if (Result < 0.0) then
-    Result := (Result + 360.0);
+  Result := Modulo(Degrees(ArcTan2(other.Y - self.Y, other.X - self.X)) - 90, 360);
 end;
 
 
