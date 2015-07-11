@@ -37,7 +37,7 @@
 
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
-  TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended);
+  TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
 
 type
   TMouse = record
@@ -153,7 +153,7 @@ begin
   Result := @Self.FOnMouseChangeDestEvent;
 end;
 
-procedure TMouse.SetOnChangeDestEven(const Event: TMouseChangeDestEvent);
+procedure TMouse.SetOnChangeDestEvent(const Event: TMouseChangeDestEvent);
 begin
   Self.FOnMouseChangeDestEvent := @Event;
 end;
@@ -189,7 +189,7 @@ var
   lastX,lastY,tempSpeed,W,TDist, xsR, ysR: Integer;
   t: UInt64;
   PDist,maxStep,dModA,dModB,nModA,nModB: extended;
-  Event: Boolean;
+  Event, doExit: Boolean;
 begin
   tempSpeed := Self.getSpeed();
   Event := Assigned(@FOnMouseChangeDestEvent);
@@ -216,7 +216,11 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnMouseChangeDestEvent(@Self, xe, ye);
+    begin
+      FOnMouseChangeDestEvent(@Self, xe, ye, doExit);
+      if (doExit) then
+        Exit;
+    end;
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -325,7 +329,7 @@ var
   lastX,lastY, tempSpeed,W,TDist, xsR, ysR: integer;
   t: UInt64;
   maxStep,rCnc: extended;
-  Event: Boolean;
+  Event, doExit: Boolean;
 begin
   tempSpeed := Self.getSpeed();
   Event := Assigned(@FOnMouseChangeDestEvent);
@@ -337,7 +341,11 @@ begin
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
 
     if (Event) then
-      FOnMouseChangeDestEvent(@Self, xe, ye);
+    begin
+      FOnMouseChangeDestEvent(@Self, xe, ye, doExit);
+      if (doExit) then
+        Exit;
+    end;
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);

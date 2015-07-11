@@ -13,6 +13,7 @@ type
     Internals: TSRLInternals;
     DisableLog, DisableDebug: Boolean;
     DefaultClientBounds: TBox;
+    OnLoginPlayer: procedure();
  end;
 
 var

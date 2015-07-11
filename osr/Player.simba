@@ -154,6 +154,8 @@ begin
   begin
     srl.Writeln('We are already logged in!');
     srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+    if (@srl.OnLoginPlayer <> nil) then
+      srl.OnLoginPlayer();
     Exit(True);
   end;
 
@@ -162,6 +164,8 @@ begin
       if (srl.isLoggedIn(Random(6000, 8000))) then
       begin
         srl.Writeln('TPlayer.Login(): Result = True (Already in lobby)', TDebug.FOOTER);
+        if (@srl.OnLoginPlayer <> nil) then
+          srl.OnLoginPlayer();
         Exit(True);
       end;
 
@@ -183,6 +187,8 @@ begin
         begin
           srl.Writeln('We have randomly logged in!');
           srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+          if (@srl.OnLoginPlayer <> nil) then
+            srl.OnLoginPlayer();
           Exit(True);
         end;
 
@@ -218,5 +224,7 @@ begin
         Result := True;
   end;
 
+  if (Result) and (@srl.OnLoginPlayer <> nil) then
+    srl.OnLoginPlayer();
   srl.Writeln('TPlayer.Login(): Result = ' + BoolToStr(Result), TDebug.FOOTER);
 end;

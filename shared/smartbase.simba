@@ -13,7 +13,7 @@ type
     Hook_After_Reload: procedure();
   end;
 
-function TSmartBase.getHWND(): PtrUInt;
+function TSmartBase.GetHWND(): PtrUInt;
 var
   a: TSysProcArr := Client.getIOManager().GetProcesses();
   c: TChildWindowArr;
@@ -34,7 +34,7 @@ begin
   srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd', TDebug.ERROR);
 end;
 
-procedure TSmartBase.setDebug(const Enable: Boolean);
+procedure TSmartBase.SetDebug(const Enable: Boolean);
 begin
   SmartSetDebug(Self.Target, Enable);
 
@@ -60,12 +60,12 @@ begin
     Result := PtrUInt(SmartImageArray(Self.Target));
 end;
 
-procedure TSmartBase.setEnabled(const Enable: Boolean);
+procedure TSmartBase.SetEnabled(const Enable: Boolean);
 begin
   SmartSetEnabled(Self.Target, Enable);
 end;
 
-function TSmartBase.getEnabled(): Boolean;
+function TSmartBase.GetEnabled(): Boolean;
 begin
   Result := SmartEnabled(Self.Target);
 end;
@@ -176,7 +176,7 @@ var
   idx: Integer = -1;
 begin
   try
-    idx := SetEIOSTarget('libsmartremote', intToStr(Self.PID));
+    idx := SetEIOSTarget('libsmartremote', IntToStr(Self.PID));
   except
     srl.WriteFmt('Failed to set libsmartremote(%d) as our target', [Self.PID]);
     idx := -1;

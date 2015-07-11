@@ -278,3 +278,10 @@ begin
 
   Result := @Self.FPlayers[c];
 end;
+
+function TPlayerArray.Login(idx: Integer = -1): Boolean;
+begin
+  if (idx = -1) then
+    idx := FCurrent;
+  Result := FPlayers[idx].Login();
+end;

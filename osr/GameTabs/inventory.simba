@@ -358,6 +358,31 @@ begin
     Result := a[Low(a)];
 end;
 
+function TRSInventory.FindItems(const bmp: Integer; Tolerance: Byte; MaxToFind: Byte = 28): TIntegerArray; overload;
+var
+  i: Integer;
+  p: TPoint;
+begin
+  for i := Self.LowSlot to Self.HighSlot do
+    if (FindBitmapToleranceIn(bmp, p.x, p.y, Self.GetSlotBox(i), Tolerance)) then
+    begin
+      Result += i;
+      if (Length(Result) = MaxToFind) then
+        Break;
+    end;
+end;
+
+function TRSInventory.FindItem(const bmp: Integer; Tolerance: Byte): Integer; overload;
+var
+  a: TIntegerArray;
+begin
+  Result := -1; // not found
+  a := Self.FindItems(bmp, Tolerance, 1);
+  if (Length(a) > 0) then
+    Result := a[Low(a)];
+end;
+
+
 function TRSInventory.Count(): Byte;
 begin
   Result := Length(Self.GetUsedSlots());

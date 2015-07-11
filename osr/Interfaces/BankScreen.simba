@@ -116,7 +116,7 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray): Boolean;
+function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray; MinWidth: Integer = 10; MinHeight: Integer = 10): Boolean;
 const
   COLOR_SKIN: TColorEx = [5603764, 18, [2, [0.02, 0.70]]];
 var
@@ -148,7 +148,7 @@ begin
   for i := 0 to High(ATPA) do
   begin
     TPA := MinAreaRectEx(ATPA[i], W, H);
-    if (W >= 10) and (H >= 10) then
+    if (W >= MinWidth) and (H >= MinHeight) then
       Points += ATPA[i];
   end;
 
@@ -496,7 +496,7 @@ var
   b:TBox;
   options:TOptionArray;
 const
-  TEXT_AREA:TBox = [200,394,450,412];
+  TEXT_AREA:TBox = [200,393,450,412];
 begin
   if (not Self.IsOpen()) then
     Exit(False);

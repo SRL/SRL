@@ -825,22 +825,30 @@ begin
     self.drawBox(box, false, boxColor);
 end;
 
-procedure TMufasaBitmap.DrawTPARainbow(TPA: TPointArray);
+procedure TMufasaBitmap.DrawTPARainbow(var TPA: TPointArray);
 var
-  i, h, x, w: Integer;
+  i, j, h, x, w, hei: Integer;
   fraction, m: Double;
   r, g, b, mt: Byte;
   ptr: PRGB32;
+  new: TPointArray;
 begin
   h := High(TPA);
   if (h < 0) then
     Exit;
 
+  j := 0;
+  SetLength(new, h+1);
+
   w := Self.getWidth();
+  hei := Self.getHeight();
   ptr := Self.getData();
 
   for i := 0 to High(TPA) do
   begin
+    if (TPA[i].X < 0) or (TPA[i].Y < 0) or (TPA[i].X >= w) or (TPA[i].Y >= hei) then
+      Continue;
+    new[Inc(j)-1] := TPA[i];
     fraction := i / h;
     if (fraction <= 0) then
       m := 0
@@ -890,6 +898,9 @@ begin
        end;
     end;
   end;
+
+  SetLength(new, j);
+  TPA := new;
 end;
 
 

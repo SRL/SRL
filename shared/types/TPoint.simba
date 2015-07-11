@@ -60,4 +60,11 @@ begin
   Result := (Self.X = Other.X) and (Self.Y = Other.Y);
 end;
 
+function TPoint.AngleTo(pt2: TPoint): Extended;
+begin
+  Result := ((ArcTan2((pt2.Y - self.Y), (pt2.X - self.X)) * (180.0 / Pi)) + 90.0);
+  if (Result < 0.0) then
+    Result := (Result + 360.0);
+end;
+
 

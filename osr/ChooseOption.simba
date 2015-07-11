@@ -331,7 +331,7 @@ begin
         False:
           if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str))<>0 then
           begin
-            Mouse.Click(Choices[i].bounds, mouse_left);
+            Mouse.Click(Choices[i].bounds, mouseAction);
             Exit(True);
           end;
       end;

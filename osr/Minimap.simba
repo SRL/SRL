@@ -250,7 +250,7 @@ begin
   until (GetTickCount64() > TimeOut);
 end;
 
-procedure TMinimap.WaitFlag(const Dist: UInt32 = 0);
+procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
 var
   TimeOut: UInt64;
   d, LastDist, SameDists: UInt32;
@@ -271,9 +271,9 @@ begin
     else
       SameDists := 0;
 
-    if (SameDists >= 60) then
+    if (ExitIfNotMoving) and (SameDists >= 20) then
     begin
-      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 60 loops, exiting.. ', TDebug.WARNING);
+      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 20 loops, exiting.. ', TDebug.WARNING);
       Exit();
     end;
 
@@ -360,9 +360,9 @@ begin
     Result := Degrees(Result);
 end;
 
-function TMinimap.MouseSetCompassAngle(Angle: Extended): Boolean;
+function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
 
-  procedure MoveRotate(xs, ys, xe, ye, Angle: Extended);
+  procedure MoveRotate(xs, ys, xe, ye, Angle, Tolerance: Extended);
   const
     sqrt2 := sqrt(2);
     sqrt3 := sqrt(3);
@@ -370,15 +370,20 @@ function TMinimap.MouseSetCompassAngle(Angle: Extended): Boolean;
   var
     veloX, veloY, windX, windY, veloMag, dist, randomDist, lastDist, D, compassDist: Extended;
     TargetArea, Wind, Gravity: Extended;
-    lastX, lastY, Speed, W, TDist, rnd_xs, rnd_ys, maxDist, rand: Integer;
+    lastX, lastY, Speed, W, TDist, rnd_xs, rnd_ys, maxDist, rand, rand2: Integer;
     maxStep, rCnc: Extended;
     t: UInt64;
+    oldSpeed: Integer;
   begin
+    oldSpeed := Mouse.GetSpeed();
+    Mouse.SetSpeed(Random(20, 22));
+
     Speed := Mouse.GetSpeed();
     Gravity := Mouse.GetGravity(mouse_Human);
     Wind := Mouse.GetWind(mouse_Human);
     TargetArea := 10.0 * ((Random(Speed) / 2.0 + Speed) / 10.0);
-    Rand := Random(25, 40);
+    rand := Random(25, 40);
+    rand2 := Random(7, 12);
     MaxDist := 15;
     TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
     t := GetTickCount64() + Random(7000, 8500);
@@ -449,27 +454,41 @@ function TMinimap.MouseSetCompassAngle(Angle: Extended): Boolean;
       Wait(W);
       LastDist := dist;
       CompassDist := Abs(DeltaAngle(Minimap.GetCompassAngle(), Angle));
-
-      if (CompassDist < Rand) then
-        maxDist := Random(6, 9) // Small steps now
-      else
+      if ((CompassDist < Rand) or (CompassDist < Rand2)) then
+      begin
+        if (CompassDist < Rand) then
+          maxDist := Random(5, 8);
+        if (CompassDist < Rand2) then
+          maxDist := Random(2, 4);
+      end else
         maxDist := 15; // Default
 
-      if (CompassDist <= 5) then
+      if (CompassDist <= Tolerance) then
         Break;
     until (Hypot(xs - xe, ys - ye) < 1);
 
     Mouse.Release(mouse_Middle);
-    Wait(Random(90, 220));
+    Wait(Random(150, 250));
+
+    Mouse.setSpeed(oldSpeed);
   end;
+
+const
+  MIN_Y_DROP = 105;
+  MIN_X_MOVE = 130;
+
+  RIGHT_START: TBox = [0, 0, 150, 380];
+  RIGHT_END_START_X = [620, 675];
+
+  LEFT_START: TBox = [600, 0, 765, 380];
+  LEFT_END_START_X = [0, 140];
 
 var
   CurrentAngle, AngleDistance: Extended;
   CompassDist: Extended;
   mp, p: TPoint;
-  Left: Boolean;
+  moveRight: Boolean;
   t: UInt64;
-  old: Integer;
 begin
   Result := False;
 
@@ -480,52 +499,49 @@ begin
     Exit(True);
 
   t := GetTickCount64() + Random(5000, 7000);
-  while (CompassDist > 5) and (t > GetTickCount64()) do
+  while (CompassDist > Tolerance) and (t > GetTickCount64()) do
   begin
     AngleDistance := CurrentAngle - Angle;
-    Left := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
+    moveRight := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
     mp := Mouse.GetPosition();
 
-    if (not Left) then { Move the mouse left to right }
+    if (moveRight) then
     begin
-      if (not PointInBox(mp, GetClientBounds())) then  { We need to start the click on the client }
-        Mouse.Move(Box(625, 0, 764, 400),, False);
-      if ((mp.x - 100) > 120) and (mp.y < 400) then { Enough space to move left }
-        { nothing }
-      else begin{ We need to move our mouse to the right side }
-        Mouse.Move(Box(625, 0, 764, 400),, False);
-        mp := Mouse.GetPosition();
-      end;
+      if (not PointInBox(mp, GetClientBounds())) then
+        Mouse.Move(RIGHT_START, False, False);
 
-      { Create a point on the left side of the screen, under the current mouse pos }
-      p.x := Random(0, 95);
-      p.y := Random(mp.y + 65, 503);
-    end else
-    begin { Move the mouse right to left }
-      if (not PointInBox(mp, GetClientBounds())) then { We need to start the click on the client }
-        Mouse.Move(Box(0, 0, 125, 400))
-      else if ((mp.x + 100) < 640) and (mp.y < 400) then { Enough space to move right }
-        { nothing }
-      else begin { We need to move our mouse to the left side }
-        Mouse.Move(Box(0, 0, 125, 400),, False);
-        mp := Mouse.GetPosition();
-      end;
+      if ((mp.x + MIN_X_MOVE) < RIGHT_END_START_X[0]) then
+        { No need to move mouse! }
+      else
+        Mouse.Move(RIGHT_START, False, False);
 
-      { Create a point on the right side of the screern, under the current mouse pos }
-      p.x := Random(660, 764);
-      p.y := Random(mp.y + 65, 503);
+      mp := Mouse.GetPosition();
+      p.x := Random(RIGHT_END_START_X[0], RIGHT_END_START_X[1]);
+      p.y := Random(mp.y + MIN_Y_DROP, GetClientBounds().Y2);
+    end else // moveLeft
+    begin
+      if (not PointInBox(mp, GetClientBounds())) then
+        Mouse.Move(LEFT_START, False, False);
+
+      if ((mp.x - MIN_X_MOVE) > LEFT_END_START_X[1]) then
+        { No need to move mouse! }
+      else
+        Mouse.Move(LEFT_START, False, False);
+
+      mp := Mouse.GetPosition();
+      p.x := Random(LEFT_END_START_X[0], LEFT_END_START_X[1]);
+      p.y := Random(mp.y + MIN_Y_DROP, GetClientBounds().Y2);
     end;
 
-    MoveRotate(mp.x, mp.y, p.x, p.y, Angle);
-    Wait(Random(40, 140));
+    MoveRotate(mp.x, mp.y, p.x, p.y, Angle, Tolerance);
     CurrentAngle := Self.GetCompassAngle();
     CompassDist := Abs(DeltaAngle(CurrentAngle, Angle));
   end;
 
-  Result := CompassDist < 5;
+  Result := CompassDist < Tolerance;
 end;
 
-function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 3): Boolean;
+function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 5): Boolean;
 
   function Compass_Distance(Angle, Target: Extended): Extended;
   begin
@@ -563,7 +579,7 @@ var
   Left: Boolean;
 begin
   if (UseMouse) then
-    Exit(Self.MouseSetCompassAngle(Angle));
+    Exit(Self.MouseSetCompassAngle(Angle, Tolerance));
 
   Angle := FixD(Angle);
   CurrentAngle := Self.GetCompassAngle();
