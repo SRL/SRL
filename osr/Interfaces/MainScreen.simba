@@ -382,6 +382,15 @@ begin
       Wait(Random(200, 500));
 end;
 
+procedure TRSMainscreen.FacePoint(pt: TPoint; rand: Integer = 20);
+var
+  a: Integer;
+begin
+  a := Round(Self.getMiddle().AngleBetween(pt));
+  a := Round(FixD(Random(a - rand, a + rand)));
+  Minimap.SetCompassAngle(a, True, 7);
+end;
+
 begin
   MainScreen.__Setup();
 end;

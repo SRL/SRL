@@ -340,10 +340,12 @@ var
   M:TPoint := Self.CompassInfo.Middle;
   TPA:TPointArray;
 begin
-  if not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 20) then
+  if not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 25) then
      Exit(srl.Writeln('Failed to find the `N` in the compass', 0.00, '', TDebug.WARNING));
 
   FilterPointsDist(TPA, 8,15, M.x,M.y);
+  if (Length(TPA) = 0) then
+    Exit(srl.Writeln('Failed to find the `N` in the compass (after filter)', 0.00, '', TDebug.WARNING));
   north := MiddleTPA(SplitTPA(TPA,3)[0]);
   south := RotatePoint(north,PI, M.x,M.y);
   if not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25) then
