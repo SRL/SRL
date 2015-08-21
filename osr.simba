@@ -3,11 +3,7 @@
 {$include_once shared.simba}
 
 begin
-  with (srl) do
-  begin
-    GameVersion := 'OSR';
-    DefaultClientBounds := [0, 0, 764, 502];
-  end;
+  srl.DefaultClientBounds := [0, 0, 764, 502];
 end;
 
 {$include_once osr/Misc.simba}
@@ -22,18 +18,21 @@ end;
 {$include_once osr/LoginScreen.simba}
 {$include_once osr/Client.simba}
 {$include_once osr/Player.simba}
-{$include_once osr/Players.Simba}
+{$include_once osr/Players.simba}
 {$include_once osr/Interfaces/BankScreen.simba}
+{$include_once osr/XPBar.simba}
 
 {$IFDEF SMART}
   {$include_once shared/smartbase.simba}
   {$include_once osr/smart.simba}
 {$ENDIF}
 
-procedure TSRL.Setup;
+procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]); override;
 begin
-  srl.WriteLn('Setting up SRL for OSR');
-  srl.Writeln('Waiting for client to load...');
+  inherited(Options);
+
+  Self.WriteLn('Setting up SRL for OSR');
+  Self.Writeln('Waiting for client to load...');
 
   {$IFDEF SMART}
   if (Players.GetCount() > 0) then
@@ -44,9 +43,9 @@ begin
   {$ENDIF}
 
   if (not Self.isClientReady(60000 * 3)) then
-    srl.Writeln('Client failed to load... make sure you are in the correct graphic settings!', TDebug.FATAL)
+    Self.Writeln('Client failed to become ready... make sure you are in the correct graphic settings!', dtFatal)
   else
-    srl.Writeln('Client succesfully loaded');
+    Self.Writeln('Client ready!');
 end;
 
 

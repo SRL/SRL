@@ -117,11 +117,17 @@ end;
 procedure TBox.LimitTo(b: TBox);
 begin
   Self.Normalize();
+  b.Normalize();
 
-  if (Self.X1 < b.X1) then Self.X1 := b.X1;
-  if (Self.X2 > b.X2) then Self.X2 := b.X2;
-  if (Self.Y1 < b.Y1) then Self.Y1 := b.Y1;
-  if (Self.Y2 > b.Y2) then Self.Y2 := b.Y2;
+  if (self.x1 < b.x1) then self.x1 := b.x1;
+  if (self.x1 > b.x2) then self.x1 := b.x2;
+  if (self.x2 < b.x1) then self.x2 := b.x1;
+  if (self.x2 > b.x2) then self.x2 := b.x2;
+
+  if (self.y1 < b.y1) then self.y1 := b.y1;
+  if (self.y1 > b.y2) then self.y1 := b.y2;
+  if (self.y2 < b.y1) then self.y2 := b.y1;
+  if (self.y2 > b.y2) then self.y2 := b.y2;
 end;
 
 function TBox.Partition(Rows, Cols: Int32; SizeMod:Int32=0): TBoxArray;

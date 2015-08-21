@@ -31,7 +31,7 @@ begin
           Exit(c[j].Handle);
     end;
 
-  srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd', TDebug.ERROR);
+  srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd');
 end;
 
 procedure TSmartBase.SetDebug(const Enable: Boolean);
@@ -127,7 +127,7 @@ begin
     CurrentPath := CurrentPath + 'Java\';
   end else
     if (Dir <> 'Z') then
-      Result := Self.LocateJavaPath(Res, x86, chr(ord(Dir) + 1), True)
+      Result := Self.LocateJavaPath(Res, x86, chr(ord(Dir) + 1), True);
 
   if (Result) then
     Exit();
@@ -188,11 +188,11 @@ end;
 function TSmartBase.CreateClient(): Boolean;
 begin
   Result := True;
-  srl.Writeln(Self.Name + '.CreateClient()', TDebug.HEADER);
+  srl.Writeln(Self.Name + '.CreateClient()', dtHeader);
 
   if (@Self.GetParams <> nil) then
     if (not Self.GetParams()) then
-      Exit(srl.Writeln('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
+      Exit(srl.Writeln('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False'));
 
   with (Self.Parameters) do
   begin
@@ -217,17 +217,17 @@ begin
   end;
 
   if (Self.Target = 0) then
-    Exit(srl.Writeln('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
+    Exit(srl.Writeln('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False'));
 
   Self.PID := SmartGetClientPID(Self.Target);
   if (not Self.SetAsTarget()) then
   begin
     SmartFreeClient(Self.Target);
-    Exit(srl.Writeln('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False', TDebug.ERROR));
+    Exit(srl.Writeln('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False'));
   end;
 
-  srl.Writeln('Succesfully created a SMART client, PID = ' + toString(Self.PID), TDebug.SUB);
-  srl.Writeln(Self.Name + '.CreateClient(): Result = True', TDebug.FOOTER);
+  srl.Writeln('Succesfully created a SMART client, PID = ' + toString(Self.PID));
+  srl.Writeln(Self.Name + '.CreateClient(): Result = True', dtFooter);
 end;
 
 function TSmartBase.PairToExisting(): Boolean;
@@ -236,7 +236,7 @@ function TSmartBase.PairToExisting(): Boolean;
   var
     i: Integer;
   begin
-    for i := 0 to SmartGetClients(True) do
+    for i := 0 to SmartGetClients(True) - 1 do
       Result += SmartGetAvailablePID(i);
   end;
 
@@ -251,7 +251,7 @@ begin
   if (Length(Pids) = 0) then
     Exit();
 
-  srl.Writeln(Self.Name + '.PairToExisting()', TDebug.HEADER);
+  srl.Writeln(Self.Name + '.PairToExisting()', dtHeader);
   srl.WriteFmt('Free clients: %s', [toString(Pids)]);
 
   for i := 0 to High(Pids) do
@@ -269,16 +269,17 @@ begin
       if (Self.SetAsTarget()) then
       begin
         Self.Target := tmp;
-        Exit(srl.WriteFmtEx('Succesfully paired to existing client; SMART[%d]', [Self.PID],
-                            True, Self.Name + '.PairToExisting(): Result = True'));
+        srl.WriteFmt('Succesfully paired to existing client; SMART[%d]', [Self.PID]);
+        srl.WriteLn(Self.Name + '.PairToExisting(): Result = True', dtFooter);
+        Exit(True);
       end;
     end else begin
-      srl.WriteFmt('Failed to pair to SMART[%d]', [Pids[i]], TDebug.ERROR);
+      srl.WriteFmt('Failed to pair to SMART[%d]', [Pids[i]]);
       SmartFreeClient(tmp);
     end;
   end;
 
-  srl.Writeln(Self.Name + '.PairToExisting(): Result = False', TDebug.FOOTER);
+  srl.Writeln(Self.Name + '.PairToExisting(): Result = False', dtFooter);
 end;
 
 function TSmartBase.Reload(): Boolean;
@@ -294,7 +295,7 @@ begin
   Result := False;
   Self.Name := GetGlobalName(@Self);
 
-  srl.Writeln(Self.Name + '.Init()', TDebug.HEADER);
+  srl.Writeln(Self.Name + '.Init()', dtHeader);
 
   if (Self.InitAttempts = 0) then
     Self.InitAttempts := 1;
@@ -304,8 +305,11 @@ begin
     Inc(i);
 
     if (i > Self.InitAttempts) then
-      Exit(srl.WriteFmtEx('Reached max(%d) init attempts', [Self.InitAttempts], False,
-                          Self.Name + '.Init(): Result = False', TDebug.ERROR));
+    begin
+      srl.WriteFmt('Reached max(%d) init attempts', [Self.InitAttempts]);
+      srl.WriteLn(Self.Name + '.Init(): Result = False');
+      Exit(False);
+    end;
 
     if (not Self.ForceSpawn) then
     begin
@@ -323,9 +327,11 @@ begin
     Self.setEnabled(True);
 
   if (Self.EnableDrawing) then
-    Self.setDebug(True);
+    Self.setDebug(True)
+  else
+    Self.SetDebug(False);
 
-  srl.Writeln(Self.Name + '.Init(): Result = True', TDebug.FOOTER);
+  srl.Writeln(Self.Name + '.Init(): Result = True', dtFooter);
 end;
 
 procedure TSmartBase.Free();

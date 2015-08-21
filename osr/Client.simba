@@ -1,9 +1,19 @@
-function TSRL.isLoggedIn(WaitTime: Integer = 0): Boolean;  {fix wait time}
+function TSRL.isLoggedIn(): Boolean;
 begin
-  if (WaitTime = 0) then
-    Result := GetColor(426, 486) = $FFFFFF
-  else
-    Result := Self.WaitColor($FFFFFF, [426, 486], WaitTime);
+  Result := GetColor(426, 486) = $FFFFFF;
+end;
+
+function TSRL.isLoggedIn(WaitTime: Integer): Boolean; overload;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount64 + WaitTime;
+  repeat
+    if (Self.isLoggedIn()) then
+      Exit(True);
+    Wait(Random(50, 200));
+  until GetTickCount64() > t;
 end;
 
 function TSRL.isClientReady(WaitTime: Integer = 0): Boolean;

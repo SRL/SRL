@@ -105,7 +105,7 @@ begin
   if (InRange(FCurrent, Low(FPlayers), High(FPlayers))) then
     Result := @FPlayers[FCurrent]
   else
-    srl.Writeln('No current player set', TDebug.FATAL);
+    srl.Writeln('Players.GetCurrent: No current player set', dtFatal);
 end;
 
 (*
@@ -279,9 +279,18 @@ begin
   Result := @Self.FPlayers[c];
 end;
 
-function TPlayerArray.Login(idx: Integer = -1): Boolean;
+(*
+TPlayerArray.LoginCurrent
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.LoginCurrent(): Boolean;
+
+Logs in the currently active player.
+
+*)
+function TPlayerArray.LoginCurrent(): Boolean;
 begin
-  if (idx = -1) then
-    idx := FCurrent;
-  Result := FPlayers[idx].Login();
+  Result := FPlayers[FCurrent].Login();
 end;

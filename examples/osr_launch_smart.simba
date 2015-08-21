@@ -1,0 +1,27 @@
+{$DEFINE SMART} // Enable smart
+{$I SRL/OSR.simba} // Include SRL OSR
+
+procedure SetupPlayer;
+begin
+  with Players.New^ do
+  begin
+    LoginName := 'Login';
+    Password := 'Password';
+    isActive := True;
+    World := 302;
+  end;
+end;
+
+begin
+  SetupPlayer; // Setup our player
+
+  Smart.EnableDrawing := True; // Enable smart drawing
+  srl.Setup([srl); // Setup SRL
+
+  if (Players.LoginCurrent) then // Login our currently active player - which we just set!
+    srl.Writeln('We logged our player in!')
+  else
+    srl.Writeln('Failed to log in! :(');
+
+  Smart.Image.DrawBox(Box(10, 10, 90, 90), True, clWhite); // Draw a random box on smart since we enabled smart drawing
+end.

@@ -51,7 +51,7 @@ type
     Proc: procedure() of object;
  end;
 var
-  Responses: array [0..6] of TResponse;
+  Responses: array [0..7] of TResponse;
   i: Integer;
 begin
   Result := False;
@@ -61,7 +61,11 @@ begin
                 ['Please enter your username/email address.', 5, 1000, nil],
                 ['You are standing in a members-only area.', 0, 1000, @Self._SwitchToMembers],
                 ['Your account is already logged in', 5, 60000, nil],
-                ['Login server offline.', 15, 60000 * 2, nil]];
+                ['Login server offline.', 15, 60000 * 2, nil],
+                ['Connection timed out.', 15, 60000, nil]];
+
+  if (@srl.OnLoginResponse <> nil) and (srl.OnLoginResponse(Response)) then
+    Exit(True);
 
   Inc(Attempts);
 
@@ -85,7 +89,7 @@ begin
           Exit(True);
       end;
 
-  srl.WriteFmt('Response: "%s" isn''t supported', [Response], TDebug.FATAL);
+  srl.WriteFmt('Response: "%s" isn''t supported', [Response], dtFatal);
 end;
 
 function TPlayer.LoginToLobby(): Boolean;
@@ -94,7 +98,7 @@ var
   Attempts, LoginAttempts: UInt32;
   TimeOut: UInt64;
 begin
-  srl.Writeln('TPlayer.LoginToLobby()', TDebug.HEADER);
+  srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
   Result := False;
 
   if (srl.isLoggedIn()) then
@@ -132,28 +136,28 @@ begin
         if (not Self._HandleResponse(Response, Attempts)) then
           Exit(srl.Writeln('Failed to handle login response', False, 'TPlayer.LoginToLobby(): Result = False'));
     end else begin
-      srl.Writeln('Failed to enter login info', TDebug.WARNING);
+      srl.Writeln('Failed to enter login info');
       Inc(LoginAttempts);
     end;
   end;
 
   if (LoginAttempts >= 10) then
-    srl.Writeln('Max login attempts reached', TDebug.WARNING);
+    srl.Writeln('Max login attempts reached');
 
-  srl.Writeln('TPlayer.LoginToLobby(): Result = False', TDebug.FOOTER);
+  srl.Writeln('TPlayer.LoginToLobby(): Result = False', dtFooter);
 end;
 
 function TPlayer.Login(): Boolean;
 var
   Tries: Integer = 0;
 begin
-  srl.Writeln('TPlayer.Login()', TDebug.HEADER);
+  srl.Writeln('TPlayer.Login()', dtHeader);
   Result := False;
 
   if (srl.isLoggedIn()) then
   begin
     srl.Writeln('We are already logged in!');
-    srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+    srl.Writeln('TPlayer.Login(): Result = True', dtFooter);
     if (@srl.OnLoginPlayer <> nil) then
       srl.OnLoginPlayer();
     Exit(True);
@@ -163,7 +167,7 @@ begin
     if (Lobby.Play()) then
       if (srl.isLoggedIn(Random(6000, 8000))) then
       begin
-        srl.Writeln('TPlayer.Login(): Result = True (Already in lobby)', TDebug.FOOTER);
+        srl.Writeln('TPlayer.Login(): Result = True (Already in lobby)', dtFooter);
         if (@srl.OnLoginPlayer <> nil) then
           srl.OnLoginPlayer();
         Exit(True);
@@ -186,7 +190,7 @@ begin
         if (srl.isLoggedIn()) then
         begin
           srl.Writeln('We have randomly logged in!');
-          srl.Writeln('TPlayer.Login(): Result = True', TDebug.FOOTER);
+          srl.Writeln('TPlayer.Login(): Result = True', dtFooter);
           if (@srl.OnLoginPlayer <> nil) then
             srl.OnLoginPlayer();
           Exit(True);
@@ -226,5 +230,5 @@ begin
 
   if (Result) and (@srl.OnLoginPlayer <> nil) then
     srl.OnLoginPlayer();
-  srl.Writeln('TPlayer.Login(): Result = ' + BoolToStr(Result), TDebug.FOOTER);
+  srl.Writeln('TPlayer.Login(): Result = ' + BoolToStr(Result), dtFooter);
 end;

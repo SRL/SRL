@@ -382,13 +382,34 @@ begin
       Wait(Random(200, 500));
 end;
 
-procedure TRSMainscreen.FacePoint(pt: TPoint; rand: Integer = 20);
+procedure TRSMainScreen.FacePoint(pt: TPoint; rand: Integer = 20);
 var
   a: Integer;
 begin
   a := Round(Self.getMiddle().AngleBetween(pt));
   a := Round(FixD(Random(a - rand, a + rand)));
-  Minimap.SetCompassAngle(a, True, 7);
+  Minimap.SetCompassAngle(a, True, Random(7, 10));
+end;
+
+function TRSMainScreen.RotateFind(func: function(): Boolean; Tries: Integer; UseMouse: Boolean = True): Boolean;
+var
+  Left: Boolean;
+begin
+  if (Tries <= 0) then
+    Exit(False);
+
+  Left := Random(2) = 0;
+  for 0 to Tries do
+    if (func()) then
+      Exit(True)
+    else begin
+      if (Left) then
+        Minimap.SetCompassAngle(Minimap.GetCompassAngle() + Random(60, 190), UseMouse, 8)
+      else
+        Minimap.SetCompassAngle(Minimap.GetCompassAngle() - Random(60, 190), UseMouse, 8);
+      Wait(Random(950, 1400));
+      Minimap.WaitFlag;
+    end;
 end;
 
 begin

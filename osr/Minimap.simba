@@ -22,6 +22,7 @@ type
     Radius: Byte;
  end;
 
+type
   TMinimap = record (TInterfaceBase)
     CompassInfo: TMMCompassInfo;
     OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
@@ -175,10 +176,6 @@ begin
       Result := not Self.isRunEnabled(Random(250, 500));
     end;
   end;
-
-  if (not Result) then
-    srl.WriteFmt(Self.getName() + '.ToggleRun(): Failed to %s run',
-                [BoolToStr(Enable, 'enable', 'disable')], TDebug.ERROR);
 end;
 
 function TMinimap.FindFlag(out p: TPoint): Boolean;
@@ -272,10 +269,7 @@ begin
       SameDists := 0;
 
     if (ExitIfNotMoving) and (SameDists >= 20) then
-    begin
-      srl.Writeln(Self.getName() + '.WaitFlag(): Distance between flag hasn''t changed in 20 loops, exiting.. ', TDebug.WARNING);
       Exit();
-    end;
 
     LastDist := d;
     Wait(Random(50, 100));
@@ -340,25 +334,25 @@ var
   M:TPoint := Self.CompassInfo.Middle;
   TPA:TPointArray;
 begin
-  if not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 25) then
-     Exit(srl.Writeln('Failed to find the `N` in the compass', 0.00, '', TDebug.WARNING));
+  if (not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 25)) then
+    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find the `N` in the compass', 0.00));
 
-  FilterPointsDist(TPA, 8,15, M.x,M.y);
+  FilterPointsDist(TPA, 8, 15, M.x, M.y);
   if (Length(TPA) = 0) then
-    Exit(srl.Writeln('Failed to find the `N` in the compass (after filter)', 0.00, '', TDebug.WARNING));
+    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find the `N` in the compass (after filter)', 0.00));
   north := MiddleTPA(SplitTPA(TPA,3)[0]);
-  south := RotatePoint(north,PI, M.x,M.y);
-  if not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25) then
-    Exit(srl.Writeln('Failed to find red compass dots color', 0.00, '', TDebug.WARNING));
+  south := RotatePoint(north, PI, M.x, M.y);
+  if (not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25)) then
+    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find red compass dots color', 0.00));
   
   FilterPointsDist(TPA, 0,6, south.x,south.y);
   SortTPAFrom(TPA, M);
   if (Length(TPA) > 0) then
     Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2))
   else
-    srl.Writeln('Failed to find compass dial color', TDebug.WARNING);
+    srl.Writeln('Minimap.GetCompassAngle: Failed to find compass dial color');
 
-  if AsDegrees then
+  if (AsDegrees) then
     Result := Degrees(Result);
 end;
 
@@ -604,7 +598,7 @@ begin
   end;
 
   if (GetTickCount64() >= TimeOut) then
-    srl.Writeln('TRSMinimap.SetCompassAngle(): Setting angle timed out', TDebug.WARNING);
+    srl.Writeln('Minimap.SetCompassAngle(): Setting angle timed out');
 
   KeyUp(VK_LEFT);
   KeyUp(VK_RIGHT);
@@ -746,7 +740,6 @@ begin
   Self.FilterPoints(TPA);
   Result := Round((Length(TPA) / Max) * 100);
 end;
-
 
 begin
   Minimap.__Setup();

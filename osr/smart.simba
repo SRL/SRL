@@ -17,7 +17,7 @@ begin
 
     if (Self.World = -1) then
     begin
-      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2', TDebug.WARNING);
+      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2');
       Self.World := 2;
     end;
 
@@ -36,7 +36,7 @@ begin
       if (not Self.LocateJavaPath(Self.JavaPath, False)) then
       begin
         srl.Writeln('TSmart.Init() Failed to find java path, if you can''t enter a graphics mode set Smart.JavaPath to your java.exe' + LineEnding +
-                    'Make sure you have no empty java directorys, Looked in: ' + Self.JavaPath, TDebug.WARNING);
+                    'Make sure you have no empty java directorys, Looked in: ' + Self.JavaPath);
         Self.JavaPath := '';
       end;
   {$ENDIF}

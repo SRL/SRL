@@ -223,6 +223,9 @@ begin
   if (Clear[_LOGIN_BOX_LOGIN]) then
     while (CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) > 5) and (Timeout > GetTickCount64()) do
     begin
+      if (not Self.isLoginOpen) then
+        Exit(False);
+
       Keyboard.PressKey(VK_BACK);
       Wait(Random(30, 120));
     end;
@@ -236,6 +239,9 @@ begin
   if (Clear[_LOGIN_BOX_PASSWORD]) then
     while (CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) > 5) and (Timeout > GetTickCount64()) do
     begin
+      if (not Self.isLoginOpen) then
+        Exit(False);
+
       Keyboard.PressKey(VK_BACK);
       Wait(Random(30, 120));
     end;
@@ -361,7 +367,7 @@ begin
     Wait(Random(300, 600));
   end;
 
-  srl.Writeln('No response found: Timed out', TDebug.WARNING);
+  srl.Writeln('LoginScreen.WaitResponse: No response found - Timed out');
 end;
 
 function TRSLoginScreen.GetCurrentWorld(): Integer;

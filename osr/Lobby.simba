@@ -35,7 +35,7 @@ var
   p: TPoint;
 begin
   if (not Self.isOpen(Random(800, 1000))) then
-    Exit(srl.Writeln('TRSLobby.Play(): Lobby screen isn''t open', False));
+    Exit(srl.Writeln('Lobby.Play(): Lobby screen isn''t open', False));
 
   Result := srl.FindText(p, 'CLICK HERE TO PLAY', 'UpChars07_s', clWhite, 0, Self.getBounds());
 
@@ -50,7 +50,7 @@ begin
     Wait(Random(500, 800));
   end;
 
-  srl.Writeln('TRSLobby.Play(): Result = ' + BoolToStr(Result), TDebug.SUB);
+  srl.Writeln('Lobby.Play(): Result = ' + BoolToStr(Result));
 end;
 
 begin
