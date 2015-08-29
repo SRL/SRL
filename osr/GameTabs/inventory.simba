@@ -169,17 +169,20 @@ inventory.MouseSlot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.MouseSlot(idx:Int32): Int32;
+  procedure TRSInventory.MouseSlot(idx:Int32; btn: Integer = mouse_Move);
 
 Moves the moise over the given slot-index.
 
 .. note:: by slacky
 *)
-function TRSInventory.MouseSlot(idx:Int32): Int32;
+procedure TRSInventory.MouseSlot(idx:Int32; btn: Integer = mouse_Move);
 begin
   if self.SlotIsVaild(idx) then
+  begin
     Mouse.Move(self.FSlots[idx])
-  else
+    if (btn <> mouse_Move) then
+      Mouse.Click(btn);
+  end else
     {notify index out of range};
 end;
 

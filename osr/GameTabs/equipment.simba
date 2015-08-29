@@ -83,6 +83,21 @@ begin
   Result := Gametabs.IsOpen(tabEquipment);
 end;
 
+function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;
+var
+  b: TBox;
+begin
+  if (not Self.Open) then
+    Exit(False);
+  b := FBoxes[Slot];
+  if (CountColor($10000, b) = 0) then
+    Exit(False);
+  Mouse.Move(b);
+  if (UpText <> '') and (not Mainscreen.isUpText(UpText)) then
+    Exit(False);
+  Result := ChooseOption.Open() and ChooseOption.Select('Remove');
+end;
+
 
 
 begin

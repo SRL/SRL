@@ -17,8 +17,6 @@ end;
 {$include_once osr/Lobby.simba}
 {$include_once osr/LoginScreen.simba}
 {$include_once osr/Client.simba}
-{$include_once osr/Player.simba}
-{$include_once osr/Players.simba}
 {$include_once osr/Interfaces/BankScreen.simba}
 {$include_once osr/XPBar.simba}
 
@@ -26,6 +24,9 @@ end;
   {$include_once shared/smartbase.simba}
   {$include_once osr/smart.simba}
 {$ENDIF}
+
+{$include_once osr/Player.simba}
+{$include_once osr/Players.simba}
 
 procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]); override;
 begin

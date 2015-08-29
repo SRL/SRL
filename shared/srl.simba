@@ -38,7 +38,7 @@ procedure TSRL.Writeln(Str: String; const debugType: EDebugType);
     Result := '['+Hours+':'+Mins+':'+Seconds+']';
   end;
 
-var s: String;
+var s, Typ: String;
 begin
   if (not Debugging) then
     Exit;
@@ -49,12 +49,12 @@ begin
       s := TimeRunning(Self.StartTime);
 
     if (debugType = dtFatal) then
-      s += ':[FATAL]';
+      Typ := ' [FATAL]:';
 
     if (debugType = dtFooter) and (_DebugLevel > 0) then
       Dec(_DebugLevel);
 
-    s += StringOfChar('-', _DebugLevel * 2) + ' ';
+    s += StringOfChar('-', _DebugLevel * 2) + Typ + ' ';
 
     if (debugType = dtHeader) then
       Inc(_DebugLevel);

@@ -1,0 +1,11 @@
+function GetPixelShift(Area: TBox; WaitTime: Integer): Integer;
+var
+  Before, After: Integer;
+begin
+  Before := BitmapFromClient(Area);
+  Wait(WaitTime);
+  After := BitmapFromClient(Area);
+  Result := CalculatePixelShift(Before, After, [0, 0, (Area.X2 - Area.X1), (Area.Y2 - Area.Y1)]);
+  FreeBitmap(Before);
+  FreeBitmap(After);
+end;

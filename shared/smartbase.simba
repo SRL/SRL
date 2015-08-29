@@ -10,7 +10,6 @@ type
     PID, InitAttempts: Integer;
     ForceSpawn, EnableDrawing, _isDrawingSetup, ShowConsole, FindJavaPath: Boolean;
     GetParams: function(): Boolean of object;
-    Hook_After_Reload: procedure();
   end;
 
 function TSmartBase.GetHWND(): PtrUInt;
@@ -283,9 +282,29 @@ begin
 end;
 
 function TSmartBase.Reload(): Boolean;
+var
+  img: Integer;
+  b: Boolean;
 begin
-  if (Assigned(@Self.Hook_After_Reload)) then
-    Self.Hook_After_Reload();
+  if (EnableDrawing) then
+    img := CopyBitmap(Self.Image.getIndex());
+
+  Self.Free();
+  SmartKillClient(Self.PID);
+
+  try
+    b := Self.ForceSpawn;
+    Self.ForceSpawn := True;
+    Result := Self.Init();
+  finally
+    Self.ForceSpawn := b;
+  end;
+
+  if (Result) and (EnableDrawing) then
+  begin
+    getMufasaBitmap(img).DrawTransparent(0, 0, Self.Image);
+    FreeBitmap(img);
+  end;
 end;
 
 function TSmartBase.Init(): Boolean;

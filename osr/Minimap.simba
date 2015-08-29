@@ -62,8 +62,8 @@ begin
 
     with (OrbInfo[Ord(MMOrbPrayer)]) do
     begin
-      Middle := [581, 136];
-      Radius := 15;
+      Middle := [557, 101];
+      Radius := 11;
       TextBox := [521, 99, 540, 112];
     end;
 
@@ -143,14 +143,19 @@ end;
 
 function TMinimap.isRunEnabled(const Time: UInt32 = 0): Boolean;
 const
-  Col = 6806252;
   Tol = 15;
   MinCount = 10;
 var
+  Col: Integer;
   b: TBox;
 begin
+  if (GetColor(Minimap.OrbInfo[Ord(MMOrbRun)].Middle) = 464438) then
+    Col := 105407
+  else
+    Col := 6806252;
+
   with (Self.OrbInfo[Ord(MMOrbRun)].Middle) do
-    b := [X - 6, Y - 6, X + 6, Y + 6];
+    b := [X - 7, Y - 7, X + 7, Y + 7];
 
   if (Time = 0) then
     Result := (CountColorTolerance(Col, b, Tol) > MinCount)
@@ -739,6 +744,62 @@ begin
   FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
   Self.FilterPoints(TPA);
   Result := Round((Length(TPA) / Max) * 100);
+end;
+
+function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+var
+  m: TPoint;
+begin
+  m := Self.getMiddle();
+  Result := GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
+end;
+
+procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+var
+  t: UInt64;
+begin
+  t := GetTickCount64() + TimeOut;
+  while (t > GetTickCount64()) do
+  begin
+    if (UseFlag) and (Self.isFlagPresent()) then
+      Self.WaitFlag;
+    if (not Self.isPlayerMoving()) then
+      Exit;
+    Wait(Random(100, 200));
+  end;
+end;
+
+function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+var
+  b: TBox;
+begin
+  with (Self.OrbInfo[Ord(MMOrbPrayer)].Middle) do
+    b := [X - 7, Y - 7, X + 7, Y + 7];
+
+  if (Time = 0) then
+    Result := (CountColorTolerance(15988210, b, 21) > 15)
+  else
+    Result := srl.WaitMinColorCount(15988210, 21, b, 15, Time);
+end;
+
+function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+begin
+  Result := True;
+
+  with (Self.OrbInfo[Ord(MMOrbPrayer)]) do
+  begin
+    if (Enable) and (not Self.isPrayerEnabled()) then
+    begin
+      Mouse.Click(Middle, Radius, mouse_Left);
+      Result := Self.isRunEnabled(Random(600, 1000));
+    end
+    else
+    if (not Enable) and (Self.isPrayerEnabled()) then
+    begin
+      Mouse.Click(Middle, Radius, mouse_Left);
+      Result := not Self.isRunEnabled(Random(250, 500));
+    end;
+  end;
 end;
 
 begin
