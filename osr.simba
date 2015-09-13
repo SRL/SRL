@@ -6,6 +6,11 @@ begin
   srl.DefaultClientBounds := [0, 0, 764, 502];
 end;
 
+{$IFDEF SMART}
+  {$include_once shared/smartbase.simba}
+  {$include_once osr/smart.simba}
+{$ENDIF}
+
 {$include_once osr/Misc.simba}
 {$include_once osr/Text.simba}
 {$include_once osr/ChooseOption.simba}
@@ -19,11 +24,6 @@ end;
 {$include_once osr/Client.simba}
 {$include_once osr/Interfaces/BankScreen.simba}
 {$include_once osr/XPBar.simba}
-
-{$IFDEF SMART}
-  {$include_once shared/smartbase.simba}
-  {$include_once osr/smart.simba}
-{$ENDIF}
 
 {$include_once osr/Player.simba}
 {$include_once osr/Players.simba}
