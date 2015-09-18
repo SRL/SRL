@@ -147,6 +147,7 @@ begin
     begin
       srl.Writeln('Entered login info, waiting for a response...');
 
+      Wait(Random(600, 900)); // wait for old response (if any) to go
       Response := LoginScreen.WaitResponse();
 
       if (Response = 'lobby') then

@@ -1,6 +1,6 @@
 function TSRL.isLoggedIn(): Boolean;
 begin
-  Result := GetColor(426, 486) = $FFFFFF;
+  Result := GetColor(443, 486) = $FFFFFF;
 end;
 
 function TSRL.isLoggedIn(WaitTime: Integer): Boolean; overload;
