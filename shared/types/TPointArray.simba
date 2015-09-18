@@ -107,22 +107,24 @@ function ConvexHull(const TPA:TPointArray): TPointArray;
 var
   pts: TPointArray;
   h,i,k,u: Int32;
-  function CrossProd(var r, p, q: TPoint): Int32;
+  function CrossProd(r, p, q: TPoint): Int32;
   begin //cross-product of rp and rq vectors.
     Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
   end;
 begin
-  if High(TPA) <= 2 then Exit(pts);
+  if High(TPA) <= 2 then Exit(TPA);
   pts := Copy(TPA);
   SortTPAByX(pts,True);
 
   H := High(pts);
   SetLength(result, 2 * (h+1));
+
   for i:=0 to h do
   begin
     while (k >= 2) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
       Dec(k);
-    result[inc(k)-1] := pts[i];
+    result[k] := pts[i];
+    Inc(k)
   end;
 
   u := k+1;
@@ -130,10 +132,12 @@ begin
   begin
     while (k >= u) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
       Dec(k);
-    result[inc(k)-1] := pts[i];
+    result[k] := pts[i];
+    Inc(k);
   end;
-  SetLength(result, k);
+  SetLength(result, k-1);
 end;
+
 
 (*
 MinAreaRect
