@@ -12,6 +12,7 @@ type
     GetParams: function(): Boolean of object;
   end;
 
+{$ifdecl TChildWindowArr}
 function TSmartBase.GetHWND(): PtrUInt;
 var
   a: TSysProcArr := Client.getIOManager().GetProcesses();
@@ -32,6 +33,7 @@ begin
 
   srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd');
 end;
+{$endif}
 
 procedure TSmartBase.SetDebug(const Enable: Boolean);
 begin
