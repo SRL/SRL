@@ -277,6 +277,7 @@ var
   enabled:Boolean;
   button:TBox = [566,425,604,464];
 begin
+  if not self.Open() then Exit(False);
   if GtButton(button).IsEnabled() = enable then
     Result := True
   else
@@ -297,6 +298,7 @@ var
   enabled:Boolean;
   button:TBox = [622,425,661,464];
 begin
+  if not self.Open() then Exit(False);
   if GtButton(button).IsEnabled() = enable then
     Result := True
   else
