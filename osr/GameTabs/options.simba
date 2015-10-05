@@ -18,8 +18,6 @@ type
  procedure TRSOptions.__setup();
  function TRSOptions.Open(): Boolean;
  function TRSOptions.IsOpen(): Boolean;
- function TRSOptions.IsButtonBoxEnabled(B:TBox): Boolean;
- function TRSOptions.ClickButtonBox(B:TBox; out enabled:Boolean; tryTime:Int32=2000): Boolean;
  function TRSOptions.GetCurrentTab(): EOptionsTab;
  function TRSOptions.SetCurrentTab(tab: EOptionsTab; tryTime:Int32=2000): Boolean;
  function TRSOptions.GetBrightness(): Int32;
@@ -101,41 +99,16 @@ begin
   Result := Gametabs.IsOpen(tabOptions);
 end;
 
-//Checks if the given button (by bounds) is red/enabled 
-function TRSOptions.IsButtonBoxEnabled(B:TBox): Boolean;
-begin
-  if not(self.Open()) then
-    Exit(False);
-  Result := CountColorTolerance(1777019, B, 30) > 100;
-end;
-
-//helper: Clicks the given button and returns True if it didn't fail
-function TRSOptions.ClickButtonBox(B:TBox; out enabled:Boolean; tryTime:Int32=2000): Boolean;
-var t:UInt64;
-begin
-  if not(self.Open()) then
-    Exit(False);
-
-  enabled := not(Self.IsButtonBoxEnabled(B));
-  mouse.click(B, mouse_left);
-  t := GetTickCount64()+tryTime;
-  repeat
-    Result := Self.IsButtonBoxEnabled(B) = enabled;
-    if not(Result) then Wait(25);
-  until (GetTickCount64() > t) or Result;
-end;
-
 //helper: Changes tab, and toggles the given button returns True if it didn't fail
 function TRSOptions.__toggleButton(button:TBox; tab:EOptionsTab; enable:Boolean; tryTime:Int32): Boolean;
-var
-  enabled:Boolean;
+var enabled:Boolean;
 begin
   if not(self.SetCurrentTab(tab)) then
     Exit(False);
-  if Self.IsButtonBoxEnabled(button) = enable then
+  if GtButton(button).IsEnabled() = enable then
     Result := True
   else
-    Result := self.ClickButtonBox(button, enabled, tryTime);
+    Result := GtButton(button).Toggle(enabled, tryTime);
 end;
 
 
@@ -155,7 +128,7 @@ begin
     Exit();
 
   for i:=0 to High(FTabs) do
-    if Self.IsButtonBoxEnabled(FTabs[i]) then
+    if GtButton(FTabs[i]).IsEnabled() then
       Exit(EOptionsTab(i));
 end;
 
@@ -182,10 +155,10 @@ begin
 
   if Self.GetCurrentTab() = tab then Exit(True);
 
-  Mouse.Click(Self.FTabs[ord(tab)], mouse_left);
+  Mouse.Click(Self.FTabs[Ord(tab)], mouse_left);
   t := GetTickCount64()+tryTime;
   repeat
-    if Self.IsButtonBoxEnabled(FTabs[ord(tab)]) then
+    if GtButton(FTabs[Ord(tab)]).IsEnabled() then
       Exit(True)
     else
       Wait(25);
@@ -204,7 +177,7 @@ Returns the mainscreen brightness
 function TRSOptions.GetBrightness(): Int32;
 var
   x,y:Int32;
-  range:TBox = [609,283,718,296];
+  range:TBox = [609,298,718,316];
 begin
   if not(self.SetCurrentTab(optDisplay)) then
     Exit(-1);
@@ -227,7 +200,7 @@ function TRSOptions.SetBrightness(level: Int32; tryTime:Int32=2000): Boolean;
 var
   t:UInt64;
   spacing:Int32=31;
-  range:TBox = [609,283,718,296];
+  range:TBox = [609,298,718,316];
 begin
   if not(self.SetCurrentTab(optDisplay)) or not(InRange(level, 0,3)) then
     Exit(False);
@@ -304,10 +277,11 @@ var
   enabled:Boolean;
   button:TBox = [566,425,604,464];
 begin
-  if Self.IsButtonBoxEnabled(button) = enable then
+  if not self.Open() then Exit(False);
+  if GtButton(button).IsEnabled() = enable then
     Result := True
   else
-    Result := self.ClickButtonBox(button, enabled, tryTime);
+    Result := GtButton(button).Toggle(enabled, tryTime);
 end;
 
 (*
@@ -324,10 +298,11 @@ var
   enabled:Boolean;
   button:TBox = [622,425,661,464];
 begin
-  if Self.IsButtonBoxEnabled(button) = enable then
+  if not self.Open() then Exit(False);
+  if GtButton(button).IsEnabled() = enable then
     Result := True
   else
-    Result := self.ClickButtonBox(button, enabled, tryTime);
+    Result := GtButton(button).Toggle(enabled, tryTime);
 end;
 
 

@@ -17,9 +17,16 @@ type
   );
 
   TRSGametab = record
-    Tabs: TBoxArray;
+    tabs: TBoxArray;
   end;
 
+  
+  TGtButton = record
+    stateEnabled: UInt32;
+    stateDisabled: UInt32;
+    bounds: TBox;
+  end;
+  
 var
   Gametabs: TRSGametab;
   
@@ -32,14 +39,14 @@ begin
     Upper := [527,168,760,204];
     Lower := [527,466,760,502];
     
-    Tabs := Upper.Partition(1, 7, -3);
-    Tabs.Extend(Lower.Partition(1, 7, -3));
+    tabs := Upper.Partition(1, 7, -3);
+    tabs.Extend(Lower.Partition(1, 7, -3));
   end;
 end;
 
 function TRSGametab.GetBounds(Tab:EGametab): TBox;
 begin
-  Result := Self.Tabs[Ord(Tab)];
+  Result := Self.tabs[Ord(Tab)];
 end;
 
 function TRSGametab.IsOpen(Tab:EGametab): Boolean;
@@ -51,8 +58,8 @@ begin
     Exit(True)
   else if (Tab = tabInventory) then
   begin
-    for i:=0 to High(Self.Tabs) do
-      if CountColorTolerance(1910383, Self.Tabs[i], 13) > 0 then
+    for i:=0 to High(Self.tabs) do
+      if CountColorTolerance(1910383, Self.tabs[i], 13) > 0 then
         Exit(False);
     Exit(True);
   end;
@@ -100,6 +107,44 @@ begin
     if Self.IsOpen(EGameTab(i)) then
       Exit(EGameTab(i));
 end;
+
+
+//----------------
+
+procedure TGtButton.Init(B:TBox; enaColor:Int32=1777019; disColor:Int32=5067346);
+begin
+  self.stateEnabled := enaColor;
+  self.stateDisabled := disColor;
+  self.bounds := B;
+end;
+
+
+function GtButton(B:TBox; enaColor:Int32=1777019; disColor:Int32=5067346): TGtButton;
+begin
+  Result.Init(B,enaColor,disColor);
+end;
+
+
+//Checks if the given button (by bounds) is red/enabled 
+function TGtButton.IsEnabled(): Boolean;
+begin
+  Result := CountColorTolerance(self.stateEnabled, self.bounds, 30) > 70;
+end;
+
+//helper: Clicks the given button and returns True if it didn't fail
+function TGtButton.Toggle(out enabled:Boolean; tryTime:Int32=2000): Boolean;
+var t:UInt64;
+begin
+  enabled := not(Self.IsEnabled());
+  mouse.click(self.bounds, mouse_left);
+  t := GetTickCount64()+tryTime;
+  repeat
+    Result := Self.IsEnabled() = enabled;
+    if not(Result) then Wait(25);
+  until (GetTickCount64() > t) or Result;
+end;
+
+
 
 
 begin
