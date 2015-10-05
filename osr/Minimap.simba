@@ -27,6 +27,7 @@ type
     CompassInfo: TMMCompassInfo;
     OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
     MaskBMP: Integer;
+    MaskTPA: TPointArray;
  end;
 
 var
@@ -76,25 +77,30 @@ begin
 
     AddOnTerminate(@Self.__Free);
 
-    Self.MaskBMP := BitmapFromString(147, 147, 'meJzt3V1u01AYBuHsf8kQCqqQ' +
-                   'UmiC4/jnzJkyzwo+v3PhG0u+XL6On4vo6/5ry2n2oJ/sazqvVwXPM' +
-                   'LJXBfdje92j95gd3ec5eqG50DW2oDeD0fPvRe8HoCc/Er3lOPTSx6' +
-                   'MXPR098LnodU9BjzoOvfRh6CEZ9Op70fuR6O23o5fj0QVeRg82F7r' +
-                   'GWvROM6KbPEcvNC+6zBJ6m9nRfR6gJzGhW32gl/Chi72jN7CqmlfV' +
-                   'vKrmVTWvwklVzatqXlXzqppX4aSq5lU1r6p5FU6qal6Fk6qaV+Gkq' +
-                   'uZVNa/CSVXNq3BSVfMqnFThpKrmVTipwklVzatwUoWTKpxU1bwKJ1' +
-                   'U4qapJFU6qcEa94KQKJ1U4qcJJFU6qcFKFkyqcVOGkCidVOKnCSRV' +
-                   'Oqk8XjC5/o8/JWoWTKpxU4aQKJ1U4qcsd+qI8d1+tcAqFkyqcVOGk' +
-                   'CidVOKmH4Wo3uX9VK9zkCie1EK5201quVrhpFU7qabjaTWhNtcJNq' +
-                   'HBbvL3RF/TfgS1+XK/sAeurFe5P12/f2QNeCle7Gzbcq9UKd6MLVz' +
-                   'vctmqFw20OVzvQnmq1o+yvVrvxjqpWuMEODFe7YY6tVrsxzqhWu7O' +
-                   'dV618JxmQrHaHG1mtdkcZX618O4HJbugNfOhin9F7zI7u8wQ9z4zo' +
-                   'JmvRO82FrvEyejAeXWA7ejkSvf0B6AlHo/c+Er3lOPTSp6BHPRe97' +
-                   'unogY9HLzoOvfSR6C0B9OR70fuR6O23o5ebAh3hNfRac6FrrEXvNC' +
-                   'O6yXP0QvOiyyyht5kd3ecxehUHutJn9B4mdKsP9BI+dLF39AZWVfO' +
-                   'qmlfVpAonVTivqkkVTqpwXlXzqppaybyq9tsv47Li7Q==');
+    MaskBMP := BitmapFromString(147, 149, 'meJzt1cGOhCAUBdH+/5+emZXp' +
+              'jIqIwnsFdVPbTlpO0M9nnv0UF/3vll6Z5smin2zO9fNSsMdGein4f' +
+              'A+O+jQF++0hTXMKtq360LqnYOWSeDULRp9fwHJ6tQlGn+W45fe6Kx' +
+              'h9ot1HJFucj062IN9MZOvwzao2t93EZJV80QK3twjZZHyrkdXwRZt' +
+              'cb2U1rt3iZJd80T4H86JV2qXiU41opxrRTrInfKohSmKnGtFONaid' +
+              'au/aqUZpvJ1qRDs/bV3hOtmpBrVTjQin2ki+TmrC9YZ7xU41qJ1qU' +
+              'XaqUXrRTjginGpQO+GIcKoR7Y5+a2Fw9XaqZbNTjVKDnXAZugunWp' +
+              '5u2amWKuGgVcL5nsxW5dtStYQJB+0Szvdkzi7flqqlTThowkErwPm' +
+              'By1zhM6da5oSDdgbnezJ5NXDhf9L2CQfNDxw04aAJB004aMJBEw6a' +
+              'cNCEgyYcNOGgCQdNOGjCQTuD0y5zBTXhMiccNOGgCQdNOGj1cNrla' +
+              'b/PbsIl7FJNuJwJB004aMJBEw7aXTjtMrTfIZyXLluVal66VNVfN+' +
+              'FSdQvOt2Webql56ZJ097oJl6QGON+WGWpQ89KF13bdhAuvGU47qJp' +
+              'wXDjtoGrCceG0g6rt4eQbRvYQ7tAu/DHn63U17bhq2nHVDuG0Q8Bp' +
+              'N4bsdTXtuGracdXk45Jph1Yr2ClY6RWlJh+XbJt2RLXvaVdWi/a52' +
+              'LK3D3TFzrag3QRq2xbhm4lsW/Gh8JUXffYvbEq7ucm2zXT1pr9o+0' +
+              '1gtxrZ97h8y5JtI8Kptg1kJ9m/IexUO1tmO8nKy2mnWs2y2alWvyS' +
+              'fPD9qDQu3U615gXaqPVweuOiT4C0DXPQZUDfYTrUXFwUX/dwzbDxc' +
+              '9BNPsjGXzuv2+gZ86fy6dVpXO9X6bXe2vdSEe3fCcXdwxB0W/ZRzT' +
+              'jX0JONONeiE4061v/0CYW7pQw==');
+
 
     SetBitmapName(Self.MaskBMP, 'Minimap mask');
+    FindColorsBitmap(Self.MaskBMP, Self.MaskTPA, $000000);
+    OffsetTPA(Self.MaskTPA, Point(Self.FBounds.X1, Self.FBounds.Y1));
   end;
 end;
 
@@ -614,6 +620,7 @@ end;
 function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 const { aligned with EMinimapDotType }
   DOT_COL_DIFF = [1907997, 23, 4369];
+  NPC_DOT_DIFF_2 = 1114626;
 var
   img, i: Integer;
   TPA: TPointArray;
@@ -628,10 +635,23 @@ begin
       if (TPA[i].X > 0) and (TPA[i].Y > 0) then
         if (FastGetPixel(img, TPA[i].X-1, TPA[i].Y-1) -
             FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-          Result += Point(TPA[i].X, TPA[i].Y - 2);
+          Result += Point(TPA[i].X, TPA[i].Y - 2)
+        else
+        begin
+          if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
+              FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
+            Result += Point(TPA[i].X - 1, TPA[i].Y - 1)
+          else if (DotType = MMDotNPC) then
+          begin
+            if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
+              FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = NPC_DOT_DIFF_2) then
+            Result += Point(TPA[i].X + 2, TPA[i].Y - 1)
+          end;
+        end;
 
     if (Length(Result) > 0) then
     begin
+      ClearDoubleTPA(Result);
       OffsetTPA(Result, Point(Self.GetBounds().X1, Self.GetBounds().Y1));
       if (SortFromPlayer) then
         SortTPAFrom(Result, Self.GetMiddle());
@@ -646,7 +666,7 @@ begin
   Result := Length(Self.GetDots(DotType, False)) >= MinCount;
 end;
 
-function TMinimap.isPointOn(pt: TPoint): Boolean;
+function TMinimap.isPointOn(pt: TPoint; Full: Boolean = True): Boolean;
 var
   p: TPoint;
 begin
@@ -656,16 +676,19 @@ begin
   begin
     p := [pt.X - Self.GetBounds().X1, pt.Y - Self.GetBounds().Y1];
     if (GetMufasaBitmap(Self.MaskBMP).PointInBitmap(p.x, p.y)) then
-      Result := FastGetPixel(Self.MaskBMP, p.x, p.y) <> $FFFFFF;
+    begin
+      if (Full) then
+        Result := (FastGetPixel(Self.MaskBMP, p.x, p.y) = $FFFFFF) or
+                  (FastGetPixel(Self.MaskBMP, p.x, p.y) = $FF)
+      else
+        Result := FastGetPixel(Self.MaskBMP, p.x, p.y) = $FF;
+    end;
   end;
 end;
 
 procedure TMinimap.FilterPoints(var TPA: TPointArray);
-var
-  FilterTPA: TPointArray;
 begin
-  if (FindColorsBitmap(Self.MaskBMP, FilterTPA, clBlack)) then
-    TPA := ClearTPAFromTPA(TPA, FilterTPA);
+  TPA := ClearTPAFromTPA(TPA, Self.MaskTPA);
 end;
 
 function TMinimap.FindDTMs(const DTM: Integer; out Matches: TPointArray; Step: Extended = 1.00; Range: UInt32 = 25): Boolean;
@@ -707,31 +730,6 @@ begin
 
   Self.FilterPoints(Matches);
   Result := Length(Matches) > 0;
-end;
-
-function TMinimap.GetBlackColor(): Integer;
-var
-  TPA: TPointArray;
-  i, Max, Count: Integer;
-  Colors: TIntegerArray;
-begin
-  FindColorsTolerance(TPA, 0, Self.GetBounds(), 3, ColorSetting(2, 100, 100));
-  Self.FilterPoints(TPA);
-  if (Length(TPA) = 0) then
-    Exit(-1);
-
-  Max := 0;
-  Colors := GetColors(TPA);
-  ClearSameIntegers(Colors);
-  for i := 0 to High(Colors) do
-  begin
-    Count := CountColor(Colors[i], Self.GetBounds());
-    if (Count > Max) then
-    begin
-      Max := Count;
-      Result := Colors[i];
-    end;
-  end;
 end;
 
 function TMinimap.GetColorPercent(Color: Integer; Tolerance: Integer = 0): Integer;
