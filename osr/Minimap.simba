@@ -738,7 +738,7 @@ var
   Max: Integer;
 begin
   FindColorsBitmap(Self.MaskBMP, TPA, $FFFFFF);
-  Max := Length(TPA);
+  Max := Length(TPAFromPolygon(TPA));
   FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
   Self.FilterPoints(TPA);
   Result := Round((Length(TPA) / Max) * 100);
