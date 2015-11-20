@@ -68,6 +68,22 @@ begin
       Wait(20);
 end;
 
+function TRSBankScreen.GetUpText(): String;
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
+var
+  client:T2DIntArray;
+  bmp:Int32;
+begin
+  bmp := BitmapFromClient(mainscreen.UpTextArea);
+  FastReplaceColor(bmp, 2070783, 0);
+  client := BitmapToMatrix(bmp);
+  OCR.SetFont(UpFont);
+  Result := OCR.Recognize(client, OCR_RULES_UPTEXT);
+  FreeBitmap(bmp);
+
+    end;
+
 
 procedure TRSBankScreen._Debug();
 var
@@ -509,7 +525,7 @@ begin
   mouse.Move(b);
   Wait(srl.GaussRangeInt(90,170));
 
-  if (upText <> []) and not(Mainscreen.IsUptext(upText)) then
+  if (upText <> []) and not(BankScreen.IsUptext(upText)) then
     Exit(False);
 
   if (amount = 1) then
