@@ -68,6 +68,22 @@ begin
       Wait(20);
 end;
 
+function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (IsArrInStr(SubStrs, Self.GetUpText())) then
+      Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
 function TRSBankScreen.GetUpText(): String;
 const
   OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
@@ -81,8 +97,10 @@ begin
   OCR.SetFont(UpFont);
   Result := OCR.Recognize(client, OCR_RULES_UPTEXT);
   FreeBitmap(bmp);
-
-    end;
+  {$IFDEF UPTEXT_DEBUG}
+    srl.Writeln('UpText found: ' + Result);
+  {$ENDIF}
+end;
 
 
 procedure TRSBankScreen._Debug();
