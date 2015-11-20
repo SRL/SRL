@@ -734,11 +734,13 @@ end;
 
 function TMinimap.GetColorPercent(Color: Integer; Tolerance: Integer = 0): Integer;
 var
-  TPA: TPointArray;
+  TPA, TPA2: TPointArray;
   Max: Integer;
 begin
   FindColorsBitmap(Self.MaskBMP, TPA, $FFFFFF);
-  Max := Length(TPAFromPolygon(TPA));
+  FindColorsBitmap(Self.MaskBMP, TPA2, $FF);
+  TPA.Extend(TPA2);
+  Max := Length(TPA);
   FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
   Self.FilterPoints(TPA);
   Result := Round((Length(TPA) / Max) * 100);
