@@ -127,7 +127,7 @@ var
   i, h, j: Integer;
 begin
   if (Length(Arr2) = 0) then
-    Exit(Self);
+    Exit(Copy(Self));
 
   Result := Self;
   SetLength(Result, Length(Self) + Length(Arr2));

@@ -120,3 +120,12 @@ begin
     inc(lo);
   end;
 end;
+
+function TBoolArray.Combine(other: TBoolArray): TBoolArray;
+begin
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;  

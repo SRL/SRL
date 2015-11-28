@@ -179,22 +179,13 @@ begin
   end;
 end;
 
-function TBoxArray.Combine(Arr2: TBoxArray): TBoxArray;
-var
-  i, h, j: Integer;
+function TBoxArray.Combine(other: TBoxArray): TBoxArray;
 begin
-  if (Length(Arr2) = 0) then
-    Exit(Self);
-
-  Result := Self;
-  SetLength(Result, Length(Self) + Length(Arr2));
-
-  j := 0;
-  for i := Length(Self) to High(Arr2) + Length(Self) do
-  begin
-    Result[i] := Arr2[j];
-    Inc(j);
-  end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
 end;
 
 procedure TBoxArray.SortFromMidPoint(const From: TPoint);
