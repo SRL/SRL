@@ -325,7 +325,7 @@ begin
 
  t := GetTickCount64() + Random(7000, 8000);
  while (GetColor(491, 99) <> 65536) and (t > GetTickCount64()) do
- { Add mouse scroll helper thing to mouse.simba} ;
+    Mouse.Scroll(IntToBox(73, 83, 497, 292), Random(2, 5), False);
 
 end;
 
