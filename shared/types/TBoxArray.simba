@@ -113,9 +113,12 @@ end;
 procedure TBoxArray.Extend(Arr:TBoxArray);
 var L:Int32;
 begin
-  L := Length(Self);
-  SetLength(Self, Length(Arr) + L);
-  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TBox));
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TBox));
+  end;
 end; 
 
 function TBoxArray.Find(const Value: TBox): Integer;
