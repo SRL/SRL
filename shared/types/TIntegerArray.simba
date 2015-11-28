@@ -50,16 +50,23 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
 
 procedure TIntegerArray.Extend(Arr:TIntegerArray);
 var L:Int32;
 begin
-  L := Length(Self);
-  SetLength(Self, Length(Arr) + L);
-  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
+  end;
 end; 
 
 function TIntegerArray.Find(const Value: Integer): Integer;
@@ -121,7 +128,11 @@ begin
   end;
 end;
 
-function TIntegerArray.Combine(const Arr2: TIntegerArray): TIntegerArray;
+function TIntegerArray.Combine(other: TIntegerArray): TIntegerArray;
 begin
-  Result := CombineIntArray(Self, Arr2);
-end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;   

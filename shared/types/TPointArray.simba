@@ -354,16 +354,23 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
 
 procedure TPointArray.Extend(Arr:TPointArray);
 var L:Int32;
 begin
-  L := Length(Self);
-  SetLength(Self, Length(Arr) + L);
-  MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TPoint));
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TPoint));
+  end;
 end; 
 
 function TPointArray.Find(const Value: TPoint): Integer;
@@ -425,21 +432,12 @@ begin
   end;
 end;
 
-function TPointArray.Combine(const Arr2: TPointArray): TPointArray;
-var
-  i, h, j: Integer;
+function TPointArray.Combine(other: TPointArray): TPointArray;
 begin
-  if (Length(Arr2) = 0) then
-    Exit(Self);
-
-  Result := Self;
-  SetLength(Result, Length(Self) + Length(Arr2));
-
-  j := 0;
-  for i := Length(Self) to High(Arr2) + Length(Self) do
-  begin
-    Result[i] := Arr2[j];
-    Inc(j);
-  end;
-end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;   
 
