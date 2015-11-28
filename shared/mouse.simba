@@ -567,9 +567,9 @@ begin
 
   repeat
     if (Down) then
-      scrollMouse(p.x, p.y, 1)
+      scrollMouse(p.x, p.y, -1)
     else
-      scrollMouse(p.x, p.y, -1);
+      scrollMouse(p.x, p.y, 1);
 
     Wait(16 + Random(220));
     Inc(c);

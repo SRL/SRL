@@ -68,6 +68,40 @@ begin
       Wait(20);
 end;
 
+function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (IsArrInStr(SubStrs, Self.GetUpText())) then
+      Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
+function TRSBankScreen.GetUpText(): String;
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
+var
+  client:T2DIntArray;
+  bmp:Int32;
+begin
+  bmp := BitmapFromClient(mainscreen.UpTextArea);
+  FastReplaceColor(bmp, 2070783, 0);
+  client := BitmapToMatrix(bmp);
+  OCR.SetFont(UpFont);
+  Result := OCR.Recognize(client, OCR_RULES_UPTEXT);
+  FreeBitmap(bmp);
+  {$IFDEF UPTEXT_DEBUG}
+    srl.Writeln('UpText found: ' + Result);
+  {$ENDIF}
+end;
+
 
 procedure TRSBankScreen._Debug();
 var
@@ -291,7 +325,7 @@ begin
 
  t := GetTickCount64() + Random(7000, 8000);
  while (GetColor(491, 99) <> 65536) and (t > GetTickCount64()) do
- { Add mouse scroll helper thing to mouse.simba} ;
+    Mouse.Scroll(IntToBox(73, 83, 497, 292), Random(2, 5), False);
 
 end;
 
@@ -509,7 +543,7 @@ begin
   mouse.Move(b);
   Wait(srl.GaussRangeInt(90,170));
 
-  if (upText <> []) and not(Mainscreen.IsUptext(upText)) then
+  if (upText <> []) and not(BankScreen.IsUptext(upText)) then
     Exit(False);
 
   if (amount = 1) then
