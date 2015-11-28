@@ -256,9 +256,10 @@ begin
       end;
     end;
 
-    Mouse.Scroll(Box(551, 230, 727, 430), Random(2, 5), Down);
-    if (GetColor(730, 416) = 65536) then  // scroll bar at bottom = we scroll up!
-      Down := False;
+    Mouse.Scroll(Box(660, 230, 727, 430), Random(2, 5), Down);
+    if ((GetColor(730, 416) = 65536) and Down) or ((GetColor(730, 245) = 65536)
+    and not Down) then  // scroll bar at bottom = we scroll up!
+      Down := Down <> True;
   end;
 end;
 
@@ -273,13 +274,10 @@ Jumps to the given world.
 *)
 function TRSLogout.SwitchToWorld(World: Integer): Boolean;
 begin
-  WriteLn(0); 
   if (not Self.OpenWS()) then
     Exit(False);
-  WriteLn(1);  
   if (not ClickWorld(World)) then
     Exit(False);
-  WriteLn(2);
   Result := True;
   Chatbox.ClickOption(['Yes.'], Random(2000, 2500));
   Chatbox.PleaseWait();

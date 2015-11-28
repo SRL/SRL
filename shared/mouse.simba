@@ -548,9 +548,17 @@ begin
 
   repeat
     if (Down) then
+      {$IFDEF SMART}
       scrollMouse(p.x, p.y, 1)
+      {$ELSE}
+      scrollMouse(p.x, p.y, -1)
+      {$ENDIF}
     else
+      {$IFDEF SMART}
       scrollMouse(p.x, p.y, -1);
+      {$ELSE}
+      scrollMouse(p.x, p.y, 1);
+      {$ENDIF}
 
     Wait(16 + Random(220));
     Inc(c);
@@ -567,9 +575,17 @@ begin
 
   repeat
     if (Down) then
+      {$IFDEF SMART}
+      scrollMouse(p.x, p.y, 1)
+      {$ELSE}
       scrollMouse(p.x, p.y, -1)
+      {$ENDIF}
     else
+      {$IFDEF SMART}
+      scrollMouse(p.x, p.y, -1);
+      {$ELSE}
       scrollMouse(p.x, p.y, 1);
+      {$ENDIF}
 
     Wait(16 + Random(220));
     Inc(c);
