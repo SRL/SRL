@@ -540,19 +540,27 @@ end;
 
 procedure TMouse.Scroll(Scrolls: Integer; Down: Boolean);
 var
-  c: Integer = 0;
-  p: TPoint;
+  i,step,k:Int32=1;
+  p:TPoint;
 begin
   p := Self.GetPosition();
-  repeat
+  step := Round(srl.GaussRand(7.0,0.6));
+  for i:=1 to Scrolls do
+  begin
     if Down then
-      scrollMouse(p.x, p.y, {$IFDEF SMART}1{$ELSE}-1{$ENDIF})
+      ScrollMouse(p.x, p.y, {$IFDEF SMART}1{$ELSE}-1{$ENDIF})
     else
-      scrollMouse(p.x, p.y, {$IFDEF SMART}-1{$ELSE}1{$ENDIF});
+      ScrollMouse(p.x, p.y, {$IFDEF SMART}-1{$ELSE}1{$ENDIF});
 
-    Wait(16 + Random(220));
-    Inc(c);
-  until(c >= Scrolls);
+    if k mod step = 0 then
+    begin
+      step := Round(srl.GaussRand(5.0,0.6));
+      srl.GaussWait(215,410);
+      k := 0;
+    end else
+      srl.GaussWait(25,46);
+    Inc(k);
+  end;
 end;
 
 procedure TMouse.Scroll(Target: TPoint; scrolls: Integer; Down: Boolean); overload;
