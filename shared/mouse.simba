@@ -38,8 +38,8 @@
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
   TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
-
-type
+  
+  
   TMouse = record
   {$IFNDEF CODEINSIGHT}
     FSpeed: Integer;
@@ -49,7 +49,7 @@ type
     FOnMouseEvent: TMouseEvent;
     FOnMouseChangeDestEvent: TMouseChangeDestEvent;
   {$ENDIF}
- end;
+  end;
 
 procedure TMouse.__Setup();
 begin
@@ -538,59 +538,35 @@ begin
   Self.Release(Button);
 end;
 
-procedure TMouse.Scroll(Target: TPoint; scrolls: Integer; Down: Boolean);
+procedure TMouse.Scroll(Scrolls: Integer; Down: Boolean);
 var
   c: Integer = 0;
   p: TPoint;
 begin
-  Self.Move(Target);
   p := Self.GetPosition();
-
   repeat
-    if (Down) then
-      {$IFDEF SMART}
-      scrollMouse(p.x, p.y, 1)
-      {$ELSE}
-      scrollMouse(p.x, p.y, -1)
-      {$ENDIF}
+    if Down then
+      scrollMouse(p.x, p.y, {$IFDEF SMART}1{$ELSE}-1{$ENDIF})
     else
-      {$IFDEF SMART}
-      scrollMouse(p.x, p.y, -1);
-      {$ELSE}
-      scrollMouse(p.x, p.y, 1);
-      {$ENDIF}
+      scrollMouse(p.x, p.y, {$IFDEF SMART}-1{$ELSE}1{$ENDIF});
 
     Wait(16 + Random(220));
     Inc(c);
   until(c >= Scrolls);
+end;
+
+procedure TMouse.Scroll(Target: TPoint; scrolls: Integer; Down: Boolean); overload;
+begin
+  Self.Move(Target);
+  Self.Scroll(Scrolls, Down);
 end;
 
 procedure TMouse.Scroll(Box: TBox; scrolls: Integer; Down: Boolean); overload;
-var
-  c: Integer = 0;
-  p: TPoint;
 begin
   Self.Move(Box);
-  p := Self.GetPosition();
-
-  repeat
-    if (Down) then
-      {$IFDEF SMART}
-      scrollMouse(p.x, p.y, 1)
-      {$ELSE}
-      scrollMouse(p.x, p.y, -1)
-      {$ENDIF}
-    else
-      {$IFDEF SMART}
-      scrollMouse(p.x, p.y, -1);
-      {$ELSE}
-      scrollMouse(p.x, p.y, 1);
-      {$ENDIF}
-
-    Wait(16 + Random(220));
-    Inc(c);
-  until(c >= Scrolls);
+  Self.Scroll(Scrolls, Down);
 end;
+
 
 var
   Mouse: TMouse;
