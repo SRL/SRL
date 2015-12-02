@@ -195,7 +195,7 @@ begin
       else
         Wait(25);
     until GetTickCount64() > t;
-    Wait(srl.GaussRangeInt(0,seed));
+    srl.NormalWait(0,seed);
   end;
 end;
 
@@ -282,7 +282,7 @@ begin
   Chatbox.ClickOption(['Yes.'], Random(2000, 2500));
   Chatbox.PleaseWait();
   Mainscreen.WaitWhileLoading();
-  Wait(srl.GaussRangeInt(150,500));
+  srl.NormalWait(150,500);
 end;
 
 

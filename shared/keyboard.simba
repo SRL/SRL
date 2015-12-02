@@ -23,7 +23,7 @@ end;
 procedure TKeyBoard.Send(const Text: String; KeyPressAfter: Integer); overload;
 begin
   Self.Send(Text);
-  srl.GaussWait(30, 120, True);
+  srl.NormalWait(30, 120, wdLeft);
   Self.PressKey(KeyPressAfter);
 end;
 

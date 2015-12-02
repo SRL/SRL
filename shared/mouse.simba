@@ -445,14 +445,14 @@ begin
     Exit();
 
   if (Gauss) then
-    Self.Move(srl.GaussPoint(Box))
+    Self.Move(srl.RandomPoint(Box))
   else
     Self.Move(Point(Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)));
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
 begin
-  Self.Move(srl.GaussPoint(Middle, Radius));
+  Self.Move(srl.RandomPoint(Middle, Radius));
 end;
 
 procedure TMouse.Click(const Button: Integer);
@@ -499,12 +499,12 @@ begin
     Self.Click(Button);
     Exit();
   end;
-  Self.Click(srl.GaussPoint(Box), Button);
+  Self.Click(srl.RandomPoint(Box), Button);
 end;
 
 procedure TMouse.Click(const Middle: TPoint; const Radius, Button: Integer); overload;
 begin
-  Self.Click(srl.GaussPoint(Middle, Radius), Button);
+  Self.Click(srl.RandomPoint(Middle, Radius), Button);
 end;
 
 procedure TMouse.Miss(const Target: TPoint; const Correct: Boolean = False; const WaitAfterMiss: Integer = 0);
@@ -544,7 +544,7 @@ var
   p:TPoint;
 begin
   p := Self.GetPosition();
-  step := Round(srl.GaussRand(7.0,0.6));
+  step := Round(srl.GaussRand(6.0,0.6));
   for i:=1 to Scrolls do
   begin
     if Down then
@@ -554,11 +554,11 @@ begin
 
     if k mod step = 0 then
     begin
-      step := Round(srl.GaussRand(5.0,0.6));
-      srl.GaussWait(215,410);
+      step := Round(srl.GaussRand(6.0,0.6));
+      srl.NormalWait(215,410);
       k := 0;
     end else
-      srl.GaussWait(25,46);
+      srl.NormalWait(25,46);
     Inc(k);
   end;
 end;
