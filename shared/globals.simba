@@ -12,23 +12,23 @@ const
   clNavy       = TColor($800000);
   clPurple     = TColor($800080);
   clTeal       = TColor($808000);
-  clGray       = TColor($808080);
-  clSilver     = TColor($C0C0C0);
   clRed        = TColor($0000FF);
   clLime       = TColor($00FF00);
   clYellow     = TColor($00FFFF);
   clBlue       = TColor($FF0000);
   clFuchsia    = TColor($FF00FF);
   clAqua       = TColor($FFFF00);
+  clGray       = TColor($808080);
+  clSilver     = TColor($C0C0C0);
   clLtGray     = TColor($C0C0C0);
+  clMedGray    = TColor($A4A0A0);
   clDkGray     = TColor($808080);
   clWhite      = TColor($FFFFFF);
-  clMoneyGreen = TColor($C0DCC0);
+  clMoneyGreen = TColor($65bb85);
   clSkyBlue    = TColor($F0CAA6);
   clCream      = TColor($F0FBFF);
   clPink       = TColor($B3A2EA);
-  clMedGray    = TColor($A4A0A0);
-  clOrange     = TColor($E56701);
+  clOrange     = TColor($0099FF);
 
 {$ifndecl LineEnding}
 const
