@@ -18,8 +18,13 @@ type
     FTabs: TBoxArray;
   end;
 
+  TChatOption = record
+    Text: String;
+    b: TBox;
+  end;
+
 (*
-var chatbox
+var Chatbox
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape chatbox interface.
 *)
@@ -28,7 +33,7 @@ var
 
 (*
 const CHATBOX_COLORS
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 constant that holds all the possible text-colors
 *)
 const
@@ -55,8 +60,8 @@ end;
 
 
 (*
-chatbox.GetTextOnLine
-~~~~~~~~~~~~~~~~~~~~~~~~
+Chatbox.GetTextOnLine
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
@@ -94,7 +99,7 @@ begin
 end;
 
 (*
-chatbox.FindTextOnLines
+Chatbox.FindTextOnLines
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -123,8 +128,8 @@ end;
 
 
 (*
-chatbox.GetLastMessage
-~~~~~~~~~~~~~~~~~~~~~~~~
+Chatbox.GetLastMessage
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
@@ -140,7 +145,7 @@ end;
 
 
 (*
-chatbox.GetChatArea
+Chatbox.GetChatArea
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -158,8 +163,8 @@ end;
 
 
 (*
-chatbox.ClickContinue
-~~~~~~~~~~~~~~~~~~~
+Chatbox.ClickContinue
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.ClickContinue(): Boolean;
@@ -187,15 +192,15 @@ end;
 
 
 (*
-chatbox.HandleLevelUp
-~~~~~~~~~~~~~~~~~~~
+Chatbox.HandleLevelUp
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.HandleLevelUp(): Boolean;
 
 Clicks the "Click here to continue" if text containing `Congratulations` was found
 
-.. note:: by olly
+.. note:: by Olly
 *)
 function TRSChatbox.HandleLevelUp(): Boolean;
 const
@@ -207,12 +212,6 @@ begin
   if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
     Exit(Self.ClickContinue());
 end;
-
-type
-  TChatOption = record
-    Text: String;
-    b: TBox;
- end;
 
 function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
 var
@@ -407,6 +406,35 @@ begin
   end;
 end;
 
+(*
+Chatbox.GetTitle
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatBox.GetTitle: String;
+
+Returns the title of a chatbox interaction such as the NPC name.
+
+.. note:: by Olly
+*)
+function TRSChatBox.GetTitle: String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  FindColors(TPA, 128, Self.GetChatArea());
+  if (Length(TPA) < 10) then
+    Exit;
+
+  ATPA := ClusterTPAEX(TPA, 1, 5);
+  SortATPAFromFirstPointX(ATPA, Point(0, 0));
+  b := GetTPABounds(ATPA[0]);
+  b.Y1 -= 1;
+  b.X2 := GetTPABounds(ATPA[High(ATPA)]).X2;
+  b.Y2 += 5;
+  Result := OCR.Recognize(b, TCompareRules([128]), NPCFont);
+end;
 
 begin
   Chatbox.__Setup();

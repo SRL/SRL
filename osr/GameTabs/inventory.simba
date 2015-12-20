@@ -53,7 +53,7 @@ const
 
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSInventory.__setup();
+procedure TRSInventory.__Setup();
 var i:Int32;
 begin
   self.FBounds := [558,211,725,462];
@@ -245,13 +245,16 @@ Returns true if the given slot is occupied.
 .. note:: by slacky
 *)
 function TRSInventory.SlotIsUsed(idx:Int32): Boolean;
-var b:TBox;
+var
+  b: TBox;
 begin
   if not(self.Open()) then
     Exit();
 
   b := self.FSlots[idx];
-  Result := CountColor($10000, b.x1,b.y1,b.x2,b.y2) > 0;
+  Result := CountColor($10000, b.x1, b.y1, b.x2, b.y2) > 0;
+  if (not Result) then
+    Result := CountColor(1777700, b.x1, b.y1, b.x2, b.y2) > 0;
 end;
 
 (*
@@ -266,7 +269,8 @@ Returns all the occupied slot-indices.
 .. note:: by slacky
 *)
 function TRSInventory.GetUsedSlots(): TIntegerArray;
-var i:Int32;
+var
+  i: Int32;
 begin
   if not(self.Open()) then
     Exit();
@@ -299,7 +303,8 @@ Examples:
     inventory.DropItems([0..3]); // drops the four first items
 *)
 procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
-var i:Int32;
+var
+  i:  Int32;
 begin
   if not(self.Open()) then
     Exit();
@@ -328,8 +333,8 @@ Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots
 *)
 procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 var
-  i:Int32;
-  ptrn:TIntegerArray;
+  i: Int32;
+  ptrn: TIntegerArray;
 begin
   for i:=0 to High(dropPattern) do
     if not(InIntArray(ignoreSlots,dropPattern[i])) then
@@ -453,5 +458,5 @@ end;
 
 
 begin
-  Inventory.__setup();
+  Inventory.__Setup();
 end;
