@@ -204,9 +204,8 @@ const
 var
   p: TPoint;
 begin
-  if (GetColor(C_CHAR_POS) = TEXT_COL) then
-    if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
-      Exit(Self.ClickContinue());
+  if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
+    Exit(Self.ClickContinue());
 end;
 
 type
