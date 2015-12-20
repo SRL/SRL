@@ -385,13 +385,37 @@ begin
     Result := a[Low(a)];
 end;
 
+function TRSInventory.FindDTMs(DTM: Integer; MaxToFind: Byte = 28): TIntegerArray;
+var
+  i: Integer;
+  pt: TPoint;
+begin
+  for i:=Self.LowSlot to Self.HighSlot do
+    if FindDTM(DTM, pt.x, pt.y, Self.GetSlotBox(i)) then
+    begin
+      Result += i;
+      if (Length(Result) = MaxToFind) then
+        Break;
+    end;
+end;
+
+function TRSInventory.FindDTM(DTM: Integer): Integer;
+var
+  a: TIntegerArray;
+begin
+  Result := -1;
+  a := Self.FindDTMs(DTM, 1);
+  if (Length(a) > 0) then
+    Result := a[0];
+end;
+
 
 function TRSInventory.Count(): Byte;
 begin
   Result := Length(Self.GetUsedSlots());
 end;
 
-function TRSInventory.GetActiveSlot(): Byte;
+function TRSInventory.GetActiveSlot(): Int8;
 var
   i: Integer;
   b: TBox;

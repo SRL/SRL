@@ -62,6 +62,18 @@ begin
   end;
 end;
 
+function TSRL.WaitFindDTM(DTM: Integer; var Pt: TPoint; Area: TBox; WaitTime: Integer=4000): Boolean;
+var
+  timeout: UInt64;
+begin
+  timeout := GetTickCount64() + WaitTime;
+  while timeout > GetTickCount64() do
+    if FindDTM(DTM, pt.x, pt.y, Area) then
+      Exit(True)
+    else
+      Wait(Random(25, 50));
+end;
+
 (*
 type TColorSettings
 ~~~~~~~~~~~~~~~~~~~
