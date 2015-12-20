@@ -2,8 +2,8 @@ function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint;
 begin
   if (Gauss) then
   begin
-    Result.X := Self.X + srl.GaussRangeInt(Min, Max);
-    Result.Y := Self.Y + srl.GaussRangeInt(Min, Max);
+    Result.X := Self.X + srl.NormalRange(Min, Max);
+    Result.Y := Self.Y + srl.NormalRange(Min, Max);
   end else 
   begin
     Result.X := Self.X + System.Random(Min, Max);
@@ -15,8 +15,8 @@ function TPoint.Random(XMin, XMax: Integer; YMin, YMax: Integer; Gauss: Boolean 
 begin
   if (Gauss) then
   begin
-    Result.X := Self.X + srl.GaussRangeInt(XMin, XMax);
-    Result.Y := Self.Y + srl.GaussRangeInt(YMin, YMax);
+    Result.X := Self.X + srl.NormalRange(XMin, XMax);
+    Result.Y := Self.Y + srl.NormalRange(YMin, YMax);
   end else 
   begin
     Result.X := Self.X + System.Random(XMin, XMax);

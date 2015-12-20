@@ -81,7 +81,7 @@ var i,j,h,errors:Integer;
 begin
   Result := Copy(Pattern);
   h := High(Pattern);
-  errors := Trunc(srl.TruncedGauss(0,MaxErrors));
+  errors := Trunc(srl.TruncatedGauss(0,MaxErrors));
   for i:=1 to Errors do
   begin
     j := RandomRange(1,h);
