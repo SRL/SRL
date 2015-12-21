@@ -197,11 +197,12 @@ const
 var
   TPA, TPAPoles: TPointArray;
   ATPA, ATPAColumns: T2DPointArray;
-  i, j, Img: Integer;
+  i, j, w, h, Img: Integer;
 begin
   p := [-1, -1];
   Img := BitmapFromClient(Self.getBounds());
   SetBitmapName(Img, 'Find flag bitmap');
+  GetBitmapSize(Img, w, h);
 
   try
     if (not FindColorsBitmap(Img, TPA, PoleColor)) then
@@ -209,6 +210,7 @@ begin
 
     with GetMufasaBitmap(Img) do
       for i := 0 to High(TPA) do
+        if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
           if (GetPixel(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetPixel(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
              (GetPixel(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetPixel(TPA[i].x, TPA[i].y + 1) = PoleColor) then
                 TPAPoles += TPA[i];
@@ -622,17 +624,19 @@ const { aligned with EMinimapDotType }
   DOT_COL_DIFF = [1907997, 23, 4369];
   NPC_DOT_DIFF_2 = 1114626;
 var
-  img, i: Integer;
+  img, i, w, h: Integer;
   TPA: TPointArray;
 begin
   img := BitmapFromClient(Self.GetBounds());
+  GetBitmapSize(img, w, h);
+  w -= 2; h -= 2;
 
   try
     if (not FindColorsBitmap(img, TPA, 65536)) then
       Exit;
 
     for i := 0 to High(TPA) do
-      if (TPA[i].X > 0) and (TPA[i].Y > 0) then
+      if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
         if (FastGetPixel(img, TPA[i].X-1, TPA[i].Y-1) -
             FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
           Result += Point(TPA[i].X, TPA[i].Y - 2)
@@ -669,6 +673,7 @@ end;
 function TMinimap.isPointOn(pt: TPoint; Full: Boolean = True): Boolean;
 var
   p: TPoint;
+  bmp: Integer;
 begin
   Result := False;
 
@@ -800,6 +805,18 @@ begin
       Result := not Self.isRunEnabled(Random(250, 500));
     end;
   end;
+end;
+
+function TMinimap.RandomCompass(MinMovement, MaxMovement: Integer; UseMouse: Boolean = True): Extended;
+var
+  a: Integer;
+begin
+  a := Round(Minimap.GetCompassAngle());
+  if (Random(2) = 0) then
+    a -= Random(MinMovement, MaxMovement)
+  else
+    a += Random(MinMovement, MaxMovement);
+  Minimap.SetCompassAngle(FixD(a), UseMouse, Random(5, 10));
 end;
 
 begin

@@ -55,16 +55,21 @@ function TXPBar.Read: Integer;
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  t: UInt64;
 begin
   if (not Self.isEnabled()) then
   begin
-    if (not Self.Toggle(True)) then
-      Exit(-1); // cant toggle
-
-    Wait(Random(850, 1050)); // We enabled it, takes a few secs to appear
+    for 0 to 1 do
+    begin
+      if (Self.Toggle(True)) then
+      begin
+        if (Self.isEnabled(Random(1000, 1200))) then
+          Break;
+      end;
+    end;
   end;
 
+  if (not Self.isEnabled()) then
+    Exit(-1);
   if (not FindColors(TPA, 16777215, Self.TextArea)) then
     Exit(-2); // no color
 

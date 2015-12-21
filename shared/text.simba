@@ -87,5 +87,12 @@ begin
   Result := GetTextATPA(ATPA, MaxVSpacing, Font);
 end;
 
+function TSRL.FormatInt(n:Int64; dec:Byte=3): String;
+var i:Int32; f:Double:=n;
+begin
+  while (abs(f) >= 1000) and Inc(i) do f := f / 1000;
+  Result := FloatToStr(Round(f,dec)) + (['','k','m','b','t','qd','qt'])[i-1];
+end;
+
 
 
