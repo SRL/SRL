@@ -1,0 +1,161 @@
+type
+  EGametab = (
+    tabCombat,
+    tabStats,
+    tabQuests,
+    tabInventory,
+    tabEquipment,
+    tabPrayer,
+    tabMagic,
+    tabClan,
+    tabFriends,
+    tabIgnores,
+    tabLogout,
+    tabOptions,
+    tabEmotes,
+    tabMusic
+  );
+
+  TRSGametab = record
+    tabs: TBoxArray;
+  end;
+
+  
+  TGtButton = record
+    stateEnabled: UInt32;
+    stateDisabled: UInt32;
+    bounds: TBox;
+  end;
+  
+var
+  Gametabs: TRSGametab;
+  
+procedure TRSGametab.__setup();
+var 
+  Upper,Lower:TBox;
+begin
+  with Self do
+  begin
+    Upper := [527,168,760,204];
+    Lower := [527,466,760,502];
+    
+    tabs := Upper.Partition(1, 7, -3);
+    tabs.Extend(Lower.Partition(1, 7, -3));
+  end;
+end;
+
+function TRSGametab.GetBounds(Tab:EGametab): TBox;
+begin
+  Result := Self.tabs[Ord(Tab)];
+end;
+
+function TRSGametab.IsOpen(Tab:EGametab): Boolean;
+var
+  B:TBox;
+  i:Int32;
+begin
+  if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
+    Exit(True)
+  else if (Tab = tabInventory) then
+  begin
+    for i:=0 to High(Self.tabs) do
+      if CountColorTolerance(1910383, Self.tabs[i], 13) > 0 then
+        Exit(False);
+    Exit(True);
+  end;
+end;
+
+function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
+var
+  i:Int32;
+  t:UInt64;
+  B:TBox;
+begin
+  B := self.getBounds(Tab);
+  if Self.IsOpen(Tab) then
+    Exit(True);
+
+  for i:=1 to tries do
+  begin
+    Mouse.Click(B, 1);
+    t := GetTickCount64() + Random(1500,2500);
+    repeat
+      if self.IsOpen(Tab) then
+        Exit(True);
+    until (GetTickCount64() > t);
+  end;
+end;
+
+
+procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+var
+  t,i:Int32;
+  B:TBox;
+begin
+  if Condition then
+  begin
+    B := self.getBounds(Tab);
+    Mouse.Move(B);
+  end;
+end;
+
+
+function TRSGametab.GetCurrent(): EGametab;
+var i:Int32;
+begin
+  for i:=0 to High(EGameTab) do
+    if Self.IsOpen(EGameTab(i)) then
+      Exit(EGameTab(i));
+end;
+
+
+//----------------
+
+procedure TGtButton.Init(B:TBox; enaColor:Int32=1777019; disColor:Int32=5067346);
+begin
+  self.stateEnabled := enaColor;
+  self.stateDisabled := disColor;
+  self.bounds := B;
+end;
+
+
+function GtButton(B:TBox; enaColor:Int32=1777019; disColor:Int32=5067346): TGtButton;
+begin
+  Result.Init(B,enaColor,disColor);
+end;
+
+
+//Checks if the given button (by bounds) is red/enabled 
+function TGtButton.IsEnabled(): Boolean;
+begin
+  Result := CountColorTolerance(self.stateEnabled, self.bounds, 30) > 70;
+end;
+
+//helper: Clicks the given button and returns True if it didn't fail
+function TGtButton.Toggle(out enabled:Boolean; tryTime:Int32=2000): Boolean;
+var t:UInt64;
+begin
+  enabled := not(Self.IsEnabled());
+  mouse.click(self.bounds, mouse_left);
+  t := GetTickCount64()+tryTime;
+  repeat
+    Result := Self.IsEnabled() = enabled;
+    if not(Result) then Wait(25);
+  until (GetTickCount64() > t) or Result;
+end;
+
+
+
+
+begin
+  Gametabs.__setup();
+end;
+
+{$include_once gametabs/combat.simba}
+{$include_once gametabs/stats.simba}
+{$include_once gametabs/inventory.simba}
+{$include_once gametabs/equipment.simba}
+
+{$include_once gametabs/logout.simba}
+{$include_once gametabs/options.simba}
+

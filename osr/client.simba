@@ -1,0 +1,32 @@
+function TSRL.isLoggedIn(): Boolean;
+begin
+  Result := GetColor(443, 486) = $FFFFFF;
+end;
+
+function TSRL.isLoggedIn(WaitTime: Integer): Boolean; overload;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount64 + WaitTime;
+  repeat
+    if (Self.isLoggedIn()) then
+      Exit(True);
+    Wait(Random(50, 200));
+  until GetTickCount64() > t;
+end;
+
+function TSRL.isClientReady(WaitTime: Integer = 0): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + WaitTime;
+
+  while (not Result) and (TimeOut >= GetTickCount64()) do
+  begin
+    if (WorldSwitcher.isOpen()) then
+      WorldSwitcher.Close();
+    Result := (Self.isLoggedIn()) or (LoginScreen.isOpen()) or (Lobby.isOpen());
+  end;
+end;
