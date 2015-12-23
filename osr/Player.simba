@@ -18,7 +18,7 @@ var
 begin
   srl.Writeln('Switching player to member state');
   Self.isMember := True;
-  Self.World := WorldSwitcher.MembersWorlds[Random(Length(WorldSwitcher.MembersWorlds))];
+  Self.World := WorldSwitcher.RandomMembers();
 
   if (LoginScreen.GetCurrentWorld() <> Self.World) then
   begin
@@ -193,14 +193,8 @@ begin
         Exit(True);
       end;
 
-  if (Self.World <> 0) or (InIntArray(WorldSwitcher.PVPWorlds, LoginScreen.GetCurrentWorld())) then
+  if (Self.World <> 0) then
   begin
-    if (InIntArray(WorldSwitcher.PVPWorlds, LoginScreen.GetCurrentWorld())) then
-    begin
-      srl.Writeln('We are on a PVP world, going to pick a non pvp world...');
-      Self.World := WorldSwitcher.MembersWorlds[Random(Length(WorldSwitcher.MembersWorlds))];
-    end;
-
     srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
 
     if (LoginScreen.GetCurrentWorld() <> Self.World) then
