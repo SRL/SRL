@@ -11,22 +11,22 @@ end;
   {$include_once osr/smart.simba}
 {$ENDIF}
 
-{$include_once osr/Misc.simba}
-{$include_once osr/Text.simba}
-{$include_once osr/ChooseOption.simba}
-{$include_once osr/Chatbox.simba}
-{$include_once osr/Minimap.simba}
-{$include_once osr/Interfaces/MainScreen.simba}
-{$include_once osr/Gametabs.simba}
-{$include_once osr/Interfaces/WorldSwitcher.simba}
-{$include_once osr/Lobby.simba}
-{$include_once osr/LoginScreen.simba}
-{$include_once osr/Client.simba}
-{$include_once osr/Interfaces/BankScreen.simba}
-{$include_once osr/XPBar.simba}
+{$include_once osr/misc.simba}
+{$include_once osr/text.simba}
+{$include_once osr/chooseoption.simba}
+{$include_once osr/interfaces/chatbox.simba}
+{$include_once osr/interfaces/minimap.simba}
+{$include_once osr/interfaces/mainscreen.simba}
+{$include_once osr/gametabs.simba}
+{$include_once osr/interfaces/worldswitcher.simba}
+{$include_once osr/interfaces/lobby.simba}
+{$include_once osr/interfaces/loginScreen.simba}
+{$include_once osr/client.simba}
+{$include_once osr/interfaces/bankscreen.simba}
+{$include_once osr/xpbar.simba}
 
-{$include_once osr/Player.simba}
-{$include_once osr/Players.simba}
+{$include_once osr/player.simba}
+{$include_once osr/players.simba}
 
 procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]); override;
 begin
