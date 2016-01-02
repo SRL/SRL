@@ -200,3 +200,17 @@ begin
   SortBoxesFromMidPoint(Self, From);
 end;
 
+procedure TBoxArray.ModifySide(side:String='x1'; change:Int32=1);
+var i:Int32;
+begin
+  side := LowerCase(side);
+  if Length(side) < 2 then Exit();
+  SetLength(side, 2);
+  for i:=0 to High(self) do
+    case Side of
+      'x1': self[i].x1 += change;
+      'y1': self[i].y1 += change;
+      'x2': self[i].x2 += change;
+      'y2': self[i].y2 += change;
+    end;
+end;
