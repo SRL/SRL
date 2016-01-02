@@ -35,7 +35,9 @@ begin
     SetName('Bankscreen');
     SetStatic(True);
 
-    fSlots := Box(66, 82, 448, 296).PartitionEx(6,8,-7,-2);
+    FSlots := Box(73, 83, 456, 298).Partition(6,8);
+    FSlots.ModifySide('x2',-16);
+    FSlots.ModifySide('y2',-4);
 
     with Self.GetBounds() do
     begin
