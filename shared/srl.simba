@@ -20,22 +20,14 @@ type
 var
   srl: TSRL;
 
-procedure TSRL.Writeln(Str: String; const debugType: EDebugType);
+procedure TSRL.WriteLn(Str: String; const debugType: EDebugType);
 
   function TimeRunning(ms: UInt64): String;
   var
-    _, Hour, Min, Sec: Integer;
-    Hours, Mins, Seconds: String;
+    _, hour, minute, second: Integer;
   begin
-    ConvertTime64(ms, _, _, _, _, Hour, Min, Sec);
-    Hours := IntToStr(Hour); Mins := IntToStr(Min); Seconds := IntToStr(Sec);
-    if (Length(Hours) = 1) then
-      Hours := '0' + Hours;
-    if (Length(Mins) = 1) then
-      Mins := '0' + Mins;
-    if (Length(Seconds) = 1) then
-      Seconds := '0' + Seconds;
-    Result := '['+Hours+':'+Mins+':'+Seconds+']';
+    ConvertTime64(ms, _, _, _, _, hour, minute, second);
+    Result := Format('[%.2d:%.2d:%.2d]', [hour,minute,second]);
   end;
 
 var s, Typ: String;
@@ -62,28 +54,28 @@ begin
     _Write(s + Str);
   end;
 
-  _Writeln();
+  _WriteLn();
 
   if (debugType = dtFatal) then
     TerminateScript;
 end;
 
-procedure TSRL.Writeln(Str: String); overload;
+procedure TSRL.WriteLn(Str: String); overload;
 begin
-  Self.Writeln(Str, dtNone);
+  Self.WriteLn(Str, dtNone);
 end;
 
-function TSRL.Writeln(Str: String; AResult: Variant; Footer: String = ''): Variant; overload;
+function TSRL.WriteLn(Str: String; AResult: Variant; Footer: String = ''): Variant; overload;
 begin
   Result := AResult;
-  Self.Writeln(Str);
+  Self.WriteLn(Str);
   if (Footer <> '') then
-    Self.Writeln(Footer, dtFooter);
+    Self.WriteLn(Footer, dtFooter);
 end;
 
 procedure TSRL.WriteFmt(Str: String; Args: TVariantArray; debugType: EDebugType = dtNone);
 begin
-  Self.Writeln(Format(Str, Args), debugType);
+  Self.WriteLn(Format(Str, Args), debugType);
 end;
 
 procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]);

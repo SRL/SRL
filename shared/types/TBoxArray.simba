@@ -214,3 +214,15 @@ begin
       'y2': self[i].y2 += change;
     end;
 end;
+
+procedure TBoxArray.Offset(pt:TPoint);
+var i:Int32;
+begin
+  for i:=0 to High(self) do
+  begin
+    self[i].x1 += pt.x;
+    self[i].y1 += pt.y;
+    self[i].x2 += pt.x;
+    self[i].y2 += pt.y;
+  end;
+end;

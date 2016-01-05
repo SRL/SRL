@@ -462,7 +462,7 @@ function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
 
       Wait(W);
       LastDist := dist;
-      CompassDist := Abs(DeltaAngle(Minimap.GetCompassAngle(), Angle));
+      CompassDist := Abs(srl.DeltaAngle(Minimap.GetCompassAngle(), Angle));
       if ((CompassDist < Rand) or (CompassDist < Rand2)) then
       begin
         if (CompassDist < Rand) then
@@ -503,7 +503,7 @@ begin
 
   Angle := FixD(Angle);
   CurrentAngle := Self.GetCompassAngle();
-  CompassDist := Abs(DeltaAngle(CurrentAngle, Angle));
+  CompassDist := Abs(srl.DeltaAngle(CurrentAngle, Angle));
   if (CompassDist <= 3) then
     Exit(True);
 
@@ -544,7 +544,7 @@ begin
 
     MoveRotate(mp.x, mp.y, p.x, p.y, Angle, Tolerance);
     CurrentAngle := Self.GetCompassAngle();
-    CompassDist := Abs(DeltaAngle(CurrentAngle, Angle));
+    CompassDist := Abs(srl.DeltaAngle(CurrentAngle, Angle));
   end;
 
   Result := CompassDist < Tolerance;

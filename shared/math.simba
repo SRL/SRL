@@ -1,10 +1,10 @@
 (*
-Modulo
+srl.Modulo
 ~~~~~~
 
 .. code-block:: pascal
 
-    function Modulo(X, Y: Double): Double;
+    function TSRL.Modulo(X, Y: Double): Double;
 
 This function returns the remainder from the division of the first argument by the second.
 Though it always returns a result with the same sign as its second operand (or zero).
@@ -13,20 +13,20 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(Modulo(a, b));
+    Writeln(srl.Modulo(a, b));
 *)
-function Modulo(X, Y: Double): Double;
+function TSRL.Modulo(X, Y: Double): Double;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
 
 (*
-Modulo; overload
+srl.Modulo; overload
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function Modulo(X, Y: Integer): Integer; overload;
+    function TSRL.Modulo(X, Y: Integer): Integer; overload;
 
 Integer overload for Modulo.
 
@@ -34,41 +34,41 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(Modulo(a, b));
+    Writeln(srl.Modulo(a, b));
 *)
-function Modulo(X, Y: Integer): Integer; overload;
+function TSRL.Modulo(X, Y: Integer): Integer; overload;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
 
 (*
-DeltaAngle
+srl.DeltaAngle
 ~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
+    function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
 
-Calculates the shortest difference between two given angles.
+Returns the shortest difference between two given angles.
 
 Example:
 
 .. code-block:: pascal
 
-    Writeln(DeltaAngle(350.0, 10.0));
+    Writeln(srl.DeltaAngle(350.0, 10.0));
 *)
-function DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
+function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
 begin
   Result := Modulo((DegA - DegB + R/2), R) - R/2;
 end;
 
 (*
-PointInRect
+srl.PointInRect
 ~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;
+    function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;
 
 Returns true if the TPoint 'Pt' is in a rect (defined by four points).
 
@@ -80,7 +80,7 @@ Example:
 
     Writeln(PointInRect(Point(100, 100), Point(0, 0), Point(200, 1), Point(201, 201), Point(0, 225)));
 *)
-function PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;
+function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;
 var
   Vec:TPoint;
   Dot:Extended;
