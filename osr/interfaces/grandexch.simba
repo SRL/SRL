@@ -648,3 +648,7 @@ begin
   end;
 end;
 {$ENDIF}
+
+begin
+  GrandExchange.__Setup();
+end.
