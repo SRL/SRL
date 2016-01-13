@@ -3,17 +3,18 @@ Logout
 =======
 The file holds functions and procedures that are in the logout-tab.
 *)
-const 
-  WS_IS_OPEN:UInt8 = 127;  
-  
+
 (*
 type TRSLogout
 ~~~~~~~~~~~~~~~
 The type that holds functions and properties of the Runescape logout-tab.
 *)
 type
+  ELogoutSubtab = (lsTabNone, lsTabLogout, lsTabWorldSelect);
+
   TRSLogout = record(TInterfaceBase)
-    btnWorldSwitch: TBox;
+    FCurrentTab: ELogoutSubtab;
+    btnOpenWS: TBox;
     btnLogout: TBox;
     btnLogoutWS: TBox; //not used yet
     btnExitWS: TBox;
@@ -40,17 +41,29 @@ var i:Int32;
 begin
   with Self do
   begin
+    FCurrentTab := lsTabLogout;
+  
     FName := 'Logout';
     FStatic := True;
     FBounds := [550,206,733,464];
     
-    btnWorldSwitch := [575,346,708,375];
-    btnLogout := [575,405,708,431];
-    btnLogoutWS := [0,0,0,0];
-    btnExitWS := [716, 207, 734, 225];
+    btnOpenWS  := [575,346,708,375];
+    btnLogout  := [575,405,708,431];
+    btnLogoutWS:= [0,0,0,0];
+    btnExitWS  := [716, 207, 734, 225];
   end;
 end;
 {$ENDIF}
+
+
+function TRSLogout.UpdateSubtab(): ELogoutSubtab;
+begin
+  self.FCurrentTab := lsTabLogout;
+  if self.IsWorldSelectOpen(Random(450,900)) then
+    self.FCurrentTab := lsTabWorldSelect;
+  Result := self.FCurrentTab;
+end;
+
 
 (*
 logout.Open
@@ -71,30 +84,28 @@ logout.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogout.IsOpen(): Boolean;
+  function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone): Boolean;
 
-Checks if the interface is already open.
+Checks if the interface is already open. Can also be used to check if a specific "subtab" is open.
 *)
-function TRSLogout.IsOpen(WaitTime:Int32=0): Boolean;
+function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone): Boolean;
 var p:TPoint;
 begin
   Result := Gametabs.IsOpen(tabLogout);
-  
-  if Result and not(srl.FindText(p, 'Switcher', 'UpChars07_s', Self.FBounds)) then
-    if self.WSIsOpen(Random(450,900)) then
-      Result := WS_IS_OPEN;
+   if (Result) and (Tab <> lsTabNone) then
+    Result := Self.UpdateSubtab() = tab;
 end;
 
 (*
-logout.WSIsOpen
+logout.IsWorldSelectOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogout.WSIsOpen(): Boolean;
+  function TRSLogout.IsWorldSelectOpen(): Boolean;
 
 Checks if the sub-interface: "world switcher" is open.
 *)
-function TRSLogout.WSIsOpen(WaitTime:Int32=0): Boolean;
+function TRSLogout.IsWorldSelectOpen(WaitTime:Int32=0): Boolean;
 var
   t: UInt64;
   p: TPoint;
@@ -105,56 +116,62 @@ begin
   t := GetTickCount64() + WaitTime;
   repeat
     if (srl.FindText(p, 'Current world', 'UpChars07_s', Self.GetBounds())) then
+    begin
+      Self.FCurrentTab := lsTabWorldSelect;
       Exit(True);
-    Wait(Random(50, 100));
+    end 
+    else
+      Wait(Random(50, 100));
   until (GetTickCount64() > t);
 
   Result := False;
 end;
 
 (*
-logout.OpenWS
+logout.OpenWorldSelect
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogout.OpenWS(): Boolean;
+  function TRSLogout.OpenWorldSelect(): Boolean;
 
 Opens the sub-interface (World Switcher)
 *)
-function TRSLogout.OpenWS(): Boolean;
+function TRSLogout.OpenWorldSelect(): Boolean;
 var 
   t:UInt64;
 begin
   if not(self.Open()) then
-    Exit();
-  Result := UInt8(self.IsOpen()) = WS_IS_OPEN;
+    Exit(False);
   
+  Result := self.IsOpen(lsTabWorldSelect);
   if not(Result) then
   begin
-    mouse.Click(Self.BtnWorldSwitch, mouse_left);
+    mouse.Click(Self.BtnOpenWS, mouse_left);
     t := GetTickCount64() + Random(500,1000);
     repeat
-      if self.WSIsOpen() then Exit(True);
-      Wait(75);
+      if (self.UpdateSubTab() = lsTabWorldSelect) then 
+        Exit(True)
+      else
+        Wait(75);
     until (GetTickCount64() > t);
   end;
 end;
 
 (*
-logout.CloseWS
+logout.CloseWorldSelect
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogout.CloseWS(): Boolean;
+  function TRSLogout.CloseWorldSelect(): Boolean;
 
-Closes the sub-interface (World Switcher), does nothing if it's not open.
+Closes/Switches from the `world select` subtab, does nothing if it's not open.
 *)
-procedure TRSLogout.CloseWS();
+procedure TRSLogout.CloseWorldSelect();
 var
   p: TPoint;
   t:UInt64;
 begin
-  if UInt8(self.IsOpen()) = WS_IS_OPEN then
+  if self.IsOpen(lsTabWorldselect) then
   begin
     Mouse.Click(BtnExitWS, mouse_Left);
     t := GetTickCount64() + Random(400,900);
@@ -181,7 +198,7 @@ var
   t,seed:UInt64;
 begin
   if not(self.Open()) then Exit();
-  self.CloseWS();
+  self.CloseWorldSelect();
   
   seed := 3153;
   Inc(tryTime, attemts * seed div 2);
@@ -232,7 +249,7 @@ var
   wo: String;
 begin
   Result := False;
-  wo := toString(ShortWorld(world));
+  wo := ToString(ShortWorld(world));
   WorldBox := Box(565, 229, 585, 431);
   t := GetTickCount64() + Random(8000, 10000);
 
@@ -274,10 +291,9 @@ Jumps to the given world.
 *)
 function TRSLogout.SwitchToWorld(World: Integer): Boolean;
 begin
-  if (not Self.OpenWS()) then
+  if (not Self.OpenWorldSelect()) and (not ClickWorld(World)) then
     Exit(False);
-  if (not ClickWorld(World)) then
-    Exit(False);
+
   Result := True;
   Chatbox.ClickOption(['Yes.'], Random(2000, 2500));
   Chatbox.PleaseWait();

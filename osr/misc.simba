@@ -79,8 +79,11 @@ function TSRL.GetLevelAtXP(XP:UInt32): Int32;
 var 
   total:Double;
 begin
-  while (total < XP*4+1) and (Result+=1) do // breaks ci keep it last in the file !
+  while (total < XP*4+1) do
+  begin  
+    Inc(Result);
     total += Floor(Result + 300 * 2 ** (Result / 7));
+  end;
   Result -= 1;
 end;
 

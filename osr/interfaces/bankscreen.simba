@@ -379,7 +379,7 @@ begin
   if not(self.IsOpen()) or (not InRange(slot,0,27)) then
     Exit();
 
-  Result := not inventory.SlotIsUsed(slot);
+  Result := not inventory.IsSlotUsed(slot);
   if not(Result) then
   begin
     Mouse.Move(inventory.GetSlotBox(slot));
@@ -412,7 +412,7 @@ begin
   begin
     Result := True;
     for i:=0 to High(slotArr) do
-      if inventory.SlotIsUsed(slotArr[i]) then
+      if inventory.IsSlotUsed(slotArr[i]) then
       begin
         self.DepositItem(slotArr[i], False);
         srl.NormalWait(6,25);
@@ -423,7 +423,7 @@ begin
       begin
         t := GetTickCount64() + 200;
         repeat
-          Result := not(inventory.SlotIsUsed(slotArr[i]));
+          Result := not(inventory.IsSlotUsed(slotArr[i]));
         until (GetTickCount64() > t) or Result;
       end;
 

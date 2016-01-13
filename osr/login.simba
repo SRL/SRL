@@ -213,8 +213,8 @@ begin
       Exit(False);
   end;
 
-  Clear[_LOGIN_BOX_LOGIN] := CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox);
-  Clear[_LOGIN_BOX_PASSWORD] := CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox);
+  Clear[_LOGIN_BOX_LOGIN]    := CountColor(_LOGIN_TEXT_WHITE, Self.LoginBox) <> 0;
+  Clear[_LOGIN_BOX_PASSWORD] := CountColor(_LOGIN_TEXT_WHITE, Self.PasswordBox) <> 0;
 
   { Login }
   if (Self.GetCursor() <> _LOGIN_BOX_LOGIN) then

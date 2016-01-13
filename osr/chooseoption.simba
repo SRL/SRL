@@ -232,6 +232,58 @@ begin
 end;
 
 (*
+ChooseOption.Select
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+
+By default it will click the given option, if not found the menu is closed.
+Returns true if the select-action was performed.
+- moves the mouse to the first match of the given options ``SubStrings``.
+- left-clicks it ``mouseAction:Int32=mouse_left;``
+- if it's not found option-menu will be closed AClose (``AClose:Boolean=True;``)
+- search can be case insensitive (``CaseSensitive:Boolean=True``)
+  
+.. note:: by slacky
+*)
+function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+var
+  Choices: TOptionArray;
+  i,j,L:Int32;
+begin
+  Choices := Self.GetOptions();
+  L := Length(Choices);
+  if L = 0 then
+    Exit(False);
+
+  for i:=0 to L-1 do
+    for j:=0 to High(SubStrings) do
+      case CaseSensitive of
+        True:
+          if Pos(SubStrings[j],Choices[i].str)<>0 then
+          begin
+            Mouse.Click(Choices[i].bounds, mouseAction);
+            Exit(True);
+          end;
+        False:
+          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str))<>0 then
+          begin
+            Mouse.Click(Choices[i].bounds, mouseAction);
+            Exit(True);
+          end;
+      end;
+
+  if AClose then
+    Self.Close();
+end;
+
+function TRSChooseOption.Select(Option: String; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
+begin
+  Result := Self.Select([Option], mouseAction, AClose, CaseSensitive);
+end;
+
+(*
 ChooseOption.Close
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -291,58 +343,6 @@ begin
     self.Select(['Cancel']);
     Result := self.IsClosed();
   end;
-end;
-
-(*
-ChooseOption.Select
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
-
-By default it will click the given option, if not found the menu is closed.
-Returns true if the select-action was performed.
-- moves the mouse to the first match of the given options ``SubStrings``.
-- left-clicks it ``mouseAction:Int32=mouse_left;``
-- if it's not found option-menu will be closed AClose (``AClose:Boolean=True;``)
-- search can be case insensitive (``CaseSensitive:Boolean=True``)
-  
-.. note:: by slacky
-*)
-function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
-var
-  Choices: TOptionArray;
-  i,j,L:Int32;
-begin
-  Choices := Self.GetOptions();
-  L := Length(Choices);
-  if L = 0 then
-    Exit(False);
-
-  for i:=0 to L-1 do
-    for j:=0 to High(SubStrings) do
-      case CaseSensitive of
-        True:
-          if Pos(SubStrings[j],Choices[i].str)<>0 then
-          begin
-            Mouse.Click(Choices[i].bounds, mouseAction);
-            Exit(True);
-          end;
-        False:
-          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str))<>0 then
-          begin
-            Mouse.Click(Choices[i].bounds, mouseAction);
-            Exit(True);
-          end;
-      end;
-
-  if AClose then
-    Self.Close();
-end;
-
-function TRSChooseOption.Select(Option: String; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
-begin
-  Result := Self.Select([Option], mouseAction, AClose, CaseSensitive);
 end;
 
 begin
