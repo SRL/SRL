@@ -15,9 +15,9 @@ begin
   Result := FName;
 end;
 
-procedure TInterfaceBase.setStatic(const Static: Boolean);
+procedure TInterfaceBase.setStatic(const stat: Boolean);
 begin
-  FStatic := Static;
+  FStatic := stat;
 end;
 
 function TInterfaceBase.getStatic(): Boolean;

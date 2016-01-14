@@ -28,6 +28,7 @@ const
 
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
+var slotBounds:TBox = [73, 83, 456, 298];
 begin
   with Self do
   begin
@@ -35,7 +36,7 @@ begin
     SetName('Bankscreen');
     SetStatic(True);
 
-    FSlots := Box(73, 83, 456, 298).Partition(6,8);
+    FSlots := slotBounds.Partition(6,8);
     FSlots.ModifySide('x2',-16);
     FSlots.ModifySide('y2',-4);
 
