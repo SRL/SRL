@@ -15,7 +15,7 @@ type
 {$ifdecl TChildWindowArr}
 function TSmartBase.GetHWND(): PtrUInt;
 var
-  a: TSysProcArr := Client.getIOManager().GetProcesses();
+  a: TSysProcArr := Client.GetIOManager().GetProcesses();
   c: TChildWindowArr;
   i, j: Integer;
 begin
@@ -31,7 +31,12 @@ begin
           Exit(c[j].Handle);
     end;
 
-  srl.Writeln(Self.Name + 'getHWND(): Failed to find hwnd');
+  srl.WriteLn(Self.Name + 'getHWND(): Failed to find hwnd');
+end;
+{$else}
+function TSmartBase.GetHWND(): PtrUInt;
+begin
+ srl.WriteLn(Self.Name + 'getHWND(): Failed to find hwnd');
 end;
 {$endif}
 
@@ -189,11 +194,11 @@ end;
 function TSmartBase.CreateClient(): Boolean;
 begin
   Result := True;
-  srl.Writeln(Self.Name + '.CreateClient()', dtHeader);
+  srl.WriteLn(Self.Name + '.CreateClient()', dtHeader);
 
   if (@Self.GetParams <> nil) then
     if (not Self.GetParams()) then
-      Exit(srl.Writeln('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False'));
+      Exit(srl.WriteLn('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False'));
 
   with (Self.Parameters) do
   begin
@@ -209,26 +214,26 @@ begin
       JavaPath += '.exe'
     {$ENDIF};
 
-    srl.Writeln('Java path: ' + JavaPath);
-    srl.Writeln('Params: ' + Root + Param);
-    srl.Writeln('Plugins: ' + toString(Plugins));
+    srl.WriteLn('Java path: ' + JavaPath);
+    srl.WriteLn('Params: ' + Root + Param);
+    srl.WriteLn('Plugins: ' + toString(Plugins));
 
     Self.Target := SmartSpawnClient(JavaPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]),
                                     Root, Param, Width, Height, InitSeq, UserAgent, '', Implode(',', Plugins));
   end;
 
   if (Self.Target = 0) then
-    Exit(srl.Writeln('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False'));
+    Exit(srl.WriteLn('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False'));
 
   Self.PID := SmartGetClientPID(Self.Target);
   if (not Self.SetAsTarget()) then
   begin
     SmartFreeClient(Self.Target);
-    Exit(srl.Writeln('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False'));
+    Exit(srl.WriteLn('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False'));
   end;
 
-  srl.Writeln('Succesfully created a SMART client, PID = ' + toString(Self.PID));
-  srl.Writeln(Self.Name + '.CreateClient(): Result = True', dtFooter);
+  srl.WriteLn('Succesfully created a SMART client, PID = ' + toString(Self.PID));
+  srl.WriteLn(Self.Name + '.CreateClient(): Result = True', dtFooter);
 end;
 
 function TSmartBase.PairToExisting(): Boolean;
@@ -252,7 +257,7 @@ begin
   if (Length(Pids) = 0) then
     Exit();
 
-  srl.Writeln(Self.Name + '.PairToExisting()', dtHeader);
+  srl.WriteLn(Self.Name + '.PairToExisting()', dtHeader);
   srl.WriteFmt('Free clients: %s', [toString(Pids)]);
 
   for i := 0 to High(Pids) do
@@ -280,7 +285,7 @@ begin
     end;
   end;
 
-  srl.Writeln(Self.Name + '.PairToExisting(): Result = False', dtFooter);
+  srl.WriteLn(Self.Name + '.PairToExisting(): Result = False', dtFooter);
 end;
 
 function TSmartBase.Reload(): Boolean;
@@ -316,7 +321,7 @@ begin
   Result := False;
   Self.Name := GetGlobalName(@Self);
 
-  srl.Writeln(Self.Name + '.Init()', dtHeader);
+  srl.WriteLn(Self.Name + '.Init()', dtHeader);
 
   if (Self.InitAttempts = 0) then
     Self.InitAttempts := 1;
@@ -352,7 +357,7 @@ begin
   else
     Self.SetDebug(False);
 
-  srl.Writeln(Self.Name + '.Init(): Result = True', dtFooter);
+  srl.WriteLn(Self.Name + '.Init(): Result = True', dtFooter);
 end;
 
 procedure TSmartBase.Free();

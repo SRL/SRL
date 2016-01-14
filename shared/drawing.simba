@@ -136,7 +136,7 @@ Example:
 
 .. code-block:: pascal
 
-    bmp.DrawBox(intToBox(50, 50, 345, 345));
+    bmp.DrawBox(IntToBox(50, 50, 345, 345));
 
 *)
 procedure TMufasaBitmap.DrawBox(box: TBox; color: TColor = clRed); overload;
@@ -168,7 +168,7 @@ Example:
 *)
 procedure TMufasaBitmap.DrawBox(x1,y1,x2,y2:Int32; fill:Boolean; color:TColor); overload;
 begin
-  self.DrawBox(intToBox(x1, y1, x2, y2), fill, color);
+  self.DrawBox(IntToBox(x1, y1, x2, y2), fill, color);
 end;
 
 (*
@@ -191,7 +191,7 @@ Example:
 
 .. code-block:: pascal
 
-    image.drawClippedBox(intToBox(50, 50, 100, 100), true, clLime);
+    image.DrawClippedBox(Box(50, 50, 100, 100), true, clLime);
 *)
 procedure TMufasaBitmap.DrawClippedBox(box: TBox; fill: boolean; color: TColor);
 var
@@ -224,8 +224,8 @@ Example:
 
 .. code-block:: pascal
 
-    image.DrawBoxes([intToBox(10, 10, 20, 20), intToBox(50, 50, 250, 250),
-                   intToBox(440, 440, 600, 600)], true, clRed);
+    image.DrawBoxes([Box(10, 10, 20, 20), Box(50, 50, 250, 250),
+                     Box(440, 440, 600, 600)], true, clRed);
 
 *)
 procedure TMufasaBitmap.DrawBoxes(boxArr: TBoxArray; fill: boolean; color: TColor);
@@ -258,7 +258,7 @@ Example:
 .. code-block:: pascal
 
     image.DrawBoxes([Box(10, 10, 20, 20), Box(50, 50, 250, 250),
-                   Box(440, 440, 600, 600)], true, [clRed, clLime, clOrange]);
+                     Box(440, 440, 600, 600)], true, [clRed, clLime, clOrange]);
 
 *)
 procedure TMufasaBitmap.DrawBoxes(boxArr: TBoxArray; fill: boolean; colors: TColorArray); overload;

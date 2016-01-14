@@ -92,7 +92,7 @@ var
   i:Int32;
   f:Double:=n;
 begin
-  while (abs(f) >= 1000) do
+  while (Abs(f) >= 1000) do
   begin  
     Inc(i);
     f := f / 1000;

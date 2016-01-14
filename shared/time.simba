@@ -23,9 +23,9 @@ begin
   end;
 
   STA[Ord(Time_Formal)] := [' Hours, ', ' Minutes and ', ' Seconds', False, 0];
-  STA[Ord(Time_Short)] := ['h ', 'm ', 's', False, 2];
+  STA[Ord(Time_Short)]  := ['h ', 'm ', 's', False, 2];
   STA[Ord(Time_Abbrev)] := [' hr ', ' min ', ' sec', False, 0];
-  STA[Ord(Time_Bare)] := [':', ':', '', True, 2];
+  STA[Ord(Time_Bare)]   := [':', ':', '', True, 2];
   STA[Ord(Time_FStop)]  := ['.', '.', '', True, 2];
   STA[Ord(Time_Formal_Long)] := [' Years, ', ' Months, ', ' Weeks, ', ' Days, ', ' Hours, ', ' Minutes and ', ' Seconds', False, 0];
 
@@ -94,12 +94,12 @@ type
   end;
 
 (*
-TTimeMarker.start
+TTimeMarker.Start
 ~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
-    procedure TTimeMarker.start();
+    procedure TTimeMarker.Start();
 
 Starts the timer. Can also be used when paused to continue where it left.
 
@@ -111,16 +111,16 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.start();
+    MyScriptTimer.Start();
 *)
-procedure TTimeMarker.start();
+procedure TTimeMarker.Start();
 begin
   if (Self.startTime = 0) then
-    Self.__prevMark := getTickCount64(); // used for adding time after a pause
+    Self.__prevMark := GetTickCount64(); // used for adding time after a pause
 
   if (not Self.paused) and (Self.startTime = 0) then
   begin
-    Self.startTime := getTickCount64();
+    Self.startTime := GetTickCount64();
     Self.time := 0;
   end;
 
@@ -128,12 +128,12 @@ begin
 end;
 
 (*
-TTimeMarker.reset
+TTimeMarker.Reset
 ~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
-    procedure TTimeMarker.reset();
+    procedure TTimeMarker.Reset();
 
 Stops the timer and resets it to zero.
 
@@ -145,9 +145,9 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.reset();
+    MyScriptTimer.Reset();
 *)
-procedure TTimeMarker.reset();
+procedure TTimeMarker.Reset();
 begin
   Self.paused := False;
   Self.time := 0;
@@ -156,7 +156,7 @@ begin
 end;
 
 (*
-TTimeMarker.pause
+TTimeMarker.Pause
 ~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
@@ -173,23 +173,23 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.pause();
+    MyScriptTimer.Pause();
     TakeABreak(90000);
-    MyScriptTimer.start();
+    MyScriptTimer.Start();
 *)
-procedure TTimeMarker.pause();
+procedure TTimeMarker.Pause();
 begin
-  Self.time := Self.time + (getTickCount64() - Self.__prevMark);
+  Self.time := Self.time + (GetTickCount64() - Self.__prevMark);
   Self.paused := True;
 end;
 
 (*
-TTimeMarker.getTime
+TTimeMarker.GetTime
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
-    function TTimeMarker.getTime(): LongWord;
+    function TTimeMarker.GetTime(): LongWord;
 
 Gets the time from the timer. Returns zero if the timer was not set.
 
@@ -204,24 +204,24 @@ Example:
     MyScriptTimer.start();
     repeat
         DoStuff;
-    until(MyScriptTimer.getTime() > 60000);
+    until(MyScriptTimer.GetTime() > 60000);
 
 *)
-function TTimeMarker.getTime(): UInt64;
+function TTimeMarker.GetTime(): UInt64;
 begin
   if not Self.paused then
-    Result := Self.time + (getTickCount64() - Self.__prevMark)
+    Result := Self.time + (GetTickCount64() - Self.__prevMark)
   else
     Result := Self.time;
 end;
 
 (*
-TTimeMarker.getTotalTime
+TTimeMarker.GetTotalTime
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block pascal
 
-    function TTimeMarker.getTotalTime(): LongWord;
+    function TTimeMarker.GetTotalTime(): LongWord;
 
 Gets the time from the timer including the time it was paused. Returns zero if
 the timer was not set.
@@ -234,12 +234,12 @@ Example:
 
 .. code-block:: pascal
 
-    BreakTime := MyTimer.getTotalTime() - MyTimer.getTime();
+    BreakTime := MyTimer.GetTotalTime() - MyTimer.getTime();
 
 *)
-function TTimeMarker.getTotalTime(): UInt64;
+function TTimeMarker.GetTotalTime(): UInt64;
 begin
   if (Self.startTime > 0) then
-    Result := getTickCount64() - Self.startTime;
+    Result := GetTickCount64() - Self.startTime;
 end;
 

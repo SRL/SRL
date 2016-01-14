@@ -94,7 +94,7 @@ ColorSetting
 
 .. code-block:: pascal
 
-    function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Saturation: Extended = 0.2; Sensitivity: Extended = 0.00): TColorSettings;
+    function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Sat: Extended = 0.2; Sens: Extended = 0.00): TColorSettings;
 
 Creates a TColorSettings type.
 
@@ -107,12 +107,12 @@ Example:
     // CTS 1
     Writeln(ColorSetting(1));
 *)
-function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Saturation: Extended = 0.2; Sensitivity: Extended = 0.00): TColorSettings;
+function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Sat: Extended = 0.2; Sens: Extended = 0.00): TColorSettings;
 begin
   Result.CTS := CTS;
   Result.Modifier.Hue := Hue;
-  Result.Modifier.Saturation := Saturation;
-  Result.Modifier.Sensitivity := Sensitivity;
+  Result.Modifier.Saturation := Sat;
+  Result.Modifier.Sensitivity := Sens;
 end;
 
 (*

@@ -5,37 +5,37 @@ type
     FStatic: Boolean;
   end;
 
-procedure TInterfaceBase.setName(const Name: String);
+procedure TInterfaceBase.SetName(const Name: String);
 begin
   FName := Name;
 end;
 
-function TInterfaceBase.getName(): String;
+function TInterfaceBase.GetName(): String;
 begin
   Result := FName;
 end;
 
-procedure TInterfaceBase.setStatic(const stat: Boolean);
+procedure TInterfaceBase.SetStatic(const isStatic: Boolean);
 begin
-  FStatic := stat;
+  FStatic := isStatic;
 end;
 
-function TInterfaceBase.getStatic(): Boolean;
+function TInterfaceBase.GetStatic(): Boolean;
 begin
   Result := FStatic;
 end;
 
-procedure TInterfaceBase.setBounds(const NewBounds: TBox);
+procedure TInterfaceBase.SetBounds(const NewBounds: TBox);
 begin
   Self.FBounds := NewBounds;
 end;
  
-function TInterfaceBase.getBounds(): TBox;
+function TInterfaceBase.GetBounds(): TBox;
 begin
   Result := Self.FBounds;
 end;
  
-function TInterfaceBase.getMiddle(): TPoint;
+function TInterfaceBase.GetMiddle(): TPoint;
 begin
   Result := MiddleBox(Self.FBounds);
 end;
