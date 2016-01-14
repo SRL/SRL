@@ -885,7 +885,7 @@ begin
 end;
 
 {$ifndecl GetTickCount64}
-var GetTickCount64: function():Int64 := Pointer(@GetTickCount);
+var GetTickCount64: function():UInt64 := GetTickCount;
 {$endif}
 
 {$f+}
