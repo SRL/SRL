@@ -80,7 +80,7 @@ TTimeMarker
         paused: Boolean;
     end;
 
-Timer type which is usefull for loops, timing and writing progress reports.
+Timer type which is useful for loops, timing and writing progress reports.
 
 .. note::
 
@@ -88,9 +88,8 @@ Timer type which is usefull for loops, timing and writing progress reports.
 *)
 type
   TTimeMarker = record
-    name: string;
-    time, startTime, __prevMark: UInt64;
-    paused: Boolean;
+    FTime, FStartTime, FPrevMark: UInt64;
+    FPaused: Boolean;
   end;
 
 (*
@@ -111,20 +110,20 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.Start();
+    myTimer.Start();
 *)
 procedure TTimeMarker.Start();
 begin
-  if (Self.startTime = 0) then
-    Self.__prevMark := GetTickCount64(); // used for adding time after a pause
+  if (Self.FStartTime = 0) then
+    Self.FPrevMark := GetTickCount64(); // used for adding time after a pause
 
-  if (not Self.paused) and (Self.startTime = 0) then
+  if (not Self.FPaused) and (Self.FStartTime = 0) then
   begin
-    Self.startTime := GetTickCount64();
-    Self.time := 0;
+    Self.FStartTime := GetTickCount64();
+    Self.FTime := 0;
   end;
 
-  Self.paused := False;
+  Self.FPaused := False;
 end;
 
 (*
@@ -145,14 +144,14 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.Reset();
+    myTimer.Reset();
 *)
 procedure TTimeMarker.Reset();
 begin
-  Self.paused := False;
-  Self.time := 0;
-  Self.startTime := 0;
-  Self.__prevMark := 0;
+  Self.FPaused := False;
+  Self.FTime := 0;
+  Self.FStartTime := 0;
+  Self.FPrevMark := 0;
 end;
 
 (*
@@ -161,7 +160,7 @@ TTimeMarker.Pause
 
 .. code-block pascal
 
-    procedure TTimeMarker.pause();
+    procedure TTimeMarker.Pause();
 
 Pauses the timer. It can be continued with start().
 
@@ -173,14 +172,14 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.Pause();
+    myTimer.Pause();
     TakeABreak(90000);
-    MyScriptTimer.Start();
+    myTimer.Start();
 *)
 procedure TTimeMarker.Pause();
 begin
-  Self.time := Self.time + (GetTickCount64() - Self.__prevMark);
-  Self.paused := True;
+  Self.FTime := Self.FTime + (GetTickCount64() - Self.FPrevMark);
+  Self.FPaused := True;
 end;
 
 (*
@@ -189,7 +188,7 @@ TTimeMarker.GetTime
 
 .. code-block pascal
 
-    function TTimeMarker.GetTime(): LongWord;
+    function TTimeMarker.GetTime(): UInt64;
 
 Gets the time from the timer. Returns zero if the timer was not set.
 
@@ -201,18 +200,18 @@ Example:
 
 .. code-block:: pascal
 
-    MyScriptTimer.start();
+    myTimer.start();
     repeat
-        DoStuff;
-    until(MyScriptTimer.GetTime() > 60000);
+      DoStuff;
+    until(myTimer.GetTime() > 60000);
 
 *)
 function TTimeMarker.GetTime(): UInt64;
 begin
-  if not Self.paused then
-    Result := Self.time + (GetTickCount64() - Self.__prevMark)
+  if not Self.FPaused then
+    Result := Self.FTime + (GetTickCount64() - Self.FPrevMark)
   else
-    Result := Self.time;
+    Result := Self.FTime;
 end;
 
 (*
@@ -221,7 +220,7 @@ TTimeMarker.GetTotalTime
 
 .. code-block pascal
 
-    function TTimeMarker.GetTotalTime(): LongWord;
+    function TTimeMarker.GetTotalTime(): UInt64;
 
 Gets the time from the timer including the time it was paused. Returns zero if
 the timer was not set.
@@ -234,12 +233,45 @@ Example:
 
 .. code-block:: pascal
 
-    BreakTime := MyTimer.GetTotalTime() - MyTimer.getTime();
+    BreakTime := MyTimer.GetTotalTime() - MyTimer.GetTime();
 
 *)
 function TTimeMarker.GetTotalTime(): UInt64;
 begin
-  if (Self.startTime > 0) then
-    Result := GetTickCount64() - Self.startTime;
+  if (Self.FStartTime > 0) then
+    Result := GetTickCount64() - Self.FStartTime;
 end;
 
+
+(*
+TTimeMarker.GetTime
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block pascal
+
+    function TTimeMarker.TimeoutIn(ms:Int64; UseTotal:Boolean=False): Boolean;
+
+Same as ``myTimer.GetTime() < t``
+
+Example:
+
+.. code-block:: pascal
+
+    myTimer.start();
+    while myTimer.TimeoutIn(5000) do
+    begin
+      WriteLn(myTimer.GetTime());
+      Wait(995);
+    end;
+
+*)
+function TTimeMarker.TimeoutIn(ms:Int64; UseTotal:Boolean=False): Boolean;
+begin
+  if UseTotal and (Self.FStartTime > 0) then
+    Result := (GetTickCount64() - Self.FStartTime) < ms
+  else if not UseTotal then
+    if not Self.FPaused then
+      Result := (Self.FTime + (GetTickCount64() - Self.FPrevMark)) < ms
+    else
+      Result := (Self.FTime) < ms;
+end;
