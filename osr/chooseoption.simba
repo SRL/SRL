@@ -221,7 +221,7 @@ begin
       begin
         bmp2 := CopyBitmap(bmp);
         CropBitmap(bmp2, B.x1,B.y1,B.x2,B.y2);
-        Result[i].str := ocr.Recognize(BitmapToMatrix(bmp2),FontSetting(255,1), UpFont);
+        Result[i].str := ocr.RecognizeEx(BitmapToMatrix(bmp2),FontSetting(255,1), UpFont);
         FreeBitmap(bmp2);
       end;
       B.Offset(Point(x1, y1));

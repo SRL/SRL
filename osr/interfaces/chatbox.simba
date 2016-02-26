@@ -94,7 +94,7 @@ begin
   BMP := CreateBitmap(B.x2-B.x1+1,B.y2-B.y1+2);
   DrawTPABitmap(BMP,textArr,255);
 
-  Result := OCR.Recognize(BitmapToMatrix(bmp),TCompareRules([255]), SmallFont);
+  Result := OCR.RecognizeEx(BitmapToMatrix(bmp),TCompareRules([255]), SmallFont);
   FreeBitmap(bmp);
 end;
 

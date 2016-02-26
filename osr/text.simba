@@ -37,17 +37,18 @@ begin
   Result := Inherited(B, Filter, MaxWalk);
 end;
 
+
 // overloads which takes a fontset.
-function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet): String; overload;
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet; MaxWalk:Int32=40): String; overload;
 begin
   Self.SetFont(Font);
-  Result := Self.Recognize(B, Filter);
+  Result := Self.Recognize(B, Filter, MaxWalk);
 end;
 
-function TSimpleOCR.Recognize(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
+function TSimpleOCR.RecognizeEx(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
-  Result := Self.Recognize(AClient, Filter);
+  Result := Self.RecognizeEx(AClient, Filter);
 end;
 
 function TSimpleOCR.ExpectText(txt:String; B:TBox; font:TFontSet; setting:TCompareRules; maxWait:Int32=6000): Boolean;
@@ -68,6 +69,7 @@ begin
   UpFont.Load(FontPath+'UpChars07_s'); 
   NPCFont.Load(FontPath+'CharsNPC07'); 
   StatFont.Load(FontPath+'StatChars07');
+
   OCR.Init(SmallFont); //just init it with W/E font.
   //freeing OCR and fonts is handeled automatically by lape
 end;

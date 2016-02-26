@@ -98,7 +98,7 @@ begin
   FastReplaceColor(bmp, 2070783, 0);
   client := BitmapToMatrix(bmp);
   OCR.SetFont(UpFont);
-  Result := OCR.Recognize(client, OCR_RULES_UPTEXT);
+  Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT);
   FreeBitmap(bmp);
   {$IFDEF UPTEXT_DEBUG}
     srl.Writeln('UpText found: ' + Result);
