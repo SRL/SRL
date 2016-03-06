@@ -184,8 +184,9 @@ end;
 
 function TBox.InnerBorder(Size: Integer): TBoxArray;
 begin
-  Result += Box(Self.X1, Self.Y1, Self.X2, Self.Y1 + Size);
-  Result += Box(Self.X1, Self.Y2 - Size, Self.X2, Self.Y2);
-  Result += Box(Self.X1, Result[0].Y2 + 1, Self.X1 + Size, Result[1].Y1 - 1);
-  Result += Box(Self.X2 - Size, Result[0].Y2 + 1, Self.X2, Result[1].Y1 - 1);
+  SetLength(Result, 4);
+  Result[0] := [Self.X1, Self.Y1, Self.X2, Self.Y1 + Size];
+  Result[1] := [Self.X1, Self.Y2 - Size, Self.X2, Self.Y2];
+  Result[2] := [Self.X1, Result[0].Y2 + 1, Self.X1 + Size, Result[1].Y1 - 1];
+  Result[3] := [Self.X2 - Size, Result[0].Y2 + 1, Self.X2, Result[1].Y1 - 1];
 end;

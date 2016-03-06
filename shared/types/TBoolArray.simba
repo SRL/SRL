@@ -1,6 +1,9 @@
 procedure TBoolArray.Append(const Value: Boolean);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TBoolArray.Insert(const Value: Boolean; Index: Integer);
@@ -80,11 +83,14 @@ end;
 
 function TBoolArray.FindAll(const Value: Boolean): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
-  for i := 0 to High(Self) do
+  for i:=0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TBoolArray.Reversed(): TBoolArray;

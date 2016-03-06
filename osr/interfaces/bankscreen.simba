@@ -153,7 +153,7 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray; MinWidth: Integer = 10; MinHeight: Integer = 10): Boolean;
+function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray; MinWidth, MinHeight:Integer = 10): Boolean;
 const
   COLOR_SKIN: TColorEx = [5603764, 18, [2, [0.02, 0.70]]];
 var
@@ -166,7 +166,7 @@ begin
   if (not FindColorsTolerance(TPASkin, COLOR_SKIN.Color, Mainscreen.getBounds(), COLOR_SKIN.Tolerance, COLOR_SKIN.Settings)) then
     Exit(False);
 
-  ATPASkin := ClusterTPAEx(TPASkin, 5, 5);
+  ATPASkin := ClusterTPAEx(TPASkin, 5,5);
   for i := 0 to High(ATPASkin) do
     if (Length(ATPASkin[i]) < 300) then
     begin
@@ -186,7 +186,7 @@ begin
   begin
     TPA := MinAreaRectEx(ATPA[i], W, H);
     if (W >= MinWidth) and (H >= MinHeight) then
-      Points += ATPA[i];
+      Points := Points + ATPA[i];
   end;
 
   Result := Length(Points) > 0;

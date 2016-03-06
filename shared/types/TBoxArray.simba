@@ -1,62 +1,9 @@
-procedure SortBoxesFromMidPoint(var BoxArray: TBoxArray; const From: TPoint);
-
-  procedure QuickTBASort(var A: TIntegerArray; var B: TBoxArray; iLo, iHi: Integer; SortUp: Boolean);
-  var
-    Lo, Hi, Mid, T: Integer;
-    TP: TBox;
-  begin
-    if (Length(A) <> Length(B)) then Exit;
-    Lo := iLo;
-    Hi := iHi;
-    Mid := A[(Lo + Hi) shr 1];
-    repeat
-      if SortUp then
-      begin
-        while (A[Lo] < Mid) do Inc(Lo);
-        while (A[Hi] > Mid) do Dec(Hi);
-      end else
-      begin
-        while (A[Lo] > Mid) do Inc(Lo);
-        while (A[Hi] < Mid) do Dec(Hi);
-      end;
-      if (Lo <= Hi) then
-      begin
-        T := A[Lo];
-        A[Lo] := A[Hi];
-        A[Hi] := T;
-        TP := B[Lo];
-        B[Lo] := B[Hi];
-        B[Hi] := TP;
-        Inc(Lo);
-        Dec(Hi);
-      end;
-    until Lo > Hi;
-    if (Hi > iLo) then QuickTBASort(A, B, iLo, Hi, SortUp);
-    if (Lo < iHi) then QuickTBASort(A, B, Lo, iHi, SortUp);
-  end;
-
-var
-  I, L: Integer;
-  Mid: TPoint;
-  DistArr: TIntegerArray;
-begin
-  L := High(BoxArray);
-  if (L < 0) then
-    Exit;
-
-  SetLength(DistArr, L + 1);
-  for i := 0 To L do
-  begin
-    Mid := MiddleBox(BoxArray[i]);
-    DistArr[i] := Round(Sqr(From.X - Mid.X) + Sqr(From.Y - Mid.Y));
-  end;
-
-  QuickTBASort(DistArr, BoxArray, 0, L, True);
-end;
-
 procedure TBoxArray.Append(const Value: TBox);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TBoxArray.Insert(const Value: TBox; Index: Integer);
@@ -137,12 +84,15 @@ end;
 
 function TBoxArray.FindAll(const Value: TBox): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
-  for i := 0 to High(Self) do
+  for i:=0 to High(Self) do
     if (Self[i].X1 = Value.X1) and (Self[i].Y1 = Value.Y1) and
        (Self[i].X2 = Value.X2) and (Self[i].Y2 = Value.Y2) then
-         Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TBoxArray.Reversed(): TBoxArray;
@@ -195,9 +145,54 @@ begin
     MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
 end;
 
-procedure TBoxArray.SortFromMidPoint(const From: TPoint);
+procedure TBoxArray.Sort(weights: TIntegerArray; iLo, iHi: Int32; SortUp: Boolean);
+var
+  lo, hi, mid: Int32;
 begin
-  SortBoxesFromMidPoint(Self, From);
+  if (Length(weights) <> Length(self)) then Exit;
+  lo := iLo;
+  hi := iHi;
+  Mid := weights[(lo + hi) shr 1];
+  repeat
+    if SortUp then
+    begin
+      while (weights[lo] < mid) do Inc(lo);
+      while (weights[hi] > mid) do Dec(hi);
+    end else
+    begin
+      while (weights[Lo] > mid) do Inc(Lo);
+      while (weights[Hi] < mid) do Dec(Hi);
+    end;
+    if (lo <= hi) then
+    begin
+      Swap(weights[lo], weights[hi]);
+      Swap(self[lo], self[hi]);
+      Inc(lo);
+      Dec(hi);
+    end;
+  until Lo > Hi;
+  if (hi > iLo) then self.Sort(weights, iLo, hi, SortUp);
+  if (lo < iHi) then self.Sort(weights, lo, iHi, SortUp);
+end;
+
+procedure TBoxArray.SortFromMidPoint(From: TPoint);
+var
+  I, L: Integer;
+  Mid: TPoint;
+  weights: TIntegerArray;
+begin
+  L := High(Self);
+  if (L <= 0) then
+    Exit;
+
+  SetLength(weights, L + 1);
+  for i := 0 To L do
+  begin
+    Mid := MiddleBox(Self[i]);
+    weights[i] := Round(Sqr(From.X - Mid.X) + Sqr(From.Y - Mid.Y));
+  end;
+
+  Self.Sort(weights, 0, L, True);
 end;
 
 procedure TBoxArray.ModifySide(side:String='x1'; change:Int32=1);

@@ -213,7 +213,7 @@ begin
         if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
           if (GetPixel(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetPixel(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
              (GetPixel(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetPixel(TPA[i].x, TPA[i].y + 1) = PoleColor) then
-                TPAPoles += TPA[i];
+                TPAPoles.Append(TPA[i]);
 
     if (Length(TPAPoles) = 0) then
       Exit(False);
@@ -639,17 +639,17 @@ begin
       if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
         if (FastGetPixel(img, TPA[i].X-1, TPA[i].Y-1) -
             FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-          Result += Point(TPA[i].X, TPA[i].Y - 2)
+          Result.Append( [TPA[i].X, TPA[i].Y - 2] )
         else
         begin
           if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
               FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-            Result += Point(TPA[i].X - 1, TPA[i].Y - 1)
+            Result.Append( [TPA[i].X - 1, TPA[i].Y - 1] )
           else if (DotType = MMDotNPC) then
           begin
             if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
               FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = NPC_DOT_DIFF_2) then
-            Result += Point(TPA[i].X + 2, TPA[i].Y - 1)
+            Result.Append( [TPA[i].X + 2, TPA[i].Y - 1] );
           end;
         end;
 
@@ -705,16 +705,20 @@ function TMinimap.FindDTMs(const DTM: Integer; out Matches: TPointArray; Step: E
     StartA := (TheAngle - TheRange);
     EndA := (TheAngle + TheRange);
 
+    SetLength(Result, 2);
     if (StartA < 0.00) then
     begin
-      Result += TExtendedArray([360 + StartA, 360]);
-      Result += TExtendedArray([0, 0 + EndA]);
-    end else if (EndA > 360.0) then
+      Result[0] := [360.0 + StartA, 360];
+      Result[1] := [0.0, 0 + EndA];
+    end else if (EndA > 360) then
     begin
-      Result += TExtendedArray([StartA, 360]);
-      Result += TExtendedArray([0, 0 + Abs(EndA - 360)]);
+      Result[0] := [StartA, 360];
+      Result[1] := [0.0, 0 + Abs(EndA - 360)];
     end else
-      Result += TExtendedArray([StartA, EndA]);
+    begin
+      SetLength(Result, 1);
+      Result[0] := [StartA, EndA];
+    end;
   end;
 
 var
@@ -727,7 +731,7 @@ begin
 
   for i := 0 to High(SearchAngles) do
     with Self.GetBounds() do
-      if (FindDTMsRotatedSE(DTM, TPA, X1, Y1, X2, Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
+      if (FindDTMsRotatedSE(DTM, TPA, X1,Y1,X2,Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
       begin
         Insert(tmp, FoundAngles, Length(FoundAngles));
         AppendTPA(Matches, TPA);

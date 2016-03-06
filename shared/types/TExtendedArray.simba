@@ -1,6 +1,9 @@
 procedure TExtendedArray.Append(const Value: Extended);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TExtendedArray.Insert(const Value: Extended; Index: Integer);
@@ -80,11 +83,14 @@ end;
 
 function TExtendedArray.FindAll(const Value: Extended): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
   for i := 0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TExtendedArray.Reversed(): TExtendedArray

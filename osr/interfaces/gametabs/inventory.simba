@@ -270,14 +270,16 @@ Returns all the occupied slot-indices.
 *)
 function TRSInventory.GetUsedSlots(): TIntegerArray;
 var
-  i: Int32;
+  i,j: Int32;
 begin
   if not(self.Open()) then
     Exit();
 
+  SetLength(Result, 28);
   for i:=0 to High(self.FSlots) do
     if Self.IsSlotUsed(i, False) then
-      Result += i;
+      Result[inc(j)-1] := i;
+  SetLength(Result, j);
 end;
 
 (*
@@ -333,85 +335,67 @@ Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots
 *)
 procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 var
-  i: Int32;
+  i,j: Int32;
   ptrn: TIntegerArray;
 begin
+  SetLength(ptrn, 28);
   for i:=0 to High(dropPattern) do
     if not(InIntArray(ignoreSlots,dropPattern[i])) then
-      ptrn += dropPattern[i];
+      ptrn[inc(j)-1] := dropPattern[i];
+
+  SetLength(ptrn, j);
   Self.DropItems(ptrn);
 end;
 
-function TRSInventory.FindItems(const Mask: TMask; Tolerance: Byte = 30; ContourTolerance: Byte = 30; MaxToFind: Byte = 28): TIntegerArray;
+
+function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
 var
-  i: Integer;
+  i,j: Int32;
   p: TPoint;
 begin
+  SetLength(Result, MaxToFind);
   for i := Self.LowSlot to Self.HighSlot do
     if (FindMaskTolerance(Mask, p.x, p.y, Self.GetSlotBox(i), Tolerance, ContourTolerance)) then
     begin
-      Result += i;
-      if (Length(Result) = MaxToFind) then
+      Result[inc(j)-1] := i;
+      if (j = MaxToFind) then
         Break;
     end;
+  SetLength(Result, j);
 end;
 
-function TRSInventory.FindItems(const bmp: Integer; Tolerance: Byte; MaxToFind: Byte = 28): TIntegerArray; overload;
-var
-  i: Integer;
-  p: TPoint;
-begin
-  for i := Self.LowSlot to Self.HighSlot do
-    if (FindBitmapToleranceIn(bmp, p.x, p.y, Self.GetSlotBox(i), Tolerance)) then
-    begin
-      Result += i;
-      if (Length(Result) = MaxToFind) then
-        Break;
-    end;
-end;
 
-function TRSInventory.FindItem(const Mask: TMask; Tolerance: Byte = 30; ContourTolerance: Byte = 30): Integer;
+function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
 var
-  a: TIntegerArray;
-begin
-  Result := -1; // not found
-  a := Self.FindItems(Mask, Tolerance, ContourTolerance, 1);
-  if (Length(a) > 0) then
-    Result := a[Low(a)];
-end;
-
-function TRSInventory.FindItem(const bmp: Integer; Tolerance: Byte): Integer; overload;
-var
-  a: TIntegerArray;
-begin
-  Result := -1; // not found
-  a := Self.FindItems(bmp, Tolerance, 1);
-  if (Length(a) > 0) then
-    Result := a[Low(a)];
-end;
-
-function TRSInventory.FindDTMs(DTM: Integer; MaxToFind: Byte = 28): TIntegerArray;
-var
-  i: Integer;
+  i,j: Int32;
   pt: TPoint;
 begin
+  SetLength(Result, MaxToFind);
   for i:=Self.LowSlot to Self.HighSlot do
     if FindDTM(DTM, pt.x, pt.y, Self.GetSlotBox(i)) then
     begin
-      Result += i;
-      if (Length(Result) = MaxToFind) then
+      Result[inc(j)-1] := i;
+      if (j = MaxToFind) then
         Break;
     end;
+  SetLength(Result, j);
 end;
 
-function TRSInventory.FindDTM(DTM: Integer): Integer;
+
+function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
 var
-  a: TIntegerArray;
+  i,j: Int32;
+  pt: TPoint;
 begin
-  Result := -1;
-  a := Self.FindDTMs(DTM, 1);
-  if (Length(a) > 0) then
-    Result := a[0];
+  SetLength(Result, MaxToFind);
+  for i := Self.LowSlot to Self.HighSlot do
+    if (FindBitmapToleranceIn(BMP, pt.x, pt.y, Self.GetSlotBox(i), Tolerance)) then
+    begin
+      Result[inc(j)-1] := i;
+      if (j = MaxToFind) then
+        Break;
+    end;
+  SetLength(Result, j);
 end;
 
 

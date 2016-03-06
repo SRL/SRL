@@ -236,7 +236,7 @@ function TRSMainScreen.FindHPBars(const Area: TBox): THPBarArray;
           if (not bad) then
           begin
             Bars[y][x] := $00FF00;
-            Result += THPBar([TBox([x, y, x + W, y + H]), 0.00]);
+            Result := Result + THPBar([TBox([x, y, x + W, y + H]), 0.00]);
           end;
         end;
   end;

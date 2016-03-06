@@ -64,10 +64,11 @@ begin
   end;
 
   //the four tabs (Display, Audio, Chat, Controls)
-  Self.FTabs += TBox([553,206,592,245]);
-  Self.FTabs += TBox([599,206,638,245]);
-  Self.FTabs += TBox([645,206,684,245]);
-  Self.FTabs += TBox([691,206,730,245]);
+  SetLength(Self.FTabs, 4);
+  Self.FTabs[0] := [553,206,592,245];
+  Self.FTabs[1] := [599,206,638,245];
+  Self.FTabs[2] := [645,206,684,245];
+  Self.FTabs[3] := [691,206,730,245];
 end;
 {$ENDIF}
 

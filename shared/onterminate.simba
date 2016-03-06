@@ -29,11 +29,11 @@ begin
   Result := True;
 
   if (not CallLast) then
-    _onTermProcs += @Proc
+    _onTermProcs := _onTermProcs + @Proc
   else if (@_onTermLastProc = nil) then
     _onTermLastProc := @Proc
   else
-    _onTermProcs += @Proc;
+    _onTermProcs := _onTermProcs + @Proc;
 
   GetScriptProp(SP_OnTerminate, v);
   for i := 0 to High(v) do

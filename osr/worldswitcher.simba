@@ -131,7 +131,7 @@ var
 begin
   for i := 0 to High(Worlds) do
     if (not (Worlds[i].Activity in Filter)) then
-      a += Worlds[i].World;
+      a := a + Worlds[i].World;
   Result := a[Random(Length(a))];
 end;
 

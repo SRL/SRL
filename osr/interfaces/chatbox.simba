@@ -238,7 +238,7 @@ begin
     begin
       s := OCR.Recognize(b, TCompareRules([TextColors[j]]), NPCFont);
       if (s <> '') then
-        Result += TChatOption([s, GetTPABounds(ATPA[i])]);
+        Result := Result + TChatOption([s, GetTPABounds(ATPA[i])]);
     end;
   end;
 end;

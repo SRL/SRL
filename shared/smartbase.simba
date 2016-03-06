@@ -31,12 +31,12 @@ begin
           Exit(c[j].Handle);
     end;
 
-  srl.WriteLn(Self.Name + 'getHWND(): Failed to find hwnd');
+  srl.WriteLn(Self.Name + 'GetHWND(): Failed to find hwnd');
 end;
 {$else}
 function TSmartBase.GetHWND(): PtrUInt;
 begin
- srl.WriteLn(Self.Name + 'getHWND(): Failed to find hwnd');
+  srl.WriteLn(Self.Name + 'GetHWND(): You need a newer Simba version to use this function');
 end;
 {$endif}
 

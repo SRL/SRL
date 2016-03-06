@@ -51,6 +51,7 @@ begin
   SetLength(Result, n);
 end;
 
+
 (*
 ConnectTPA
 ~~~~~~~~~~
@@ -81,6 +82,7 @@ begin
   line := TPAFromLine(TPA[High(TPA)].x, TPA[High(TPA)].y, TPA[0].x, TPA[0].y);
   Result := CombineTPA(Result, line);
 end;
+
 
 (*
 ConvexHull
@@ -238,6 +240,7 @@ begin
     Swap(W, H);
 end;
 
+
 (*
 ExtractPointsRect
 ~~~~~~~~~~~~~~~~~
@@ -300,11 +303,15 @@ begin
   end;
 end;
 
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure TPointArray.Append(const Value: TPoint);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TPointArray.Insert(const Value: TPoint; Index: Integer);
@@ -384,11 +391,14 @@ end;
 
 function TPointArray.FindAll(const Value: TPoint): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
   for i := 0 to High(Self) do
     if (Value.X = Self[i].X) and (Value.Y = Self[i].Y) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TPointArray.Reversed(): TPointArray;
