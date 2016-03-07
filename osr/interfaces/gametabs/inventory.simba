@@ -28,6 +28,12 @@ type
  function TRSInventory.GetUsedSlots(): TIntegerArray;
  procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+ function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+ function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
+ function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+ function TRSInventory.Count(): Byte;
+ function TRSInventory.GetActiveSlot(): Int8;
+ function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 }
 
 (*
@@ -36,7 +42,7 @@ var inventory
 Variable that stores functions and properties of the Runescape inventory gametab.
 *)
 var 
-  inventory: TRSInventory;
+  Inventory: TRSInventory;
 
 const
     //Column wise (Z-style) and "reversed" column wise (S-style)
@@ -90,7 +96,7 @@ begin
 end;
 
 (*
-inventory.Open
+Inventory.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -105,7 +111,7 @@ end;
 
 
 (*
-inventory.IsOpen
+Inventory.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -119,7 +125,7 @@ begin
 end;
 
 (*
-inventory.IsSlotValid
+Inventory.IsSlotValid
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -135,7 +141,7 @@ begin
 end;
 
 (*
-inventory.PointToSlot
+Inventory.PointToSlot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -165,7 +171,7 @@ begin
 end;
 
 (*
-inventory.MouseSlot
+Inventory.MouseSlot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -187,7 +193,7 @@ begin
 end;
 
 (*
-inventory.IsFull
+Inventory.IsFull
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -215,7 +221,7 @@ begin
 end;
 
 (*
-inventory.GetSlotBox
+Inventory.GetSlotBox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -234,7 +240,7 @@ begin
 end;
 
 (*
-inventory.IsSlotUsed
+Inventory.IsSlotUsed
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -258,7 +264,7 @@ begin
 end;
 
 (*
-inventory.GetUsedSlots
+Inventory.GetUsedSlots
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -283,7 +289,7 @@ begin
 end;
 
 (*
-inventory.DropItems
+Inventory.DropItems
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -298,11 +304,11 @@ Examples:
 .. code-block:: pascal
 
     // drops all items in a "snake order" / "Z"-order
-    inventory.DropItems(DROP_PATTERN_SNAKE);
+    Inventory.DropItems(DROP_PATTERN_SNAKE);
 
 .. code-block:: pascal
 
-    inventory.DropItems([0..3]); // drops the four first items
+    Inventory.DropItems([0..3]); // drops the four first items
 *)
 procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
 var
@@ -323,7 +329,7 @@ begin
 end;
 
 (*
-inventory.DropItemsExcept
+Inventory.DropItemsExcept
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -347,7 +353,22 @@ begin
   Self.DropItems(ptrn);
 end;
 
+(*
+Inventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+
+Find the slots of the given item defined by a TMask
+
+Examples:
+.. code-block:: pascal
+
+    itemArr := Inventory.FindItem(myMask);
+    if itemArr = [] then
+      WriteLn('Not found');
+*)
 function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
 var
   i,j: Int32;
@@ -364,7 +385,22 @@ begin
   SetLength(Result, j);
 end;
 
+(*
+Inventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
+
+Find the slots of the given item defined my a DTM
+
+Examples:
+.. code-block:: pascal
+
+    itemArr := Inventory.FindItem(myDTM);
+    if itemArr = [] then
+      WriteLn('Not found');
+*)
 function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
 var
   i,j: Int32;
@@ -381,7 +417,22 @@ begin
   SetLength(Result, j);
 end;
 
+(*
+Inventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+
+Find the slots of the given item defined by a bitmap
+
+Examples:
+.. code-block:: pascal
+
+    itemArr := Inventory.FindItem(bmp, 40);
+    if itemArr = [] then
+      WriteLn('Not found');
+*)
 function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
 var
   i,j: Int32;
@@ -418,12 +469,13 @@ begin
   end;
 end;
 
-function TRSInventory.ActivateSlot(const Slot: Integer): Boolean;
+function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 var
   a: Byte;
 begin
   Result := False;
-  if (Slot = -1) and ((a := Self.GetActiveSlot()) > -1) then
+  a := Self.GetActiveSlot();
+  if (Slot = -1) and (a > -1) then
   begin
     Self.MouseSlot(a);
     Mouse.Click(mouse_Left);

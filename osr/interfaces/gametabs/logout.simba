@@ -28,12 +28,12 @@ type
 }
 
 (*
-var logout
+var Logout
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape logout interface.
 *)
 var 
-  logout: TRSLogout;
+  Logout: TRSLogout;
   
 {$IFNDEF CODEINSIGHT}
 procedure TRSLogout.__setup();
@@ -66,7 +66,7 @@ end;
 
 
 (*
-logout.Open
+Logout.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -80,7 +80,7 @@ begin
 end;
 
 (*
-logout.IsOpen
+Logout.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -97,7 +97,7 @@ begin
 end;
 
 (*
-logout.IsWorldSelectOpen
+Logout.IsWorldSelectOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -128,7 +128,7 @@ begin
 end;
 
 (*
-logout.OpenWorldSelect
+Logout.OpenWorldSelect
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -158,7 +158,7 @@ begin
 end;
 
 (*
-logout.CloseWorldSelect
+Logout.CloseWorldSelect
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -184,7 +184,7 @@ begin
 end;
 
 (*
-logout.ClickLogout
+Logout.ClickLogout
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -281,7 +281,7 @@ begin
 end;
 
 (*
-logout.SwitchToWorld
+Logout.SwitchToWorld
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 

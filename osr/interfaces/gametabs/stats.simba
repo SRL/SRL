@@ -25,12 +25,12 @@ type
 }
 
 (*
-var stats
+var Stats
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape stats gametab.
 *)
 var 
-  stats: TRSStats;
+  Stats: TRSStats;
 
 const
   SKILL_ATTACK     = 0;
@@ -104,7 +104,7 @@ end;
 
 
 (*
-stats.Open
+Stats.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -119,7 +119,7 @@ end;
 
 
 (*
-stats.IsOpen
+Stats.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -149,7 +149,7 @@ end;
 
 
 (*
-stats.GetSkillBox
+Stats.GetSkillBox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -171,7 +171,7 @@ end;
 
 
 (*
-stats.MouseOver
+Stats.MouseOver
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -194,7 +194,7 @@ end;
 
 
 (*
-stats.GetSkillInfo
+Stats.GetSkillInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 

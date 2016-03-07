@@ -34,12 +34,12 @@ type
 }
 
 (*
-var options
+var Options
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape options interface.
 *)
 var 
-  options: TRSOptions;
+  Options: TRSOptions;
 
 
 (*
@@ -73,7 +73,7 @@ end;
 {$ENDIF}
 
 (*
-options.Open
+Options.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -87,7 +87,7 @@ begin
 end;
 
 (*
-options.IsOpen
+Options.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -114,7 +114,7 @@ end;
 
 
 (*
-options.GetCurrentTab
+Options.GetCurrentTab
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -134,7 +134,7 @@ begin
 end;
 
 (*
-options.SetCurrentTab
+Options.SetCurrentTab
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -167,7 +167,7 @@ begin
 end;
 
 (*
-options.GetBrightness
+Options.GetBrightness
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -189,7 +189,7 @@ end;
 
 
 (*
-options.SetBrightness
+Options.SetBrightness
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -223,7 +223,7 @@ end;
 
 
 (*
-options.ToggleOrbs
+Options.ToggleOrbs
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -237,7 +237,7 @@ begin
 end;
 
 (*
-options.ToggleRoofRemoval
+Options.ToggleRoofRemoval
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -251,7 +251,7 @@ begin
 end;
 
 (*
-options.ToggleRemainingXP
+Options.ToggleRemainingXP
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -265,7 +265,7 @@ begin
 end;
 
 (*
-options.ToggleAcceptAid
+Options.ToggleAcceptAid
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -286,7 +286,7 @@ begin
 end;
 
 (*
-options.ToggleRun
+Options.ToggleRun
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -308,7 +308,7 @@ end;
 
 
 (*
-options.ToggleChatEffects
+Options.ToggleChatEffects
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -322,7 +322,7 @@ begin
 end;
 
 (*
-options.ToggleSplitPrivChat
+Options.ToggleSplitPrivChat
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -337,7 +337,7 @@ end;
 
 
 (*
-options.ToggleProfanityFilter
+Options.ToggleProfanityFilter
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -351,7 +351,7 @@ begin
 end;
 
 (*
-options.ToggleTimeoutNotice
+Options.ToggleTimeoutNotice
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 

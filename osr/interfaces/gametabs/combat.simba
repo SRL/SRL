@@ -24,12 +24,12 @@ type
 }
 
 (*
-var combat
+var Combat
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape combat interface.
 *)
 var 
-  combat: TRSCombat;
+  Combat: TRSCombat;
 
 (*
 type ECombatButton
@@ -70,7 +70,7 @@ end;
 {$ENDIF}
 
 (*
-combat.Open
+Combat.Open
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -84,7 +84,7 @@ begin
 end;
 
 (*
-combat.IsOpen
+Combat.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -98,7 +98,7 @@ begin
 end;
 
 (*
-combat.ToggleButton
+Combat.ToggleButton
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -129,7 +129,7 @@ begin
 end;
 
 (*
-combat.GetCombatLevel
+Combat.GetCombatLevel
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
@@ -147,7 +147,7 @@ begin
 end;
 
 (*
-combat.GetWeapon
+Combat.GetWeapon
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
