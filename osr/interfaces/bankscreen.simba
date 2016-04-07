@@ -89,16 +89,17 @@ end;
 
 function TRSBankScreen.GetUpText(): String;
 const
-  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 85];
 var
   client:T2DIntArray;
   bmp:Int32;
 begin
   bmp := BitmapFromClient(mainscreen.UpTextArea);
-  FastReplaceColor(bmp, 2070783, 0);
+  FastReplaceColor(bmp, 2070783, 3424329);
+  //FastReplaceColor(bmp, 0, 3424329);
+  ShowBitmap(bmp);
   client := BitmapToMatrix(bmp);
-  OCR.SetFont(UpFont);
-  Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT);
+  Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT, UpFont);
   FreeBitmap(bmp);
   {$IFDEF UPTEXT_DEBUG}
     srl.Writeln('UpText found: ' + Result);
