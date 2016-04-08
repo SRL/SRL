@@ -25,10 +25,13 @@ type
 
   TRSMainScreen = record(TInterfaceBase)
     UpTextArea: TBox;
+    UpTextFilter: TCompareRules; //avilable to modify from script! :)
   end;
 
 var
   MainScreen: TRSMainScreen;
+
+
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSMainScreen.__Setup();
@@ -40,6 +43,7 @@ begin
     SetBounds([4, 4, 515, 337]);
 
     UpTextArea := [7, 7, 465, 25];
+    UpTextFilter := [-1, 85, True, 55];
   end;
 end;
 {$ENDIF}
@@ -61,14 +65,12 @@ Example:
     srl.Writeln(MainScreen.GetUpText());
 *)
 function TRSMainScreen.GetUpText(): String;
-const
-  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 55];
 var
   x: Int32;
 begin
-  Result := OCR.Recognize(Self.UpTextArea, OCR_RULES_UPTEXT, UpFont);
-  if (x := Pos('more options', Result)) <> 0 then
-    SetLength(Result, x + length('more options') - 1);
+  Result := OCR.Recognize(Self.UpTextArea, Self.UpTextFilter, UpFont);
+  if (Result = '') then
+    Result := OCR.Recognize(Self.UpTextArea, Self.UpTextFilter, UpFont, 350);
 
   {$IFDEF UPTEXT_DEBUG}
     srl.Writeln('UpText found: ' + Result);
