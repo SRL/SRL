@@ -70,7 +70,7 @@ var
   total:Double;
   i:Int32;
 begin
-  for i:=1 to level-1 do
+  for i:=1 to level do
     total += Floor(i + 300 * 2 ** (i / 7));
   Result := Floor(total / 4);
 end;
