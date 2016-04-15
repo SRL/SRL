@@ -84,15 +84,16 @@ Logout.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone): Boolean;
+  function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone; maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open. Can also be used to check if a specific "subtab" is open.
 *)
-function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone): Boolean;
-var p:TPoint;
+function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone; maxWait:Int32=0): Boolean;
+var 
+  t:Int64;
 begin
-  Result := Gametabs.IsOpen(tabLogout);
-   if (Result) and (Tab <> lsTabNone) then
+  Result := Gametabs.IsOpen(tabLogout, maxWait);
+  if (Result) and (Tab <> lsTabNone) then
     Result := Self.UpdateSubtab() = tab;
 end;
 

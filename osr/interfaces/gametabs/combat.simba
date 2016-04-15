@@ -88,13 +88,13 @@ Combat.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSCombat.IsOpen(): Boolean;
+  function TRSCombat.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSCombat.IsOpen(): Boolean;
+function TRSCombat.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabCombat);
+  Result := Gametabs.IsOpen(tabCombat, maxWait);
 end;
 
 (*

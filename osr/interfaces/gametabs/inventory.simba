@@ -115,14 +115,15 @@ Inventory.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.IsOpen(): Boolean;
+  function TRSInventory.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSInventory.IsOpen(): Boolean;
+function TRSInventory.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabInventory);
+  Result := Gametabs.IsOpen(tabInventory, maxWait);
 end;
+
 
 (*
 Inventory.IsSlotValid

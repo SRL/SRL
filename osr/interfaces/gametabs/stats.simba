@@ -123,13 +123,13 @@ Stats.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.IsOpen(): Boolean;
+  function TRSStats.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSStats.IsOpen(): Boolean;
+function TRSStats.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabStats);
+  Result := Gametabs.IsOpen(tabStats, maxWait);
 end;
 
 

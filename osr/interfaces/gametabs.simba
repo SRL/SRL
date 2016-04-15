@@ -49,20 +49,29 @@ begin
   Result := Self.tabs[Ord(Tab)];
 end;
 
-function TRSGametab.IsOpen(Tab:EGametab): Boolean;
+function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;
 var
-  B:TBox;
-  i:Int32;
+  FoundTab:Boolean;
+  i,t:Int64;
 begin
-  if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
-    Exit(True)
-  else if (Tab = tabInventory) then
-  begin
-    for i:=0 to High(Self.tabs) do
-      if CountColorTolerance(1910383, Self.tabs[i], 13) > 0 then
-        Exit(False);
-    Exit(True);
-  end;
+  t := GetTickCount64() + maxWait;
+  repeat
+    if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
+      Exit(True)
+    else if (Tab = tabInventory) then //when in bank no tabs exist
+    begin
+      FoundTab := False;
+      for i:=0 to High(Self.tabs) do
+        if (CountColorTolerance(1910383, Self.tabs[i], 13) > 0) then
+        begin
+          FoundTab := True;
+          break;
+        end;
+      if not FoundTab then
+        Exit(True);
+    end;
+    Wait(Random(50,90));
+  until GetTickCount64() > t;
 end;
 
 function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;

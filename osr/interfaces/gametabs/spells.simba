@@ -140,33 +140,13 @@ Spells.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.IsOpen(): Boolean;
+  function TRSSpells.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSSpells.IsOpen(): Boolean;
+function TRSSpells.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabMagic);
-end;
-
-(*
-Spells.WaitIsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSSpells.WaitIsOpen(): Boolean;
-
-Checks if the interface is open, waits "maxWait" time for it to open.
-*)
-function TRSSpells.WaitIsOpen(maxWait:Int32=500): Boolean;
-var 
-  t:Int64;
-begin
-  t := GetTickCount64() + maxWait;
-  repeat
-    if Gametabs.IsOpen(tabMagic) then
-      Exit(True);
-  until GetTickCount64() > t;
+  Result := Gametabs.IsOpen(tabMagic, maxWait);
 end;
 
 

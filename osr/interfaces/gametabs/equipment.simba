@@ -78,9 +78,9 @@ Equipment.IsOpen
 
 Checks if the interface is already open.
 *)
-function TRSEquipment.IsOpen(): Boolean;
+function TRSEquipment.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabEquipment);
+  Result := Gametabs.IsOpen(tabEquipment, maxWait);
 end;
 
 function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;

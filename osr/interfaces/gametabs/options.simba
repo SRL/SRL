@@ -91,14 +91,15 @@ Options.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.IsOpen(): Boolean;
+  function TRSOptions.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSOptions.IsOpen(): Boolean;
+function TRSOptions.IsOpen(maxWait:Int32=0): Boolean;
 begin
-  Result := Gametabs.IsOpen(tabOptions);
+  Result := Gametabs.IsOpen(tabOptions, maxWait);
 end;
+
 
 //helper: Changes tab, and toggles the given button returns True if it didn't fail
 function TRSOptions.__toggleButton(button:TBox; tab:EOptionsTab; enable:Boolean; tryTime:Int32): Boolean;
