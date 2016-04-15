@@ -128,7 +128,9 @@ const
 var
   p: TPoint;
 begin
-  Result := srl.FindText(p, 'Rearrange mode', 'SmallChars', TEXT_COL, 0, Box(54,295,154,314));
+  Result := srl.FindText(p, 'Rearrange mode', 'SmallChars', TEXT_COL, 0, Box(22,292,378,330));
+  if not Result then
+    Result := srl.FindText(p, 'Withdraw as', 'SmallChars', TEXT_COL, 0, Box(22,292,378,330));
 end;
 
 (*
