@@ -419,22 +419,24 @@ begin
 end;
 
 (*
-Inventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+Inventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
 
 Find the slots of the given item defined by a bitmap
+
+_Note: Last parameter is not defaulted to avoid an overload limitation in lape (DTM is also Integer)._
 
 Examples:
 .. code-block:: pascal
 
-    itemArr := Inventory.FindItem(bmp, 40);
+    itemArr := Inventory.FindItem(bmp, 40, 28);
     if itemArr = [] then
       WriteLn('Not found');
 *)
-function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
 var
   i,j: Int32;
   pt: TPoint;

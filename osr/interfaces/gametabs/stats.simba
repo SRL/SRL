@@ -161,8 +161,6 @@ Returns the bounding box covering the given skill-index.
 *)
 function TRSStats.GetSkillBounds(skill:Int32): TBox;
 begin
-  if not(self.Open()) then Exit();
-  
   if Self.IsSkillVaild(skill) then
     Result := Self.FSlots[skill]
   else

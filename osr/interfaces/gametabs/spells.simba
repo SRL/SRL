@@ -163,8 +163,6 @@ Returns the bounding box covering the given spell.
 *)
 function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
 begin
-  if not(self.Open()) then Exit();
-  
   Result := Self.FSlots[spell]
 end;
 
