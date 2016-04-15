@@ -71,7 +71,7 @@ begin
   Result := OCR.Recognize(Self.UpTextArea, Self.UpTextFilter, UpFont);
   if (Result = '') then
     Result := OCR.Recognize(Self.UpTextArea, Self.UpTextFilter, UpFont, 350);
-
+  
   {$IFDEF UPTEXT_DEBUG}
     srl.Writeln('UpText found: ' + Result);
   {$ENDIF}

@@ -1,0 +1,225 @@
+(*
+Spells
+=======
+The file holds functions and procedures that are related to the spells gametab
+*)
+
+type 
+  TRSSpells = record(TInterfaceBase)
+    FSlots: TBoxArray;
+  end;
+
+  
+{==| Table of Contents |=======================
+ procedure TRSSpells.__setup();
+ function TRSSpells.Open(): Boolean;
+ function TRSSpells.IsOpen(): Boolean;
+ function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+ function TRSSpells.MouseOver(spell:ESpellCast): Int32;
+}
+
+(*
+var Spells
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape magic/spells gametab.
+*)
+var 
+  Spells: TRSSpells;
+
+type
+  ESpellCast = (
+    CAST_LUMBRIDGE_HOME_TELEPORT,
+    CAST_WIND_STRIKE,
+    CAST_CONFUSE,
+    CAST_ENCHANT_CROSSBOW_BOLT,
+    CAST_WATER_STRIKE,
+    CAST_LVL1_ENCHANT,
+    CAST_EARTH_STRIKE,
+
+    CAST_WEAKEN,
+    CAST_FIRE_STRIKE,
+    CAST_BONES_TO_BANANAS,
+    CAST_WIND_BOLT,
+    CAST_CURSE,
+    CAST_BIND,
+    CAST_LOW_LEVEL_ALCHEMY,
+
+    CAST_WATER_BOLT,
+    CAST_VARROCK_TELEPORT,
+    CAST_LVL2_ENCHANT,
+    CAST_EARTH_BOLT,
+    CAST_LUMBRIDGE_TELEPORT,
+    CAST_TELEKINETIC_GRAB,
+    CAST_FIRE_BOLT,
+
+    CAST_FALADOR_TELEPORT,
+    CAST_CRUMBLE_UNDEAD,
+    CAST_TELEPORT_TO_HOUSE,
+    CAST_WIND_BLAST,
+    CAST_SUPERHEAT_ITEM,
+    CAST_CAMELOT_TELEPORT,
+    CAST_WATER_BLAST,
+
+    CAST_LVL3_ENCHANT,
+    CAST_IBAN_BLAST,
+    CAST_SNARE,
+    CAST_MAGIC_DART,
+    CAST_ARDOUGNE_TELEPORT,
+    CAST_EARTH_BLAST,
+    CAST_HIGH_LEVEL_ALCHEMY,
+
+    CAST_CHARGE_WATER_ORB,
+    CAST_LVL4_ENCHANT,
+    CAST_WATCHTOWER_TELEPORT,
+    CAST_FIRE_BLAST,
+    CAST_CHARGE_EARTH_ORB,
+    CAST_BONES_TO_PEACHES,
+    CAST_SARADOMIN_STRIKE,
+
+    CAST_CLAWS_OF_GUTHIX,
+    CAST_FLAMES_OF_ZAMORAK,
+    CAST_TROLLHEIM_TELEPORT,
+    CAST_WIND_WAVE,
+    CAST_CHARGE_FIRE_ORB,
+    CAST_TELEPORT_TO_APE_ATOLL,
+    CAST_WATER_WAVE,
+
+    CAST_CHARGE_AIR_ORB,
+    CAST_VULNERABILITY,
+    CAST_LVL5_ENCHANT,
+    CAST_TELEPORT_TO_KOUREND,
+    CAST_EARTH_WAVE,
+    CAST_ENFEEBLE,
+    CAST_TELEOTHER_LUMBRIDGE,
+
+    CAST_FIRE_WAVE,
+    CAST_ENTANGLE,
+    CAST_STUN,
+    CAST_CHARGE,
+    CAST_TELEOTHER_FALADOR,
+    CAST_TELE_BLOCK,
+    CAST_TELEPORT_TO_BOUNTY_TARGET,
+
+    CAST_LVL6_ENCHANT,
+    CAST_TELEOTHER_CAMELOT
+  );
+
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSSpells.__setup();
+var i:Int32;
+begin
+  with Self do
+  begin
+    FName := 'Spells';
+    FStatic := True;
+    FBounds := [559,220,726,459];
+    FSlots := FBounds.Partition(10,7);
+  end;
+end;
+{$ENDIF}
+
+
+(*
+Spells.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.Open(): Boolean;
+
+Opens the interface
+*)
+function TRSSpells.Open(): Boolean;
+begin
+  Result := Gametabs.Open(tabMagic);
+end;
+
+
+(*
+Spells.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.IsOpen(): Boolean;
+
+Checks if the interface is already open.
+*)
+function TRSSpells.IsOpen(): Boolean;
+begin
+  Result := Gametabs.IsOpen(tabMagic);
+end;
+
+(*
+Spells.WaitIsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.WaitIsOpen(): Boolean;
+
+Checks if the interface is open, waits "maxWait" time for it to open.
+*)
+function TRSSpells.WaitIsOpen(maxWait:Int32=500): Boolean;
+var 
+  t:Int64;
+begin
+  t := GetTickCount64() + maxWait;
+  repeat
+    if Gametabs.IsOpen(tabMagic) then
+      Exit(True);
+  until GetTickCount64() > t;
+end;
+
+
+(*
+Spells.GetSpellBounds
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+
+Returns the bounding box covering the given spell.
+
+.. note:: by slacky
+*)
+function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+begin
+  if not(self.Open()) then Exit();
+  
+  Result := Self.FSlots[spell]
+end;
+
+
+(*
+Spells.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
+
+Moves the mouse over the given spell.
+
+.. note:: by slacky
+*)
+function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
+begin
+  if not(self.Open()) then Exit();
+  
+  Result := True;
+  Mouse.Move(Self.FSlots[spell]);
+end;
+
+
+
+begin
+  Spells.__setup();
+end;
+
+
+
+
+
+
+
+
+
+

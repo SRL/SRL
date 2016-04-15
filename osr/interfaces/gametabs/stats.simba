@@ -20,7 +20,7 @@ type
  procedure TRSStats.__setup();
  function TRSStats.Open(): Boolean;
  function TRSStats.IsOpen(): Boolean;
- function TRSStats.GetSkillBox(skill:Int32): TBox;
+ function TRSStats.GetSkillBounds(skill:Int32): TBox;
  function TRSStats.MouseOver(skill:Int32): Int32;
 }
 
@@ -138,32 +138,32 @@ stats.SkillIsVaild
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.SkillIsVaild(skill:Int32): Boolean;
+  function TRSStats.IsSkillVaild(skill:Int32): Boolean;
 
 ---
 *)
-function TRSStats.SkillIsVaild(skill:Int32): Boolean;
+function TRSStats.IsSkillVaild(skill:Int32): Boolean;
 begin
   Result := InRange(skill, 0, High(Self.FSlots));
 end;
 
 
 (*
-Stats.GetSkillBox
+Stats.GetSkillBounds
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillBox(skill:Int32): TBox;
+  function TRSStats.GetSkillBounds(skill:Int32): TBox;
 
 Returns the bounding box covering the given skill-index.
 
 .. note:: by slacky
 *)
-function TRSStats.GetSkillBox(skill:Int32): TBox;
+function TRSStats.GetSkillBounds(skill:Int32): TBox;
 begin
   if not(self.Open()) then Exit();
   
-  if Self.SkillIsVaild(skill) then
+  if Self.IsSkillVaild(skill) then
     Result := Self.FSlots[skill]
   else
     {notify index out of range};
@@ -186,7 +186,7 @@ begin
   if not(self.Open()) then Exit();
   
   Result := True;
-  if Self.SkillIsVaild(skill) then
+  if Self.IsSkillVaild(skill) then
     Mouse.Move(Self.FSlots[skill])
   else
     Result := False;

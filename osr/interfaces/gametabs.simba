@@ -157,4 +157,4 @@ end;
 {$include_once gametabs/equipment.simba}
 {$include_once gametabs/logout.simba}
 {$include_once gametabs/options.simba}
-
+{$include_once gametabs/spells.simba}

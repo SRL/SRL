@@ -97,7 +97,7 @@ begin
   bmp := BitmapFromClient(mainscreen.UpTextArea);
   FastReplaceColor(bmp, 2070783, 3424329);
   //FastReplaceColor(bmp, 0, 3424329);
-  ShowBitmap(bmp);
+  //ShowBitmap(bmp);
   client := BitmapToMatrix(bmp);
   Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT, UpFont);
   FreeBitmap(bmp);
@@ -156,7 +156,7 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.FindNPCs(Color: TColorEx; var Points: T2DPointArray; MinWidth, MinHeight:Integer = 10): Boolean;
+function TRSBankScreen.FindNPCs(Color: TColorEx; out Points: T2DPointArray; MinWidth:Int32=13; MinHeight:Int32=6): Boolean;
 const
   COLOR_SKIN: TColorEx = [5603764, 18, [2, [0.02, 0.70]]];
 var
@@ -175,7 +175,7 @@ begin
     begin
       b := GetTPABounds(ATPASkin[i]);
       b.Expand(4, MainScreen.getBounds());
-
+      
       if (FindColorsTolerance(temp, Color.Color, b, Color.Tolerance, Color.Settings)) then
         TPA.Extend(temp);
     end;
@@ -184,12 +184,15 @@ begin
     Exit(False);
 
   ATPA := ClusterTPAEx(TPA, 6, 6);
-  SortATPAFromMidPoint(ATPA, Mainscreen.getMiddle());
+  SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
   for i := 0 to High(ATPA) do
   begin
     TPA := MinAreaRectEx(ATPA[i], W, H);
     if (W >= MinWidth) and (H >= MinHeight) then
+    begin
+      //SMART.Image.DrawTPA(ConnectTPA(ConvexHull(TPA)), 255);
       Points := Points + ATPA[i];
+    end;
   end;
 
   Result := Length(Points) > 0;
@@ -213,7 +216,7 @@ begin
         p := ATPA[i][Random(Length(ATPA[i]))]
       else
         p := MiddleTPA(ATPA[i]).Random(-4, 4);
-
+      
       Mouse.Move(p);
       if (MainScreen.IsUpText(UpText, 500)) then
       begin
@@ -245,7 +248,7 @@ Opens the bankscreen.
 function TRSBankScreen.Open(Typ: EBankType): Boolean;
 const
   COLOR_NPC_GRAY: TColorEx = [6513771, 9, [2, [0.35, 0.10]]];
-  COLOR_NPC_BLUE: TColorEx  = [4533549, 15, [2, [0.75, 0.96]]];
+  COLOR_NPC_BLUE: TColorEx  = [4533549, 18, [2, [0.75, 0.96]]];
 begin
   if (Self.isOpen()) then
     Exit(True);
@@ -509,8 +512,8 @@ Withdraws the the amount ``amount`` from the bank slot ``slot``. If it fails to 
 
 Extra vaild constants for ``amount`` are:
 
-   - ``WITHDRAW_AMOUNT_ALL = -1;``
-   - ``WITHDRAW_AMOUNT_ALL_BUT_ONE = -2;``
+   - ``WITHDRAW_ALL = -1;``
+   - ``WITHDRAW_ALL_BUT_ONE = -2;``
 
 
 .. note:: by slacky
