@@ -106,6 +106,15 @@ begin
   self.y2 += pt.y;
 end;
 
+function TBox.OffsetEx(pt:TPoint): TBox;
+begin
+  Result    := self;
+  Result.x1 += pt.x;
+  Result.y1 += pt.y;
+  Result.x2 += pt.x;
+  Result.y2 += pt.y;
+end;
+
 procedure TBox.Normalize();
 begin
   if (Self.X1 > Self.X2) then

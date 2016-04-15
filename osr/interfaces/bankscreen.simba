@@ -9,12 +9,13 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
     Writeln(BankScreen.IsOpen());
 *)
 type
-  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbSearch, bbDepositInv, bbDepositWorn, bbMenu, bbClose);
+  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
+                 bbDepositInv, bbDepositWorn, bbMenu, bbClose);
   EBankType = (btNPCBlue, btNPCGray, btNPCGrey);
 
   TRSBankScreen = record (TInterfaceBase)
-    fSlots: TBoxArray;
-    fButtons: array [0..High(EBankButton)] of TBox;
+    FSlots: TBoxArray;
+    FButtons: array [0..High(EBankButton)] of TBox;
   end;
 
 var
@@ -28,7 +29,10 @@ const
 
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
-var slotBounds:TBox = [73, 83, 456, 298];
+var 
+  slotBounds:TBox = [73, 83, 456, 298];
+  TextBtn:TBox = [0,0,75,21];
+  IconBtn:TBox = [0,0,35,35];
 begin
   with Self do
   begin
@@ -42,17 +46,18 @@ begin
 
     with Self.GetBounds() do
     begin
-      fButtons[bbSwap] := Box(X1 + 6, Y2 - 25, X1 + 88, Y2 - 6);
-      fButtons[bbInsert] := Box(X1 + 91, Y2 - 25, X1 + 173, Y2 - 6);
-      fButtons[bbItem] := Box(X1 + 186, Y2 - 25, X1 + 268, Y2 - 6);
-      fButtons[bbNote] := Box(X1 + 272, Y2 - 25, X1 + 353, Y2 - 6);
+      FButtons[bbSwap]   := TextBtn.OffsetEx([X1+5,  Y2-26]);
+      FButtons[bbInsert] := TextBtn.OffsetEx([X1+81, Y2-26]);
+      FButtons[bbItem]   := TextBtn.OffsetEx([X1+164, Y2-26]);
+      FButtons[bbNote]   := TextBtn.OffsetEx([X1+240, Y2-26]);
 
-      fButtons[bbSearch] := Box(X2 - 122, Y2 - 40, X2 - 89, Y2 - 7);
-      fButtons[bbDepositInv] := Box(X2 - 76, Y2 - 40, X2 - 43, Y2 - 7);
-      fButtons[bbDepositWorn] := Box(X2 - 40, Y2 - 40, X2 - 7, Y2 - 7);
+      FButtons[bbPlaceholder] := IconBtn.OffsetEx([X2-164, Y2-41]);
+      FButtons[bbSearch]      := IconBtn.OffsetEx([X2-121, Y2-41]);
+      FButtons[bbDepositInv]  := IconBtn.OffsetEx([X2-78, Y2-41]);
+      FButtons[bbDepositWorn] := IconBtn.OffsetEx([X2-42, Y2-41]);
 
-      fButtons[bbMenu] := Box(X2 - 36, Y1 + 42, X2 - 12, Y1 + 66);
-      fButtons[bbClose] := Box(X2 - 27, Y1 + 7, X2 - 7, Y1 + 27);
+      FButtons[bbMenu]  := Box(X2-36, Y1+42, X2-12, Y1+66);
+      FButtons[bbClose] := Box(X2-27, Y1+7,  X2-7,  Y1+27);
     end;
   end;
 end;
@@ -109,13 +114,18 @@ end;
 
 procedure TRSBankScreen._Debug();
 var
-  BMP, i: Integer;
+  BMP, i, c: Integer;
 begin
   BMP := BitmapFromClient(GetClientBounds());
 
-  for i := 0 to High(fButtons) do
-    DrawTPABitmap(BMP, EdgeFromBox(fButtons[i]), 255);
-  for i := 0 to High(fSlots) do
+  c := 255;
+  for i:=0 to High(FButtons) do
+  begin
+    DrawTPABitmap(BMP, EdgeFromBox(fButtons[i]), c);
+    c := i + ((c * 128) and $FFFFFF);
+    WriteLn(c);
+  end;
+  for i:=0 to High(FSlots) do
     DrawTPABitmap(BMP, EdgeFromBox(fSlots[i]), $00FF00);
 
   ShowBitmap(BMP);
@@ -567,7 +577,7 @@ begin
       Result := ChooseOption.Select(['Withdraw-All'])
 
     else if amount = WITHDRAW_ALL_BUT_ONE then
-      Result := ChooseOption.Select(['Withdraw-All-but-one'])
+      Result := ChooseOption.Select(['Withdraw-All-but'])
 
     else if ChooseOption.Select(['Withdraw-'+ToString(amount)+' '],,False) then  // space after amount so it can't find "2" in 28
       Result := True
