@@ -243,35 +243,48 @@ begin
 end;
 
 
+
 (*
-TTimeMarker.TimeoutIn
+TCountDown
 ~~~~~~~~~~~~~~~~~~~
-
-.. code-block pascal
-
-    function TTimeMarker.TimeoutIn(ms:Int64; UseTotal:Boolean=False): Boolean;
-
-Same as ``myTimer.GetTime() < t``
+A neat and simple timer type.
 
 Example:
-
 .. code-block:: pascal
 
-    myTimer.start();
-    while myTimer.TimeoutIn(5000) do
-    begin
-      WriteLn(myTimer.GetTime());
-      Wait(995);
-    end;
-
+  myTimer.Init(3000); //3000ms
+  while not myTimer.IsFinished() do
+    {do something};
+  
+  myTimer.Restart(Random(-200,200)); //3000 +/- 200ms
+  while not myTimer.IsFinished() do
+    {do something};
 *)
-function TTimeMarker.TimeoutIn(ms:Int64; UseTotal:Boolean=False): Boolean;
+type
+  TCountDown = record
+    Length: UInt64;
+    Timeout: UInt64;
+  end;
+
+  
+procedure TCountDown.Init(Time: UInt32);
 begin
-  if UseTotal and (Self.FStartTime > 0) then
-    Result := (GetTickCount64() - Self.FStartTime) < ms
-  else if not UseTotal then
-    if not Self.FPaused then
-      Result := (Self.FTime + (GetTickCount64() - Self.FPrevMark)) < ms
-    else
-      Result := (Self.FTime) < ms;
+  self.Length  := Time;
+  self.Timeout := GetTickCount64() + Time;
+end;
+
+function TCountDown.Restart(Rand:Int32=0): UInt32;
+begin
+  self.Timeout := GetTickCount64() + (Length + Rand);
+end;  
+
+function TCountDown.TimeRemaining(): UInt32;
+begin
+  if not self.IsFinished() then
+    Result := self.Timeout - GetTickCount64();
+end;
+
+function TCountDown.IsFinished(): Boolean;
+begin
+  Result := GetTickCount64() >= self.Timeout;
 end;
