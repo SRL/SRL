@@ -173,11 +173,11 @@ begin
   begin
     B := GetClientBounds(True);
     FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2);
+    if (TPA = []) then
+      RaiseException('It''s impossible');
+
     ATPA := ClusterTPAEx(TPA,1,1);
     SortATPAFromFirstPoint(ATPA, pt);
-    
-    if Length(ATPA) = 0 then 
-      RaiseException(erException,'No wai!! This is bullshit'); 
     
     Self.Bounds := GetTPABounds(ATPA[0]);
     Self.Bounds.Expand(1);
@@ -202,7 +202,7 @@ var
   i,bmp,bmp2:Int32;
 begin
   if not(self.Find()) then
-    Exit();
+    Self.Open();
   
   with self.Bounds do
   begin
@@ -240,10 +240,10 @@ ChooseOption.Select
 
 By default it will click the given option, if not found the menu is closed.
 Returns true if the select-action was performed.
-- moves the mouse to the first match of the given options ``SubStrings``.
-- left-clicks it ``mouseAction:Int32=mouse_left;``
-- if it's not found option-menu will be closed AClose (``AClose:Boolean=True;``)
-- search can be case insensitive (``CaseSensitive:Boolean=True``)
+- moves the mouse to the first match of the given options `SubStrings`.
+- left-clicks it `mouseAction:Int32=mouse_left;`
+- if it's not found option-menu will be closed AClose `AClose:Boolean=True;`
+- search can be case-insensitive `CaseSensitive:Boolean=True`
   
 .. note:: by slacky
 *)
