@@ -19,4 +19,4 @@ Some basic guidelines if you feel like contributing to this project:
 
 Reach us
 ---------
-For any discussion, or just some talking we are usually available at IRC: #SRL @ Rizon
+For any discussion, or just some talking we are usually available at IRC `#SRL @ Rizon`
