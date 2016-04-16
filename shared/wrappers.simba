@@ -5,11 +5,22 @@ Wrappers
 The Wrappers include contains wrapper functions used throughout SRL.  These functions should
 be put inside Simba itself, and will be removed from SRL when that is done.
 
-The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/wrappers.simba>`_.
+The source for this file can be found `here <https://github.com/Olly-/SRL/blob/master/lib/utilities/wrappers.simba>`_.
 
 *)
 
 {$f-}
+
+
+{$ifndecl ShowBitmap}
+procedure ShowBitmap(bmp: Integer);
+var w,h: Int32;
+begin
+  GetBitmapSize(bmp, w,h);
+  DisplayDebugImgWindow(w,h);
+  DrawBitmapDebugImg(bmp);
+end;
+{$endif}
 
 (*
 GetClientBounds
@@ -63,7 +74,7 @@ Example:
 .. code-block:: pascal
 
      p := Point(350, 200);
-     Writeln(p);
+     WriteLn(p);
 *)
 function GetColor(const p: TPoint): Integer; overload;
 begin
@@ -166,7 +177,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindColors(TPA, 255, Box));
+    WriteLn(FindColors(TPA, 255, Box));
 *)
 function FindColors(var Points: TPointArray; const Color: Integer; const SearchBox: TBox): Boolean; overload;
 begin
@@ -191,7 +202,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindColorsTolerance(TPA, 255, Box, 10));
+    WriteLn(FindColorsTolerance(TPA, 255, Box, 10));
 *)
 function FindColorsTolerance(var Points: TPointArray; const Color: Integer; const SearchBox: TBox; const Tolerance: Integer): Boolean; overload;
 begin
@@ -216,7 +227,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindColorSpiral(x, y, 255, Box));
+    WriteLn(FindColorSpiral(x, y, 255, Box));
 *)
 function FindColorSpiral(var x, y: Integer; Color: Integer; SearchBox: TBox): Boolean; overload;
 begin
@@ -241,7 +252,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindColorSpiralTolerance(x, y, 255, Box));
+    WriteLn(FindColorSpiralTolerance(x, y, 255, Box));
 *)
 function FindColorSpiralTolerance(var x, y: Integer; Color: Integer; SearchBox: TBox; Tol: Integer): Boolean; overload;
 begin
@@ -266,7 +277,7 @@ Example:
 
 .. code-block:: pascal
 
-    findColorsSpiralTolerance(x, y, TPA, clWhite, mainScreen.GetBounds, 10);
+    FindColorsSpiralTolerance(x, y, TPA, clWhite, mainScreen.GetBounds, 10);
 
 *)
 function FindColorsSpiralTolerance(var x, y: integer; var Points: TPointArray; Color: Integer; SearchBox: TBox; Tolerance: Integer): boolean; overload;
@@ -292,7 +303,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(CountColor(clRed, Box));
+    WriteLn(CountColor(clRed, Box));
 *)
 function CountColor(const Color: Integer; const SearchBox: TBox): Integer; overload;
 begin
@@ -305,7 +316,7 @@ CountColorTolerance: overload;
 
 .. code-block:: pascal
 
-    function countColorTolerance(Color: integer; searchBox: TBox; tol: integer): Boolean; overload;
+    function CountColorTolerance(Color: integer; searchBox: TBox; tol: integer): Boolean; overload;
 
 Takes a TBox variable instead of x1, y1, x2 and y2 variables.
 
@@ -317,7 +328,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(CountColorTolerance(clRed, 10, Box));
+    WriteLn(CountColorTolerance(clRed, 10, Box));
 *)
 function CountColorTolerance(const Color: Integer; const SearchBox: TBox; const Tol: Integer): Integer; overload;
 begin
@@ -325,7 +336,7 @@ begin
 end;
 
 (*
-freeDTMs
+FreeDTMs
 ~~~~~~~~
 
 .. code-block:: pascal
@@ -381,12 +392,12 @@ begin
 end;
 
 (*
-getBitmapName
+GetBitmapName
 ~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getBitmapName(const Index: Integer): String;
+    function GetBitmapName(const Index: Integer): String;
 
 Returns the name of the bitmap stored in 'index'.
 
@@ -398,9 +409,9 @@ Example:
 
 .. code-block:: pascal
 
-     Writeln(getBitmapName(BMP));
+     WriteLn(GetBitmapName(BMP));
 *)
-function getBitmapName(const Index: Integer): String;
+function GetBitmapName(const Index: Integer): String;
 begin
   Result := '';
 
@@ -410,12 +421,12 @@ begin
 end;
 
 (*
-getDTMName
+GetDTMName
 ~~~~~~~~~~
 
 .. code-block:: pascal
 
-    function getDTMName(const Index: Integer): String;
+    function GetDTMName(const Index: Integer): String;
 
 Returns the name of the dtm stored in 'index'.
 
@@ -427,9 +438,9 @@ Example:
 
 .. code-block:: pascal
 
-     Writeln(getDTMName(DTM));
+     WriteLn(GetDTMName(DTM));
 *)
-function getDTMName(const Index: Integer): String;
+function GetDTMName(const Index: Integer): String;
 begin
   Result := '';
 
@@ -464,7 +475,7 @@ begin
 end;
 
 (*
-findBitmapIn; overload
+FindBitmapIn; overload
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -531,7 +542,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindBitmapTolerance(bmp, x, y, 50));
+    WriteLn(FindBitmapTolerance(bmp, x, y, 50));
 *)
 function FindBitmapTolerance(const BMP: Integer; var x, y: Integer; const Tolerance: Integer): Boolean;
 var
@@ -566,7 +577,7 @@ begin
 end;
 
 (*
-findDeformedBitmapToleranceIn; overload
+FindDeformedBitmapToleranceIn; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -584,7 +595,7 @@ Example:
 .. code-block:: pascal
 
     if (FindDeformedBitmapToleranceIn(BMP, x, y, Box, 10, 0, true, acc)) then
-      Writeln('We found the bitmap at accuracy: ' floatToStr(acc));
+      WriteLn('We found the bitmap at accuracy: ' floatToStr(acc));
 *)
 function FindDeformedBitmapToleranceIn(const BMP: Integer; var x, y: integer; SearchBox: TBox; Tolerance: Integer; Range: Integer; AllowPartialAccuracy: Boolean; var Accuracy: Extended): Boolean; overload;
 begin
@@ -592,7 +603,7 @@ begin
 end;
 
 (*
-findDTMRotatedSE; overload
+FindDTMRotatedSE; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -610,7 +621,7 @@ Example:
 .. code-block:: pascal
 
     if (FindDTMRotatedSE(aDTM, x, y, Box, -Pi/4, Pi/4, Pi/60, aFound)) then
-      Writeln('Found the dtm!');
+      WriteLn('Found the dtm!');
 *)
 function FindDTMRotatedSE(const DTM: Integer; var x, y: Integer; SearchBox: TBox; sAngle, eAngle, aStep, aFound: Extended): Boolean; overload;
 begin
@@ -636,7 +647,7 @@ Example:
 .. code-block:: pascal
 
     if (FindDTMRotatedAlternating(DTM, x, y, Box, -Pi/4, Pi/4, Pi/60, aFound)) then
-      Writeln('Found the dtm!');
+      WriteLn('Found the dtm!');
 *)
 function FindDTMRotatedAlternating(DTM: Integer; var x, y: integer; SearchBox: TBox; sAngle, eAngle, aStep, aFound: Extended): Boolean; overload;
 begin
@@ -662,7 +673,7 @@ Example:
 .. code-block:: pascal
 
     if (FindDTMRotated(DTM, x, y, 100, 100, 400, 400, -Pi/4, Pi/4, Pi/60, aFound)) then
-      Writeln('Found the dtm!');
+      WriteLn('Found the dtm!');
 *)
 function FindDTMRotated(const DTM: integer; var x, y: Integer; const x1, y1, x2, y2: Integer; const sAngle, eAngle, aStep: Extended; out aFound: Extended): Boolean;
 begin
@@ -688,7 +699,7 @@ Example:
 .. code-block:: pascal
 
     if (FindDTMRotated(aDTM, x, y, Box, -Pi/4, Pi/4, Pi/60, aFound)) then
-      Writeln('found the dtm!');
+      WriteLn('found the dtm!');
 *)
 function FindDTMRotated(const DTM: Integer; var x, y: integer; const SearchBox: TBox; const sAngle, eAngle, aStep: extended; out aFound: Extended): Boolean; overload;
 begin
@@ -714,7 +725,7 @@ Example:
 .. code-block:: pascal
 
     FindDTMs(DTM, TPA, Box);
-    Writeln('Matches' + toString(TPA));
+    WriteLn('Matches' + toString(TPA));
 *)
 function FindDTMs(const DTM: Integer; var TPA: TPointArray; const SearchBox: TBox): Boolean; overload;
 begin
@@ -722,7 +733,7 @@ begin
 end;
 
 (*
-findDTM; overload
+FindDTM; overload
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
@@ -739,7 +750,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(FindDTM(DTM, x, y, Box));
+    WriteLn(FindDTM(DTM, x, y, Box));
 *)
 function FindDTM(const DTM: Integer; var x, y: integer; const SearchBox: TBox): Boolean; overload;
 begin
@@ -792,7 +803,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(Replicate('SRL', 10));
+    WriteLn(Replicate('SRL', 10));
 *)
 function Replicate(const Str: String; const Times: Integer): String; overload;
 begin
@@ -818,7 +829,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(InRange(15.0, 10.0, 20.0));
+    WriteLn(InRange(15.0, 10.0, 20.0));
 *)
 function InRange(const Value, Min, Max: Extended): Boolean; overload;
 begin
@@ -843,7 +854,7 @@ Example:
 
 .. code-block:: pascal
 
-    Writeln(Distance(Point(100, 100), Point(200, 200)));
+    WriteLn(Distance(Point(100, 100), Point(200, 200)));
 *)
 function Distance(const p1, p2: TPoint): Integer; overload;
 begin
@@ -863,4 +874,20 @@ begin
   Result := (Point1.X = Point2.X) and (Point1.Y = Point2.Y);
 end;
 
+function GetTextAtEx(const SearchBox: TBox; MinV, MaxV, HSpacing, Color, Tol: Integer; const Font: String): String; overload;
+begin
+  Result := GetTextAtEx(SearchBox.X1, SearchBox.Y1, SearchBox.X2, SearchBox.Y2, MinV, MaxV, HSpacing, Color, Tol, Font);
+end;
+
+function FindMaskTolerance(Mask: TMask; out x, y: Integer; SearchArea: TBox; Tolerance, ContourTolerance: Integer): Boolean; overload;
+begin
+  Result := FindMaskTolerance(Mask, x, y, SearchArea.X1, SearchArea.Y1, SearchArea.X2, SearchArea.Y2, Tolerance, ContourTolerance);
+end;
+
+{$ifndecl GetTickCount64}
+var GetTickCount64: function():UInt64 := GetTickCount;
+{$endif}
+
 {$f+}
+
+

@@ -1,0 +1,127 @@
+type
+  EWaitDir = (wdLeft,wdMean,wdRight);
+
+(*
+srl.GaussRand
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.GaussRand(mean, dev:Extended): Extended;
+
+Generates a random gaussian/normal number.
+*)
+function TSRL.GaussRand(mean, dev:Extended): Extended;
+var 
+  len:Double;
+  function __random(): Double; 
+  begin Result := MaxE(Random(),1.0e-14); end;
+begin
+  len := dev * Sqrt(-2 * Ln(__random()));
+  Result := mean + len * Cos(2 * PI * __random());
+end;
+
+
+(*
+srl.TruncatedGauss
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.TruncatedGauss(left:Double=0; right:Double=1): Double;
+
+Generates a random gaussian/normal number which is truncated and mapped within then 
+given range ``[left..right]`` weighted towards ``left``
+*)
+function TSRL.TruncatedGauss(left:Double=0; right:Double=1): Double;
+const LIMIT = 5.5; //make this a (defaulted) parameter?
+begin
+  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := MinE(Result, LIMIT);
+  Result := Result / LIMIT * (right-left) + left;
+end;
+
+
+(*
+srl.NormalRange
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.NormalRange(min, max: Integer): Integer;
+
+Generates a random integer in the given range, weighted towards the mean.
+*)
+function TSRL.NormalRange(min, max:Integer): Integer;
+begin
+  case Random(0,1) of
+    0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2));
+    1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2));
+  end;
+end;
+
+(*
+srl.NormalRange
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.NormalRange(min, max: Extended): Extended;
+
+Generates a random float in the given range, weighted towards the mean.
+*)
+function TSRL.NormalRange(min, max:Extended): Extended; overload;
+begin
+  case Random(0,1) of
+    0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2);
+    1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2);
+  end;
+end;
+
+
+(*
+srl.RandomPoint
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.RandomPoint(mean: TPoint; maxRad: Int32): TPoint;
+
+Generates a random TPoint which weights around ``mean``, with a max distance 
+from mean defined by ``maxRad``.
+*)
+function TSRL.RandomPoint(mean:TPoint; maxRad:Int32): TPoint;
+begin
+  Result.X := NormalRange(mean.x-maxRad, mean.x+maxRad);
+  Result.Y := NormalRange(mean.y-maxRad, mean.y+maxRad);
+end;
+
+(*
+srl.RandomPoint (overload)
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.RandomPoint(bounds:TBox): TPoint; overload;
+
+Generates a random TPoint in the bounds of the given box `bounds`, 
+the point weights towards the middle of the box.
+*)
+function TSRL.RandomPoint(bounds:TBox): TPoint; overload;
+begin
+  Result.X := NormalRange(bounds.x1, bounds.x2);
+  Result.Y := NormalRange(bounds.y1, bounds.y2);
+end;
+
+
+(*
+srl.NormalWait (overload)
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=edMean): TPoint; overload;
+
+Waits ... Weighted towards the mean of `min` and `max`
+*)
+procedure TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=wdMean);
+begin
+  case weight of
+    wdLeft:  Wait(Round(TruncatedGauss(min, max)));
+    wdMean:  Wait(NormalRange(min, max));
+    wdRight: Wait(Round(TruncatedGauss(max, min)));
+  end;
+end;

@@ -1,0 +1,142 @@
+type
+  EWorldType = (wtFree, wtMembers);
+  EWorldActivity = (waPVP, waDeadman, waSkill, waNone);
+
+  TWorldInfo = record
+    World: Integer;
+    Typ: EWorldType;
+    Activity: EWorldActivity;
+  end;
+  TWorldInfoArray = array of TWorldInfo;
+
+  TRSWorldSwitcher = record(TInterfaceBase)
+    Worlds: TWorldInfoArray;
+ end;
+
+var
+  WorldSwitcher: TRSWorldSwitcher;
+
+procedure TRSWorldSwitcher.__Setup();
+begin
+  with Self do
+  begin
+    SetName('World switcher');
+    SetStatic(True);
+    SetBounds(srl.DefaultClientBounds);
+
+    // tools/generate_worlds.simba
+    Worlds := [
+               [385, wtFree, waNone], [393, wtFree, waNone], [394, wtFree, waNone],
+               [301, wtFree, waNone], [335, wtFree, waNone], [384, wtFree, waNone],
+               [383, wtFree, waNone], [326, wtFree, waNone], [382, wtFree, waNone],
+               [316, wtFree, waNone], [381, wtFree, waNone], [308, wtFree, waNone],
+               [337, wtMembers, waPVP], [361, wtMembers, waSkill], [353, wtMembers, waSkill],
+               [354, wtMembers, waNone], [362, wtMembers, waNone], [314, wtMembers, waNone],
+               [321, wtMembers, waNone], [378, wtMembers, waNone], [386, wtMembers, waNone],
+               [338, wtMembers, waNone], [377, wtMembers, waNone], [313, wtMembers, waNone],
+               [322, wtMembers, waNone], [345, wtMembers, waDeadman], [306, wtMembers, waNone],
+               [369, wtMembers, waNone], [346, wtMembers, waNone], [370, wtMembers, waNone],
+               [305, wtMembers, waNone], [330, wtMembers, waNone], [329, wtMembers, waNone],
+               [360, wtMembers, waDeadman], [352, wtMembers, waDeadman], [319, wtMembers, waDeadman],
+               [336, wtMembers, waNone], [375, wtMembers, waNone], [343, wtMembers, waNone],
+               [359, wtMembers, waNone], [367, wtMembers, waNone], [368, wtMembers, waNone],
+               [320, wtMembers, waNone], [376, wtMembers, waNone], [327, wtMembers, waNone],
+               [328, wtMembers, waNone], [304, wtMembers, waNone], [351, wtMembers, waNone],
+               [312, wtMembers, waNone], [311, wtMembers, waNone], [303, wtMembers, waNone],
+               [344, wtMembers, waNone], [357, wtMembers, waDeadman], [373, wtMembers, waSkill],
+               [374, wtMembers, waDeadman], [365, wtMembers, waNone], [325, wtMembers, waPVP],
+               [366, wtMembers, waSkill], [350, wtMembers, waNone], [341, wtMembers, waNone],
+               [317, wtMembers, waNone], [333, wtMembers, waNone], [349, wtMembers, waNone],
+               [334, wtMembers, waNone], [342, wtMembers, waNone], [309, wtMembers, waNone],
+               [310, wtMembers, waNone], [358, wtMembers, waNone], [318, wtMembers, waNone],
+               [302, wtMembers, waNone]
+              ];
+  end;
+end;
+
+function TRSWorldSwitcher.isOpen(WaitTime: Integer = 0): Boolean;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount64() + WaitTime;
+
+  repeat
+    if (WaitTime > 0) then
+      Wait(Random(50, 100));
+
+    if (GetColor(146, 6) = 1682881) and (not srl.isLoggedIn()) then
+      Exit(True);
+  until (GetTickCount64() >= t);
+end;
+
+function TRSWorldSwitcher.FixWorld(wo: Integer): Integer;
+var
+  w: String;
+begin
+  w := IntToStr(wo);
+  if (Length(w) = 3) then
+    w := Copy(w, 2, Length(w));
+
+  if (w[1] = '0') then
+    w := Copy(w, 2, Length(w));
+
+  Result := StrToInt(w);
+end;
+
+function TRSWorldSwitcher.SelectWorld(wo: Integer): Boolean;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+  b: TBox;
+  p: TPoint;
+begin
+  Result := False;
+  if (not FindColors(TPA, clBlack, Self.GetBounds())) then
+    Exit;
+
+  srl.Writeln('WorldSwitcher.SelectWorld: Searching for world ' + toString(wo));
+
+  { Pretty much get everything black, remove the biggest (the background)
+    and then a simple cluster so we have text :) }
+  ATPA := FloodFillTPA(TPA);
+  SortATPASize(ATPA, True);
+  TPA := MergeATPA(Copy(ATPA, 1, Length(ATPA) - 1));
+  ATPA := ClusterTPAEx(TPA, 5, 1);
+
+  for i := 0 to High(ATPA) do
+    if (srl.FindText(p, toString(wo), 'UpChars07_s', clBlack, 0, TBox(b := GetTPABounds(ATPA[i])))) then
+    begin
+      b.Expand(-2, 3); { Adjust the bounds so it's the whole button }
+      b.X2 += 60;
+      Mouse.click(b, mouse_Left);
+      Wait(Random(200, 500));
+      Exit(True);
+    end;
+
+  srl.Writeln('Failed to find and select world');
+end;
+
+procedure TRSWorldSwitcher.Close;
+begin
+  Mouse.Click(Point(734, 12).Random(-5, 5), mouse_Left);
+  Wait(Random(500, 1000));
+end;
+
+function TRSWorldSwitcher.RandomMembers(Filter: set of EWorldActivity = [waPVP, waDeadman, waSkill]): Integer;
+var
+  a: TIntegerArray;
+  i: Integer;
+begin
+  for i := 0 to High(Worlds) do
+    if (not (Worlds[i].Activity in Filter)) then
+      a := a + Worlds[i].World;
+  Result := a[Random(Length(a))];
+end;
+
+begin
+  WorldSwitcher.__Setup();
+end;
+
+

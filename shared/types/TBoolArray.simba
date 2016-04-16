@@ -1,6 +1,9 @@
 procedure TBoolArray.Append(const Value: Boolean);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TBoolArray.Insert(const Value: Boolean; Index: Integer);
@@ -50,9 +53,24 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
+
+procedure TBoolArray.Extend(Arr:TBoolArray);
+var L:Int32;
+begin
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Boolean));
+  end;
+end; 
 
 function TBoolArray.Find(const Value: Boolean): Integer;
 begin
@@ -65,11 +83,14 @@ end;
 
 function TBoolArray.FindAll(const Value: Boolean): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
-  for i := 0 to High(Self) do
+  for i:=0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TBoolArray.Reversed(): TBoolArray;
@@ -112,3 +133,12 @@ begin
     inc(lo);
   end;
 end;
+
+function TBoolArray.Combine(other: TBoolArray): TBoolArray;
+begin
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;  

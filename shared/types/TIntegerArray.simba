@@ -1,6 +1,9 @@
 procedure TIntegerArray.Append(const Value: Integer);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TIntegerArray.Insert(const Value, Index: Integer);
@@ -50,9 +53,24 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
+
+procedure TIntegerArray.Extend(Arr:TIntegerArray);
+var L:Int32;
+begin
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
+  end;
+end; 
 
 function TIntegerArray.Find(const Value: Integer): Integer;
 begin
@@ -65,11 +83,14 @@ end;
 
 function TIntegerArray.FindAll(const Value: Integer): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
-  for i := 0 to High(Self) do
+  for i:=0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TIntegerArray.Reversed(): TIntegerArray;
@@ -113,7 +134,11 @@ begin
   end;
 end;
 
-function TIntegerArray.Combine(const Arr2: TIntegerArray): TIntegerArray;
+function TIntegerArray.Combine(other: TIntegerArray): TIntegerArray;
 begin
-  Result := CombineIntArray(Self, Arr2);
-end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;   

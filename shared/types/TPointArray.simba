@@ -1,6 +1,317 @@
-procedure TPointArray.Append(const Value: TPoint);
+(*
+TPASplitRows
+~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function TPASplitRows(Arr:TPointArray; dist:Int32): T2DPointArray;
+
+Splits a TPA ``Arr`` into TPAs of each row, it then proceeds to further split the rows
+in to separate TPAs when the given distance ``dist`` is less than the distance between the points
+Same output as ``SplitTPAEx(TPA,dist,0)``, but generally faster.
+
+.. note:: by slacky
+
+Example:
+
+.. code-block:: pascal
+
+    ATPA := TPASplitRows(TPA, 5);
+*)
+function TPASplitRows(Arr:TPointArray; dist:Int32): T2DPointArray;
+var
+  TPA,tmp:TPointArray;
+  i,ii,j,n,s,h,l:Int32 = 0;
 begin
-  Self += Value;
+  TPA := Copy(arr);
+  SortTPAByY(TPA,True);
+  SetLength(Result, Length(TPA));
+  l := Length(TPA);
+  while i < l do
+  begin
+    s := 0;
+    i := j;
+    inc(j);
+    while (j < l) and (TPA[j].y = TPA[j-1].y) do Inc(j);
+
+    if j-i > 1 then
+    begin
+      tmp := Copy(TPA,i,j-i);
+      SortTPAByX(tmp,True);
+      h := High(tmp);
+      for ii:=1 to h do
+        if (tmp[ii].x-tmp[ii-1].x > dist) or (ii = h) then
+        begin
+          Result[Inc(n)-1] := Copy(tmp, s, ii-s+(ord(ii = h) and 1));
+          s := ii;
+        end;
+    end else if j-i = 1 then
+      Result[Inc(n)-1] := [TPA[i]];
+  end;
+  SetLength(Result, n);
+end;
+
+
+(*
+ConnectTPA
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function ConnectTPA(TPA:TPointArray): TPointArray;
+
+Fills a line between all the points (by their order), can be used to get the edges
+around a polygon
+
+.. note:: by slacky
+
+Example:
+
+.. code-block:: pascal
+
+    shape := ConnectTPA(ConvexHull(TPA));
+*)
+function ConnectTPA(TPA:TPointArray): TPointArray;
+var line:TPointArray; i:Int32;
+begin
+  for i:=0 to High(TPA)-1 do
+  begin
+    line := TPAFromLine(TPA[i].x, TPA[i].y, TPA[i+1].x, TPA[i+1].y);
+    Result := CombineTPA(Result, line);
+  end;
+  line := TPAFromLine(TPA[High(TPA)].x, TPA[High(TPA)].y, TPA[0].x, TPA[0].y);
+  Result := CombineTPA(Result, line);
+end;
+
+
+(*
+ConvexHull
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function ConvexHull(TPA:TPointArray): TPointArray;
+
+Computes the convex hull around the given TPA. Imagine placing a rubber band around the
+points, the points which strech the band are the points returned by this function.
+
+See: http://en.wikipedia.org/wiki/Convex_hull for more information.
+
+.. note:: by slacky
+
+Example:
+
+.. code-block:: pascal
+
+    Smart.Image.DrawTPA(ConvexHull(TPA));
+*)
+function ConvexHull(const TPA:TPointArray): TPointArray;
+var
+  pts: TPointArray;
+  h,i,k,u: Int32;
+  function CrossProd(r, p, q: TPoint): Int32;
+  begin //cross-product of rp and rq vectors.
+    Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
+  end;
+begin
+  if High(TPA) <= 2 then Exit(TPA);
+  pts := Copy(TPA);
+  SortTPAByX(pts,True);
+
+  H := High(pts);
+  SetLength(result, 2 * (h+1));
+
+  for i:=0 to h do
+  begin
+    while (k >= 2) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+      Dec(k);
+    result[k] := pts[i];
+    Inc(k)
+  end;
+
+  u := k+1;
+  for i:=h-1 downto 0 do
+  begin
+    while (k >= u) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+      Dec(k);
+    result[k] := pts[i];
+    Inc(k);
+  end;
+  SetLength(result, k-1);
+end;
+
+
+(*
+MinAreaRect
+~~~~~~~~~~~
+
+.. code-block:: pascal
+
+     function MinAreaRect(TPA:TPointArray): TPointArray;
+
+Computes the minimum bounding box (defined by area) around the given shape.
+Four points (which are in order) are always returned.
+
+See: http://en.wikipedia.org/wiki/Minimum_bounding_box for more information.
+
+.. note:: by slacky
+
+Example:
+
+.. code-block:: pascal
+
+    Writeln('The four box corners are: ', MinAreaRect(TPA));
+*)
+function MinAreaRect(TPA:TPointArray): TPointArray;
+var
+  l,i,ii,j,c: Int32;
+  x,y,cosA,cosAP,cosAM: Double;
+  xl,yl,xh,yh,area,angle: Double;
+  angles, best: Array of Double;
+  added: Boolean;
+  
+  function Modulo(X,Y:Double): Double;
+  begin
+    Result := X - Floor(X / Y) * Y;
+  end;
+const
+  HALF_PI := PI / 2;
+begin
+  SetLength(Result, 4);
+  if Length(TPA) <= 1 then Exit;
+  TPA := ConvexHull(TPA);
+  L := High(TPA);
+  SetLength(angles, L);
+
+  j := 0;
+  for i:=0 to (L-1) do
+  begin
+    angles[j] := High(Int32);
+    added := False;
+    angle := Abs(Modulo(ArcTan2(TPA[i+1].y-TPA[i].y, TPA[i+1].x-TPA[i].x), HALF_PI));
+    for c:=0 to j do
+      if (angles[c] = angle) then
+        added := True;
+
+    if not(added) then
+      angles[Inc(j)-1] := angle;
+  end;
+
+  SetLength(best, 2);
+  best[1] := High(Int32);
+  for i:=0 to j-1 do
+  begin
+    CosA  := Cos(Angles[i]);
+    CosAP := Cos(Angles[i] + HALF_PI);
+    CosAM := Cos(Angles[i] - HALF_PI);
+    xl := (CosA*TPA[0].x) + (CosAM*TPA[0].y);
+    yl := (CosAP*TPA[0].x) + (CosA*TPA[0].y);
+    xh := xl;
+    yh := yl;
+
+    for ii:=0 to L do
+    begin
+      x := (CosA * TPA[ii].x) + (CosAM * TPA[ii].y);
+      y := (CosAP * TPA[ii].x) + (CosA * TPA[ii].y);
+      if (x > xh) then xh := x
+      else if (x < xl) then xl := x;
+      if (y > yh) then yh := y
+      else if (y < yl) then yl := y;
+    end;
+
+    if (xh-xl)*(yh-yl) < best[1] then
+    begin
+      best[0] := angles[i];       //angle
+      best[1] := (xh-xl)*(yh-yl); //area
+      Result[0] := Point(Round((cosAP*yl) + (cosA*xh)), Round((cosA*yl) + (cosAM*xh)));
+      Result[1] := Point(Round((cosAP*yl) + (cosA*xl)), Round((cosA*yl) + (cosAM*xl)));
+      Result[2] := Point(Round((cosAP*yh) + (cosA*xl)), Round((cosA*yh) + (cosAM*xl)));
+      Result[3] := Point(Round((cosAP*yh) + (cosA*xh)), Round((cosA*yh) + (cosAM*xh)));
+    end;
+  end;
+end;
+
+function MinAreaRectEx(TPA:TPointArray; out W,H:Int32): TPointArray;
+begin
+  Result := MinAreaRect(TPA);
+  W := Round(Distance(Result[0], Result[3]));
+  H := Round(Distance(Result[0], Result[1]));
+  if (W < H) then
+    Swap(W, H);
+end;
+
+
+(*
+ExtractPointsRect
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure ExtractPointsRect(var Points: TPointArray; const A, B, C, D: TPoint);
+
+Removes all points not in the rect (defined by four points).
+
+Example:
+
+.. code-block:: pascal
+
+    ExtractPointsRect(TPA, mbr[0], mbr[1], mbr[2], mbr[3]);
+
+.. note:: by slacky
+*)
+function ExtractPointsRect(var Points: TPointArray; const A, B, C, D: TPoint): TPointArray;
+var
+  i, h, Count: UInt32;
+  Vec: TPoint;
+  Dot: Extended;
+begin
+  h := High(Points);
+  if (h < 0) then
+    Exit;
+
+  SetLength(Result, Length(Points));
+  Count := 0;
+
+  for i := 0 to h do
+  begin
+    Vec := Point(A.x-B.x, A.y-B.y);
+    Dot := ((A.x-Points[i].x) * Vec.x) + ((A.y-Points[i].y) * Vec.y);
+    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+      Continue;
+
+    Vec := Point(A.x-D.x, A.y-D.y);
+    Dot := ((A.x-Points[i].x) * Vec.x) + ((A.y-Points[i].y) * Vec.y);
+    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+      Continue;
+
+    Result[Count] := Points[i];
+    Inc(Count);
+  end;
+
+  SetLength(Result, Count);
+end;
+
+procedure ExpandRect(var Rect: TPointArray; Percent: Integer);
+var
+  i, CenterX, CenterY: Integer;
+begin
+  MiddleTPAEx(Rect, CenterX, CenterY);
+  for i := 0 to High(Rect) do
+  begin
+    Rect[i].X := Round((Rect[i].X - CenterX) * (1 + Percent / 100) + CenterX);
+    Rect[i].Y := Round((Rect[i].Y - CenterY) * (1 + Percent / 100) + CenterY);
+  end;
+end;
+
+
+//--| Type helpers |----------------------------------------------------------->
+//----------------------------------------------------------------------------->
+procedure TPointArray.Append(const Value: TPoint);
+var top:Int32;
+begin
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TPointArray.Insert(const Value: TPoint; Index: Integer);
@@ -50,9 +361,24 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
+
+procedure TPointArray.Extend(Arr:TPointArray);
+var L:Int32;
+begin
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(TPoint));
+  end;
+end; 
 
 function TPointArray.Find(const Value: TPoint): Integer;
 begin
@@ -65,11 +391,14 @@ end;
 
 function TPointArray.FindAll(const Value: TPoint): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
   for i := 0 to High(Self) do
     if (Value.X = Self[i].X) and (Value.Y = Self[i].Y) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TPointArray.Reversed(): TPointArray;
@@ -113,21 +442,12 @@ begin
   end;
 end;
 
-function TPointArray.Combine(const Arr2: TPointArray): TPointArray;
-var
-  i, h, j: Integer;
+function TPointArray.Combine(other: TPointArray): TPointArray;
 begin
-  if (Length(Arr2) = 0) then
-    Exit(Self);
-
-  Result := Self;
-  SetLength(Result, Length(Self) + Length(Arr2));
-
-  j := 0;
-  for i := Length(Self) to High(Arr2) + Length(Self) do
-  begin
-    Result[i] := Arr2[j];
-    Inc(j);
-  end;
-end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end;   
 

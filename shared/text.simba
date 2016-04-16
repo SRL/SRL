@@ -1,0 +1,104 @@
+function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
+var
+  img: Integer;
+begin
+  p := [-1, -1];
+
+  try
+    img := BitmapFromText(Text, Font);
+    Result := FindBitmapMaskTolerance(img, p, SearchBox, 30, 30);
+  finally
+    FreeBitmap(img);
+  end;
+end;
+
+function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+var
+  TPA, TPAText: TPointArray;
+  w, h: Integer;
+begin
+  if (not FindColorsTolerance(TPA, Color, SearchBox, Tolerance)) then
+    Exit(False);
+
+  SetLength(Matches, 0);
+  TPAText := TPAFromText(Text, Font, w, h);
+  Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
+end;
+
+function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+var
+  tmp: TPointArray;
+begin
+  Result := Self.FindText(tmp, Text, Font, Color, Tolerance, SearchBox);
+  if (Result) then
+    p := tmp[0];
+end;
+
+function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
+var
+  TPA: TPointArray;
+  p: TPoint;
+begin
+  Result := FindText(p, Text, Font, SearchBox);
+
+  if (Result) then
+  begin
+    TPA := TPAFromText(Text, Font);
+    OffsetTPA(TPA, p);
+
+    Mouse.Move(GetTPABounds(TPA))
+    if (MouseAction <> mouse_Move) then
+      Mouse.Click(mouseAction);
+  end;
+end;
+
+function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
+var
+  TPA, TPA2: TPointArray;
+  p: TPoint;
+  i: Integer;
+begin
+  Result := FindText(TPA2, Text, Font, Color, Tolerance, SearchBox);
+
+  if (Result) then
+  begin
+    p := TPA2[0];
+    TPA := TPAFromText(Text, Font);
+    OffsetTPA(TPA, p);
+
+    Mouse.Move(GetTPABounds(TPA))
+    if (MouseAction <> mouse_Move) then
+      Mouse.Click(mouseAction);
+  end;
+end;
+
+function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
+var
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  if (Length(TPA) < 1) then
+    Exit('');
+
+  ATPA := ClusterTPAEx(TPA, MinVSpacing, HSpacing);
+  b := GetTPABounds(TPA);
+
+  SortATPAFromFirstPointX(ATPA, Point(b.X1, b.Y1));
+  Result := GetTextATPA(ATPA, MaxVSpacing, Font);
+end;
+
+function TSRL.FormatInt(n:Int64; dec:Byte=3): String;
+var
+  i:Int32;
+  f:Double:=n;
+begin
+  while (Abs(f) >= 1000) do
+  begin  
+    Inc(i);
+    f := f / 1000;
+  end;
+  Result := FloatToStr(Round(f,dec)) + (['','k','m','b','t','qd','qt'])[i-1];
+end;
+
+
+

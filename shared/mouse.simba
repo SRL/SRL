@@ -37,8 +37,9 @@
 
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
-
-type
+  TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
+  
+  
   TMouse = record
   {$IFNDEF CODEINSIGHT}
     FSpeed: Integer;
@@ -46,22 +47,25 @@ type
     FGravity, FWind: array [0..2] of Integer;
     FOnMouseMove: TMouseMoveEvent;
     FOnMouseEvent: TMouseEvent;
+    FOnMouseChangeDestEvent: TMouseChangeDestEvent;
   {$ENDIF}
- end;
+  end;
 
-procedure TMouse.Init();
+procedure TMouse.__Setup();
 begin
-  FSpeed := Random(22, 24);
+  FSpeed := Random(21, 23);
   FMode := mouse_Human;
+
   FOnMouseMove := nil;
   FOnMouseEvent := nil;
+  FOnMouseChangeDestEvenT := nil;
 
   FGravity[Ord(Mouse_Human)] := 7;
-  FGravity[Ord(Mouse_Brake)] := 8;
+  FGravity[Ord(Mouse_Brake)] := 7;
   FGravity[Ord(Mouse_Accurate)] := 14;
 
-  FWind[Ord(mouse_Human)] := 5;
-  FWind[Ord(mouse_Brake)] := 5;
+  FWind[Ord(mouse_Human)] := 4;
+  FWind[Ord(mouse_Brake)] := 4;
   FWind[Ord(mouse_Accurate)] := 3;
 end;
 
@@ -71,7 +75,7 @@ begin
     RaiseException(erCustomError, 'TMouse.ValidateButton: Mouse button isn''t vaild, use (mouse_Left, mouse_Right, mouse_Middle');
 end;
 
-procedure TMouse.setPosition(const Target: TPoint);
+procedure TMouse.SetPosition(const Target: TPoint);
 begin
   if (@FOnMouseMove <> nil) then
     FOnMouseMove(@Self, [], Target.X, Target.Y);
@@ -79,69 +83,79 @@ begin
   MoveMouse(Target.X, Target.Y);
 end;
 
-function TMouse.getPosition(): TPoint;
+function TMouse.GetPosition(): TPoint;
 begin
   GetMousePos(Result.X, Result.Y);
 end;
 
-function TMouse.getMode(): TMouseMode;
+function TMouse.GetMode(): TMouseMode;
 begin
   Result := FMode;
 end;
 
-procedure TMouse.setMode(const NewMode: TMouseMode);
+procedure TMouse.SetMode(const NewMode: TMouseMode);
 begin
   FMode := NewMode;
 end;
 
-function TMouse.getSpeed(): Integer;
+function TMouse.GetSpeed(): Integer;
 begin
   Result := Self.FSpeed;
 end;
 
-procedure TMouse.setSpeed(const NewSpeed: Integer);
+procedure TMouse.SetSpeed(const NewSpeed: Integer);
 begin
   Self.FSpeed := NewSpeed;
 end;
 
-function TMouse.getGravity(const Mode: TMouseMode): Integer;
+function TMouse.GetGravity(const Mode: TMouseMode): Integer;
 begin
   Result := Self.FGravity[Ord(Mode)];
 end;
 
-procedure TMouse.setGravity(const Mode: TMouseMode; const NewGravity: Integer);
+procedure TMouse.SetGravity(const Mode: TMouseMode; const NewGravity: Integer);
 begin
   Self.FGravity[Ord(Mode)] := NewGravity;
 end;
 
-function TMouse.getWind(const Mode: TMouseMode): Integer;
+function TMouse.GetWind(const Mode: TMouseMode): Integer;
 begin
   Result := Self.FWind[Ord(Mode)];
 end;
 
-procedure TMouse.setWind(const Mode: TMouseMode; const NewWind: Integer);
+procedure TMouse.SetWind(const Mode: TMouseMode; const NewWind: Integer);
 begin
   Self.FWind[Ord(Mode)] := NewWind;
 end;
 
-function TMouse.getOnMouseMove(): TMouseMoveEvent;
+function TMouse.GetOnMouseMove(): TMouseMoveEvent;
 begin
-  Result := @FOnMouseMove;
+  Result := @Self.FOnMouseMove;
 end;
 
-procedure TMouse.setOnMouseMove(const Event: TMouseMoveEvent);
+procedure TMouse.SetOnMouseMove(const Event: TMouseMoveEvent);
 begin
-  FOnMouseMove := @Event;
+  Self.FOnMouseMove := @Event;
 end;
 
-function TMouse.getOnMouseEvent(): TMouseEvent;
+function TMouse.GetOnMouseEvent(): TMouseEvent;
 begin
-  Result := @FOnMouseEvent;
+  Result := @Self.FOnMouseEvent;
 end;
 
-procedure TMouse.setOnMouseEvent(const Event: TMouseEvent);
+procedure TMouse.SetOnMouseEvent(const Event: TMouseEvent);
 begin
-  FOnMouseEvent := @Event;
+  Self.FOnMouseEvent := @Event;
+end;
+
+function TMouse.GetOnChangeDestEvent(): TMouseChangeDestEvent;
+begin
+  Result := @Self.FOnMouseChangeDestEvent;
+end;
+
+procedure TMouse.SetOnChangeDestEvent(const Event: TMouseChangeDestEvent);
+begin
+  Self.FOnMouseChangeDestEvent := @Event;
 end;
 
 procedure TMouse.Hold(const Button: Integer);
@@ -175,8 +189,10 @@ var
   lastX,lastY,tempSpeed,W,TDist, xsR, ysR: Integer;
   t: UInt64;
   PDist,maxStep,dModA,dModB,nModA,nModB: extended;
+  Event, doExit: Boolean;
 begin
   tempSpeed := Self.getSpeed();
+  Event := Assigned(@FOnMouseChangeDestEvent);
   TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
   if (TDist < 1) then
     TDist := 1;
@@ -198,6 +214,13 @@ begin
   repeat
     if (GetTickCount64() > t) then
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    if (Event) then
+    begin
+      FOnMouseChangeDestEvent(@Self, xe, ye, doExit);
+      if (doExit) then
+        Exit;
+    end;
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -306,14 +329,23 @@ var
   lastX,lastY, tempSpeed,W,TDist, xsR, ysR: integer;
   t: UInt64;
   maxStep,rCnc: extended;
+  Event, doExit: Boolean;
 begin
   tempSpeed := Self.getSpeed();
+  Event := Assigned(@FOnMouseChangeDestEvent);
 
   TDist := distance(Round(xs), Round(ys), Round(xe), Round(ye));
   t := GetTickCount64() + Random(9700, 10000);
   repeat
     if (GetTickCount64() > t) then
       RaiseException(erCustomError, GetGlobalName(@Self) + ' timed out');
+
+    if (Event) then
+    begin
+      FOnMouseChangeDestEvent(@Self, xe, ye, doExit);
+      if (doExit) then
+        Exit;
+    end;
 
     dist := hypot(xs - xe, ys - ye);
     wind := minE(wind, dist);
@@ -374,7 +406,7 @@ begin
     W := round(W * 0.7);
 
     Wait(W);
-    lastdist:= dist;
+    lastdist := dist;
   until (hypot(xs - xe, ys - ye) < 1);
 
   if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
@@ -407,14 +439,20 @@ begin
   Self.Move(Point(X, Y));
 end;
 
-procedure TMouse.Move(const Box: TBox); overload;
+procedure TMouse.Move(const Box: TBox; ForcedMove:Boolean=False; Gauss:Boolean=True); overload;
 begin
-  Self.Move(gaussBox(Box));
+  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
+    Exit();
+
+  if (Gauss) then
+    Self.Move(srl.RandomPoint(Box))
+  else
+    Self.Move(Point(Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)));
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
 begin
-  Self.Move(gaussPoint(Middle, 0.00, 360.0, Radius));
+  Self.Move(srl.RandomPoint(Middle, Radius));
 end;
 
 procedure TMouse.Click(const Button: Integer);
@@ -440,7 +478,10 @@ begin
   p := Self.getPosition();
 
   if (p.X <> Target.X) or (p.Y <> Target.Y) then
+  begin
     Self.Move(Target.X, Target.Y);
+    Wait(16 + Random(70));
+  end;
 
   Self.Click(Button);
 end;
@@ -451,14 +492,19 @@ begin
   Self.Click(Point(X, Y), Button);
 end;
 
-procedure TMouse.Click(const Box: TBox; const Button: Integer); overload;
+procedure TMouse.Click(const Box: TBox; const Button: Integer; ForcedMove:Boolean=False); overload;
 begin
-  Self.Click(gaussBox(Box), Button);
+  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
+  begin
+    Self.Click(Button);
+    Exit();
+  end;
+  Self.Click(srl.RandomPoint(Box), Button);
 end;
 
 procedure TMouse.Click(const Middle: TPoint; const Radius, Button: Integer); overload;
 begin
-  Self.Click(gaussPoint(Middle, 0.00, 360.0, Radius), Button);
+  Self.Click(srl.RandomPoint(Middle, Radius), Button);
 end;
 
 procedure TMouse.Miss(const Target: TPoint; const Correct: Boolean = False; const WaitAfterMiss: Integer = 0);
@@ -492,9 +538,47 @@ begin
   Self.Release(Button);
 end;
 
+procedure TMouse.Scroll(Scrolls: Integer; Down: Boolean);
+var
+  i,step,k:Int32=1;
+  p:TPoint;
+begin
+  p := Self.GetPosition();
+  step := Round(srl.GaussRand(6.0,0.6));
+  for i:=1 to Scrolls do
+  begin
+    if Down then
+      ScrollMouse(p.x, p.y, {$IFDEF SMART}1{$ELSE}-1{$ENDIF})
+    else
+      ScrollMouse(p.x, p.y, {$IFDEF SMART}-1{$ELSE}1{$ENDIF});
+
+    if k mod step = 0 then
+    begin
+      step := Round(srl.GaussRand(6.0,0.6));
+      srl.NormalWait(215,410);
+      k := 0;
+    end else
+      srl.NormalWait(25,46);
+    Inc(k);
+  end;
+end;
+
+procedure TMouse.Scroll(Target: TPoint; scrolls: Integer; Down: Boolean); overload;
+begin
+  Self.Move(Target);
+  Self.Scroll(Scrolls, Down);
+end;
+
+procedure TMouse.Scroll(Box: TBox; scrolls: Integer; Down: Boolean); overload;
+begin
+  Self.Move(Box);
+  Self.Scroll(Scrolls, Down);
+end;
+
+
 var
   Mouse: TMouse;
 
 begin
-  Mouse.Init();
+  Mouse.__Setup();
 end;

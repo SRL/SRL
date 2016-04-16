@@ -1,6 +1,9 @@
 procedure TStringArray.Append(const Value: String);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TStringArray.Insert(const Value: String; Index: Integer);
@@ -50,9 +53,22 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
+
+procedure TStringArray.Extend(const Arr: TStringArray);
+var i,len:Int32;
+begin
+  len := Length(Self);
+  SetLength(Self, len+Length(Arr));
+  for i:=0 to High(Arr) do
+    Self[len+i] := Arr[i];
+end; 
 
 function TStringArray.Find(const Value: String): Integer;
 begin
@@ -65,11 +81,14 @@ end;
 
 function TStringArray.FindAll(const Value: String): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
-  for i := 0 to High(Self) do
+  for i:=0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TStringArray.Reversed(): TStringArray;
@@ -118,7 +137,7 @@ var
   i, h, j: Integer;
 begin
   if (Length(Arr2) = 0) then
-    Exit(Self);
+    Exit(Copy(Self));
 
   Result := Self;
   SetLength(Result, Length(Self) + Length(Arr2));

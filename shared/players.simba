@@ -1,0 +1,39 @@
+type
+  TPlayers = record
+    FPlayers: array of TPlayer;
+    FCurrent: Integer;
+  end;
+
+var
+  Players: TPlayers;
+
+procedure TPlayers.SetCount(Number: Integer);
+begin
+  SetLength(FPlayers, Number);
+end;
+
+function TPlayers.GetCount(): Integer;
+begin
+  Result := Length(FPlayers);
+end;
+
+function TPlayers.GetCurrent(): TPlayer;
+begin
+  Result := FPlayers[FCurrent];
+end;
+
+procedure TPlayers.SetCurrent(idx: Integer);
+begin
+  FCurrent := idx;
+end;
+
+procedure TPlayers.SwitchTo(PlayerIndex: Integer; SetInActive: Boolean = True);
+begin
+
+end;
+
+function TPlayers.Add(Player: TPlayer);
+begin
+  Self.SetCount(Self.GetCount() + 1);
+  Self.FPlayers[Self.GetCount() - 1] := Player;
+end;

@@ -1,6 +1,9 @@
 procedure TExtendedArray.Append(const Value: Extended);
+var top:Int32;
 begin
-  Self += Value;
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
 end;
 
 procedure TExtendedArray.Insert(const Value: Extended; Index: Integer);
@@ -50,9 +53,24 @@ var
   h: Integer;
 begin
   h := High(Self);
-  Result := Self[h];
-  SetLength(Self, h);
+  if h >= 0 then
+  begin
+    Result := Self[h];
+    SetLength(Self, h);
+  end else
+    RaiseException(erOutOfRange, 'Array is empty');
 end;
+
+procedure TExtendedArray.Extend(Arr:TExtendedArray);
+var L:Int32;
+begin
+  if Length(arr) > 0 then
+  begin
+    L := Length(Self);
+    SetLength(Self, Length(Arr) + L);
+    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Extended));
+  end;
+end; 
 
 function TExtendedArray.Find(const Value: Extended): Integer;
 begin
@@ -65,11 +83,14 @@ end;
 
 function TExtendedArray.FindAll(const Value: Extended): TIntegerArray;
 var
-  i: UInt32;
+  i,top: UInt32;
 begin
   for i := 0 to High(Self) do
     if (Self[i] = Value) then
-      Result += i;
+    begin
+      SetLength(Result, top+1);
+      Result[Inc(top)-1] := i;
+    end;
 end
 
 function TExtendedArray.Reversed(): TExtendedArray
@@ -113,20 +134,11 @@ begin
   end;
 end;
 
-function TExtendedArray.Combine(const Arr2: TExtendedArray): TExtendedArray;
-var
-  i, h, j: Integer;
+function TExtendedArray.Combine(other: TExtendedArray): TExtendedArray;
 begin
-  if (Length(Arr2) = 0) then
-    Exit(Self);
-
-  Result := Self;
-  SetLength(Result, Length(Self) + Length(Arr2));
-
-  j := 0;
-  for i := Length(Self) to High(Arr2) + Length(Self) do
-  begin
-    Result[i] := Arr2[j];
-    Inc(j);
-  end;
-end;
+  SetLength(Result, Length(Self) + Length(other));
+  if Length(self) > 0 then
+    MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
+  if Length(other) > 0 then
+    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+end; 

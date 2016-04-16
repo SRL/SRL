@@ -1,0 +1,80 @@
+{$loadlib SimpleOCR}
+var 
+  OCR: TSimpleOCR;
+  SmallFont, UpFont, NPCFont, StatFont: TFontSet;
+
+const
+  OCR_RULES_CHATBOX:TCompareRules = [-1,,,,-50,True];
+  OCR_RULES_BLUE:   TCompareRules = [16711680,10];     //navy blue
+  OCR_RULES_BLACK:  TCompareRules = [0,10];            //black
+
+  
+// FontSetting - General purpose
+function FontSetting(color, tolerance:Int32=0; useShadow:Boolean=False;
+                     shadowMaxLight, threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  Result := [color,tolerance,useShadow,shadowMaxLight,threshold,threshInv];
+end;
+
+// FontSetting - Shadow
+function FontSettingShd(color:Int32=-1; tolerance:Int32=0; shadowMaxLight:Int32=0): TCompareRules;
+begin
+  Result := [color,tolerance,True,shadowMaxLight];
+end;
+
+// FontSetting - Threshold
+function FontSettingTrh(threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  Result := [-1,0,False,0,threshold,threshInv];
+end;
+
+ 
+  
+// override to keep up with simbas target
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
+begin
+  Self.ClientID := ExportImageTarget();
+  Result := Inherited(B, Filter, MaxWalk);
+end;
+
+
+// overloads which takes a fontset.
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet; MaxWalk:Int32=40): String; overload;
+begin
+  Self.SetFont(Font);
+  Result := Self.Recognize(B, Filter, MaxWalk);
+end;
+
+function TSimpleOCR.RecognizeEx(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
+begin
+  Self.SetFont(Font);
+  Result := Self.RecognizeEx(AClient, Filter);
+end;
+
+function TSimpleOCR.ExpectText(txt:String; B:TBox; font:TFontSet; setting:TCompareRules; maxWait:Int32=6000): Boolean;
+var
+  t:UInt32;
+begin
+  t := GetTimeRunning() + maxWait;
+  while GetTimeRunning() < t do
+  begin
+    Wait(Random(25, 75));
+    if Pos(txt, ocr.Recognize(B, setting, font)) <> 0 then
+      Exit(True);
+  end;
+end; 
+
+begin
+  SmallFont.Load(FontPath+'SmallChars07'); 
+  UpFont.Load(FontPath+'UpChars07_s'); 
+  NPCFont.Load(FontPath+'CharsNPC07'); 
+  StatFont.Load(FontPath+'StatChars07');
+
+  OCR.Init(SmallFont); //just init it with W/E font.
+  //freeing OCR and fonts is handeled automatically by lape
+end;
+
+
+
+
+

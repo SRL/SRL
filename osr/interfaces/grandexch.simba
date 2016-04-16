@@ -1,0 +1,654 @@
+(*
+  This file is a work in progress.
+  In other words:
+  * it will be a subject to change
+  * it doesn't have any documentation
+  * it may lack a lot of safety checks
+  * it will no be included by default
+  * it could contain bugs
+  
+  - slacky was here!
+*)
+type
+  EGEInterface = (geOverview, geOfferStatus, geSetupOffer);
+  EExchButton  = (ebHistory, ebAbort, ebReturn, ebCollect, ebClose);
+  EAdjustButton = (
+    abDecQuant, abQuantInc, abDecPrice, abIncPrice,
+    abIncQuant1, abIncQuant10, abIncQuant100, abIncQuant1K, abEnterQuantity,
+    abDecPrice5Prc, abGuidePrice, abEnterPrice, abIncPrice5Prc
+  );
+  EExchType   = (etEmpty, etBuy, etSell);
+  EOfferState = (osIncomplete, osCompleted, osAborted);
+
+  TExchangeInfo = record
+    Item: String;
+    Typ: EExchType;
+    Status: EOfferState;
+    Progress: Int32;
+    Price: Int32;
+    Sum: Int32;
+  end;
+
+  TGrandExchHistory = record(TInterfaceBase)
+    null:Pointer;
+  end;
+
+  TGrandExchStub = record(TInterfaceBase)
+    FHeader:TBox;
+    FTitles:Array [EGEInterface] of String;
+    FButtons: Array [EExchButton] of TBox;
+    FMiscBoxes: TBoxArray;
+  end;
+
+  TGrandExchOffer = record(TGrandExchStub)
+    FConfimButton: TBox;
+    FAdjBounds: TBoxArray;
+    FAdjButtons: TBoxArray;
+  end;
+
+  TRSGrandExch = record(TGrandExchStub)
+    FOfferButtons: TBoxArray;
+    FExchBoxes: TBoxArray;
+    ExchTables: TBoxArray;
+
+    History: TGrandExchHistory;
+    Offer: TGrandExchOffer;
+  end;
+
+const
+  clGEOrange     = 2070783;
+  clGELiteOrange = 4176127;
+  clGEProgOrange = 2130136;
+
+var
+  GrandExchange: TRSGrandExch;
+
+
+
+//====| The base of GE interfaces |===========================================\\
+procedure TGrandExchStub.__Setup();
+begin
+  self.FBounds := [23,24,496,317];
+  self.FHeader := [100,25,450,47];
+
+  with self.FBounds do
+  begin
+    FButtons[ebHistory] := Box(X1+3,   Y1+3,   X1+47,  Y1+20);
+    FButtons[ebAbort]   := Box(X1+326, Y1+242, X1+345, Y1+261);
+    FButtons[ebReturn]  := Box(X1+13,  Y1+253, X1+41,  Y1+274);
+    FButtons[ebCollect] := Box(X1+390, Y1+36,  X1+470, Y1+53);
+    FButtons[ebClose]   := Box(X2-21,  Y1+3,   X2-3,   Y1+21);
+  end;
+
+  FTitles[geOverview]   := 'Grand Exchange';
+  FTitles[geOfferStatus]:= 'Offer status';
+  FTitles[geSetupOffer] := 'Set up offer';
+end;
+
+
+function TGrandExchStub.RecognizeStr(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                     WSplit:Int32=3; HSplit:Int32=2): String;
+var
+  i:Int32;
+  TPA:TPointArray;
+  TSA:TStringArray;
+  ATPA:T2DPointArray;
+begin
+  if FindColorsTolerance(TPA, Color, B, Tol) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10,2);
+    for i:=0 to High(ATPA) do
+      TSA.Append(GetTextAtEx(GetTPABounds(ATPA[i]), 0,WSplit,HSplit, Color, Tol, Font));
+    Result := Trim(Implode(' ', TSA));
+  end;
+end;
+
+
+function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                     WSplit:Int32=3; HSplit:Int32=2): Int32;
+var tmp:String;
+begin
+  tmp := Self.RecognizeStr(B,Color,Font,Tol,WSplit,HSplit);
+  Result := StrToIntDef(ExtractFromStr(tmp, NUMBERS), -1);
+end;
+
+
+function TGrandExchStub.Title(): String;
+begin
+  Result := RecognizeStr(FHeader, clGEOrange, 'UpChars07_s',,,4);
+end;
+
+
+function TGrandExchStub.CurrentInterface(wtime:Int32=0): EGEInterface;
+var
+  title:String;
+  t:Int64;
+begin
+  t := GetTickCount64() + wtime;
+  repeat
+    title := self.Title();
+    if (title = self.FTitles[geOverview]) then
+      Exit(geOverview)
+    else if Pos(self.FTitles[geOfferStatus], title) > 0 then
+      Exit(geOfferStatus)
+    else if Pos(self.FTitles[geSetupOffer], title) > 0 then
+      Exit(geSetupOffer);
+  until (GetTickCount64() > t);
+end;
+
+
+function TGrandExchStub.IsOpen(screen:EGEInterface=geOverview; wtime:Int32=0): Boolean;
+var
+  title:String;
+  t:Int64;
+begin
+  t := GetTickCount64() + wtime;
+  repeat
+    title := self.Title();
+    if (title = self.FTitles[geOverview]) then
+      Result := geOverview = screen
+    else if Pos(self.FTitles[geOfferStatus], title) > 0 then
+      Result := geOfferStatus = screen
+    else if Pos(self.FTitles[geSetupOffer], title) > 0 then
+      Result := geSetupOffer = screen;
+  until (GetTickCount64() > t) or (Result);
+end;
+
+
+procedure TGrandExchStub.Click(button:EExchButton);
+begin
+  Mouse.Click(self.FButtons[ord(button)], mouse_left);
+end;
+
+
+{$IFDEF SMART}
+procedure TGrandExchStub.Debug();
+begin
+  Smart.Image.DrawBox(FBounds, False, $FFFFFF);
+  Smart.Image.DrawBox(FHeader, False, $FF0000);
+end;
+{$ENDIF}
+
+
+
+//====| GE Offer Interface (Sell & Buy) |=====================================\\
+procedure TGrandExchOffer.__Setup(); override;
+begin
+  inherited;
+
+  //stores just about all the areas - relative to FBounds (X1,Y1)
+  FMiscBoxes := [
+    [ 18,  37, 164,  59], //0:  Exchange-type
+    [ 72,  67, 108, 100], //1:  item icon
+    [ 18, 106, 164, 120], //2:  item value
+    [167,  37, 456,  59], //3:  item name
+    [167,  59, 456, 124], //4:  item description area (n lines)
+    [ 46, 153, 207, 172], //5:  quantity
+    [267, 153, 427, 172], //6:  price per item
+    [131, 207, 342, 226], //7:  total price
+    [ 54, 236, 345, 270], //8:  misc text area (two lines)
+    [372, 246, 408, 278], //9:  withdraw-1 (item)
+    [423, 246, 459, 278], //10: withdraw-2 (item)
+    [ 54, 274, 345, 288]  //11: progressbar
+  ];
+  FMiscBoxes.Offset(Point(FBounds.x1, FBounds.y1));
+
+  FAdjBounds := [
+    [18,152,456,173],
+    [18,175,456,201]
+  ];
+  FAdjBounds.Offset(Point(FBounds.X1, FBounds.Y1));
+  FConfimButton := [161,244,312,283];
+  FConfimButton.Offset(Point(FBounds.X1, FBounds.Y1));
+end;
+
+
+function TGrandExchOffer.LoadButtons(): TBoxArray;
+var
+  i:Int32;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+  B:TBox;
+begin
+  if FAdjButtons = [] then
+  begin
+    FindColorsTolerance(TPA, 5990257, FAdjBounds[0], 30);
+    ATPA := ClusterTPA(TPA, 5);
+    for i:=0 to High(ATPA) do
+    begin
+      B := GetTPABounds(ATPA[i]);
+      if (B.Width() < 16) and (B.Height() < 16) then
+      begin
+        B.Expand(1);
+        FAdjButtons.Append(B);
+      end;
+    end;
+
+    FindColorsTolerance(TPA, $100000, FAdjBounds[1], 30);
+    ATPA := ClusterTPA(TPA, 4);
+    for i:=0 to High(ATPA) do
+    begin
+      B := GetTPABounds(ATPA[i]);
+      if (B.Width() > 30) and (B.Height() > 20) then
+        FAdjButtons.Append(B);
+    end;
+  end;
+
+  Result := FAdjButtons;
+end;
+
+procedure TGrandExchOffer.Click(button:EAdjustButton; times:Int32=1); overload;
+var i:Int32;
+begin
+  self.LoadButtons();
+  for i:=1 to times do
+  begin
+    Mouse.Click(self.FAdjButtons[ord(button)], mouse_left);
+    srl.NormalWait(65,220);
+  end;
+end;
+
+procedure TGrandExchOffer.Confirm();
+begin
+  Mouse.Click(self.FConfimButton, mouse_left);
+end;
+
+function TGrandExchOffer.SelectItem(name:String; Exact:Boolean=False; wtime:Int32=2000): Boolean;
+var
+  i,t:Int64;
+  B:TBox;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+  str:String;
+begin
+  t := GetTickCount64()+wtime;
+  repeat
+    if (FindColors(TPA, 0, Chatbox.GetChatArea())) and
+       (Pos('What would you', Chatbox.GetQuery()) > 0) then
+    begin
+      ATPA := ClusterTPAEx(TPA, 6, 4);
+      for i:=0 to High(ATPA) do
+      begin
+        B := GetTPABounds(ATPA[i]);
+        str := self.RecognizeStr(B, 0, 'SmallChars');
+        if (Exact and (str = name)) or ((not Exact) and (Pos(name,str) > 0)) then
+        begin
+          Mouse.Click(B, mouse_left);
+          Exit(True);
+        end;
+      end;
+    end;
+  until (GetTickCount64() > t);
+end;
+
+function TGrandExchOffer.SetQuntity(quantity:Int32): Boolean;
+begin
+  Self.Click(abEnterQuantity);
+  Result := Chatbox.AnswerQuery('How many', IntToStr(quantity), True, 2500);
+end;
+
+function TGrandExchOffer.SetPrice(price:Int32): Boolean;
+begin
+  Self.Click(abEnterPrice);
+  Result := Chatbox.AnswerQuery('Set a price', IntToStr(price), True, 2500);
+end;
+
+function TGrandExchOffer.ExchangeType(): EExchType;
+var str:String;
+begin
+  str := self.RecognizeStr(FMiscBoxes[0], clGEOrange, 'UpChars07_s');
+  SetLength(str,3);
+  case Lowercase(str) of
+    'emp': Result := etEmpty;
+    'sel': Result := etSell;
+    'buy': Result := etBuy;
+  end;
+end;
+
+function TGrandExchOffer.OfferIcon(): TMufasaBitmap;
+var bmp:Integer;
+begin
+  with FMiscBoxes[0] do
+  begin
+    CopyClientToBitmap(bmp, x1,y1,x2,y2);
+    Result := GetMufasaBitmap(bmp);
+  end;
+end;
+
+function TGrandExchOffer.ItemValue(): Int32;
+begin
+  Result := self.RecognizeInt(FMiscBoxes[2], clGELiteOrange, 'StatChars07_s');
+end;
+
+function TGrandExchOffer.ItemName(): String;
+begin
+  Result := self.RecognizeStr(FMiscBoxes[3], clGEOrange, 'UpChars07_s');
+end;
+
+function TGrandExchOffer.ItemDesc(): String;
+begin
+  Result := self.RecognizeStr(FMiscBoxes[4], clGELiteOrange, 'StatChars07_s');
+end;
+
+function TGrandExchOffer.Quantity(): Int32;
+var iface:EGEInterface;
+begin
+  iface := self.CurrentInterface();
+  if iface = geSetupOffer then
+    Result := self.RecognizeInt(FMiscBoxes[5], clGELiteOrange, 'StatChars07_s')
+  else if iface = geOfferStatus then
+    Result := self.RecognizeInt(FMiscBoxes[5], clGELiteOrange, 'UpChars07_s')
+  else
+    Result := -1;
+end;
+
+function TGrandExchOffer.Price(): Int32;
+var iface:EGEInterface;
+begin
+  iface := self.CurrentInterface();
+  if iface = geSetupOffer then
+    Result := self.RecognizeInt(FMiscBoxes[6], clGELiteOrange, 'StatChars07_s')
+  else if iface = geOfferStatus then
+    Result := self.RecognizeInt(FMiscBoxes[6], clGELiteOrange, 'UpChars07_s')
+  else
+    Result := -1;
+end;
+
+function TGrandExchOffer.Sum(): Int32;
+var iface:EGEInterface;
+begin
+  iface := self.CurrentInterface();
+  if iface = geSetupOffer then
+    Result := self.RecognizeInt(FMiscBoxes[7], clWhite, 'StatChars07_s')
+  else if iface = geOfferStatus then
+    Result := self.RecognizeInt(FMiscBoxes[7], clWhite, 'UpChars07_s')
+  else
+    Result := -1;
+end;
+
+function TGrandExchOffer.Status(): String;
+begin
+  Result := self.RecognizeStr(FMiscBoxes[8], clGEOrange, 'StatChars07_s', 60);
+end;
+
+
+//untested (I assume it works)
+function TGrandExchOffer.Progress(): Int32;
+var
+  B:TBox;
+  y,count:Int32;
+begin
+  B := FMiscBoxes[11];
+  B.Expand(-1);
+  y := B.Middle().y;
+  B.y1 := y;
+  B.y2 := y;
+  count := CountColorTolerance(clGEProgOrange, B, 80);
+  Result := Round(count / B.Width() * 100);
+end;
+
+function TGrandExchOffer.State(): EOfferState;
+var B:TBox;
+begin
+  B := FMiscBoxes[11];
+  Result := osIncomplete;
+  if CountColorTolerance(143,  B,30) > 500 then Exit(osAborted);
+  if CountColorTolerance(24320,B,30) > 500 then Exit(osCompleted);
+end;
+
+function TGrandExchOffer.SearchFor(name:String): Boolean;
+begin
+  if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etBuy) then
+    Exit(False);
+
+  if Pos('What would you', Chatbox.GetQuery()) = 0 then
+  begin
+    Mouse.Click(FMiscBoxes[1], mouse_left);
+  end;
+  Result := Chatbox.AnswerQuery('What would you', name, False, 2500);
+end;
+
+function TGrandExchOffer.SellItem(invIndex:Int32): Boolean;
+begin
+  if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etSell) then
+    Exit(False);
+
+  Result := Inventory.SlotIsUsed(invIndex);
+  WriteLn(Result);
+  if Result then
+    Inventory.MouseSlot(invIndex, mouse_Left);
+end;
+
+function TGrandExchOffer.Info(): TExchangeInfo;
+begin
+  Result.Typ     := self.ExchangeType();
+  Result.Status  := self.State();
+  Result.Progress:= self.Progress();
+  Result.Item    := self.ItemName();
+  Result.Price   := self.Price();
+  Result.Sum     := self.Sum();
+end;
+
+
+{$IFDEF SMART}
+procedure TGrandExchOffer.Debug(); override;
+var i:Int32;
+begin
+  inherited;
+  Smart.Image.DrawBoxes(FAdjBounds, False, $777777);
+  Smart.Image.DrawBoxes(Self.LoadButtons(), False, $0077FF);
+
+  if Self.CurrentInterface() = geSetupOffer then
+  begin
+    Smart.Image.DrawBoxes(Copy(FMiscBoxes, 0, Length(FMiscBoxes)-4), False, $FFFF00);
+    Smart.Image.DrawBox(FConfimButton, False, $FFFFFF);
+  end
+  else
+    Smart.Image.DrawBoxes(FMiscBoxes, False, $FFFF00);
+
+  for i:=0 to High(FButtons) do
+    if i <> ord(ebCollect) then
+      Smart.Image.DrawBox(FButtons[i], False, $0000FF);
+end;
+{$ENDIF}
+
+
+
+//====| GrandExchange Interface |=============================================\\
+procedure TRSGrandExch.__Setup(); override;
+var
+  i:Int32;
+  tmpBox: TBox = [26,82,493,321];
+begin
+  inherited;
+  Offer.__Setup();
+
+  ExchTables := tmpBox.Partition(2,4,-3);
+  ExchTables.ModifySide('y2',-8);
+
+  //The following are relative bounds to the exchange-table
+  FOfferButtons := [
+    [0,0,0,0],     //etEmpty
+    [6,43,48,84],  //etBuy
+    [62,43,104,84] //etSell
+  ];
+
+  FExchBoxes := [
+    [ 1,  1, -2,  19], //0: Exchange type (buy / sell)
+    [42, 30, -3,  65], //1: Item name
+    [ 2, 30,  40, 65], //2: Item icon
+    [ 2, 72, -3,  86], //3: Progress-bar
+    [ 2, 87, -3,  -3]  //4: Sum
+  ];
+end;
+
+
+function TRSGrandExch.OffsetToTable(slot:Int32; B:TBox): TBox;
+begin
+  B.x1 := srl.Modulo(B.x1, ExchTables[slot].Width() );
+  B.y1 := srl.Modulo(B.y1, ExchTables[slot].Height());
+  B.x2 := srl.Modulo(B.x2, ExchTables[slot].Width() );
+  B.y2 := srl.Modulo(B.y2, ExchTables[slot].Height());
+  B.Offset(Point(ExchTables[slot].x1, ExchTables[slot].y1));
+  Result := B;
+end;
+
+
+function TRSGrandExch.ExchangeType(slot:Int32): EExchType;
+var
+  B:TBox;
+  str:String;
+begin
+  B := self.OffsetToTable(slot, FExchBoxes[0]);
+  str := Self.RecognizeStr(B, clGEOrange, 'UpChars07_s');
+  SetLength(str,3);
+  case Lowercase(str) of
+    'emp': Result := etEmpty;
+    'sel': Result := etSell;
+    'buy': Result := etBuy;
+  end;
+end;
+
+
+function TRSGrandExch.Available(slot:Int32): Boolean;
+var B:TBox;
+begin
+  if self.ExchangeType(slot) = etEmpty then
+  begin
+    B := self.OffsetToTable(slot, FOfferButtons[ord(etSell)]);
+    B := B.Combine( self.OffsetToTable(slot, FOfferButtons[ord(etBuy)]) );
+    Result := CountColorTolerance($FFFFFF,B,220) < 180;
+  end;
+end;
+
+
+function TRSGrandExch.ItemName(slot:Int32): String;
+var
+  B:TBox;
+  i:Int32;
+  tmp:String;
+begin
+  B := self.OffsetToTable(slot, FExchBoxes[1]);
+  Result := self.RecognizeStr(B, clGELiteOrange, 'StatChars07');
+end;
+
+
+function TRSGrandExch.State(slot:Int32): EOfferState;
+var B:TBox;
+begin
+  B := self.OffsetToTable(slot, FExchBoxes[3]);
+  Result := osIncomplete;
+  if CountColorTolerance(143,  B,30) > 500 then Exit(osAborted);
+  if CountColorTolerance(24320,B,30) > 500 then Exit(osCompleted);
+end;
+
+
+function TRSGrandExch.Price(slot:Int32): Int32;
+var B:TBox;
+begin
+  B := self.OffsetToTable(slot, FExchBoxes[4]);
+  Result := self.RecognizeInt(B, clGELiteOrange, 'StatChars07');
+end;
+
+//untested (I assume it works)
+function TRSGrandExch.Progress(slot:Int32): Int32;
+var
+  B:TBox;
+  y,count:Int32;
+begin
+  B := self.OffsetToTable(slot, FExchBoxes[3]);
+  B.Expand(-1);
+  y := B.Middle().y;
+  B.y1 := y;
+  B.y2 := y;
+  count := CountColorTolerance(clGEProgOrange, B, 80);
+  Result := Round(count / B.Width() * 100);
+end;
+
+
+function TRSGrandExch.Sum(slot:Int32): Int32;
+begin
+  Result := -1;
+end;
+
+
+function TRSGrandExch.Info(slot:Int32): TExchangeInfo;
+begin
+  Result.Typ     := self.ExchangeType(slot);
+  Result.Status  := self.State(slot);
+  Result.Progress:= self.Progress(slot);
+  Result.Item    := self.ItemName(slot);
+  Result.Price   := self.Price(slot);
+  Result.Sum     := self.Sum(slot);
+end;
+
+
+function TRSGrandExch.PlaceOffer(slot:Int32; typ:EExchType): Boolean;
+var
+  B:TBox;
+begin
+  if self.Available(slot) then
+  begin
+    B := self.OffsetToTable(slot, FOfferButtons[ord(typ)]);
+    Mouse.Click(B, mouse_left);
+    Result := self.IsOpen(geSetupOffer, 2500);
+  end;
+end;
+
+function TRSGrandExch.PlaceOffer(typ:EExchType): Boolean; overload;
+var slot:Int32;
+begin
+  for slot:=0 to High(ExchTables) do
+    if self.Available(slot) then
+      Exit(self.PlaceOffer(slot, typ));
+end;
+
+
+function TRSGrandExch.ViewOffer(slot:Int32): Boolean;
+begin
+  if not self.Available(slot) then
+  begin
+    Mouse.Click(ExchTables[slot], mouse_left);
+    Result := self.IsOpen(geOfferStatus, 2500);
+  end;
+end;
+
+
+{$IFDEF SMART}
+procedure TRSGrandExch.Debug(); override;
+var
+  curr:EGEInterface;
+  i,j:Int32;
+begin
+  curr := CurrentInterface();
+  if (curr = geOverview) then
+  begin
+    inherited;
+    Smart.Image.DrawBoxes(self.ExchTables, False, 1);
+    Smart.Image.DrawBox(FButtons[ebClose],   False, $0000FF);
+    Smart.Image.DrawBox(FButtons[ebCollect], False, $0000FF);
+    Smart.Image.DrawBox(FButtons[ebHistory], False, $0000FF);
+    for i:=0 to High(ExchTables) do
+    begin
+      Smart.Image.DrawBox(OffsetToTable(i, FExchBoxes[0]),False,$DDDDDD);
+      if self.ExchangeType(i) = etEmpty then
+      begin
+        Smart.Image.DrawBox(OffsetToTable(i, FOfferButtons[ord(etSell)]), False, $0077FF);
+        Smart.Image.DrawBox(OffsetToTable(i, FOfferButtons[ord(etBuy)]),  False, $00FFFF);
+      end
+      else for j:=1 to High(FExchBoxes) do
+      begin
+        Smart.Image.DrawBox(OffsetToTable(i, FExchBoxes[j]),False,$00FFFF);
+      end;
+    end;
+  end
+  else if curr in [geSetupOffer, geOfferStatus] then
+  begin
+    self.offer.Debug();
+  end;
+end;
+{$ENDIF}
+
+begin
+  GrandExchange.__Setup();
+end.

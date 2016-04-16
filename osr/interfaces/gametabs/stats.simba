@@ -1,0 +1,266 @@
+(*
+Stats
+=======
+The file holds functions and procedures that are related to the stats gametab
+*)
+
+type 
+  TRSStats = record(TInterfaceBase)
+    FSlots: TBoxArray;
+  end;
+  
+  TSkillInfo = record
+    Level:Int32;
+    XP:   Int32;
+    Next: Int32;
+    Remainder: Int32;
+  end;
+  
+{==| Table of Contents |=======================
+ procedure TRSStats.__setup();
+ function TRSStats.Open(): Boolean;
+ function TRSStats.IsOpen(): Boolean;
+ function TRSStats.GetSkillBounds(skill:Int32): TBox;
+ function TRSStats.MouseOver(skill:Int32): Int32;
+}
+
+(*
+var Stats
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape stats gametab.
+*)
+var 
+  Stats: TRSStats;
+
+const
+  SKILL_ATTACK     = 0;
+  SKILL_HITPOINTS  = 1;
+  SKILL_MINING     = 2;
+  SKILL_STRENGTH   = 3;
+  SKILL_AGILITY    = 4;
+  SKILL_SMITHING   = 5;
+  SKILL_DEFENCE    = 6;
+  SKILL_HERBLORE   = 7;
+  SKILL_FISHING    = 8;
+  SKILL_RANGE      = 9;
+  SKILL_THIEVING   = 10;
+  SKILL_COOKING    = 11;
+  SKILL_PRAYER     = 12;
+  SKILL_CRAFTING   = 13;
+  SKILL_FIREMAKING = 14;
+  SKILL_MAGIC      = 15;
+  SKILL_FLETCHING  = 16;
+  SKILL_WOODCUTTING = 17;
+  SKILL_RUNECRAFTING = 18;
+  SKILL_SLAYER     = 19;
+  SKILL_FARMING    = 20;
+  SKILL_CONSTRUCTION = 21;
+  SKILL_HUNTER     = 22;
+  SKILL_TOTAL      = 23;
+
+
+const
+  SKILLNAMES = [
+   'Attack',
+   'Hitpoints',
+   'Mining',
+   'Strength',
+   'Agility',
+   'Smithing',
+   'Defence',
+   'Herblore',
+   'Fishing',
+   'Range',
+   'Thieving',
+   'Cooking',
+   'Prayer',
+   'Crafting',
+   'Firemaking',
+   'Magic',
+   'Fletching',
+   'Woodcutting',
+   'Runecraft',
+   'Slayer',
+   'Farming',
+   'Construction',
+   'Hunter',
+   'Total'
+  ];
+
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSStats.__setup();
+var i:Int32;
+begin
+  with Self do
+  begin
+    FName := 'Inventory';
+    FStatic := True;
+    FBounds := [548,206,735,454];
+    FSlots := FBounds.Partition(8, 3);
+  end;
+end;
+{$ENDIF}
+
+
+(*
+Stats.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.Open(): Boolean;
+
+Opens the interface
+*)
+function TRSStats.Open(): Boolean;
+begin
+  Result := Gametabs.Open(tabStats);
+end;
+
+
+(*
+Stats.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.IsOpen(maxWait:Int32=0): Boolean;
+
+Checks if the interface is already open.
+*)
+function TRSStats.IsOpen(maxWait:Int32=0): Boolean;
+begin
+  Result := Gametabs.IsOpen(tabStats, maxWait);
+end;
+
+
+(*
+stats.SkillIsVaild
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.IsSkillVaild(skill:Int32): Boolean;
+
+---
+*)
+function TRSStats.IsSkillVaild(skill:Int32): Boolean;
+begin
+  Result := InRange(skill, 0, High(Self.FSlots));
+end;
+
+
+(*
+Stats.GetSkillBounds
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.GetSkillBounds(skill:Int32): TBox;
+
+Returns the bounding box covering the given skill-index.
+
+.. note:: by slacky
+*)
+function TRSStats.GetSkillBounds(skill:Int32): TBox;
+begin
+  if Self.IsSkillVaild(skill) then
+    Result := Self.FSlots[skill]
+  else
+    {notify index out of range};
+end;
+
+
+(*
+Stats.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.MouseOver(skill:Int32): Boolean;
+
+Moves the mouse over the given skill-index.
+
+.. note:: by slacky
+*)
+function TRSStats.MouseOver(skill:Int32): Boolean;
+begin
+  if not(self.Open()) then Exit();
+  
+  Result := True;
+  if Self.IsSkillVaild(skill) then
+    Mouse.Move(Self.FSlots[skill])
+  else
+    Result := False;
+end;
+
+
+(*
+Stats.GetSkillInfo
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.GetSkillInfo(skill:Int32): TSkillInfo;
+
+Returns the level info: "Level", "xp", "next level at" and "remainder"
+
+.. note:: by slacky
+*)
+function TRSStats.GetSkillInfo(skill:Int32; WaitTime:Int32=400): TSkillInfo;
+const
+  TextColor:TCompareRules = [0];
+var
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+  B:TBox;
+  TBA:TBoxArray;
+  t:UInt64;
+  text:String;
+begin
+  if not self.MouseOver(skill) then
+    Exit();
+
+  t := GetTickCount64() + WaitTime;
+  repeat
+    if FindColors(TPA, $A0FFFF, Self.FBounds) then
+    begin
+      ATPA := SplitTPAEx(TPA, 1,1);
+      SortATPASize(ATPA,True);
+      B := GetTPABounds(ATPA[0]);
+
+      TBA := [[B.x1,B.y1,B.x2,B.y2], [B.x1,B.y1+12,B.x2,B.y2]];
+      if skill = 23 then
+        text := GetTextAtEx(B.x1,B.y1,B.x2,B.y1+13,0,3,5,0,0,'SmallChars07')
+      else
+        text := OCR.Recognize(TBA[0],TextColor, SmallFont);
+
+      if Pos(SKILLNAMES[skill], text) = 0 then Continue;
+      Result.XP := StrToIntDef(ExtractFromStr(text, Numbers),0);
+
+      if skill <> 23 then
+      begin
+        text := OCR.Recognize(TBA[1], TextColor, SmallFont);
+        Result.Next :=  StrToIntDef(ExtractFromStr(text, Numbers),0);
+        if Result.XP <> -1 then
+        begin
+          Result.Level := srl.GetLevelAtXP(Result.XP);
+          Result.Remainder := Result.Next - Result.XP;
+        end;
+      end;
+
+      Break;
+    end;
+    Wait(Random(20,50));
+  until t < GetTickCount64();
+end;
+
+
+begin
+  Stats.__setup();
+end;
+
+
+
+
+
+
+
+
+
+

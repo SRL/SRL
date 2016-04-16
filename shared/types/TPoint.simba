@@ -1,0 +1,68 @@
+function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint;
+begin
+  if (Gauss) then
+  begin
+    Result.X := Self.X + srl.NormalRange(Min, Max);
+    Result.Y := Self.Y + srl.NormalRange(Min, Max);
+  end else 
+  begin
+    Result.X := Self.X + System.Random(Min, Max);
+    Result.Y := Self.Y + System.Random(Min, Max);
+  end;
+end;
+
+function TPoint.Random(XMin, XMax: Integer; YMin, YMax: Integer; Gauss: Boolean = False): TPoint; overload;
+begin
+  if (Gauss) then
+  begin
+    Result.X := Self.X + srl.NormalRange(XMin, XMax);
+    Result.Y := Self.Y + srl.NormalRange(YMin, YMax);
+  end else 
+  begin
+    Result.X := Self.X + System.Random(XMin, XMax);
+    Result.Y := Self.Y + System.Random(YMin, YMax);
+  end;
+end;
+
+procedure TPoint.Offset(p: TPoint);
+begin
+  Self.X := Self.X + p.X;
+  Self.Y := Self.Y + p.Y;
+end;
+
+function TPoint.InBox(Box: TBox): Boolean;
+begin
+  Result := PointInBox(Self, Box);
+end;
+
+function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean;
+begin
+  Result := Distance(Self.x, Self.y, Mid.x, Mid.y) <= Radius;
+end;
+
+function TPoint.DistanceTo(Other:TPoint): Extended;
+begin
+  Result := Distance(Self.x, Self.y, other.x, other.y);
+end;
+
+function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint;
+begin
+  Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
+end;
+
+function TPoint.Magnitude(): Extended;
+begin
+  Result := Sqrt(Sqr(Self.x) + Sqr(Self.y));
+end;
+
+function TPoint.Equals(Other: TPoint): Boolean;
+begin
+  Result := (self.X = other.X) and (self.Y = other.Y);
+end;
+
+function TPoint.AngleBetween(Other: TPoint): Extended;
+begin
+  Result := srl.Modulo(Degrees(ArcTan2(other.Y - self.Y, other.X - self.X)) - 90, 360);
+end;
+
+
