@@ -17,14 +17,14 @@ end;
 {$include_once osr/worldswitcher.simba}
 {$include_once osr/login.simba}
 {$include_once osr/client.simba}
-{$include_once osr/player.simba}
-{$include_once osr/players.simba}
 {$include_once osr/chooseoption.simba}
 {$include_once osr/interfaces/chatbox.simba}
 {$include_once osr/interfaces/minimap.simba}
 {$include_once osr/interfaces/mainscreen.simba}
 {$include_once osr/interfaces/gametabs.simba}
 {$include_once osr/interfaces/bankscreen.simba}
+{$include_once osr/player.simba}
+{$include_once osr/players.simba}
 {$include_once osr/xpbar.simba}
 
 procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]); override;
@@ -40,6 +40,8 @@ begin
       Smart.World := WorldSwitcher.FixWorld(Players.GetCurrent()^.World);
 
   Smart.Init();
+  {$ELSE}
+  ActivateClient();
   {$ENDIF}
 
   if (not Self.isClientReady(60000 * 3)) then

@@ -32,6 +32,8 @@ begin
 end;
 
 function TXPBar.Toggle(const Enable: Boolean): Boolean;
+var
+  t: UInt64;
 begin
   Result := True;
 
@@ -40,13 +42,23 @@ begin
     if (Enable) and (not Self.isEnabled) then
     begin
       Mouse.Click(btnMiddle, btnRadius, mouse_Left);
-      Result := Self.isEnabled(Random(600, 1000));
+      Result := Self.isEnabled(Random(800, 1000));
+      if (Result) then
+      begin
+        t := GetTickCount64() + Random(3800, 46000);
+        // Wait for the interface to appear (checks 2 colors of the border)
+        while (t > GetTickCount64()) do
+          if (GetColor(513, 6) = 2306104) and (GetColor(512, 33) = 4543066) then
+            Exit(True)
+          else
+            Wait(Random(100, 200));
+      end;
     end
     else
     if (not Enable) and (Self.isEnabled) then
     begin
       Mouse.Click(btnMiddle, btnRadius, mouse_Left);
-      Result := not Self.isEnabled(Random(250, 500));
+      Result := not Self.isEnabled(Random(500, 800));
     end;
   end;
 end;

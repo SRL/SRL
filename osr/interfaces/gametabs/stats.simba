@@ -89,7 +89,7 @@ const
 
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSStats.__setup();
+procedure TRSStats.__Setup();
 var i:Int32;
 begin
   with Self do
@@ -236,7 +236,7 @@ begin
       if skill <> 23 then
       begin
         text := OCR.Recognize(TBA[1], TextColor, SmallFont);
-        Result.Next :=  StrToIntDef(ExtractFromStr(text, Numbers),0);
+        Result.Next := StrToIntDef(ExtractFromStr(text, Numbers),0);
         if Result.XP <> -1 then
         begin
           Result.Level := srl.GetLevelAtXP(Result.XP);
@@ -250,9 +250,19 @@ begin
   until t < GetTickCount64();
 end;
 
+procedure TRSStats.HoverSkill(Skill: UInt32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
+var
+  old: EGametab;
+begin
+  old := Gametabs.GetCurrent();
+  Stats.GetSkillInfo(Skill);
+  Wait(HoverTime);
+  if (ReturnToCurrentTab) then
+    Gametabs.Open(old);
+end;
 
 begin
-  Stats.__setup();
+  Stats.__Setup();
 end;
 
 

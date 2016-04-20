@@ -48,7 +48,7 @@ end;
 function TSimpleOCR.RecognizeEx(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
 begin
   Self.SetFont(Font);
-  Result := Self.RecognizeEx(AClient, Filter);
+  Result := Self.Recognize(AClient, Filter);
 end;
 
 function TSimpleOCR.ExpectText(txt:String; B:TBox; font:TFontSet; setting:TCompareRules; maxWait:Int32=6000): Boolean;
