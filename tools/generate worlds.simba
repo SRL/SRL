@@ -19,8 +19,10 @@ begin
       'Members': typ := 'wtMembers';
       'Free': typ := 'wtFree';
     end;
+
     case Copy(ss[4], 3, Length(ss[4])) of
       'PVP World - High Risk', 'PVP World': activty := 'waPVP';
+      'Deadman Seasonal': activty := 'waDeadman';
       'Deadman': activty := 'waDeadman';
       '1250 skill total', '2000 skill total',
       '1750 skill total', '1500 skill total': activty := 'waSkill';
