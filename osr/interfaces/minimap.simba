@@ -23,7 +23,7 @@ type
  end;
 
 type
-  TMinimap = record (TInterfaceBase)
+  TMinimap = record(TInterfaceBase)
     CompassInfo: TMMCompassInfo;
     OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
     MaskBMP: Integer;
@@ -147,26 +147,14 @@ begin
   Result := Self._GetOrbValue(MMOrbRun);
 end;
 
-function TMinimap.isRunEnabled(const Time: UInt32 = 0): Boolean;
-const
-  Tol = 15;
-  MinCount = 10;
+function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
 var
   Col: Integer;
   b: TBox;
 begin
-  if (GetColor(Minimap.OrbInfo[Ord(MMOrbRun)].Middle) = 464438) then
-    Col := 105407
-  else
-    Col := 6806252;
-
-  with (Self.OrbInfo[Ord(MMOrbRun)].Middle) do
-    b := [X - 7, Y - 7, X + 7, Y + 7];
-
-  if (Time = 0) then
-    Result := (CountColorTolerance(Col, b, Tol) > MinCount)
-  else
-    Result := srl.WaitMinColorCount(Col, Tol, b, MinCount, Time);
+  with (Self.OrbInfo[MMOrbRun].Middle) do
+    b := [X - 8, Y - 8, X + 8, Y + 15];
+  Result := srl.WaitColorCount([101547, 40], b, @GreaterThan, 5, WaitTime);
 end;
 
 function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
@@ -788,7 +776,7 @@ begin
   if (Time = 0) then
     Result := (CountColorTolerance(15988210, b, 21) > 15)
   else
-    Result := srl.WaitMinColorCount(15988210, 21, b, 15, Time);
+    Result := srl.WaitColorCount([15988210, 21], b, @GreaterThan, 15, Time);
 end;
 
 function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;

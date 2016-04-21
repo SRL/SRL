@@ -20,15 +20,8 @@ begin
 end;
 
 function TXPBar.isEnabled(WaitTime: Integer = 0): Boolean;
-var
-  b: TBox;
-  t: UInt64;
 begin
-  b := btnBounds;
-  if (WaitTime = 0) then
-    Result := CountColor(11592943, b) > 0
-  else
-    Result := srl.WaitMinColorCount(11592943, 0, b, 1, WaitTime);
+  Result := srl.WaitColorCount([11592943, 0], btnBounds, @GreaterThan, 0, WaitTime);
 end;
 
 function TXPBar.Toggle(const Enable: Boolean): Boolean;
