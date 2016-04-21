@@ -46,7 +46,8 @@ type
     cbtAggressive, 
     cbtControlled, 
     cbtDefensive, 
-    cbtRetaliate
+    cbtRetaliate,
+    cbtSpecialAttack
   );
   
 {$IFNDEF CODEINSIGHT}
@@ -162,6 +163,44 @@ begin
   OCR.SetFont(NPCFont);
   with Self.FBounds do
     Result := ocr.Recognize(TBox([x1,212,x2,230]), TCompareRules([2070783]), 70);
+end;
+
+function TRSCombat.GetSpecialAttack(): Integer;
+const
+  COL_TEXT = [1048576, 65535];
+var
+  Text: String;
+  TPA: TPointArray;
+  b: TBox;
+  i: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(-1);
+  for i := 0 to High(COL_TEXT) do
+    if (FindColors(TPA, COL_TEXT[i], Self.FButtons[cbtSpecialAttack])) then
+    begin
+      b := GetTPABounds(TPA);
+      b.Expand(1);
+      Text := ocr.Recognize(b, TCompareRules([COL_TEXT[i]]), StatFont);
+      Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
+    end;
+end;
+
+function TRSCombat.SpecialAttackEnabled: Boolean;
+var
+  x, y: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(False);
+  Result := FindColor(x, y, 65535, Self.FButtons[cbtSpecialAttack]);
+end;
+
+function TRSCombat.UseSpecialAttack: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(-1);
+  if (not Self.SpecialAttackEnabled()) then
+    Mouse.Click(Self.FButtons[cbtSpecialAttack], mouse_Left);
 end;
 
 begin
