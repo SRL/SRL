@@ -61,10 +61,11 @@ begin
     FBounds := [550,206,733,464];
     FButtons := [
       [568,251,635,294], //accurate
-      [652,251,719,294], //aggressive
+      [654,254,717,292], //aggressive
       [568,305,635,347], //controlled
       [652,305,719,347], //defensive
-      [568,358,719,301]  //retaliate
+      [568,358,719,401], //retaliate
+      [568,414,715,431]  //spec
     ];
   end;
 end;
