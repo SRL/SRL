@@ -76,7 +76,7 @@ Example:
   // Waits 5000ms for the color count in area to be greater than 50
   srl.WaitColorCount([255, 10], Area, @GreaterThan, 50, 5000);
 
-  // Waits 500ms for the color count in area to equal 10
+  // Waits 500ms for the color count in area to equal 20
   srl.WaitColorCount([255, 10], Area, @Equals, 20, 5000);
 *)
 function TSRL.WaitColorCount(Color: TCTS1Color; Area: TBox; CompareFunc: TCompareFunc; Count, WaitTime: Integer): Boolean;

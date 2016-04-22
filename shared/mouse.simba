@@ -542,15 +542,26 @@ procedure TMouse.Scroll(Scrolls: Integer; Down: Boolean);
 var
   i,step,k:Int32=1;
   p:TPoint;
+  downInt, upInt: Integer;
 begin
+  {$IFDEF LINUX}
+    downInt := 1; upInt := -1;
+  {$ELSE}
+  {$IFDEF SMART}
+    downInt := 1; upInt := -1;
+  {$ELSE}
+    downInt := -1; upInt := 1;
+  {$ENDIF}
+  {$ENDIF}
+
   p := Self.GetPosition();
   step := Round(srl.GaussRand(6.0,0.6));
   for i:=1 to Scrolls do
   begin
     if Down then
-      ScrollMouse(p.x, p.y, {$IFDEF SMART}1{$ELSE}-1{$ENDIF})
+      ScrollMouse(p.x, p.y, downInt)
     else
-      ScrollMouse(p.x, p.y, {$IFDEF SMART}-1{$ELSE}1{$ENDIF});
+      ScrollMouse(p.x, p.y, upInt);
 
     if k mod step = 0 then
     begin
