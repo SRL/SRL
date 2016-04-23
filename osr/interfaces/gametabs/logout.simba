@@ -324,7 +324,7 @@ function TRSLogoutWS.SwitchTo(World: Integer): Boolean;
     Mouse.Scroll(Box(722, 246, 735, 415), Random(3, 5), Down);
   end;
 
-  function ClickWorld(World: Integer): Boolean;
+  function ClickWorld(Self:TRSLogoutWS; World: Integer): Boolean;
   var
     i: Integer;
     t: UInt64;
@@ -340,7 +340,7 @@ function TRSLogoutWS.SwitchTo(World: Integer): Boolean;
       SetLength(Worlds, 0);
       SetLength(Boxes, 0);
 
-      if (VisibleWorlds(Worlds, Boxes)) then
+      if (Self.VisibleWorlds(Worlds, Boxes)) then
         for i := 0 to High(Worlds) do
           if (Worlds[i] = World) then
           begin
@@ -358,7 +358,7 @@ begin
     Exit(False);
   if (CurrentWorld = World) then
     Exit(True);
-  if (not ClickWorld(ShortWorld(World))) then
+  if (not ClickWorld(Self, ShortWorld(World))) then
     Exit(False);
 
   Chatbox.ClickOption(['Yes. In', 'Yes.'], Random(2000, 2500));
