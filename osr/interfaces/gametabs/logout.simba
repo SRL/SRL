@@ -248,8 +248,8 @@ begin
       Text := GetTextAtEx(b, 0, 3, 0, WORLD_COLORS[j], 0, 'SmallChars07');
       if (Text <> '') then
       begin
-        Worlds += StrToIntDef(Text, -1);
-        Boxes += Box(b.X1 - 15, b.Y1, b.X2 + 130, b.Y2);
+        Worlds := Worlds + StrToIntDef(Text, -1);
+        Boxes := Boxes + Box(b.X1 - 15, b.Y1, b.X2 + 130, b.Y2);
         Continue;
       end;
     end;
