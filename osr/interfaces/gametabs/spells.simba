@@ -163,17 +163,17 @@ end;
 
 
 (*
-Spells.GetSpellBounds
+Spells.GetSpellBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+  function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
 
 Returns the bounding box covering the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
 begin
   Result := Self.FSlots[spell]
 end;

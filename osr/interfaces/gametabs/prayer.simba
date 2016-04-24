@@ -65,7 +65,7 @@ type
 {$IFNDEF CODEINSIGHT}
 procedure TRSPrayer.__Setup();
 var
- SlotBounds: TBox = [550,213,734,433];
+  SlotBounds: TBox = [550,213,734,433];
 begin
   with Self do
   begin
@@ -119,19 +119,19 @@ end;
 
 
 (*
-Prayer.GetSpellBounds
+Prayer.GetSpellBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.GetPrayerBounds(spell:ESpellCast): TBox;
+  function TRSPrayer.GetPrayerBound(pray:ESpellCast): TBox;
 
 Returns the bounding box covering the given prayer.
 
 .. note:: by slacky
 *)
-function TRSPrayer.GetSpellBounds(spell:EPrayerType): TBox;
+function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
 begin
-  Result := Self.FSlots[spell];
+  Result := Self.FSlots[pray];
 end;
 
 

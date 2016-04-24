@@ -161,17 +161,17 @@ end;
 
 
 (*
-Stats.GetSkillBounds
+Stats.GetSkillBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillBounds(skill:Int32): TBox;
+  function TRSStats.GetSkillBound(skill:Int32): TBox;
 
 Returns the bounding box covering the given skill-index.
 
 .. note:: by slacky
 *)
-function TRSStats.GetSkillBounds(skill:Int32): TBox;
+function TRSStats.GetSkillBound(skill:Int32): TBox;
 begin
   if Self.IsSkillVaild(skill) then
     Result := Self.FSlots[skill]
