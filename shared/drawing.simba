@@ -649,9 +649,9 @@ begin
     exit();
   end;
 
-  ClearDebugImg();
-  DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
+  //ClearDebugImg();
   DrawBitmapDebugImg(self.GetIndex());
+  DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
 end;
 
 (*

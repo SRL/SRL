@@ -60,23 +60,37 @@ const
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSInventory.__Setup();
-var i:Int32;
+var 
+  i:Int32;
+  SlotBounds:TBox = [558,211,725,462];
 begin
-  self.FBounds := [558,211,725,462];
-  self.FSlots := self.FBounds.Partition(7, 4, -2);
-  for i:=0 to High(self.FSlots) do
-  begin
-    self.FSlots[i].x1 += 3;
-    self.FSlots[i].x2 -= 3;
-  end;
-  
   with Self do
   begin
     FName := 'Inventory';
     FStatic := True;
-    LowSlot := 0;
+  
+    FBounds := [548,206,735,464];
+    FSlots := SlotBounds.Partition(7, 4, -2);
+    for i:=0 to High(FSlots) do
+    begin
+      FSlots[i].x1 += 3;
+      FSlots[i].x2 -= 3;
+    end;
+   
+    LowSlot  := 0;
     HighSlot := 27;
   end;
+end;
+
+procedure TRSInventory.__Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FSlots, False, $0000FF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
 end;
 {$ENDIF}
 
@@ -154,21 +168,14 @@ If it's not over a slot then -1 is returned
 .. note:: by slacky
 *)
 function TRSInventory.PointToSlot(pt:TPoint): Int32;
-var
-  x,y,w:Int32;
-const
-  SLOT_WIDTH = 42; //inc. padding
-  SLOT_HEIGHT= 36; //..
 begin
   if not(PointInBox(Pt, Self.FBounds)) then
     Exit(-1);
-
-  x := (Pt.x - Self.FBounds.x1) div SLOT_WIDTH;
-  y := (Pt.y - Self.FBounds.y1) div SLOT_HEIGHT;
-  w := (Self.FBounds.X2 - Self.FBounds.X1) + 1;
-  Result := (y * (w div SLOT_WIDTH)) + x;
-  if not(PointInBox(pt, Self.FSlots[Result])) then
-    Result := -1;
+  
+  for Result:=0 to High(self.FSlots) do
+    if PointInBox(pt, Self.FSlots[Result]) then
+      Exit;
+  Result := -1;
 end;
 
 (*
