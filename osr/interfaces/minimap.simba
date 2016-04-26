@@ -112,12 +112,15 @@ var
   ATPA: array [0..1] of TPointArray;
   TextTPA: TPointArray;
   i: Integer;
+  Text: String;
 begin
   for i := 0 to High(IgnoreCols) do
     FindColors(ATPA[i], IgnoreCols[i], OrbInfo[Ord(orb)].TextBox);
 
   TextTPA := ReturnPointsNotInTPA(MergeATPA(ATPA), OrbInfo[Ord(orb)].TextBox);
-  Result := StrToIntDef(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 0);
+  // look into a better fix
+  Text := StringReplace(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 'O', '0', [rfReplaceAll]);
+  Result := StrToIntDef(Text, 0);
 end;
 
 function TMinimap.GetPrayerLevel(): Integer;
