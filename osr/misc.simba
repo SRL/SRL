@@ -1,5 +1,5 @@
 type
-  EClickType = (ctNone,ctRed,ctYellow);
+  EClickType = (ctNone, ctRed, ctYellow);
 
 function TSRL.GetClickType(Area: TBox): EClickType;
 var
@@ -84,5 +84,33 @@ begin
     Inc(Result);
     total += Floor(Result + 300 * 2 ** (Result / 7));
   end;
+end;
+
+function TSRL.GetItemAmount(Area: TBox): Int32;
+const
+  TEXT_COLORS: TIntegerArray = [65535, 65278, 16777215, 8453888]; // Million = white | Billion = green etc.
+var
+  i: Integer;
+  Text: String;
+  b: TBox;
+  TPA: TPointArray;
+begin
+  for i := 0 to High(TEXT_COLORS) do
+    if (System.FindColors(TPA, TEXT_COLORS[i], Area.X1, Area.Y1, Area.X2, Area.Y2)) then
+    begin
+      b := GetTPABounds(TPA);
+      b.Expand(2);
+      b.LimitTo(GetClientBounds());
+
+      Text := StringReplace(GetTextAtEx(b, 0, 3, 3, TEXT_COLORS[i], 5, 'StatChars07'), 'O', '0', [rfReplaceAll]);
+      Result := StrToIntDef(ExtractFromStr(Text, Numbers), 0);
+
+      if Pos('K', Text) > 0 then
+        Result := Result * 1000;
+      if Pos('M', Text) > 0 then
+        Result := Result * 1000000;
+
+      Exit;
+    end;
 end;
 
