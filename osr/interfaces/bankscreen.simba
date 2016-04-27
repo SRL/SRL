@@ -254,15 +254,24 @@ begin
   if (not Self.IsOpen()) then
     Exit(True);
 
-  Self.ClickButton(bbClose);
+  if (srl.CloseInterfacesWithEscape) then
+  begin
+    Keyboard.PressKey(VK_ESCAPE);
+    t := GetTickCount64() + Random(4000, 5000);
+    while (t > GetTickCount64()) do
+    begin
+      if (not Self.IsOpen()) then
+        Exit(True);
+    end;
+    srl.ToggleCloseInterfacesWithEscape(False);
+  end;
 
+  Self.ClickButton(bbClose);
   t := GetTickCount64() + Random(4000, 5000);
   while (t > GetTickCount64()) do
   begin
     if (not Self.IsOpen()) then
       Exit(True);
-
-    Wait(Random(100, 200));
   end;
 end;
 
