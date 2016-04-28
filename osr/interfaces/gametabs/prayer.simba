@@ -14,14 +14,14 @@ type
  procedure TRSPrayer.__setup();
  function TRSPrayer.Open(): Boolean;
  function TRSPrayer.IsOpen(): Boolean;
- function TRSPrayer.GetSpellBounds(spell:ESpellCast): TBox;
- function TRSPrayer.MouseOver(spell:ESpellCast): Int32;
+ function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
+ function TRSPrayer.MouseOver(pray:EPrayerType): Int32;
 }
 
 (*
-var Spells
+var Prayer
 ~~~~~~~~~~~
-Variable that stores functions and properties of the Runescape magic/spells gametab.
+Variable that stores functions and properties of the Runescape prayer gametab.
 *)
 var 
   Prayer: TRSPrayer;
@@ -119,11 +119,11 @@ end;
 
 
 (*
-Prayer.GetSpellBound
+Prayer.GetPrayerBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.GetPrayerBound(pray:ESpellCast): TBox;
+  function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
 
 Returns the bounding box covering the given prayer.
 
