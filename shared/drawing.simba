@@ -645,11 +645,33 @@ begin
   if (not BitmapExists(self.getIndex())) then
   begin
     WriteLn('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
-    WriteLn('-- HINT: Example for a managed bitmap is "tmb.init(client.getMBitmaps());"');
+    WriteLn('-- HINT: Example for a managed bitmap is "TMufasaBitmap.Init(client.GetMBitmaps());"');
     exit();
   end;
 
-  //ClearDebugImg();
+  ClearDebugImg();
+  DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
+  DrawBitmapDebugImg(self.GetIndex());
+end;
+
+(*
+TMufasaBitmap.UpdateDebugImage
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.UpdateDebugImage();
+
+Will update Simba's debug image form with the current image. 
+*)
+procedure TMufasaBitmap.UpdateDebugImage();
+begin
+  if (not BitmapExists(self.GetIndex())) then
+  begin
+    WriteLn('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
+    WriteLn('-- HINT: Example for a managed bitmap is "TMufasaBitmap.Init(client.GetMBitmaps());"');
+    Exit;
+  end;
+  
   DrawBitmapDebugImg(self.GetIndex());
   DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
 end;
