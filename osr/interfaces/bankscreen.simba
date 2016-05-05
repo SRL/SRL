@@ -11,7 +11,10 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
                  bbDepositInv, bbDepositWorn, bbMenu, bbClose);
-  EBankLocation = (blYanille, blVarrockWest);
+  EBankLocation = (blYanille, blAlKharid,
+                   blVarrockWest, blVarrockEast,
+                   blFaladorEast, blFaladorWest);
+  EBankerColor = (bcBlue, bcGray);
 
   TRSBankScreen = record (TInterfaceBase)
     FSlots: TBoxArray;
@@ -167,15 +170,18 @@ begin
 end;
 
 function TRSBankScreen.OpenAt(pt: TPoint): Boolean;
+var
+  Text: String;
 begin
   Mouse.Move(pt);
-
   if (MainScreen.IsUpText(['Bank Bank', 'Bank booth', 'to Banker', 'nk booth'])) then
   begin
-    if (MainScreen.IsUpText('booth')) and (Random(3) = 0) then
+    Wait(Random(50, 80));
+    Text := Mainscreen.GetUpText();
+    if (Pos('booth', Text) > 0) and (Random(3) = 0) then
       Result := Mouse.Click(ctRed)
     if (not Result) then
-      Result := (ChooseOption.Open()) and (ChooseOption.Select(['Bank Bank', 'Bank booth', 'to Banker', 'nk booth']));
+      Result := (ChooseOption.Open()) and (ChooseOption.Select(['Bank Bank']));
 
     if (Result) then
     begin
@@ -217,6 +223,77 @@ begin
   end;
 end;
 
+function TRSBankScreen._OpenNPC(Typ: EBankerColor; Area: TBox): Boolean;
+const
+  colBlue: TCTS2Color = [4533549, 18, 0.75, 0.96];
+  colGray: TCTS2Color = [6513771, 9, 0.35, 0.10];
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i, W, H: Integer;
+  b: TBox;
+begin
+  case Typ of
+    bcBlue: srl.FindColors(TPA, colBlue, Area);
+    bcGray: srl.FindColors(TPA, colGray, Area);
+  end;
+
+  if (Length(TPA) > 0) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 3, 3);
+    SortATPAFromMidPoint(ATPA, MiddleBox(Area));
+
+    for i := 0 to High(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      if (b.Width >= 8) and (b.Height >= 8) then
+        if (Self.OpenAt(MiddleTPA(ATPA[i]).Random(-4, -4))) then
+          Exit(True);
+    end;
+  end;
+end;
+
+(*
+BankScreen._MagicalBankerFinder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen._MagicalBankerFinder(BoothTopColor: TCTS2Color; BankerColor: EBankerColor; Offset: TPoint): Boolean;
+
+Calculates and finds where a bank NPC should be based from the bank booth.
+*)
+function TRSBankScreen._MagicalBankerFinder(BoothTopColor: TCTS2Color; BankerColor: EBankerColor; Offset: TPoint): Boolean;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+  i, W, H: Integer;
+  pt, Mid: TPoint;
+begin
+  if (srl.FindColors(TPA, BoothTopColor, Mainscreen.GetBounds()) > 5) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 3, 3);
+    SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
+
+    for i := 0 to High(ATPA) do
+    begin
+      TPA := MinAreaRectEx(ATPA[i], W, H);
+
+      if (W >= 15) and (W <= 30) and (H <= 8) then
+      begin
+        Mid := MiddleTPA(TPA);
+        pt := [Mid.X + Offset.X, Mid.Y + Offset.Y];
+        pt := pt.Rotate(Minimap.GetCompassAngle(False), Mid);
+
+        b := [pt.X - 28, pt.Y - 28, pt.X + 28, pt.Y + 28];
+        b.LimitTo(Mainscreen.GetBounds());
+
+        if (Self._OpenNPC(BankerColor, b)) then
+          Exit(True);
+      end;
+    end;
+  end;
+end;
 
 (*
 BankScreen.Open
@@ -234,6 +311,11 @@ begin
 
   case Loc of
     blYanille: Exit(Self._OpenYanille());
+    blVarrockWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]));
+    blVarrockEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]));
+    blFaladorEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]));
+    blFaladorWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [0, 40]));
+    blAlKharid: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
   end;
 end;
 
