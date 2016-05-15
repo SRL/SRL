@@ -459,13 +459,13 @@ begin
   SetLength(Result, j);
 end;
 
-
 function TRSInventory.Count(): Byte;
 begin
   Result := Length(Self.GetUsedSlots());
 end;
 
-function TRSInventory.GetActiveSlot(): Int8;
+
+function TRSInventory.GetActiveSlot(): Int32;
 var
   i: Integer;
   b: TBox;
@@ -474,34 +474,44 @@ begin
   for i := 0 to High(Self.FSlots) do
   begin
     b := self.FSlots[i];
-    if (CountColor(16777215, b.x1,b.y1,b.x2,b.y2) > 10) then
+    if (CountColor(16777215, b.X1, b.Y1 + 15, b.X2, b.Y2) > 10) then
       Exit(i);
   end;
 end;
 
 function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
-var
-  a: Byte;
-begin
-  Result := False;
-  a := Self.GetActiveSlot();
-  if (Slot = -1) and (a > -1) then
-  begin
-    Self.MouseSlot(a);
-    Mouse.Click(mouse_Left);
-    Result := True;
-  end else
-  begin
-    a := Self.GetActiveSlot();
-    if (a = Slot) then
-      Exit(True);
-    Self.ActivateSlot(-1); // un-activate a slot if needed
-    Self.MouseSlot(Slot);
-    if (ChooseOption.Open()) then
-      Result := ChooseOption.Select(['Use']);
-  end;
-end;
 
+  procedure DeActivate(Slot: Int32);
+  begin
+    if (Slot > -1) then
+    begin
+      Inventory.MouseSlot(Slot, mouse_Left);
+      Wait(Random(200, 300));
+    end;
+  end;
+
+var
+  i: Int32;
+begin
+  Result := True;
+
+  // DeActivate whatever is activated
+  if (Slot = -1) and (Self.GetActiveSlot() > -1) then
+  begin
+    DeActivate(Self.GetActiveSlot());
+    Exit;
+  end;
+
+  i := Self.GetActiveSlot();
+  if (Slot = i) then
+    Exit;
+
+  if (i > -1) then
+    DeActivate(i);
+
+  Inventory.MouseSlot(Slot);
+  Result := (ChooseOption.Open()) and (ChooseOption.Select(['Use']));
+end;
 
 begin
   Inventory.__Setup();
