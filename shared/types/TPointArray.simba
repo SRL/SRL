@@ -295,15 +295,18 @@ end;
 
 
 (*
+ExpandPolygon
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
+    function ExpandPolygon(Poly:TPointArray; inc:Int32): TPointArray;
 
 A method for increasing the size of any convex polygon.
 
 .. note:: by slacky
 *)
+function ExpandPolygon(Poly:TPointArray; inc:Int32): TPointArray;
 type
   TPointF = record x,y:Double; end;
 var
