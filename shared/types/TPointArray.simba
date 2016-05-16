@@ -74,6 +74,8 @@ Example:
 function ConnectTPA(TPA:TPointArray): TPointArray;
 var line:TPointArray; i:Int32;
 begin
+  if Length(TPA) = 0 then Exit;
+
   for i:=0 to High(TPA)-1 do
   begin
     line := TPAFromLine(TPA[i].x, TPA[i].y, TPA[i+1].x, TPA[i+1].y);

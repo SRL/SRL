@@ -7,8 +7,8 @@ to the runescape ChooseOption-menu
 
 type
   TOption = record
-    str: String;
-    bounds: TBox;
+    Str: String;
+    Bounds: TBox;
   end;
   TOptionArray = Array of TOption;
 
@@ -84,7 +84,7 @@ function TRSChooseOption.Open(tryTime:Int32=-1): Boolean;
 var _:TPoint;
 begin
   Mouse.Click(mouse_right);
-  Result := self.__find(_, tryTime);
+  Result := self.Find(tryTime);
 end;
 
 
@@ -95,7 +95,7 @@ ChooseOption.Open
 
   function TRSChooseOption.Open(Box:TBox): Boolean; overload;
 
-Opens the optionbox, returns true if it worked.
+Opens the menu and stores it's bounds, returns true if it worked.
 
 .. note:: by slacky
 *)
@@ -103,7 +103,7 @@ function TRSChooseOption.Open(Box:TBox; tryTime:Int32=-1): Boolean; overload;
 var _:TPoint;
 begin
   Mouse.Click(Box, mouse_right);
-  Result := self.__find(_, tryTime);
+  Result := self.Find(tryTime);
 end;
 
 
@@ -119,11 +119,11 @@ Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False`
 .. note:: by slacky
 *)
 function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
-var pt:TPoint;
+var _:TPoint;
 begin
   if tryTime < 0 then
     tryTime := Random(1500,2500);
-  Result := self.__find(pt, tryTime);
+  Result := self.__find(_, tryTime);
 end;
 
 (*
@@ -133,7 +133,7 @@ ChooseOption.IsClosed
 
   function TRSChooseOption.IsClosed(): Boolean;
 
-Checks if the menu is closed, it repeats the check for a +/-2 sec if it's ``True`` (expecting it to close).
+Checks if the menu is closed, it repeats the check for a +/-650ms if it's ``True`` (expecting it to close).
 
 .. note:: by slacky
 *)
@@ -141,7 +141,7 @@ function TRSChooseOption.IsClosed(maxWaitTime:Int32=-1; IntervalMS:Int32=25): Bo
 var t:UInt64;
 begin
   if maxWaitTime < 0 then
-    maxWaitTime := Random(1500,2500);
+    maxWaitTime := Random(500,800);
   t := GetTickCount64() + maxWaitTime;
   while self.IsOpen(1) and (GetTickCount64() < t) do
     Wait(IntervalMS);
@@ -160,7 +160,7 @@ Returns True if it's found.
 
 .. note:: by slacky
 *)
-function TRSChooseOption.Find(): Boolean;
+function TRSChooseOption.Find(tryTime:Int32=-1): Boolean;
 var
   pt: TPoint;
   B:TBox;
@@ -168,7 +168,7 @@ var
   ATPA:T2DPointArray;
 begin
   Self.Bounds := [0,0,0,0];
-  Result := Self.__find(pt);
+  Result := Self.__find(pt, tryTime);
   if Result then
   begin
     B := GetClientBounds(True);
@@ -201,11 +201,14 @@ var
   b: TBox;
   i,bmp,bmp2:Int32;
 begin
-  if not(self.Find()) then
-    Self.Open();
+  if not(self.Find(1)) then
+    self.Open();
   
   with self.Bounds do
   begin
+    if (x1=x2) or (y1=y2) then
+      Exit;
+
     bmp := BitmapFromClient(x1,y1,x2,y2);
     FastReplaceColor(bmp,4674653,0);
     ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
@@ -261,19 +264,22 @@ begin
     for j:=0 to High(SubStrings) do
       case CaseSensitive of
         True:
-          if Pos(SubStrings[j],Choices[i].str)<>0 then
+          if Pos(SubStrings[j],Choices[i].str) <> 0 then
           begin
+            Wait(Random(80,270));
             Mouse.Click(Choices[i].bounds, mouseAction);
-            Exit(True);
+            Exit(self.IsClosed());
           end;
         False:
-          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str))<>0 then
+          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str)) <> 0 then
           begin
+            Wait(Random(80,270));
             Mouse.Click(Choices[i].bounds, mouseAction);
-            Exit(True);
+            Exit(self.IsClosed());
           end;
       end;
 
+  Wait(Random(80,270));
   if AClose then
     Self.Close();
 end;
@@ -297,50 +303,35 @@ failed it clicks the "Close"-option.
 *)
 function TRSChooseOption.Close(): Boolean;
 var
-  i,minV,minI:Int32;
-  B,clientB:TBox;
-  pt:TPoint;
-  dist:Array [0..3] of Int32;
-const
-  MIN_MOUSE_OFFSET = 30;
-  RND = 40;
-begin
-  if self.IsClosed() then
-    Exit(True);
+  B:TBox;
+  pt,dest:TPoint;
+  dir:PPoint;
 
-  with self.bounds do
-    B := [x1,y1-BoxBitmap_Height,x2,y2];
-  B.Expand(MIN_MOUSE_OFFSET);
-
-  clientB := GetClientBounds(True);
-  pt := Mouse.getPosition();
-
-  dist := [abs(pt.x - B.x1), abs(pt.y - B.y1), abs(pt.y - B.y2),abs(pt.x - B.x2)];
-  minv := Min(Min(dist[0],dist[2]),Min(dist[1],dist[3]));
-  if B.x1 < clientB.x1 then dist[0] := High(Int32); //left
-  if B.y1 < clientB.y1 then dist[1] := High(Int32); //top
-  if B.x2 > clientB.x2 then dist[2] := High(Int32); //right
-  if B.y2 > clientB.y2 then dist[3] := High(Int32); //bottom
-
-  for i:=0 to 3 do
-    if dist[i] < dist[minI] then
-      minI := i;
-
-  case minI of
-    0: pt := [B.x1-Random(RND), pt.y+Random(-RND,RND)]; //left
-    1: pt := [pt.x+Random(-RND,RND), B.y1-Random(RND)]; //top
-    2: pt := [B.x2+Random(RND), pt.y+Random(-RND,RND)]; //right
-    3: pt := [pt.x+Random(-RND,RND), B.y2+Random(RND)]; //bottom
-  end;
-  Mouse.Move(Point(
-      max(clientB.x1, min(pt.x, clientB.x2)),
-      max(clientB.y1, min(pt.y, clientB.y2))
-    ));
-
-  Result := self.IsClosed();
-  if not(Result) then
+  procedure TrackMovment(a:Pointer; b:TShiftState; dest:TPoint);
+  var p:TPoint;
   begin
+    GetMousePos(p.x,p.y);
+    if not ChooseOption.__find(p,0) then
+      RaiseException('Finally');
+  end;
+begin
+  if not self.Find() then Exit(True);
+  mouse.SetOnMouseMove(@TrackMovment);
+  with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
+
+  pt := mouse.GetPosition();
+  dir := [Abs(pt.x - B.x1), Pi];
+  if dir.R > Abs(pt.y - B.y1) then dir := [Abs(pt.y - B.y1), -(Pi/2)];
+  if dir.R > Abs(pt.x - B.x2) then dir := [Abs(pt.x - B.x2), 0];
+  if dir.R > Abs(pt.y - B.y2) then dir := [Abs(pt.y - B.y2), (Pi/2)];
+
+  dir.T := (dir.T-Pi/3) + Random()*((dir.T+Pi/3) - (dir.T-Pi/3));
+  dest := [pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T))];
+  try
+    mouse.Move(dest);
     self.Select(['Cancel']);
+    Result := self.IsClosed();
+  except
     Result := self.IsClosed();
   end;
 end;
