@@ -334,6 +334,7 @@ begin
   except
     Result := self.IsClosed();
   end;
+  mouse.SetOnMouseMove(nil);
 end;
 
 begin
