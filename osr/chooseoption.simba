@@ -310,7 +310,6 @@ var
   procedure TrackMovment(a:Pointer; b:TShiftState; dest:TPoint);
   var p:TPoint;
   begin
-    GetMousePos(p.x,p.y);
     if not ChooseOption.__find(p,0) then
       RaiseException('Finally');
   end;
