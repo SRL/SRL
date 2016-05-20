@@ -104,7 +104,6 @@ var
   i:Int32;
   f:Extended := n;
 begin
-  System.WriteLn(f);
   while (Abs(f) >= 1000) do
   begin
     Inc(i);
