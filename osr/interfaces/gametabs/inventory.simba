@@ -362,8 +362,8 @@ begin
 end;
 
 (*
-Inventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
-~~~~~~~~~~~~~~~~~~~~~~~~
+Inventory.FindItem
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
@@ -394,8 +394,8 @@ begin
 end;
 
 (*
-Inventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
-~~~~~~~~~~~~~~~~~~~~~~~~
+Inventory.FindItem
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
@@ -426,8 +426,8 @@ begin
 end;
 
 (*
-Inventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
-~~~~~~~~~~~~~~~~~~~~~~~~
+Inventory.FindItem
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
