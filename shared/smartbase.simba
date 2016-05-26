@@ -243,7 +243,7 @@ function TSmartBase.PairToExisting(): Boolean;
     i: Integer;
   begin
     for i := 0 to SmartGetClients(True) - 1 do
-      Result += SmartGetAvailablePID(i);
+      Result :=Result + SmartGetAvailablePID(i);
   end;
 
 var

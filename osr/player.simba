@@ -81,7 +81,7 @@ begin
                ];
 
   {$IFDEF SMART}
-    Responses += TResponse(['RuneScape has been updated', 5, 60000 * 5, @Self._ReloadClient]);
+    Responses := Responses + TResponse(['RuneScape has been updated', 5, 60000 * 5, @Self._ReloadClient]);
     // test reload
     // Response := 'RuneScape has been updated';
   {$ENDIF}
