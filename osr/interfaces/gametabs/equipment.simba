@@ -94,7 +94,16 @@ begin
   Result := Gametabs.IsOpen(tabEquipment, maxWait);
 end;
 
-function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;
+(*
+Equipment.InteractSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.InteractSlot(): Boolean;
+
+Interacts with the item at the given slot using given option
+*)
+function TRSEquipment.InteractSlot(Slot: Integer; Option: String; UpText: String = ''): Boolean;
 var
   b: TBox;
 begin
@@ -106,9 +115,22 @@ begin
   Mouse.Move(b);
   if (UpText <> '') and (not Mainscreen.isUpText(UpText)) then
     Exit(False);
-  Result := ChooseOption.Open() and ChooseOption.Select('Remove');
+  Result := ChooseOption.Open() and ChooseOption.Select(Option);
 end;
 
+(*
+Equipment.Remove
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.Remove(): Boolean;
+
+Unequips the item at the given slot
+*)
+function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;
+begin
+  Result := Self.InteractSlot(Slot, 'Remove', UpText);
+end;
 
 
 begin
