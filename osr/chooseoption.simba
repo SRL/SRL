@@ -307,7 +307,7 @@ var
   pt,dest:TPoint;
   dir:PPoint;
 
-  procedure TrackMovment(a:Pointer; b:TShiftState; dest:TPoint);
+  procedure TrackMovment(a:Pointer; b:TShiftState; x,y:Int32);
   var p:TPoint;
   begin
     if not ChooseOption.__find(p,0) then
@@ -315,7 +315,7 @@ var
   end;
 begin
   if not self.Find() then Exit(True);
-  mouse.SetOnMouseMove(@TrackMovment);
+  mouse.SetOnMouseMove(Pointer(@TrackMovment));
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
   pt := mouse.GetPosition();

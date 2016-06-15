@@ -318,7 +318,7 @@ Examples:
 
     Inventory.DropItems([0..3]); // drops the four first items
 *)
-procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSInventory.DropItems(SlotArr:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
   i:  Int32;
 begin
@@ -329,12 +329,17 @@ begin
     if self.IsSlotValid(slotArr[i]) and self.IsSlotUsed(slotArr[i]) then
     begin
       Mouse.Move(self.FSlots[slotArr[i]]);
-      //Check uptext?
-      ChooseOption.Open();
+      if (UpText <> []) then
+      begin
+        Wait(Random(60,90)); //for uptext to refresh
+        if not mainscreen.IsUpText(UpText) then
+          Continue;
+      end;
       ChooseOption.Select(['Drop']);
-      wait(120 + random(100));
+      Wait(Random(103,219));
     end;
 end;
+
 
 (*
 Inventory.DropItemsExcept
@@ -347,7 +352,7 @@ Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots
 
 .. note:: by slacky
 *)
-procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSInventory.DropItemsExcept(IgnoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
 var
   i,j: Int32;
   ptrn: TIntegerArray;
