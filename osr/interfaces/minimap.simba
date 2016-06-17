@@ -751,7 +751,7 @@ var
   m: TPoint;
 begin
   m := Self.getMiddle();
-  Result := GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
+  Result := srl.GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
 end;
 
 procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);

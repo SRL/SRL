@@ -4,9 +4,9 @@
 {$include_once shared/onterminate.simba}
 {$include_once shared/interfacebase.simba}
 {$include_once shared/wrappers.simba}
-{$include_once shared/pixelshift.simba}
 
 {$include_once shared/srl.simba}
+{$include_once shared/pixelshift.simba}
 {$include_once shared/random.simba}
 {$include_once shared/math.simba}
 {$include_once shared/mouse.simba}
