@@ -20,8 +20,12 @@ type
  procedure TRSStats.__setup();
  function TRSStats.Open(): Boolean;
  function TRSStats.IsOpen(): Boolean;
- function TRSStats.GetSkillBounds(skill:Int32): TBox;
- function TRSStats.MouseOver(skill:Int32): Int32;
+ function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
+ function TRSStats.GetSkillBox(Skill:Int32): TBox;
+ function TRSStats.MouseOver(Skill:Int32): Int32;
+ function TRSStats.GetCurrentLevel(Skill:Int32): Int32;
+ function TRSStats.GetSkillInfo(Skill:Int32; WaitTime:Int32=400): TSkillInfo;
+ procedure TRSStats.HoverSkill(Skill:Int32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
 }
 
 (*
@@ -150,31 +154,31 @@ stats.SkillIsVaild
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.IsSkillVaild(skill:Int32): Boolean;
+  function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
 
 ---
 *)
-function TRSStats.IsSkillVaild(skill:Int32): Boolean;
+function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
 begin
-  Result := InRange(skill, 0, High(Self.FSlots));
+  Result := InRange(Skill, 0, High(Self.FSlots));
 end;
 
 
 (*
-Stats.GetSkillBound
+Stats.GetSkillBox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillBound(skill:Int32): TBox;
+  function TRSStats.GetSkillBox(Skill:Int32): TBox;
 
 Returns the bounding box covering the given skill-index.
 
 .. note:: by slacky
 *)
-function TRSStats.GetSkillBound(skill:Int32): TBox;
+function TRSStats.GetSkillBox(Skill:Int32): TBox;
 begin
-  if Self.IsSkillVaild(skill) then
-    Result := Self.FSlots[skill]
+  if Self.IsSkillVaild(Skill) then
+    Result := Self.FSlots[Skill]
   else
     {notify index out of range};
 end;
@@ -191,7 +195,7 @@ Moves the mouse over the given skill-index.
 
 .. note:: by slacky
 *)
-function TRSStats.MouseOver(skill:Int32): Boolean;
+function TRSStats.MouseOver(Skill:Int32): Boolean;
 begin
   if not(self.Open()) then Exit();
   
@@ -200,6 +204,31 @@ begin
     Mouse.Move(Self.FSlots[skill])
   else
     Result := False;
+end;
+
+
+(*
+Stats.GetCurrentLevel
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.GetCurrentLevel(Skill:Int32);
+
+Returns the current level of a skill, handy for task that require prayer.
+Returns `-1` n failure.
+*)
+function TRSStats.GetCurrentLevel(Skill:Int32): Int32;
+var
+  lvl:String;
+begin
+  if (not Self.IsSkillVaild(skill)) or (not self.Open()) then
+    Exit(-1);
+
+  with self.GetSkillBox(skill) do
+  begin
+    lvl := GetTextAtEx(Box(X1+25,y1+2,x2-13,y2-14), 0,3,2, $00FFFF,0, 'StatChars07_s');
+    Result := StrToIntDef(ExtractFromStr(lvl, NUMBERS), -1);
+  end;
 end;
 
 
@@ -214,7 +243,7 @@ Returns the level info: "Level", "xp", "next level at" and "remainder"
 
 .. note:: by slacky
 *)
-function TRSStats.GetSkillInfo(skill:Int32; WaitTime:Int32=400): TSkillInfo;
+function TRSStats.GetSkillInfo(Skill:Int32; WaitTime:Int32=400): TSkillInfo;
 const
   TextColor:TCompareRules = [0];
 var
@@ -262,7 +291,16 @@ begin
   until t < GetTickCount64();
 end;
 
-procedure TRSStats.HoverSkill(Skill: UInt32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
+(*
+Stats.HoverSkill
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSStats.HoverSkill(Skill: Int32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
+
+Holds the mouse over the given skill.
+*)
+procedure TRSStats.HoverSkill(Skill: Int32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
 var
   old: EGametab;
 begin
@@ -272,6 +310,7 @@ begin
   if (ReturnToCurrentTab) then
     Gametabs.Open(old);
 end;
+
 
 begin
   Stats.__Setup();
