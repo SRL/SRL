@@ -171,7 +171,7 @@ begin
   Result := Self.__find(pt, tryTime);
   if Result then
   begin
-    B := GetClientBounds(True);
+    B := GetClientBounds();
     FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2);
     if (TPA = []) then
       RaiseException('It''s impossible');
