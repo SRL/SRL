@@ -26,7 +26,7 @@ type
  function TRSInventory.GetSlotBox(idx:Int32): TBox;
  function TRSInventory.IsSlotUsed(idx:Int32): Boolean;
  function TRSInventory.GetUsedSlots(): TIntegerArray;
- procedure TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+ procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR);
  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
  function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
@@ -126,7 +126,7 @@ end;
 
 (*
 Inventory.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.IsOpen(maxWait:Int32=0): Boolean;
@@ -141,7 +141,7 @@ end;
 
 (*
 Inventory.IsSlotValid
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.IsSlotValid(idx: Int32): Boolean;
@@ -157,7 +157,7 @@ end;
 
 (*
 Inventory.PointToSlot
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.PointToSlot(pt:TPoint): Int32;
@@ -180,7 +180,7 @@ end;
 
 (*
 Inventory.MouseSlot
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   procedure TRSInventory.MouseSlot(idx:Int32; btn: Integer = mouse_Move);
@@ -189,8 +189,11 @@ Moves the moise over the given slot-index.
 
 .. note:: by slacky
 *)
-procedure TRSInventory.MouseSlot(idx:Int32; btn: Integer = mouse_Move);
+procedure TRSInventory.MouseSlot(idx:Int32; btn:Integer=mouse_Move);
 begin
+  if not(self.Open()) then
+    Exit(False);
+
   if self.IsSlotValid(idx) then
   begin
     Mouse.Move(self.FSlots[idx])
@@ -202,7 +205,7 @@ end;
 
 (*
 Inventory.IsFull
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.IsFull(): Boolean;
@@ -230,7 +233,7 @@ end;
 
 (*
 Inventory.GetSlotBox
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.GetSlotBox(idx:Int32): TBox;
@@ -249,7 +252,7 @@ end;
 
 (*
 Inventory.IsSlotUsed
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.IsSlotUsed(idx:Int32): Boolean;
@@ -258,12 +261,12 @@ Returns true if the given slot is occupied.
 
 .. note:: by slacky
 *)
-function TRSInventory.IsSlotUsed(idx:Int32; checkIfOpen:Boolean=True): Boolean;
+function TRSInventory.IsSlotUsed(idx:Int32; DoOpen:Boolean=True): Boolean;
 var
   b: TBox;
 begin
-  if (checkIfOpen) and not(self.Open()) then
-    Exit();
+  if (DoOpen) and not(self.Open()) then
+    Exit(False);
 
   b := self.FSlots[idx];
   Result := CountColor($10000, b.x1, b.y1, b.x2, b.y2) > 0;
@@ -273,7 +276,7 @@ end;
 
 (*
 Inventory.GetUsedSlots
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.GetUsedSlots(idx:Int32): TIntegerArray;
@@ -298,10 +301,10 @@ end;
 
 (*
 Inventory.DropItems
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.DropItems(slotArr:TIntegerArray = DROP_PATTERN_REGULAR);
+  function TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR);
 
 Drops the given items. It's order-sensitive which means unless you want it to 
 jump randomly all over the inventory dropping items, you give it a ordered drop-pattern.
@@ -318,20 +321,20 @@ Examples:
 
     Inventory.DropItems([0..3]); // drops the four first items
 *)
-procedure TRSInventory.DropItems(SlotArr:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
+procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
   i:  Int32;
 begin
   if not(self.Open()) then
     Exit();
 
-  for i:=0 to High(slotArr) do
-    if self.IsSlotValid(slotArr[i]) and self.IsSlotUsed(slotArr[i]) then
+  for i:=0 to High(Slots) do
+    if self.IsSlotValid(Slots[i]) and self.IsSlotUsed(Slots[i], False) then
     begin
-      Mouse.Move(self.FSlots[slotArr[i]]);
+      Mouse.Move(self.FSlots[Slots[i]]);
       if (UpText <> []) then
       begin
-        Wait(Random(60,90)); //for uptext to refresh
+        Wait(Random(70,100)); //for uptext to refresh
         if not mainscreen.IsUpText(UpText) then
           Continue;
       end;
@@ -343,7 +346,7 @@ end;
 
 (*
 Inventory.DropItemsExcept
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
@@ -368,7 +371,7 @@ end;
 
 (*
 Inventory.FindItem
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
@@ -400,7 +403,7 @@ end;
 
 (*
 Inventory.FindItem
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
@@ -432,7 +435,7 @@ end;
 
 (*
 Inventory.FindItem
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
@@ -464,13 +467,30 @@ begin
   SetLength(Result, j);
 end;
 
+(*
+Inventory.Count
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Count(): Byte;
+
+Returns the number of used slots
+*)
 function TRSInventory.Count(): Byte;
 begin
   Result := Length(Self.GetUsedSlots());
 end;
 
+(*
+Inventory.GetActiveSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-function TRSInventory.GetActiveSlot(): Int32;
+  function TRSInventory.GetActiveSlot(): Int8;
+
+Returns the index to the current active slot, returns `-1` if none.
+*)
+function TRSInventory.GetActiveSlot(): Int8;
 var
   i: Integer;
   b: TBox;
@@ -484,8 +504,18 @@ begin
   end;
 end;
 
-function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
+(*
+Inventory.ActivateSlot
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
+
+Activates (Presses) the given slot, however if `Slot` is `-1` then it will disable the current active slot.
+*)
+function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
+var
+  i: Int32;
   procedure DeActivate(Slot: Int32);
   begin
     if (Slot > -1) then
@@ -494,14 +524,11 @@ function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
       Wait(Random(200, 300));
     end;
   end;
-
-var
-  i: Int32;
 begin
   Result := True;
 
   // DeActivate whatever is activated
-  if (Slot = -1) and (Self.GetActiveSlot() > -1) then
+  if (Slot = -1) and (Self.GetActiveSlot() <> -1) then
   begin
     DeActivate(Self.GetActiveSlot());
     Exit;
@@ -515,7 +542,7 @@ begin
     DeActivate(i);
 
   Inventory.MouseSlot(Slot);
-  Result := (ChooseOption.Open()) and (ChooseOption.Select(['Use']));
+  Result := ChooseOption.Select(['Use']);
 end;
 
 begin
