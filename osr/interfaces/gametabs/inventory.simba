@@ -192,7 +192,7 @@ Moves the moise over the given slot-index.
 procedure TRSInventory.MouseSlot(idx:Int32; btn:Integer=mouse_Move);
 begin
   if not(self.Open()) then
-    Exit(False);
+    Exit();
 
   if self.IsSlotValid(idx) then
   begin
