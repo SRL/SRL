@@ -18,7 +18,7 @@ type
 
   TRSBankScreen = record (TInterfaceBase)
     FSlots: TBoxArray;
-    FButtons: array [0..High(EBankButton)] of TBox;
+    FButtons: array [EBankButton] of TBox;
   end;
 
 var

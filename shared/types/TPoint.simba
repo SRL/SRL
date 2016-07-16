@@ -1,4 +1,4 @@
-function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint;
+function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint; constref;
 begin
   if (Gauss) then
   begin
@@ -11,7 +11,7 @@ begin
   end;
 end;
 
-function TPoint.Random(XMin, XMax: Integer; YMin, YMax: Integer; Gauss: Boolean = False): TPoint; overload;
+function TPoint.Random(XMin, XMax: Integer; YMin, YMax: Integer; Gauss: Boolean = False): TPoint; constref; overload;
 begin
   if (Gauss) then
   begin
@@ -30,37 +30,37 @@ begin
   Self.Y := Self.Y + p.Y;
 end;
 
-function TPoint.InBox(Box: TBox): Boolean;
+function TPoint.InBox(Box: TBox): Boolean; constref;
 begin
   Result := PointInBox(Self, Box);
 end;
 
-function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean;
+function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean; constref;
 begin
   Result := Distance(Self.x, Self.y, Mid.x, Mid.y) <= Radius;
 end;
 
-function TPoint.DistanceTo(Other:TPoint): Extended;
+function TPoint.DistanceTo(Other:TPoint): Extended; constref;
 begin
   Result := Distance(Self.x, Self.y, other.x, other.y);
 end;
 
-function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint;
+function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint; constref;
 begin
   Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
 end;
 
-function TPoint.Magnitude(): Extended;
+function TPoint.Magnitude(): Extended; constref;
 begin
   Result := Sqrt(Sqr(Self.x) + Sqr(Self.y));
 end;
 
-function TPoint.Equals(Other: TPoint): Boolean;
+function TPoint.Equals(Other: TPoint): Boolean; constref;
 begin
   Result := (self.X = other.X) and (self.Y = other.Y);
 end;
 
-function TPoint.AngleBetween(Other: TPoint): Extended;
+function TPoint.AngleBetween(Other: TPoint): Extended; constref;
 begin
   Result := srl.Modulo(Degrees(ArcTan2(other.Y - self.Y, other.X - self.X)) - 90, 360);
 end;

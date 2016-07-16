@@ -31,7 +31,7 @@ begin
   t := GetTickCount64() + WaitTime;
   repeat
     if (FindColors(TPA, COL_INNER_BORDER, Self.FBounds)) and
-       (GetTPABounds(TPA).Equals(Self.FBounds)) then
+       (GetTPABounds(TPA) = Self.FBounds) then
          Exit(True);
     if (WaitTime > 0) then
       Wait(Random(50, 100));

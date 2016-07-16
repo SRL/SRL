@@ -300,10 +300,14 @@ Example:
 
 *)
 procedure TMufasaBitmap.DrawBitmap(bmp: Integer; pnt: TPoint);
+var
+  img:TMufasaBitmap;
 begin
   if (BitmapExists(bmp)) then
-    GetMufasaBitmap(bmp).DrawTransparent(pnt.x, pnt.y, self)
-  else
+  begin
+    img := GetMufasaBitmap(bmp);
+    img.DrawTransparent(pnt.x, pnt.y, self)
+  end else
     WriteLn('-- ERROR: TMufasaBitmap.DrawBitmap(): bitmap does not exist');
 end;
 

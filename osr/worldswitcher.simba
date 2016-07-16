@@ -178,7 +178,7 @@ end;
 
 procedure TRSWorldSwitcher.Close;
 begin
-  Mouse.Click(Point(734, 12).Random(-5, 5), mouse_Left);
+  Mouse.Click(srl.RandomPoint(Point(734,12), 5), mouse_Left);
   Wait(Random(500, 1000));
 end;
 

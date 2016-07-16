@@ -38,15 +38,16 @@
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
   TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
-  
-  
+  TMouseMoveEvent2 = procedure(Sender: TObject; Shift:TShiftState; X,Y: Integer);
+  TMouseEvent2 = procedure(Sender: TObject; Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
+
   TMouse = record
   {$IFNDEF CODEINSIGHT}
     FSpeed: Integer;
     FMode: TMouseMode;
     FGravity, FWind: array [0..2] of Integer;
-    FOnMouseMove: TMouseMoveEvent;
-    FOnMouseEvent: TMouseEvent;
+    FOnMouseMove: TMouseMoveEvent2;
+    FOnMouseEvent: TMouseEvent2;
     FOnMouseChangeDestEvent: TMouseChangeDestEvent;
   {$ENDIF}
   end;
@@ -128,22 +129,22 @@ begin
   Self.FWind[Ord(Mode)] := NewWind;
 end;
 
-function TMouse.GetOnMouseMove(): TMouseMoveEvent;
+function TMouse.GetOnMouseMove(): TMouseMoveEvent2;
 begin
   Result := @Self.FOnMouseMove;
 end;
 
-procedure TMouse.SetOnMouseMove(const Event: TMouseMoveEvent);
+procedure TMouse.SetOnMouseMove(const Event: TMouseMoveEvent2);
 begin
   Self.FOnMouseMove := @Event;
 end;
 
-function TMouse.GetOnMouseEvent(): TMouseEvent;
+function TMouse.GetOnMouseEvent(): TMouseEvent2;
 begin
   Result := @Self.FOnMouseEvent;
 end;
 
-procedure TMouse.SetOnMouseEvent(const Event: TMouseEvent);
+procedure TMouse.SetOnMouseEvent(const Event: TMouseEvent2);
 begin
   Self.FOnMouseEvent := @Event;
 end;
@@ -463,7 +464,7 @@ begin
   p := Self.getPosition();
 
   if (Assigned(@FOnMouseEvent)) then
-    Self.FOnMouseEvent(@Self, Abs(Abs(not Button) - 2), [], p.X, p.Y);
+    Self.FOnMouseEvent(@Self, TMouseButton(Abs(Abs(not Button) - 2)), [], p.X, p.Y);
 
   Self.Hold(Button);
   Wait(Random(60, 155));

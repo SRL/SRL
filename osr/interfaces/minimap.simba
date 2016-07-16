@@ -25,7 +25,7 @@ type
 type
   TMinimap = record(TInterfaceBase)
     CompassInfo: TMMCompassInfo;
-    OrbInfo: array [0..High(EMinimapOrb)] of TMMOrbInfo;
+    OrbInfo: array [EMinimapOrb] of TMMOrbInfo;
     MaskBMP: Integer;
     MaskTPA: TPointArray;
  end;

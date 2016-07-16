@@ -127,7 +127,7 @@ end;
 function TRSGametab.GetCurrent(): EGametab;
 var i:Int32;
 begin
-  for i:=0 to High(EGameTab) do
+  for i:=0 to Ord(High(EGameTab)) do
     if Self.IsOpen(EGameTab(i)) then
       Exit(EGameTab(i));
 end;
@@ -150,13 +150,13 @@ end;
 
 
 //Checks if the given button (by bounds) is red/enabled
-function TGtButton.IsEnabled(): Boolean;
+function TGtButton.IsEnabled(): Boolean; constref;
 begin
   Result := CountColorTolerance(self.stateEnabled, self.bounds, 30) > 70;
 end;
 
 //helper: Clicks the given button and returns True if it didn't fail
-function TGtButton.Toggle(out enabled:Boolean; tryTime:Int32=2000): Boolean;
+function TGtButton.Toggle(out enabled:Boolean; tryTime:Int32=2000): Boolean; constref;
 var t:UInt64;
 begin
   enabled := not(Self.IsEnabled());
