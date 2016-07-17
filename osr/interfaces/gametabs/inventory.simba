@@ -222,12 +222,10 @@ begin
   if not(self.Open()) then
     Exit();
 
-  for i:=0 to High(self.FSlots) do
-  begin
-    b := self.FSlots[i];
+  for b in self.FSlots do
     if (CountColor($10000, b.x1,b.y1,b.x2,b.y2) = 0) then
       Exit(False);
-  end;
+
   Result := True;
 end;
 
@@ -323,15 +321,15 @@ Examples:
 *)
 procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
-  i:  Int32;
+  idx: Int32;
 begin
   if not(self.Open()) then
     Exit();
 
-  for i:=0 to High(Slots) do
-    if self.IsSlotValid(Slots[i]) and self.IsSlotUsed(Slots[i], False) then
+  for idx in Slots do
+    if self.IsSlotValid(idx) and self.IsSlotUsed(idx, False) then
     begin
-      Mouse.Move(self.FSlots[Slots[i]]);
+      Mouse.Move(self.FSlots[idx]);
       if (UpText <> []) then
       begin
         Wait(Random(70,100)); //for uptext to refresh

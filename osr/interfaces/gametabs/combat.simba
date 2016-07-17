@@ -178,22 +178,21 @@ begin
 end;
 
 function TRSCombat.GetSpecialAttack(): Integer;
-const
-  COL_TEXT = [1048576, 65535];
 var
   Text: String;
   TPA: TPointArray;
   b: TBox;
-  i: Integer;
+  color: Integer;
 begin
   if (not Self.Open()) then
     Exit(-1);
-  for i := 0 to High(COL_TEXT) do
-    if (FindColors(TPA, COL_TEXT[i], Self.FButtons[cbtSpecialAttack])) then
+  
+  for color in [$100000, $00FFFF] do
+    if (FindColors(TPA, color, Self.FButtons[cbtSpecialAttack])) then
     begin
       b := GetTPABounds(TPA);
       b.Expand(1);
-      Text := ocr.Recognize(b, TCompareRules([COL_TEXT[i]]), StatFont);
+      Text := ocr.Recognize(b, TCompareRules([color]), StatFont);
       Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
     end;
 end;

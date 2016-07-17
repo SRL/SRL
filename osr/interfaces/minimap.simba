@@ -186,9 +186,10 @@ const
   FlagColor = 255;
   LightPoleColor = 284358;
 var
-  TPA, TPAPoles: TPointArray;
+  pt: TPoint;
+  TPA, TPAPoles, column: TPointArray;
   ATPA, ATPAColumns: T2DPointArray;
-  i, j, w, h, Img: Integer;
+  w, h, img: Integer;
 begin
   p := [-1, -1];
   Img := BitmapFromClient(Self.getBounds());
@@ -200,27 +201,24 @@ begin
       Exit(False);
 
     with GetMufasaBitmap(Img) do
-      for i := 0 to High(TPA) do
-        if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
-          if (GetPixel(TPA[i].x - 1, TPA[i].y) = FlagColor) or (GetPixel(TPA[i].x - 1, TPA[i].y) = LightPoleColor) and
-             (GetPixel(TPA[i].X, TPA[i].y - 1) = PoleColor) or (GetPixel(TPA[i].x, TPA[i].y + 1) = PoleColor) then
-                TPAPoles.Append(TPA[i]);
+      for pt in TPA do
+        if (pt.X > 2) and (pt.Y > 2) and (pt.X < w) and (pt.Y < h) then
+          if (GetPixel(pt.x - 1, pt.y) = FlagColor) or (GetPixel(pt.x - 1, pt.y) = LightPoleColor) and
+             (GetPixel(pt.X, pt.y - 1) = PoleColor) or (GetPixel(pt.x, pt.y + 1) = PoleColor) then
+                TPAPoles += pt;
 
     if (Length(TPAPoles) = 0) then
       Exit(False);
-
-    ATPAColumns := FindTPAColumns(TPAPoles);
-    for i := 0 to High(ATPAColumns) do
+    
+    for column in FindTPAColumns(TPAPoles) do
     begin
-      ATPA := SplitTPA(ATPAColumns[i], 1);
-
-      for j := 0 to High(ATPA) do
-        if (InRange(GetTPABounds(ATPA[j]).Height, 4, 20)) then
+      for TPA in SplitTPA(column, 1) do
+        if (InRange(GetTPABounds(TPA).Height, 4, 20)) then
         begin
           Result := True;
-          p := ATPA[j][0];
+          p := TPA[0];
 
-          while (p.y < (Self.getBounds().Height - 1)) and (FastGetPixel(Img, p.x, p.y) = PoleColor) do
+          while (p.y < (Self.GetBounds().Height - 1)) and (FastGetPixel(Img, p.x, p.y) = PoleColor) do
             Inc(p.y);
 
           if (FastGetPixel(Img, p.x, p.y) <> PoleColor) then // Make sure we have the bottom of the pole
@@ -615,6 +613,7 @@ const { aligned with EMinimapDotType }
   DOT_COL_DIFF = [1907997, 23, 4369];
   NPC_DOT_DIFF_2 = 1114626;
 var
+  pt: TPoint;
   img, i, w, h: Integer;
   TPA: TPointArray;
 begin
@@ -626,21 +625,18 @@ begin
     if (not FindColorsBitmap(img, TPA, 65536)) then
       Exit;
 
-    for i := 0 to High(TPA) do
-      if (TPA[i].X > 2) and (TPA[i].Y > 2) and (TPA[i].X < w) and (TPA[i].Y < h) then
-        if (FastGetPixel(img, TPA[i].X-1, TPA[i].Y-1) -
-            FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-          Result.Append( [TPA[i].X, TPA[i].Y - 2] )
+    for pt in TPA do
+      if (pt.X > 2) and (pt.Y > 2) and (pt.X < w) and (pt.Y < h) then
+        if (FastGetPixel(img, pt.X-1, pt.Y-1) - FastGetPixel(img, pt.X, pt.Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
+          Result += Point(pt.X, pt.Y - 2)
         else
         begin
-          if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
-              FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-            Result.Append( [TPA[i].X - 1, TPA[i].Y - 1] )
+          if (FastGetPixel(img, pt.X, pt.Y-2) - FastGetPixel(img, pt.X, pt.Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
+            Result += Point(pt.X - 1, pt.Y - 1)
           else if (DotType = MMDotNPC) then
           begin
-            if (FastGetPixel(img, TPA[i].X, TPA[i].Y-2) -
-              FastGetPixel(img, TPA[i].X, TPA[i].Y-1) = NPC_DOT_DIFF_2) then
-            Result.Append( [TPA[i].X + 2, TPA[i].Y - 1] );
+            if (FastGetPixel(img, pt.X, pt.Y-2) - FastGetPixel(img, pt.X, pt.Y-1) = NPC_DOT_DIFF_2) then
+            Result += Point(pt.X + 2, pt.Y - 1);
           end;
         end;
 

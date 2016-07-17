@@ -196,19 +196,28 @@ Example:
     Bars := MainScreen.FindHPBars(MainScreen.GetBounds());
 *)
 function TRSMainScreen.FindHPBars(const Area: TBox): THPBarArray;
-
-  function _FixHPBars(var Bars: T2DIntArray; TPA: TPointArray): TPointArray;
-  var i: Int32;
+const
+  COLOR_BARS = [$00FF00, $0000FF];
+  COLOR_SPLATS = [16728128, 11339523, 5571843, 192, 197503, 65889, $FFFFFF, 0];
+var
+  pt: TPoint;
+  i, color: Int32;
+  tmp, TPA, Splats: TPointArray;
+  bars: T2DIntArray;
+  B: TBox;
+  
+  function _FixHPBars(TPA: TPointArray): TPointArray;
+  var pt:TPoint;
   begin
-    FilterPointsBox(TPA, 1, 0, High(Bars[0]), High(Bars));
+    FilterPointsBox(TPA, 1, 0, High(bars[0]), High(bars));
     SortTPAByX(TPA, True);
-
-    for i := 0 to High(TPA) do
-      if (Bars[TPA[i].y][TPA[i].x - 1] <> 0) then
-        Bars[TPA[i].y][TPA[i].x] := 255;
+    
+    for pt in TPA do
+      if (Bars[pt.y][pt.x-1] <> 0) then
+        Bars[pt.y][pt.x] := 255;
   end;
 
-  procedure _FindHPBars(var Bars: T2DIntArray; var Result: THPBarArray);
+  procedure _FindHPBars(var Result: THPBarArray);
   const
     W = 29;
     H = 4;
@@ -238,50 +247,43 @@ function TRSMainScreen.FindHPBars(const Area: TBox): THPBarArray;
           if (not bad) then
           begin
             Bars[y][x] := $00FF00;
-            Result := Result + THPBar([TBox([x, y, x + W, y + H]), 0.00]);
+            Result += THPBar([TBox([x, y, x + W, y + H]), 0.00]);
           end;
         end;
   end;
 
-const
-  COLOR_BARS = [$00FF00, $0000FF];
-  COLOR_SPLATS = [16728128, 11339523, 5571843, 192, 197503, 65889, $FFFFFF, 0];
-var
-  i: Int32;
-  tmp, TPA, Splats: TPointArray;
-  Mat: T2DIntArray;
-  B: TBox;
 begin
   Freeze();
 
   try
-    for i := 0 to High(COLOR_BARS) do
-      if (FindColors(tmp, COLOR_BARS[i], Area)) then
-        Insert(tmp, TPA, Length(TPA) + 1);
+    for color in COLOR_BARS do
+      if (FindColors(tmp, color, Area)) then
+        TPA += tmp;
 
-    for i := 0 to High(COLOR_SPLATS) do
-      if (FindColors(tmp, COLOR_SPLATS[i], Area)) then
-        Insert(tmp, Splats, Length(Splats) + 1);
+    for color in COLOR_SPLATS do
+      if (FindColors(tmp, color, Area)) then
+        Splats += tmp;
 
     if (Length(TPA) < 10) then
       Exit;
 
     B := GetTPABounds(TPA);
     OffsetTPA(Splats, Point(-B.X1+1,-B.Y1+1));
-    SetLength(Mat, B.Height()+2, B.Width()+2);
-    for i := 0 to High(TPA) do
-      Mat[(TPA[i].y-B.Y1)+1][(TPA[i].x-B.X1)+1] := 255;
-
-    _FixHPBars(Mat, Splats);
-    _FindHPBars(Mat, Result);
+    SetLength(bars, B.Height()+2, B.Width()+2);
+    
+    for pt in TPA do
+      bars[(pt.y-B.Y1)+1][(pt.x-B.X1)+1] := 255;
+    
+    _FixHPBars(Splats);
+    _FindHPBars(Result);
 
     for i := High(Result) downto 0 do
     begin
-      if (Mat[Result[i].Bounds.Y1, Result[i].Bounds.X1] = 0) or
-         (Mat[Result[i].Bounds.Y1, Result[i].Bounds.X2] = 0) or
-         (Mat[Result[i].Bounds.Y2, Result[i].Bounds.X2] = 0) or
-         (Mat[Result[i].Bounds.Y2, Result[i].Bounds.X1] = 0) then
-       Delete(Result, i, 1)
+      if (bars[Result[i].Bounds.Y1, Result[i].Bounds.X1] = 0) or
+         (bars[Result[i].Bounds.Y1, Result[i].Bounds.X2] = 0) or
+         (bars[Result[i].Bounds.Y2, Result[i].Bounds.X2] = 0) or
+         (bars[Result[i].Bounds.Y2, Result[i].Bounds.X1] = 0) then
+        Delete(Result, i, 1)
       else
         with Result[i] do
         begin
@@ -325,23 +327,18 @@ var
   b: TBox;
 begin
   if FindColorsTolerance(TPA, color, self.FBounds, 0) then
-  begin
-    clusters := TPASplitRows(TPA, 7);  //think SplitTPAEx(TPA,7,0);
-    SetLength(lines, Length(clusters));
-    for i:=0 to High(clusters) do
+    for TPA in TPASplitRows(TPA, 7) do
     begin
-      b := GetTPABounds(clusters[i]);
+      b := GetTPABounds(TPA);
       if (B.x2-B.x1+1 > 3) then
-        lines[inc(j)-1] := clusters[i];
+        lines += TPA;
     end;
-    SetLength(lines, j);
-  end;
+  
   if Length(lines) = 0 then Exit;
 
-  Clusters := ClusterTPAEx(MergeATPA(lines),10,1);
-  for i:=0 to High(Clusters) do
+  for TPA in ClusterTPAEx(MergeATPA(lines),10,1) do
   begin
-    B := GetTPABounds(Clusters[i]);
+    B := GetTPABounds(TPA);
     if (B.x2-B.x1+1 < 6) or (B.y2-B.y1+1 < 6) then
       Continue;
     B.x2 += 1;
