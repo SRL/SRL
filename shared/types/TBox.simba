@@ -40,7 +40,7 @@ begin
   Result := Self.Y2 - Self.Y1 + 1;
 end;
 
-function TBox.Area(): UInt32;
+function TBox.Area(): UInt32; constref;
 begin
   Result := (Self.X2 - Self.X1 + 1) * (Self.Y2 - Self.Y1 + 1);
 end;

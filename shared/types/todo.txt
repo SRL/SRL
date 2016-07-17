@@ -3,11 +3,8 @@ Types that lacks helpers currently, that should preferably be implemented:
 - T2DIntArray
 - T2DExtendedArray
 
-Note (march 2016):
-1. Keep up compatibility with current official release of Simba.
-   Sadly that means we can't use some of the nicer features of newer Lape
-
-2. We should get all functions documented, even a very simple focumentation does the trick
+Note (July 2016):
+1. We should get all functions documented, even a very simple documentation does the trick
    Just so that people have something to refer to.
    
-   Currently docs are not hosted online, but we'll get there.  
+   Currently docs are not hosted anywhere, but we'll get there.  

@@ -18,7 +18,7 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(self[0]));
   Self[Index] := Value;
 end;
 
