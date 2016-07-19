@@ -636,7 +636,7 @@ begin
           else if (DotType = MMDotNPC) then
           begin
             if (FastGetPixel(img, pt.X, pt.Y-2) - FastGetPixel(img, pt.X, pt.Y-1) = NPC_DOT_DIFF_2) then
-            Result += Point(pt.X + 2, pt.Y - 1);
+              Result += Point(pt.X + 2, pt.Y - 1);
           end;
         end;
 
