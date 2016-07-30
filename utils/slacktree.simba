@@ -1,0 +1,30 @@
+{$loadlib ..\Includes\SRL\utils\slacktree\slacktree}
+
+// my answer to FilterTPADistTPA found in AND_TPA.pas
+// solves the problem in roughly O(n log n) time
+function TPAOverlap(TPA1,TPA2:TPointArray; minDist, maxDist:Double): TPointArray;
+var
+  tree:TSlackTree;
+  pt:TPoint;
+begin
+  tree.Init(TPA1);
+  for pt in TPA2 do
+    Result.Extend(tree.RangeQueryEx(pt, minDist,minDist, maxDist,maxDist, True));
+end;
+
+// my answer to RAaSTPA found in Simba
+// solves the problem in roughly O(n log n) time
+procedure RAaSTPA2(var a:TPointArray; const dist:Double);
+var
+  tree:TSlackTree;
+  i,c:Int32;
+begin
+  tree.Init(Copy(a));
+  for i:=0 to High(a) do
+    if (not tree.Find(a[i])^.hidden) then
+    begin
+      tree.RangeQueryEx(a[i], dist,dist, True);
+      a[Inc(c) - 1] := a[i];
+    end;
+  SetLength(a, c);
+end;
