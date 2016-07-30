@@ -327,7 +327,7 @@ var
   b: TBox;
 begin
   if FindColorsTolerance(TPA, color, self.FBounds, 0) then
-    for TPA in TPASplitRows(TPA, 7) do
+    for TPA in TPA.SplitRows(7) do
     begin
       b := GetTPABounds(TPA);
       if (B.x2-B.x1+1 > 3) then
