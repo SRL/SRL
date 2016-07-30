@@ -1,7 +1,7 @@
 type
   ENumberFormat = (formatRS, formatSI);
 
-function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
+function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;  constref;
 var
   img: Integer;
 begin
@@ -15,7 +15,7 @@ begin
   end;
 end;
 
-function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
 var
   TPA, TPAText: TPointArray;
   w, h: Integer;
@@ -28,7 +28,7 @@ begin
   Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
 end;
 
-function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
 var
   tmp: TPointArray;
 begin
@@ -37,7 +37,7 @@ begin
     p := tmp[0];
 end;
 
-function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
+function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref;
 var
   TPA: TPointArray;
   p: TPoint;
@@ -55,7 +55,7 @@ begin
   end;
 end;
 
-function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
+function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref; overload;
 var
   TPA, TPA2: TPointArray;
   p: TPoint;
@@ -75,7 +75,7 @@ begin
   end;
 end;
 
-function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
+function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String; constref;
 var
   ATPA: T2DPointArray;
   b: TBox;
@@ -99,7 +99,7 @@ end;
 
   The RS prefix is default, since SRL mainly focuses on RS.
 *)
-function TSRL.FormatNumber(n:Extended; dec:Byte=3; mode:ENumberFormat=formatRS): String;
+function TSRL.FormatNumber(n:Extended; dec:Byte=3; mode:ENumberFormat=formatRS): String; constref;
 var
   i:Int32;
   f:Extended := n;
@@ -120,7 +120,7 @@ begin
 end;
 
 // Added for backwards compatibility.
-function TSRL.FormatInt(n:Int64; dec:Byte=3; mode:ENumberFormat=formatRS): String;
+function TSRL.FormatInt(n:Int64; dec:Byte=3; mode:ENumberFormat=formatRS): String; constref;
 begin
   Result := Self.FormatNumber(n,dec,mode);
 end;

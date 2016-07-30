@@ -15,7 +15,7 @@ Example:
 
     Writeln(srl.Modulo(a, b));
 *)
-function TSRL.Modulo(X, Y: Double): Double;
+function TSRL.Modulo(X, Y: Double): Double; constref;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
@@ -36,7 +36,7 @@ Example:
 
     Writeln(srl.Modulo(a, b));
 *)
-function TSRL.Modulo(X, Y: Integer): Integer; overload;
+function TSRL.Modulo(X, Y: Integer): Integer; constref; overload;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
@@ -57,7 +57,7 @@ Example:
 
     Writeln(srl.DeltaAngle(350.0, 10.0));
 *)
-function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
+function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double; constref;
 begin
   Result := Modulo((DegA - DegB + R/2), R) - R/2;
 end;
@@ -80,7 +80,7 @@ Example:
 
     Writeln(PointInRect(Point(100, 100), Point(0, 0), Point(200, 1), Point(201, 201), Point(0, 225)));
 *)
-function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;
+function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean; constref;
 var
   Vec:TPoint;
   Dot:Extended;
@@ -97,3 +97,51 @@ begin
 end;
 
 
+{*
+ Check if a point is within a circle.
+*}
+function TSRL.PointInCircle(PT, Center: TPoint; Radius: Double): Boolean; constref;
+begin
+  Result := Sqr(PT.X - Center.X) + Sqr(PT.Y - Center.Y) <= Sqr(Radius);
+end;
+
+  
+{*
+ Check if a point is within a ellipse.
+*}
+function TSRL.PointInEllipse(PT, Center:TPoint; YRad, XRad: Double): Boolean; constref;
+var
+  X, Y: Integer;
+begin
+  X := PT.X - Center.X;
+  Y := PT.Y - Center.Y;
+  Result := (Sqr(X)*Sqr(YRad))+(Sqr(Y)*Sqr(XRad)) <= (Sqr(YRad)*Sqr(XRad));
+end; 
+
+{* 
+ Check if a point is within a polygon/shape by the given outline points (poly)
+ The points must be in order, as if you would draw a line trough each point.
+ note: Winding number algorithm
+*}
+function TSRL.PointInPoly(pt:TPoint; Poly:TPointArray): Boolean; constref; 
+var
+  wn,H,i,j:Int32;
+begin
+  wn := 0;
+  H := High(poly);
+  j := H;
+  for i:=0 to H do 
+  begin
+    if (poly[i].y <= pt.y) then 
+    begin
+      if (poly[j].y > pt.y) then
+        if (((poly[j].x-poly[i].x)*(pt.y-poly[i].y)-(pt.x-poly[i].x)*(poly[j].y-poly[i].y)) > 0) then
+          Inc(wn);
+    end else
+      if poly[j].y <= pt.y then
+        if (((poly[j].x-poly[i].x)*(pt.y-poly[i].y)-(pt.x-poly[i].x)*(poly[j].y-poly[i].y)) < 0) then
+          Dec(wn);
+    j := i;
+  end;
+  Result := (wn <> 0);
+end;
