@@ -1,30 +1,32 @@
 {$loadlib ..\Includes\SRL\utils\slacktree\slacktree}
 
-// my answer to FilterTPADistTPA found in AND_TPA.pas
+// my answers to FilterTPADistTPA found in AND_TPA.pas
 // solves the problem in roughly O(n log n) time
-function TPAOverlap(TPA1,TPA2:TPointArray; minDist, maxDist:Double): TPointArray;
+(*
+ Returns all the points from `self` that are within range of any point in `other`.
+ The parameters `mindist` and `maxdist` determine what "within range" means.
+*)
+function TPointArray.PointsInRangeOf(Other: TPointArray; MinDist, MaxDist: Double): TPointArray; constref;
 var
   tree:TSlackTree;
   pt:TPoint;
 begin
-  tree.Init(TPA1);
-  for pt in TPA2 do
+  tree.Init(Copy(self));
+  for pt in Other do
     Result.Extend(tree.RangeQueryEx(pt, minDist,minDist, maxDist,maxDist, True));
 end;
 
-// my answer to RAaSTPA found in Simba
-// solves the problem in roughly O(n log n) time
-procedure RAaSTPA2(var a:TPointArray; const dist:Double);
+(*
+ same as the above but lets you specify X- and Y-wise distance separately. This allows
+ for a lot of cool stuff :p
+*)
+function TPointArray.PointsInRangeOf(Other: TPointArray; minDx, minDy, maxDx, maxDy: Int32): TPointArray; constref; overload;
 var
   tree:TSlackTree;
-  i,c:Int32;
+  pt:TPoint;
 begin
-  tree.Init(Copy(a));
-  for i:=0 to High(a) do
-    if (not tree.Find(a[i])^.hidden) then
-    begin
-      tree.RangeQueryEx(a[i], dist,dist, True);
-      a[Inc(c) - 1] := a[i];
-    end;
-  SetLength(a, c);
+  tree.Init(Copy(self));
+  for pt in Other do
+    Result.Extend(tree.RangeQueryEx(pt, minDx, minDy, maxDx, maxDy, True));
 end;
+
