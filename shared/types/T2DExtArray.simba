@@ -1,4 +1,8 @@
-procedure TExtendedArray.Append(const Value: Extended);
+type T2DExtArray = T2DExtendedArray;
+
+//--| Type helpers |----------------------------------------------------------->
+//----------------------------------------------------------------------------->
+procedure T2DExtArray.Append(const Value: TExtendedArray);
 var top:Int32;
 begin
   top := Length(Self);
@@ -6,7 +10,7 @@ begin
   Self[top] := Value;
 end;
 
-procedure TExtendedArray.Insert(const Value: Extended; Index: Integer);
+procedure T2DExtArray.Insert(const Value: TExtendedArray; Index: Integer);
 var
   l: UInt32;
 begin
@@ -16,23 +20,23 @@ begin
     Self.Append(Value);
     Exit();
   end;
-
+  
   SetLength(Self, l + 1);
   MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(self[0]));
   Self[Index] := Value;
 end;
 
-procedure TExtendedArray.Del(const Index: Integer; const Count: Integer = 1);
+procedure T2DExtArray.Del(const Index:Int32; const Count:Int32=1);
 begin
   Delete(Self, Index, Count);
 end;
 
-function TExtendedArray.Len(): Integer;
+function T2DExtArray.Len(): Integer;
 begin
   Result := Length(Self);
 end;
 
-procedure TExtendedArray.Remove(const Value: Extended; const All: Boolean = False);
+procedure T2DExtArray.Remove(const Value: TExtendedArray; const All: Boolean = False);
 var
   Arr: TIntegerArray;
   i: Integer;
@@ -43,12 +47,12 @@ begin
     SetLength(Arr, 1);
     Arr[0] := Self.Find(Value);
   end;
-
-  for i := 0 to High(Arr) do
+  
+  for i:=0 to High(Arr) do
     Self.Del(Arr[i]);
 end;
 
-function TExtendedArray.Pop(): Extended;
+function T2DExtArray.Pop(): TExtendedArray;
 var
   h: Integer;
 begin
@@ -61,42 +65,38 @@ begin
     raise 'Array is empty';
 end;
 
-procedure TExtendedArray.Extend(Arr:TExtendedArray);
+procedure T2DExtArray.Extend(Arr:T2DExtArray);
 var L:Int32;
 begin
   if Length(arr) > 0 then
   begin
     L := Length(Self);
     SetLength(Self, Length(Arr) + L);
-    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Extended));
+    MemMove(Arr[0], Self[L], Length(Arr)*SizeOf(arr[0]));
   end;
 end; 
 
-function TExtendedArray.Find(const Value: Extended): Integer; constref;
+function T2DExtArray.Find(const Value: TExtendedArray): Integer; constref;
 begin
-  for Result := 0 to High(Self) do
-    if (Value = Self[Result]) then
+  for Result:=0 to High(Self) do
+    if Self[Result].Equals(Value) then
       Exit;
-
   Result := -1;
 end;
 
-function TExtendedArray.FindAll(const Value: Extended): TIntegerArray; constref;
+function T2DExtArray.FindAll(const Value: TExtendedArray): TIntegerArray; constref;
 var
-  i,top: UInt32;
+  i: UInt32;
 begin
-  for i := 0 to High(Self) do
-    if (Self[i] = Value) then
-    begin
-      SetLength(Result, top+1);
-      Result[Inc(top)-1] := i;
-    end;
+  for i:=0 to High(Self) do
+    if Value.Equals(Self[i]) then
+      Result += i;
 end
 
-function TExtendedArray.Reversed(): TExtendedArray
+function T2DExtArray.Reversed(): T2DExtArray;
 var
   lo:PtrUInt;
-  p,r:^Extended;
+  p,r:^TExtendedArray;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -114,10 +114,10 @@ begin
   end;
 end;
 
-procedure TExtendedArray.Reverse();
+procedure T2DExtArray.Reverse();
 var
-  tmp:Extended;
-  lo,hi:^Extended;
+  tmp:TExtendedArray;
+  lo,hi:^TExtendedArray;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -134,18 +134,31 @@ begin
   end;
 end;
 
-function TExtendedArray.Combine(Other: TExtendedArray): TExtendedArray; constref;
+function T2DExtArray.Combine(Other: T2DExtArray): T2DExtArray; constref;
 begin
   SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
   if Length(Other) > 0 then
     MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
-end; 
+end;   
 
-function TExtendedArray.Equals(Other:TExtendedArray): Boolean; constref;
+
+function T2DExtArray.Equals(Other:T2DExtArray): Boolean;
+var i:Int32;
 begin
   if (Length(Self) <> Length(Other)) then Exit(False);
   if (Length(Self) = 0) then Exit(True);
-  Result := CompareMem(Self[0], Other[0], length(self)*SizeOf(self[0]));     
+  
+  for i:=0 to High(self) do
+    if self[i] <> Other[i] then
+      Exit(False);
+  Result := True;      
+end;
+
+function T2DExtArray.Merge(): TExtendedArray;
+var i:Int32;
+begin
+  for i:=0 to High(self) do
+    Result.Extend(self[i]);  
 end;

@@ -58,7 +58,7 @@ begin
     Result := Self[h];
     SetLength(Self, h);
   end else
-    RaiseException(erOutOfRange, 'Array is empty');
+    raise 'Array is empty';
 end;
 
 procedure TIntegerArray.Extend(Arr:TIntegerArray);
@@ -72,7 +72,7 @@ begin
   end;
 end; 
 
-function TIntegerArray.Find(const Value: Integer): Integer;
+function TIntegerArray.Find(const Value: Integer): Integer; constref;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -81,7 +81,7 @@ begin
   Result := -1;
 end;
 
-function TIntegerArray.FindAll(const Value: Integer): TIntegerArray;
+function TIntegerArray.FindAll(const Value: Integer): TIntegerArray; constref;
 var
   i,top: UInt32;
 begin
@@ -134,11 +134,19 @@ begin
   end;
 end;
 
-function TIntegerArray.Combine(other: TIntegerArray): TIntegerArray;
+function TIntegerArray.Combine(Other: TIntegerArray): TIntegerArray; constref;
 begin
-  SetLength(Result, Length(Self) + Length(other));
+  SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
-  if Length(other) > 0 then
-    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+  if Length(Other) > 0 then
+    MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
 end;   
+
+
+function TIntegerArray.Equals(Other:TIntegerArray): Boolean; constref;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  Result := CompareMem(Self[0], Other[0], Length(Self)*SizeOf(self[0]));     
+end;

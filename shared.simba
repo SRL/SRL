@@ -16,14 +16,18 @@
 {$include_once shared/color.simba}
 {$include_once shared/drawing.simba}
 
+{$include_once shared/types/TPoint.simba}
 {$include_once shared/types/TBox.simba}
-{$include_once shared/types/TStringArray.simba}
 {$include_once shared/types/TIntegerArray.simba}
 {$include_once shared/types/TExtendedArray.simba}
 {$include_once shared/types/TBoolArray.simba}
 {$include_once shared/types/TBoxArray.simba}
 {$include_once shared/types/TPointArray.simba}
-{$include_once shared/types/TPoint.simba}
+{$include_once shared/types/TStringArray.simba}
+{$include_once shared/types/T2DIntArray.simba}
+{$include_once shared/types/T2DExtArray.simba}
+{$include_once shared/types/T2DPointArray.simba}
+
 
 begin
 

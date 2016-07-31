@@ -58,7 +58,7 @@ begin
     Result := Self[h];
     SetLength(Self, h);
   end else
-    RaiseException(erOutOfRange, 'Array is empty');
+    raise 'Array is empty';
 end;
 
 procedure TBoxArray.Extend(Arr:TBoxArray);
@@ -72,27 +72,22 @@ begin
   end;
 end; 
 
-function TBoxArray.Find(const Value: TBox): Integer;
+function TBoxArray.Find(const Value: TBox): Integer; constref;
 begin
   for Result := 0 to High(Self) do
-    if (Self[Result].X1 = Value.X1) and (Self[Result].Y1 = Value.Y1) and
-       (Self[Result].X2 = Value.X2) and (Self[Result].Y2 = Value.Y2) then
-         Exit;
+    if Self[result] = Value then
+      Exit;
 
   Result := -1;
 end;
 
-function TBoxArray.FindAll(const Value: TBox): TIntegerArray;
+function TBoxArray.FindAll(const Value: TBox): TIntegerArray; constref;
 var
   i,top: UInt32;
 begin
   for i:=0 to High(Self) do
-    if (Self[i].X1 = Value.X1) and (Self[i].Y1 = Value.Y1) and
-       (Self[i].X2 = Value.X2) and (Self[i].Y2 = Value.Y2) then
-    begin
-      SetLength(Result, top+1);
-      Result[Inc(top)-1] := i;
-    end;
+    if Self[i] = Value then
+      Result += i;
 end
 
 function TBoxArray.Reversed(): TBoxArray;
@@ -136,14 +131,24 @@ begin
   end;
 end;
 
-function TBoxArray.Combine(other: TBoxArray): TBoxArray;
+function TBoxArray.Combine(Other: TBoxArray): TBoxArray; constref;
 begin
-  SetLength(Result, Length(Self) + Length(other));
+  SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
-  if Length(other) > 0 then
-    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+  if Length(Other) > 0 then
+    MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
 end;
+
+function TBoxArray.Equals(Other:TBoxArray): Boolean; constref;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  Result := CompareMem(Self[0], Other[0], length(self)*SizeOf(self[0]));     
+end;
+
+//--| Type helpers (extended) |------------------------------------------------>
+//----------------------------------------------------------------------------->
 
 procedure TBoxArray.Sort(weights: TIntegerArray; iLo, iHi: Int32; SortUp: Boolean);
 var

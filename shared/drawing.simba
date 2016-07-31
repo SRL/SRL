@@ -644,9 +644,9 @@ Example:
     GetMufasaBitmap(bitmap).Debug();
 
 *)
-procedure TMufasaBitmap.Debug();
+procedure TMufasaBitmap.Debug(); constref;
 begin
-  if (not BitmapExists(self.getIndex())) then
+  if (not BitmapExists(self.GetIndex())) then
   begin
     WriteLn('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
     WriteLn('-- HINT: Example for a managed bitmap is "TMufasaBitmap.Init(client.GetMBitmaps());"');
@@ -667,7 +667,7 @@ TMufasaBitmap.UpdateDebugImage
 
 Will update Simba's debug image form with the current image. 
 *)
-procedure TMufasaBitmap.UpdateDebugImage();
+procedure TMufasaBitmap.UpdateDebugImage(); constref;
 begin
   if (not BitmapExists(self.GetIndex())) then
   begin

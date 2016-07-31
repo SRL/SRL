@@ -60,7 +60,7 @@ begin
     Result := Self[h];
     SetLength(Self, h);
   end else
-    RaiseException(erOutOfRange, 'Array is empty');
+    raise 'Array is empty';
 end;
 
 procedure TPointArray.Extend(Arr:TPointArray);
@@ -88,7 +88,7 @@ var
   i,top: UInt32;
 begin
   for i := 0 to High(Self) do
-    if (Value.X = Self[i].X) and (Value.Y = Self[i].Y) then
+    if Self[i] = Value then
     begin
       SetLength(Result, top+1);
       Result[Inc(top)-1] := i;
@@ -136,14 +136,23 @@ begin
   end;
 end;
 
-function TPointArray.Combine(other: TPointArray): TPointArray; constref;
+function TPointArray.Combine(Other: TPointArray): TPointArray; constref;
 begin
-  SetLength(Result, Length(Self) + Length(other));
+  SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
-  if Length(other) > 0 then
-    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
-end;   
+  if Length(Other) > 0 then
+    MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
+end;  
+
+
+function TPointArray.Equals(Other:TPointArray): Boolean; constref;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  Result := CompareMem(Self[0], Other[0], length(self)*SizeOf(self[0]));     
+end;
+ 
 
 
 
