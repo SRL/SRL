@@ -151,7 +151,7 @@ begin
   if (Length(Self) = 0) then Exit(True);
   
   for i:=0 to High(self) do
-    if self[i] <> Other[i] then
+    if not self[i].Equals(Other[i]) then
       Exit(False);
   Result := True;      
 end;
