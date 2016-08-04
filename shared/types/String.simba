@@ -221,12 +221,12 @@ end;
   test if a string only contains alpha numerical characters.
 *)
 function AnsiString.IsAlphaNum(): Boolean; constref;
-var ptr: PChar; hiptr:UInt32;
+var ptr: PChar; hiptr:PtrUInt;
 begin
   if Length(Self) = 0 then Exit(False);
   ptr := PChar(Self);
-  hiptr := UInt32(UInt32(ptr) + Length(self));
-  while UInt32(ptr) < hiptr do
+  hiptr := PtrUInt(PtrUInt(ptr) + Length(self));
+  while PtrUInt(ptr) < hiptr do
     if not (ptr^ in ['0'..'9','a'..'z','A'..'Z']) then
       Exit(False)
     else
@@ -245,12 +245,12 @@ end;
 function AnsiString.IsDigit(): Boolean; constref;
 var 
   ptr: PChar;
-  hiptr:UInt32;
+  hiptr:PtrUInt;
 begin
   if Length(Self) = 0 then Exit(False);
   ptr := PChar(Self);
-  hiptr := UInt32(UInt32(ptr) + Length(self));
-  while UInt32(ptr) < hiptr do
+  hiptr := PtrUInt(PtrUInt(ptr) + Length(self));
+  while PtrUInt(ptr) < hiptr do
     if not (ptr^ in ['0'..'9']) then
       Exit(False)
     else
@@ -269,15 +269,15 @@ end;
 function AnsiString.IsFloat(): Boolean; constref;
 var 
   ptr: PChar; 
-  hiptr:UInt32; 
+  hiptr:PtrUInt; 
   i:Int32; 
   dotAdded:Boolean;
 begin
   if Length(Self) = 0 then Exit(False);
   ptr := PChar(Self);
   i:=0;
-  hiptr := UInt32(UInt32(ptr) + Length(self));
-  while UInt32(ptr) < hiptr do
+  hiptr := PtrUInt(PtrUInt(ptr) + Length(self));
+  while PtrUInt(ptr) < hiptr do
     if not (ptr^ in ['0'..'9']) then
       if (i >= 1) and (ptr^ = '.') and not(dotAdded) then
       begin
@@ -304,12 +304,12 @@ end;
 function AnsiString.IsAlpha(): Boolean; constref;
 var 
   ptr: PChar; 
-  hiptr:UInt32;
+  hiptr:PtrUInt;
 begin
   if Length(Self) = 0 then Exit(False);
   ptr := PChar(Self);
-  hiptr := UInt32(UInt32(ptr) + Length(self));
-  while UInt32(ptr) < hiptr do
+  hiptr := PtrUInt(PtrUInt(ptr) + Length(self));
+  while PtrUInt(ptr) < hiptr do
     if not (ptr^ in ['A'..'Z', 'a'..'z']) then
       Exit(False)
     else
