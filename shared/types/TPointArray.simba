@@ -435,7 +435,7 @@ begin
   SortTPAByY(TPA,True);
   SetLength(Result, Length(TPA));
   l := Length(TPA);
-  while i < l do
+  while j < l do
   begin
     s := 0;
     i := j;
