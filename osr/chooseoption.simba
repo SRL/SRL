@@ -64,6 +64,7 @@ begin
       pos.y += BoxBitmap_Height;
       Exit;
     end;
+    Wait(Random(50,70));
   until (GetTickCount64() > t);
 end;
 {$ENDIF}
@@ -212,7 +213,7 @@ begin
     bmp := BitmapFromClient(x1,y1,x2,y2);
     FastReplaceColor(bmp,4674653,0);
     ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-
+    
     SetLength(Result, (y2 - y1 + 1) div 15);
     for i:=0 to High(Result) do
     begin
