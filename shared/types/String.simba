@@ -341,6 +341,7 @@ begin
     end;
 end;
 
+//---| operator overloads bellow this |---------------------------------------\\
 
 operator * (left:AnsiString; Right:Int32): String;
 var
@@ -358,4 +359,14 @@ end;
 operator * (left:Char; Right:Int32): String;
 begin
   Result := String(Left) * Right;
+end;
+
+operator in (left:Char; Right:String): Boolean;
+begin
+  Result := System.Pos(left, Right) > 0;
+end;
+
+operator in (left:String; Right:String): Boolean;
+begin
+  Result := System.Pos(left, Right) > 0;
 end;
