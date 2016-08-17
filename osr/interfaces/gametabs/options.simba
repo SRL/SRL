@@ -53,7 +53,6 @@ type
   
 {$IFNDEF CODEINSIGHT}
 procedure TRSOptions.__setup();
-var i:Int32;
 begin
   self.FBounds := [550,206,733,464];
   

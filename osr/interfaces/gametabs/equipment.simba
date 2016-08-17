@@ -31,7 +31,6 @@ var
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSEquipment.__Setup();
-var i:Int32;
 begin
   with Self do
   begin

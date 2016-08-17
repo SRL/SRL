@@ -65,8 +65,6 @@ Example:
     srl.Writeln(MainScreen.GetUpText());
 *)
 function TRSMainScreen.GetUpText(): String;
-var
-  x: Int32;
 begin
   Result := OCR.Recognize(Self.UpTextArea, Self.UpTextFilter, UpFont);
   if (Result = '') then
@@ -206,7 +204,7 @@ var
   bars: T2DIntArray;
   B: TBox;
   
-  function _FixHPBars(TPA: TPointArray): TPointArray;
+  procedure _FixHPBars(TPA: TPointArray);
   var pt:TPoint;
   begin
     FilterPointsBox(TPA, 1, 0, High(bars[0]), High(bars));
