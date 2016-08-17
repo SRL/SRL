@@ -31,7 +31,7 @@ end;
  
   
 // override to keep up with simbas target
-function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=50): String; override;
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
 begin
   Self.ClientID := ExportImageTarget();
   Result := Inherited(B, Filter, MaxWalk);
