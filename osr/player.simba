@@ -118,7 +118,6 @@ function TPlayer.LoginToLobby(): Boolean;
 var
   Response: String;
   Attempts, LoginAttempts: UInt32;
-  TimeOut: UInt64;
 begin
   srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
   Result := False;

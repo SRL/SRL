@@ -53,12 +53,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    raise 'Array is empty';
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TBoolArray.Extend(Arr:TBoolArray);

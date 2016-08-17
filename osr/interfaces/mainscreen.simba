@@ -320,9 +320,8 @@ Example:
 }
 function TRSMainScreen.GetText(color:Int32): TMSTextArray;
 var
-  w,h,i,j: Int32;
   TPA: TPointArray;
-  clusters,lines: T2DPointArray;
+  lines: T2DPointArray;
   text: String;
   b: TBox;
 begin

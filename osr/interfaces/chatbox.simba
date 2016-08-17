@@ -305,7 +305,6 @@ end;
 function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
   opt: TChatOption;
-  i, c: Integer;
   t: UInt64;
   b: Boolean = False;
 begin
@@ -407,8 +406,6 @@ begin
 end;
 
 function TRSChatbox.AnswerQuery(Query, Response: String; PressEnter:Boolean; WaitTime: Integer): Boolean;
-var
-  t: UInt64;
 begin
   Result := Self.WaitQuery(Query, WaitTime);
   if result and (Response <> Self.GetQuery(True)) then

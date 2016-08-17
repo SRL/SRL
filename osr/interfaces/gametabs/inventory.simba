@@ -216,7 +216,6 @@ Returns True if the inventory can't hold anymore items
 *)
 function TRSInventory.IsFull(): Boolean;
 var
-  i:Int32;
   b:TBox;
 begin
   if not(self.Open()) then

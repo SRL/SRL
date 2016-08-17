@@ -87,7 +87,6 @@ end;
 function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
 var
   i:Int32;
-  t:UInt64;
   B:TBox;
 begin
   B := self.getBounds(Tab);
@@ -112,15 +111,9 @@ end;
 
 
 procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
-var
-  t,i:Int32;
-  B:TBox;
 begin
   if Condition then
-  begin
-    B := self.getBounds(Tab);
-    Mouse.Move(B);
-  end;
+    Mouse.Move(self.GetBounds(Tab));
 end;
 
 

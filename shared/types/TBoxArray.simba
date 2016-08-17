@@ -53,12 +53,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    raise 'Array is empty';
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TBoxArray.Extend(Arr:TBoxArray);
@@ -83,7 +79,7 @@ end;
 
 function TBoxArray.FindAll(const Value: TBox): TIntegerArray; constref;
 var
-  i,top: UInt32;
+  i: UInt32;
 begin
   for i:=0 to High(Self) do
     if Self[i] = Value then

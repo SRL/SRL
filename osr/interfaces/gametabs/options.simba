@@ -124,7 +124,7 @@ Options.GetCurrentTab
 Returns which tab is currently active.
 *)
 function TRSOptions.GetCurrentTab(): EOptionsTab;
-var i,curr,best:Int32;
+var i:Int32;
 begin
   if not(self.Open()) then
     Exit();
@@ -145,7 +145,6 @@ Sets the current tab to the given ``Tab``
 *)
 function TRSOptions.SetCurrentTab(tab: EOptionsTab; tryTime:Int32=2000): Boolean;
 var
-  curr:EOptionsTab;
   t:UInt64;
   wasOpen:Boolean;
 begin
@@ -379,10 +378,8 @@ function TRSOptions.SetZoom(APosition: Byte): Boolean;
   function Position: Byte;
   var
     TPA: TPointArray;
-    b: TBox;
-    x: Integer;
+    b: TBox = [602, 266, 698, 279];
   begin
-    b := [602, 266, 698, 279];
     if (FindColors(TPA, 11053482, b)) then
       Result := Round(((GetTPABounds(TPA).X1 - b.X1) / b.Width) * 100);
   end;

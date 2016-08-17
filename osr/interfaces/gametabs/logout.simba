@@ -102,7 +102,6 @@ Clicks the logout button, by default retires 3 times over 20 seconds.
 *)
 function TRSLogout.ClickLogout(attemts:Int32=3; tryTime:Int32=20000): Boolean;
 var 
-  state:boolean;
   t,seed:UInt64;
 begin
   if (not Self.Open()) then

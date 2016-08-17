@@ -511,7 +511,7 @@ end;
 procedure TMouse.Miss(const Target: TPoint; const Correct: Boolean = False; const WaitAfterMiss: Integer = 0);
 var
   randSpeed: Extended;
-  x2,y2,tempSpeed,dist,mp, a: integer;
+  dist,mp, a: integer;
   p: TPoint;
 begin
   a := Self.getSpeed();

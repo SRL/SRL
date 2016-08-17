@@ -547,8 +547,6 @@ Example:
     WriteLn(FindBitmapTolerance(bmp, x, y, 50));
 *)
 function FindBitmapTolerance(const BMP: Integer; var x, y: Integer; const Tolerance: Integer): Boolean;
-var
-  W, H: Integer;
 begin
   Result := FindBitmapToleranceIn(bmp, x, y, GetClientBounds(), Tolerance);
 end;

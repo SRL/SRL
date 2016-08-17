@@ -273,7 +273,7 @@ begin
   self.Timeout := GetTickCount64() + Time;
 end;
 
-function TCountDown.Restart(Rand:Int32=0): UInt32;
+procedure TCountDown.Restart(Rand:Int32=0);
 begin
   self.Timeout := GetTickCount64() + (Length + Rand);
 end;  

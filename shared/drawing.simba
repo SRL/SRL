@@ -854,7 +854,7 @@ procedure TMufasaBitmap.DrawTPARainbow(var TPA: TPointArray);
 var
   i, j, h, x, w, hei: Integer;
   fraction, m: Double;
-  r, g, b, mt: Byte;
+  mt: Byte;
   ptr: PRGB32;
   new: TPointArray;
 begin

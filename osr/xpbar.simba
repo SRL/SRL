@@ -21,7 +21,7 @@ begin
   FButtonRadius := 9;
 end;
 
-function TXPBar.isOpen(WaitTime: UInt32 = 0): Boolean;
+function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
 const
   COL_INNER_BORDER = 4543066;
 var

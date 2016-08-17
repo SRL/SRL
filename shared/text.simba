@@ -59,7 +59,6 @@ function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox
 var
   TPA, TPA2: TPointArray;
   p: TPoint;
-  i: Integer;
 begin
   Result := FindText(TPA2, Text, Font, Color, Tolerance, SearchBox);
 

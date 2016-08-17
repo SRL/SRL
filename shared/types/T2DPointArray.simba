@@ -55,12 +55,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    raise 'Array is empty';
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure T2DPointArray.Extend(Arr:T2DPointArray);
@@ -157,4 +153,43 @@ end;
 function T2DPointArray.Merge(): TPointArray;
 begin
   Result := MergeATPA(self);    
+end;
+
+
+procedure T2DPointArray.FilterSize(MinLen:Int32; KeepIf:TComparator=__LT__);
+var
+  tmp:T2DPointArray;
+  TPA:TPointArray;
+begin
+  for TPA in Self do
+    case KeepIf of
+      __LT__: if Length(TPA) < MinLen then tmp += TPA;
+      __GT__: if Length(TPA) > MinLen then tmp += TPA;
+      __EQ__: if Length(TPA) = MinLen then tmp += TPA;
+      __NE__: if Length(TPA)<> MinLen then tmp += TPA;
+    end;
+  self := tmp;
+end;
+
+procedure T2DPointArray.FilterSize(MinLen,MaxLen:Int32); overload;
+var
+  tmp:T2DPointArray;
+  TPA:TPointArray;
+begin
+  for TPA in Self do
+    if InRange(Length(TPA), MinLen, MaxLen) then
+      tmp += TPA;
+  self := tmp;
+end;
+
+procedure T2DPointArray.FilterDimensions(MinW,MinH, MaxW,MaxH:Int32); overload;
+var
+  tmp:T2DPointArray;
+  TPA:TPointArray;
+begin
+  for TPA in Self do
+    with GetTPABounds(TPA) do
+      if InRange(x2-x1+1, MinW, MaxW) and InRange(y2-y1+1, MinH, MaxH) then
+        tmp += TPA;
+  self := tmp;
 end;

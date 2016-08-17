@@ -55,12 +55,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    raise 'Array is empty';
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TPointArray.Extend(Arr:TPointArray);
@@ -293,7 +289,6 @@ Returns the TPA's density (Length(TPA)/(width*height))
 function TPointArray.Density(): Double; constref;
 var
   TMP: TPointArray;
-  box: TBox;
 begin
   TMP := Copy(self);
   ClearDoubleTPA(TMP);
@@ -575,7 +570,7 @@ function MinAreaRect(TPA:TPointArray): TPointArray;
 var
   l,i,ii,j,c: Int32;
   x,y,cosA,cosAP,cosAM: Double;
-  xl,yl,xh,yh,area,angle: Double;
+  xl,yl,xh,yh,angle: Double;
   angles, best: Array of Double;
   added: Boolean;
   
@@ -717,7 +712,7 @@ function ExpandPolygon(Poly:TPointArray; inc:Int32): TPointArray;
 type
   TPointF = record x,y:Double; end;
 var
-  i,j,k:Int32;
+  i,k:Int32;
   theta, det: Double;
   c1,c2:array [0..2] of Double;
   p1,q1,p2,q2: TPointF;

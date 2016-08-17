@@ -198,7 +198,6 @@ const
 var
   TPA, Edge: TPointArray;
   ATPA: T2DPointArray;
-  b: TBox;
   i, j, W, H, Matches: Integer;
 begin
   if (srl.FindColors(TPA, colMiddle, Mainscreen.GetBounds()) > 20) then
@@ -230,7 +229,7 @@ const
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  i, W, H: Integer;
+  i: Integer;
   b: TBox;
 begin
   case Typ of

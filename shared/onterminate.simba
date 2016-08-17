@@ -24,7 +24,6 @@ function AddOnTerminate(Proc: TProcedureOfObject; CallLast: Boolean = False): Bo
 var
   v: TVariantArray;
   i: Integer;
-  tmp: TProcedureOfObject;
 begin
   Result := True;
 

@@ -82,7 +82,6 @@ Opens the optionbox, returns true if it worked.
 .. note:: by slacky
 *)
 function TRSChooseOption.Open(tryTime:Int32=-1): Boolean;
-var _:TPoint;
 begin
   Mouse.Click(mouse_right);
   Result := self.Find(tryTime);
@@ -101,7 +100,6 @@ Opens the menu and stores it's bounds, returns true if it worked.
 .. note:: by slacky
 *)
 function TRSChooseOption.Open(Box:TBox; tryTime:Int32=-1): Boolean; overload;
-var _:TPoint;
 begin
   Mouse.Click(Box, mouse_right);
   Result := self.Find(tryTime);

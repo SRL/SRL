@@ -20,7 +20,6 @@ procedure TWorldInfoArray.Fill;
 var
   WorldList, WorldInfo: TStringArray;
   i: Integer;
-  Info: TWorldInfo;
 begin
   WorldList := MultiBetween(GetPage('http://oldschool.runescape.com/slu'), '<tr class=''server-list__row', '</tr>');
   for i := 0 to High(WorldList) do

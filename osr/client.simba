@@ -58,6 +58,8 @@ end;
 
 function TSRL.WaitClientLoading: Boolean;
 begin
-  while (Self.isClientLoading()) do
+  repeat
+    Result := not Self.isClientLoading();
     Wait(Random(500, 1000));
+  until Result;
 end;

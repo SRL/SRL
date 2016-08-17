@@ -152,7 +152,6 @@ end;
 
 function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
 var
-  Col: Integer;
   b: TBox;
 begin
   with (Self.OrbInfo[MMOrbRun].Middle) do
@@ -451,7 +450,7 @@ function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
 
       Wait(W);
       LastDist := dist;
-      CompassDist := Abs(srl.DeltaAngle(Minimap.GetCompassAngle(), Angle));
+      CompassDist := Abs(srl.DeltaAngle(Self.GetCompassAngle(), Angle));
       if ((CompassDist < Rand) or (CompassDist < Rand2)) then
       begin
         if (CompassDist < Rand) then
@@ -614,7 +613,7 @@ const { aligned with EMinimapDotType }
   NPC_DOT_DIFF_2 = 1114626;
 var
   pt: TPoint;
-  img, i, w, h: Integer;
+  img, w, h: Integer;
   TPA: TPointArray;
 begin
   img := BitmapFromClient(Self.GetBounds());
@@ -660,7 +659,6 @@ end;
 function TMinimap.isPointOn(pt: TPoint; Full: Boolean = True): Boolean;
 var
   p: TPoint;
-  bmp: Integer;
 begin
   Result := False;
 
@@ -759,7 +757,7 @@ begin
   begin
     if (UseFlag) and (Self.isFlagPresent()) then
       Self.WaitFlag;
-    if (not Self.isPlayerMoving()) then
+    if (not Self.isPlayerMoving(MinShift)) then
       Exit;
     Wait(Random(100, 200));
   end;
@@ -802,12 +800,13 @@ function TMinimap.RandomCompass(MinMovement, MaxMovement: Integer; UseMouse: Boo
 var
   a: Integer;
 begin
-  a := Round(Minimap.GetCompassAngle());
+  a := Round(Self.GetCompassAngle());
   if (Random(2) = 0) then
     a -= Random(MinMovement, MaxMovement)
   else
     a += Random(MinMovement, MaxMovement);
-  Minimap.SetCompassAngle(FixD(a), UseMouse, Random(5, 10));
+  Self.SetCompassAngle(FixD(a), UseMouse, Random(5, 10));
+  Result := Self.GetCompassAngle();
 end;
 
 begin
