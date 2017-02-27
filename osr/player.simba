@@ -67,7 +67,8 @@ begin
   Result := False;
 
   SetLength(Responses, 9);
-  Responses := [['Invalid username/email or password.', 2, 1000, nil],
+  Responses := [
+                ['Invalid username/email or password.', 2, 1000, nil],
                 ['Please enter your', 2, 1000, nil],
                 ['Error connecting to server.', 20, 8000, nil],
                 ['Please enter your username/email address.', 5, 1000, nil],
@@ -75,10 +76,12 @@ begin
                 ['Your account is already logged in', 5, 60000, nil],
                 ['Login server offline.', 15, 60000 * 2, nil],
                 ['Connection timed out.', 15, 60000, nil],
-                ['Login limit exceeded', 15, 30000, nil]];
+                ['Login limit exceeded', 15, 30000, nil],
+                ['This world is full', 15, 15000, nil]
+               ];
 
   {$IFDEF SMART}
-    Responses += TResponse(['RuneScape has been updated', 5, 60000 * 5, @Self._ReloadClient]);
+    Responses := Responses + TResponse(['RuneScape has been updated', 5, 60000 * 5, @Self._ReloadClient]);
     // test reload
     // Response := 'RuneScape has been updated';
   {$ENDIF}
@@ -115,7 +118,6 @@ function TPlayer.LoginToLobby(): Boolean;
 var
   Response: String;
   Attempts, LoginAttempts: UInt32;
-  TimeOut: UInt64;
 begin
   srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
   Result := False;

@@ -1,4 +1,4 @@
-function GetPixelShift(Area: TBox; WaitTime: Integer): Integer;
+function TSRL.GetPixelShift(Area: TBox; WaitTime: UInt32): Integer;
 var
   Before, After: Integer;
 begin
@@ -8,4 +8,13 @@ begin
   Result := CalculatePixelShift(Before, After, [0, 0, (Area.X2 - Area.X1), (Area.Y2 - Area.Y1)]);
   FreeBitmap(Before);
   FreeBitmap(After);
+end;
+
+function TSRL.IsAnimating(Area:TBox; Shift, WaitTime, Iter:UInt32): Boolean;
+var 
+  i:Int32;
+begin
+  for i:=1 to Iter do
+    if (Self.GetPixelShift(Area, WaitTime) > shift) then
+      Exit(True);
 end;

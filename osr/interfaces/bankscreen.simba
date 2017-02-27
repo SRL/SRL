@@ -11,11 +11,14 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
                  bbDepositInv, bbDepositWorn, bbMenu, bbClose);
-  EBankType = (btNPCBlue, btNPCGray, btNPCGrey);
+  EBankLocation = (blYanille, blAlKharid,
+                   blVarrockWest, blVarrockEast,
+                   blFaladorEast, blFaladorWest);
+  EBankerColor = (bcBlue, bcGray);
 
   TRSBankScreen = record (TInterfaceBase)
     FSlots: TBoxArray;
-    FButtons: array [0..High(EBankButton)] of TBox;
+    FButtons: array [EBankButton] of TBox;
   end;
 
 var
@@ -166,106 +169,152 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.FindNPCs(Color: TColorEx; out Points: T2DPointArray; MinWidth:Int32=13; MinHeight:Int32=6): Boolean;
-const
-  COLOR_SKIN: TColorEx = [5603764, 18, [2, [0.02, 0.70]]];
+function TRSBankScreen.OpenAt(pt: TPoint): Boolean;
 var
-  TPASkin, TPA, temp: TPointArray;
-  ATPASkin, ATPA: T2DPointArray;
-  i, W, H: Integer;
-  b: TBox;
+  Text: String;
 begin
-  SetLength(Points, 0);
-  if (not FindColorsTolerance(TPASkin, COLOR_SKIN.Color, Mainscreen.getBounds(), COLOR_SKIN.Tolerance, COLOR_SKIN.Settings)) then
-    Exit(False);
-
-  ATPASkin := ClusterTPAEx(TPASkin, 5,5);
-  for i := 0 to High(ATPASkin) do
-    if (Length(ATPASkin[i]) < 300) then
-    begin
-      b := GetTPABounds(ATPASkin[i]);
-      b.Expand(4, MainScreen.getBounds());
-      
-      if (FindColorsTolerance(temp, Color.Color, b, Color.Tolerance, Color.Settings)) then
-        TPA.Extend(temp);
-    end;
-
-  if (Length(TPA) < 10) then
-    Exit(False);
-
-  ATPA := ClusterTPAEx(TPA, 6, 6);
-  SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
-  for i := 0 to High(ATPA) do
+  Mouse.Move(pt);
+  if (MainScreen.IsUpText(['Bank Bank', 'Bank booth', 'to Banker', 'nk booth'])) then
   begin
-    TPA := MinAreaRectEx(ATPA[i], W, H);
-    if (W >= MinWidth) and (H >= MinHeight) then
+    Wait(Random(50, 80));
+    Text := Mainscreen.GetUpText();
+    if (Pos('booth', Text) > 0) and (Random(3) = 0) then
+      Result := Mouse.Click(ctRed)
+    if (not Result) then
+      Result := (ChooseOption.Open()) and (ChooseOption.Select(['Bank Bank']));
+
+    if (Result) then
     begin
-      //SMART.Image.DrawTPA(ConnectTPA(ConvexHull(TPA)), 255);
-      Points := Points + ATPA[i];
+      Minimap.WaitFlag();
+      Result := Bankscreen.IsOpen(Random(4000, 5000));
     end;
   end;
-
-  Result := Length(Points) > 0;
 end;
 
-function TRSBankScreen._OpenNPC(Color: TColorEx): Boolean;
+function TRSBankScreen._OpenYanille: Boolean;
 const
-  UpText = ['Bank bank booth', 'Talk-to Banker', 'Bank Banker'];
-  Option = ['Bank bank booth', 'Bank Banker'];
+  colMiddle: TCTS2Color = [5660003, 10, 0.63, 0.79]; // grey
+  colEdge: TCTS2Color = [277329, 10, 0.07, 2.23]; // brown
 var
+  TPA, Edge: TPointArray;
   ATPA: T2DPointArray;
-  i: Integer;
-  p: TPoint;
+  i, j, W, H, Matches: Integer;
 begin
-  Result := False;
-  if (Self.FindNPCs(Color, ATPA)) then
+  if (srl.FindColors(TPA, colMiddle, Mainscreen.GetBounds()) > 20) then
   begin
+    ATPA := ClusterTPAEx(TPA, 3, 3);
+    SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
     for i := 0 to High(ATPA) do
     begin
-      if (Random(5) = 0) then
-        p := ATPA[i][Random(Length(ATPA[i]))]
-      else
-        p := MiddleTPA(ATPA[i]).Random(-4, 4);
-      
-      Mouse.Move(p);
-      if (MainScreen.IsUpText(UpText, 500)) then
+      MinAreaRectEx(ATPA[i], W, H);
+      if (W > 15) and (W < 30) and (H >= 6) and (H <= 15) then
       begin
-        if (ChooseOption.Open()) then
-          if (ChooseOption.Select(Option)) then
-          begin
-            if (Minimap.isFlagPresent(Random(300, 400))) then
-              Minimap.WaitFlag();
-
-            Result := BankScreen.IsOpen(Random(4000, 6000));
-            if (Result) then
-              Exit(True);
-          end;
+        Matches := 0;
+        Edge := FindTPAEdges(ATPA[i]);
+        for j := 0 to High(Edge) do
+          if (NearbyPointInArrayEx(Edge[i], 1, 1, ATPA[i])) then
+            if (Inc(Matches) >= 40) then
+              Break;
+        if (Matches >= 30) and (Self.OpenAt(MiddleTPA(ATPA[i]).Random(-5, 5))) then
+          Exit(True);
       end;
     end;
   end;
 end;
 
+function TRSBankScreen._OpenNPC(Typ: EBankerColor; Area: TBox): Boolean;
+const
+  colBlue: TCTS2Color = [4533549, 18, 0.75, 0.96];
+  colGray: TCTS2Color = [6513771, 9, 0.35, 0.10];
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+  b: TBox;
+begin
+  case Typ of
+    bcBlue: srl.FindColors(TPA, colBlue, Area);
+    bcGray: srl.FindColors(TPA, colGray, Area);
+  end;
+
+  if (Length(TPA) > 0) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 3, 3);
+    SortATPAFromMidPoint(ATPA, MiddleBox(Area));
+
+    for i := 0 to High(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      if (b.Width >= 8) and (b.Height >= 8) then
+        if (Self.OpenAt(MiddleTPA(ATPA[i]).Random(-4, -4))) then
+          Exit(True);
+    end;
+  end;
+end;
+
+(*
+BankScreen._MagicalBankerFinder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen._MagicalBankerFinder(BoothTopColor: TCTS2Color; BankerColor: EBankerColor; Offset: TPoint): Boolean;
+
+Calculates and finds where a bank NPC should be based from the bank booth.
+*)
+function TRSBankScreen._MagicalBankerFinder(BoothTopColor: TCTS2Color; BankerColor: EBankerColor; Offset: TPoint): Boolean;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+  i, W, H: Integer;
+  pt, Mid: TPoint;
+begin
+  if (srl.FindColors(TPA, BoothTopColor, Mainscreen.GetBounds()) > 5) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 3, 3);
+    SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
+
+    for i := 0 to High(ATPA) do
+    begin
+      TPA := MinAreaRectEx(ATPA[i], W, H);
+
+      if (W >= 15) and (W <= 30) and (H <= 8) then
+      begin
+        Mid := MiddleTPA(TPA);
+        pt := [Mid.X + Offset.X, Mid.Y + Offset.Y];
+        pt := pt.Rotate(Minimap.GetCompassAngle(False), Mid);
+
+        b := [pt.X - 28, pt.Y - 28, pt.X + 28, pt.Y + 28];
+        b.LimitTo(Mainscreen.GetBounds());
+
+        if (Self._OpenNPC(BankerColor, b)) then
+          Exit(True);
+      end;
+    end;
+  end;
+end;
 
 (*
 BankScreen.Open
 ~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSBankScreen.Open(): Boolean;
+  function TRSBankScreen.Open(Loc: EBankLocation): Boolean;
 
-Opens the bankscreen.
+Opens the bankscreen at the selected bank location.
 *)
-function TRSBankScreen.Open(Typ: EBankType): Boolean;
-const
-  COLOR_NPC_GRAY: TColorEx = [6513771, 9, [2, [0.35, 0.10]]];
-  COLOR_NPC_BLUE: TColorEx  = [4533549, 18, [2, [0.75, 0.96]]];
+function TRSBankScreen.Open(Loc: EBankLocation): Boolean;
 begin
   if (Self.isOpen()) then
     Exit(True);
 
-  case Typ of
-    btNPCGray, btNPCGrey: Result := Self._OpenNPC(COLOR_NPC_GRAY);
-    btNPCBlue: Result := Self._OpenNPC(COLOR_NPC_BLUE);
+  case Loc of
+    blYanille: Exit(Self._OpenYanille());
+    blVarrockWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]));
+    blVarrockEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]));
+    blFaladorEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]));
+    blFaladorWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [0, 40]));
+    blAlKharid: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
   end;
 end;
 
@@ -286,15 +335,24 @@ begin
   if (not Self.IsOpen()) then
     Exit(True);
 
-  Self.ClickButton(bbClose);
+  if (srl.CloseInterfacesWithEscape) then
+  begin
+    Keyboard.PressKey(VK_ESCAPE);
+    t := GetTickCount64() + Random(4000, 5000);
+    while (t > GetTickCount64()) do
+    begin
+      if (not Self.IsOpen()) then
+        Exit(True);
+    end;
+    srl.ToggleCloseInterfacesWithEscape(False);
+  end;
 
+  Self.ClickButton(bbClose);
   t := GetTickCount64() + Random(4000, 5000);
   while (t > GetTickCount64()) do
   begin
     if (not Self.IsOpen()) then
       Exit(True);
-
-    Wait(Random(100, 200));
   end;
 end;
 

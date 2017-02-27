@@ -18,7 +18,7 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], Self[Index + 1], (L - Index) * SizeOf(Integer));
+  MemMove(Self[Index], Self[Index + 1], (L - Index) * SizeOf(self[0]));
   Self[Index] := Value;
 end;
 
@@ -53,12 +53,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    RaiseException(erOutOfRange, 'Array is empty');
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TBoolArray.Extend(Arr:TBoolArray);
@@ -72,7 +68,7 @@ begin
   end;
 end; 
 
-function TBoolArray.Find(const Value: Boolean): Integer;
+function TBoolArray.Find(const Value: Boolean): Integer; constref;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -81,7 +77,7 @@ begin
   Result := -1;
 end;
 
-function TBoolArray.FindAll(const Value: Boolean): TIntegerArray;
+function TBoolArray.FindAll(const Value: Boolean): TIntegerArray; constref;
 var
   i,top: UInt32;
 begin
@@ -134,7 +130,7 @@ begin
   end;
 end;
 
-function TBoolArray.Combine(other: TBoolArray): TBoolArray;
+function TBoolArray.Combine(other: TBoolArray): TBoolArray; constref;
 begin
   SetLength(Result, Length(Self) + Length(other));
   if Length(self) > 0 then
@@ -142,3 +138,11 @@ begin
   if Length(other) > 0 then
     MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
 end;  
+
+
+function TBoolArray.Equals(Other:TBoolArray): Boolean; constref;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  Result := CompareMem(Self[0], Other[0], length(self)*SizeOf(self[0]));     
+end;

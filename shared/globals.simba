@@ -2,7 +2,7 @@ const
   mouse_Move = 3;
   
 const
-  VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
+  VK_ENTER = VK_RETURN;
 
 const
   clBlack      = TColor($000000);
@@ -24,7 +24,7 @@ const
   clMedGray    = TColor($A4A0A0);
   clDkGray     = TColor($808080);
   clWhite      = TColor($FFFFFF);
-  clMoneyGreen = TColor($65bb85);
+  clMoneyGreen = TColor($65BB85);
   clSkyBlue    = TColor($F0CAA6);
   clCream      = TColor($F0FBFF);
   clPink       = TColor($B3A2EA);

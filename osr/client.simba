@@ -30,3 +30,36 @@ begin
     Result := (Self.isLoggedIn()) or (LoginScreen.isOpen()) or (Lobby.isOpen());
   end;
 end;
+
+function TSRL.isClientLoading(WaitTime: Integer = 0): Boolean;
+
+  function isLoading: Boolean;
+  var
+    p: TPoint;
+  begin
+    Result := srl.FindText(p, 'lease wait', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50)) or
+              srl.FindText(p, 'oading', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50));
+  end;
+
+var
+  t: UInt64;
+begin
+  if (WaitTime = 0) then
+    Exit(isLoading());
+
+  t := GetTickCount64() + WaitTime;
+  repeat
+    if (isLoading()) then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  until (GetTickCount64() >= t);
+end;
+
+function TSRL.WaitClientLoading: Boolean;
+begin
+  repeat
+    Result := not Self.isClientLoading();
+    Wait(Random(500, 1000));
+  until Result;
+end;

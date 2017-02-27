@@ -1,0 +1,170 @@
+(*
+Prayer
+=======
+The file holds functions and procedures that are related to the prayer gametab
+*)
+
+type 
+  TRSPrayer = record(TInterfaceBase)
+    FSlots: TBoxArray;
+  end;
+
+  
+{==| Table of Contents |=======================
+ procedure TRSPrayer.__setup();
+ function TRSPrayer.Open(): Boolean;
+ function TRSPrayer.IsOpen(): Boolean;
+ function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
+ function TRSPrayer.MouseOver(pray:EPrayerType): Int32;
+}
+
+(*
+var Prayer
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape prayer gametab.
+*)
+var 
+  Prayer: TRSPrayer;
+
+type
+  EPrayerType = (
+    PRAY_THICK_SKIN,
+    PRAY_BURST_OF_STRENGTH,
+    PRAY_CLARITY_OFTHOUGHT,
+    PRAY_SHARP_EYE,
+    PRAY_MYSTIC_WILL,
+    
+    PRAY_ROCK_SKIN,
+    PRAY_SUPERHUMAN_STRENGTH,
+    PRAY_IMPROVED_REFLEXES,
+    PRAY_RAPID_RESTORE,
+    PRAY_RAPID_HEAL,
+    
+    PRAY_PROTECT_ITEM,
+    PRAY_HAWK_EYE,
+    PRAY_MYSTIC_LORE,
+    PRAY_STEEL_SKIN,
+    PRAY_ULTIMATE_STRENGTH,
+    
+    PRAY_INCREDIBLE_REFLEXES,
+    PRAY_PROTECT_FROM_MAGIC,
+    PRAY_PROTECT_FROM_MISSILES,
+    PRAY_PROTECT_FROM_MELEE,
+    PRAY_EAGLE_EYE,
+    
+    PRAY_MYSTIC_MIGHT,
+    PRAY_RETRIBUTION,
+    PRAY_REDEMPTION,
+    PRAY_SMITE,
+    PRAY_CHIVALRY,
+    
+    PRAY_PIETY
+  );
+
+
+{$IFNDEF CODEINSIGHT}
+procedure TRSPrayer.__Setup();
+var
+  SlotBounds: TBox = [550,213,734,433];
+begin
+  with Self do
+  begin
+    FName := 'Prayer';
+    FStatic := True;
+    FBounds := [548,206,735,464];
+    FSlots := SlotBounds.Partition(6,5,-3);
+  end;
+end;
+
+procedure TRSPrayer.__Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FSlots, False, $0000FF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
+end;
+{$ENDIF}
+
+(*
+Prayer.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.Open(): Boolean;
+
+Opens the interface
+*)
+function TRSPrayer.Open(): Boolean;
+begin
+  Result := Gametabs.Open(tabPrayer);
+end;
+
+
+(*
+Prayer.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.IsOpen(maxWait:Int32=0): Boolean;
+
+Checks if the interface is already open.
+*)
+function TRSPrayer.IsOpen(maxWait:Int32=0): Boolean;
+begin
+  Result := Gametabs.IsOpen(tabPrayer, maxWait);
+end;
+
+
+(*
+Prayer.GetPrayerBound
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
+
+Returns the bounding box covering the given prayer.
+
+.. note:: by slacky
+*)
+function TRSPrayer.GetPrayerBound(pray:EPrayerType): TBox;
+begin
+  Result := Self.FSlots[pray];
+end;
+
+
+(*
+Prayer.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.MouseOver(pray:EPrayerType): Boolean;
+
+Moves the mouse over the given prayer.
+
+.. note:: by slacky
+*)
+function TRSPrayer.MouseOver(pray:EPrayerType): Boolean;
+begin
+  if not(self.Open()) then Exit();
+  
+  Result := True;
+  Mouse.Move(Self.FSlots[pray]);
+end;
+
+
+begin
+  Prayer.__Setup();
+end;
+
+
+
+
+
+
+
+
+
+

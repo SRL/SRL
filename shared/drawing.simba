@@ -300,10 +300,14 @@ Example:
 
 *)
 procedure TMufasaBitmap.DrawBitmap(bmp: Integer; pnt: TPoint);
+var
+  img:TMufasaBitmap;
 begin
   if (BitmapExists(bmp)) then
-    GetMufasaBitmap(bmp).DrawTransparent(pnt.x, pnt.y, self)
-  else
+  begin
+    img := GetMufasaBitmap(bmp);
+    img.DrawTransparent(pnt.x, pnt.y, self)
+  end else
     WriteLn('-- ERROR: TMufasaBitmap.DrawBitmap(): bitmap does not exist');
 end;
 
@@ -640,18 +644,40 @@ Example:
     GetMufasaBitmap(bitmap).Debug();
 
 *)
-procedure TMufasaBitmap.Debug();
+procedure TMufasaBitmap.Debug(); constref;
 begin
-  if (not BitmapExists(self.getIndex())) then
+  if (not BitmapExists(self.GetIndex())) then
   begin
     WriteLn('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
-    WriteLn('-- HINT: Example for a managed bitmap is "tmb.init(client.getMBitmaps());"');
+    WriteLn('-- HINT: Example for a managed bitmap is "TMufasaBitmap.Init(client.GetMBitmaps());"');
     exit();
   end;
 
   ClearDebugImg();
   DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
   DrawBitmapDebugImg(self.GetIndex());
+end;
+
+(*
+TMufasaBitmap.UpdateDebugImage
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.UpdateDebugImage();
+
+Will update Simba's debug image form with the current image. 
+*)
+procedure TMufasaBitmap.UpdateDebugImage(); constref;
+begin
+  if (not BitmapExists(self.GetIndex())) then
+  begin
+    WriteLn('-- ERROR: Cannot debug the bitmap because it is not managed by Simba');
+    WriteLn('-- HINT: Example for a managed bitmap is "TMufasaBitmap.Init(client.GetMBitmaps());"');
+    Exit;
+  end;
+  
+  DrawBitmapDebugImg(self.GetIndex());
+  DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
 end;
 
 (*
@@ -828,7 +854,7 @@ procedure TMufasaBitmap.DrawTPARainbow(var TPA: TPointArray);
 var
   i, j, h, x, w, hei: Integer;
   fraction, m: Double;
-  r, g, b, mt: Byte;
+  mt: Byte;
   ptr: PRGB32;
   new: TPointArray;
 begin

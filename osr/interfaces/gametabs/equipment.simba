@@ -30,28 +30,38 @@ var
 
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSEquipment.__setup();
-var i:Int32;
+procedure TRSEquipment.__Setup();
 begin
   with Self do
   begin
     FName := 'Equipment';
-    FStatic := True;
-    FBounds := [550,206,733,464];
+    FStatic := True; 
+    FBounds := [548,206,735,464]; 
     FBoxes := [
-      [626,210,659,243], //head
-      [585,249,618,282], //cape
-      [626,249,659,282], //neck
-      [667,249,700,282], //arrows
-      [570,288,604,321], //right "arm"
-      [626,288,659,321], //upper-body
-      [682,288,715,321], //left "arm"
-      [626,328,659,361], //legs
-      [570,368,604,401], //right "hand"
-      [626,368,659,401], //feet
-      [682,368,715,401] //left "hand"
+      [626,210,657,243], //head
+      [585,249,616,282], //left back
+      [626,249,657,282], //right back
+      [667,249,698,282], //arrows
+      [570,288,601,321], //right "arm"
+      [626,288,657,321], //upper-body
+      [682,288,713,321], //left "arm"
+      [626,328,657,361], //legs
+      [570,368,601,401], //right "hand"
+      [626,368,657,401], //feet
+      [682,368,713,401]  //left "hand"
     ];
   end;
+end;
+
+procedure TRSEquipment.__Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FBoxes, False, $0000FF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
 end;
 {$ENDIF}
 
@@ -83,7 +93,16 @@ begin
   Result := Gametabs.IsOpen(tabEquipment, maxWait);
 end;
 
-function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;
+(*
+Equipment.InteractSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.InteractSlot(): Boolean;
+
+Interacts with the item at the given slot using given option
+*)
+function TRSEquipment.InteractSlot(Slot: Integer; Option: String; UpText: String = ''): Boolean;
 var
   b: TBox;
 begin
@@ -95,9 +114,22 @@ begin
   Mouse.Move(b);
   if (UpText <> '') and (not Mainscreen.isUpText(UpText)) then
     Exit(False);
-  Result := ChooseOption.Open() and ChooseOption.Select('Remove');
+  Result := ChooseOption.Open() and ChooseOption.Select(Option);
 end;
 
+(*
+Equipment.Remove
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.Remove(): Boolean;
+
+Unequips the item at the given slot
+*)
+function TRSEquipment.Remove(Slot: Integer; UpText: String = ''): Boolean;
+begin
+  Result := Self.InteractSlot(Slot, 'Remove', UpText);
+end;
 
 
 begin

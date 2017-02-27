@@ -4,9 +4,9 @@
 {$include_once shared/onterminate.simba}
 {$include_once shared/interfacebase.simba}
 {$include_once shared/wrappers.simba}
-{$include_once shared/pixelshift.simba}
 
 {$include_once shared/srl.simba}
+{$include_once shared/pixelshift.simba}
 {$include_once shared/random.simba}
 {$include_once shared/math.simba}
 {$include_once shared/mouse.simba}
@@ -16,14 +16,7 @@
 {$include_once shared/color.simba}
 {$include_once shared/drawing.simba}
 
-{$include_once shared/types/TBox.simba}
-{$include_once shared/types/TStringArray.simba}
-{$include_once shared/types/TIntegerArray.simba}
-{$include_once shared/types/TExtendedArray.simba}
-{$include_once shared/types/TBoolArray.simba}
-{$include_once shared/types/TBoxArray.simba}
-{$include_once shared/types/TPointArray.simba}
-{$include_once shared/types/TPoint.simba}
+{$include_once shared/types.simba}
 
 begin
 

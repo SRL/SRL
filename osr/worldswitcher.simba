@@ -16,6 +16,63 @@ type
 var
   WorldSwitcher: TRSWorldSwitcher;
 
+procedure TWorldInfoArray.Fill;
+var
+  WorldList, WorldInfo: TStringArray;
+  i: Integer;
+begin
+  WorldList := MultiBetween(GetPage('http://oldschool.runescape.com/slu'), '<tr class=''server-list__row', '</tr>');
+  for i := 0 to High(WorldList) do
+  begin
+    {0 = World URL, 1 = Player count, 2 = Location, 3 = Type, 4 = Activity }
+    WorldInfo := MultiBetween(WorldList[i], 'server-list__row-cell', '</td>');
+    if (Length(WorldInfo) <> 5) then
+      Continue;
+
+    SetLength(Self, Length(Self) + 1);
+    with Self[High(Self)] do
+    begin
+      World := StrToIntDef(Between('world-', '''', WorldInfo[0]), - 1);
+
+      if (Pos('Free', WorldInfo[3]) > 0) then
+        Typ := wtFree
+      else
+        Typ := wtMembers;
+
+      if (Pos('PVP', WorldInfo[4]) > 0) then
+        Activity := waPVP
+      else
+      if (Pos('Deadman', WorldInfo[4]) > 0) then
+        Activity := waDeadman
+      else
+      if (Pos('skill total', WorldInfo[4]) > 0) then
+        Activity := waSkill
+      else
+        Activity := waNone;
+    end;
+  end;
+end;
+
+function TWorldInfoArray.ToString: String;
+var
+  i, c: Integer;
+begin
+  Result := '[' + LineEnding + '  ';
+  for i := 0 to High(Self) do
+  begin
+    Result := Result + Format('[%d, %s, %s]', [Self[i].World, System.ToStr(Self[i].Typ), System.ToString(Self[i].Activity)]);
+    if (i < High(Self)) then
+      Result := Result + ', ';
+
+    if (Inc(c) = 3) then
+    begin
+      Result := Result + LineEnding + '  ';
+      c := 0;
+    end;
+  end;
+  Result := Result + LineEnding + '];';
+end;
+
 procedure TRSWorldSwitcher.__Setup();
 begin
   with Self do
@@ -24,32 +81,32 @@ begin
     SetStatic(True);
     SetBounds(srl.DefaultClientBounds);
 
-    // tools/generate_worlds.simba
+    // todo: Generate these when needed? - Worlds.Fill();
     Worlds := [
-               [385, wtFree, waNone], [393, wtFree, waNone], [394, wtFree, waNone],
-               [301, wtFree, waNone], [335, wtFree, waNone], [384, wtFree, waNone],
-               [383, wtFree, waNone], [326, wtFree, waNone], [382, wtFree, waNone],
-               [316, wtFree, waNone], [381, wtFree, waNone], [308, wtFree, waNone],
-               [337, wtMembers, waPVP], [361, wtMembers, waSkill], [353, wtMembers, waSkill],
-               [354, wtMembers, waNone], [362, wtMembers, waNone], [314, wtMembers, waNone],
-               [321, wtMembers, waNone], [378, wtMembers, waNone], [386, wtMembers, waNone],
-               [338, wtMembers, waNone], [377, wtMembers, waNone], [313, wtMembers, waNone],
-               [322, wtMembers, waNone], [345, wtMembers, waDeadman], [306, wtMembers, waNone],
-               [369, wtMembers, waNone], [346, wtMembers, waNone], [370, wtMembers, waNone],
-               [305, wtMembers, waNone], [330, wtMembers, waNone], [329, wtMembers, waNone],
-               [360, wtMembers, waDeadman], [352, wtMembers, waDeadman], [319, wtMembers, waDeadman],
-               [336, wtMembers, waNone], [375, wtMembers, waNone], [343, wtMembers, waNone],
-               [359, wtMembers, waNone], [367, wtMembers, waNone], [368, wtMembers, waNone],
-               [320, wtMembers, waNone], [376, wtMembers, waNone], [327, wtMembers, waNone],
-               [328, wtMembers, waNone], [304, wtMembers, waNone], [351, wtMembers, waNone],
-               [312, wtMembers, waNone], [311, wtMembers, waNone], [303, wtMembers, waNone],
-               [344, wtMembers, waNone], [357, wtMembers, waDeadman], [373, wtMembers, waSkill],
-               [374, wtMembers, waDeadman], [365, wtMembers, waNone], [325, wtMembers, waPVP],
-               [366, wtMembers, waSkill], [350, wtMembers, waNone], [341, wtMembers, waNone],
-               [317, wtMembers, waNone], [333, wtMembers, waNone], [349, wtMembers, waNone],
-               [334, wtMembers, waNone], [342, wtMembers, waNone], [309, wtMembers, waNone],
-               [310, wtMembers, waNone], [358, wtMembers, waNone], [318, wtMembers, waNone],
-               [302, wtMembers, waNone]
+                [393, wtFree, waNone], [385, wtFree, waNone], [394, wtFree, waNone],
+                [301, wtFree, waNone], [384, wtFree, waNone], [335, wtFree, waNone],
+                [383, wtFree, waNone], [326, wtFree, waNone], [382, wtFree, waNone],
+                [316, wtFree, waNone], [381, wtFree, waNone], [308, wtFree, waNone],
+                [321, wtMembers, waDeadman], [345, wtMembers, waDeadman], [337, wtMembers, waPVP],
+                [361, wtMembers, waSkill], [362, wtMembers, waNone], [369, wtMembers, waNone],
+                [353, wtMembers, waSkill], [354, wtMembers, waNone], [378, wtMembers, waNone],
+                [313, wtMembers, waNone], [370, wtMembers, waNone], [386, wtMembers, waNone],
+                [338, wtMembers, waNone], [346, wtMembers, waNone], [314, wtMembers, waNone],
+                [377, wtMembers, waNone], [322, wtMembers, waNone], [306, wtMembers, waNone],
+                [305, wtMembers, waNone], [330, wtMembers, waNone], [329, wtMembers, waNone],
+                [343, wtMembers, waNone], [368, wtMembers, waNone], [367, wtMembers, waNone],
+                [352, wtMembers, waNone], [319, wtMembers, waNone], [320, wtMembers, waNone],
+                [360, wtMembers, waNone], [375, wtMembers, waNone], [359, wtMembers, waNone],
+                [336, wtMembers, waNone], [328, wtMembers, waNone], [327, wtMembers, waNone],
+                [351, wtMembers, waNone], [376, wtMembers, waNone], [304, wtMembers, waNone],
+                [312, wtMembers, waNone], [311, wtMembers, waNone], [344, wtMembers, waNone],
+                [303, wtMembers, waNone], [317, wtMembers, waDeadman], [349, wtMembers, waSkill],
+                [325, wtMembers, waPVP], [365, wtMembers, waNone], [373, wtMembers, waSkill],
+                [341, wtMembers, waNone], [342, wtMembers, waNone], [374, wtMembers, waNone],
+                [350, wtMembers, waNone], [366, wtMembers, waSkill], [334, wtMembers, waNone],
+                [357, wtMembers, waNone], [310, wtMembers, waNone], [333, wtMembers, waNone],
+                [358, wtMembers, waNone], [309, wtMembers, waNone], [318, wtMembers, waNone],
+                [302, wtMembers, waNone]
               ];
   end;
 end;
@@ -120,19 +177,45 @@ end;
 
 procedure TRSWorldSwitcher.Close;
 begin
-  Mouse.Click(Point(734, 12).Random(-5, 5), mouse_Left);
+  Mouse.Click(srl.RandomPoint(Point(734,12), 5), mouse_Left);
   Wait(Random(500, 1000));
 end;
 
-function TRSWorldSwitcher.RandomMembers(Filter: set of EWorldActivity = [waPVP, waDeadman, waSkill]): Integer;
+(*
+WorldSwitcher.RandomMembers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSWorldSwitcher.RandomMembers(ActivityFilter: set of EWorldActivity = [waPVP, waDeadman, waSkill]; WorldFilter: TIntegerArray = []): Integer;
+
+Select's a random members world that isn't a part of the activity filter and world filter.
+
+Example:
+.. code-block:: pascal
+
+// Would return a random members world that isn't a pvp world and isn't world 302
+World := WorldSwitcher.RandomMembers(waPVP, [302]);
+
+.. note:: by Olly
+*)
+function TRSWorldSwitcher.RandomMembers(ActivityFilter: set of EWorldActivity = [waPVP, waDeadman, waSkill]; WorldFilter: TIntegerArray = []): Integer;
 var
-  a: TIntegerArray;
+  Arr: TIntegerArray;
   i: Integer;
 begin
   for i := 0 to High(Worlds) do
-    if (not (Worlds[i].Activity in Filter)) then
-      a := a + Worlds[i].World;
-  Result := a[Random(Length(a))];
+    if (Worlds[i].Typ = wtMembers) and (not (Worlds[i].Activity in ActivityFilter)) then
+    begin
+      if (WorldFilter <> []) and (InIntArray(WorldFilter, Worlds[i].World)) then
+        Continue;
+
+      Arr := Arr + Worlds[i].World;
+    end;
+
+  if (Length(Arr) = 0) then
+    srl.Writeln('WorldSwitcher.RandomMembers: All worlds have been filtered!', dtFatal);
+
+  Result := Arr[Random(Length(Arr))];
 end;
 
 begin

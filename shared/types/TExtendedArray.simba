@@ -18,7 +18,7 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(self[0]));
   Self[Index] := Value;
 end;
 
@@ -53,12 +53,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    RaiseException(erOutOfRange, 'Array is empty');
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TExtendedArray.Extend(Arr:TExtendedArray);
@@ -72,7 +68,7 @@ begin
   end;
 end; 
 
-function TExtendedArray.Find(const Value: Extended): Integer;
+function TExtendedArray.Find(const Value: Extended): Integer; constref;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -81,7 +77,7 @@ begin
   Result := -1;
 end;
 
-function TExtendedArray.FindAll(const Value: Extended): TIntegerArray;
+function TExtendedArray.FindAll(const Value: Extended): TIntegerArray; constref;
 var
   i,top: UInt32;
 begin
@@ -134,11 +130,18 @@ begin
   end;
 end;
 
-function TExtendedArray.Combine(other: TExtendedArray): TExtendedArray;
+function TExtendedArray.Combine(Other: TExtendedArray): TExtendedArray; constref;
 begin
-  SetLength(Result, Length(Self) + Length(other));
+  SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
-  if Length(other) > 0 then
-    MemMove(other[0], result[Length(Self)], Length(other)*SizeOf(other[0]));
+  if Length(Other) > 0 then
+    MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
 end; 
+
+function TExtendedArray.Equals(Other:TExtendedArray): Boolean; constref;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  Result := CompareMem(Self[0], Other[0], length(self)*SizeOf(self[0]));     
+end;

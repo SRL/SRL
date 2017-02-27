@@ -18,7 +18,7 @@ begin
   end;
 
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Integer));
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(Pointer));
   Self[Index] := Value;
 end;
 
@@ -53,12 +53,8 @@ var
   h: Integer;
 begin
   h := High(Self);
-  if h >= 0 then
-  begin
-    Result := Self[h];
-    SetLength(Self, h);
-  end else
-    RaiseException(erOutOfRange, 'Array is empty');
+  Result := Self[h];
+  SetLength(Self, h);
 end;
 
 procedure TStringArray.Extend(const Arr: TStringArray);
@@ -70,7 +66,7 @@ begin
     Self[len+i] := Arr[i];
 end; 
 
-function TStringArray.Find(const Value: String): Integer;
+function TStringArray.Find(const Value: String): Integer; constref;
 begin
   for Result := 0 to High(Self) do
     if (Value = Self[Result]) then
@@ -79,16 +75,13 @@ begin
   Result := -1;
 end;
 
-function TStringArray.FindAll(const Value: String): TIntegerArray;
+function TStringArray.FindAll(const Value: String): TIntegerArray; constref;
 var
-  i,top: UInt32;
+  i: UInt32;
 begin
   for i:=0 to High(Self) do
     if (Self[i] = Value) then
-    begin
-      SetLength(Result, top+1);
-      Result[Inc(top)-1] := i;
-    end;
+      Result += i;
 end
 
 function TStringArray.Reversed(): TStringArray;
@@ -132,9 +125,9 @@ begin
   end;
 end;
 
-function TStringArray.Combine(const Arr2: TStringArray): TStringArray;
+function TStringArray.Combine(const Arr2: TStringArray): TStringArray; constref;
 var
-  i, h, j: Integer;
+  i,j: Int32;
 begin
   if (Length(Arr2) = 0) then
     Exit(Copy(Self));
@@ -148,4 +141,25 @@ begin
     Result[i] := Arr2[j];
     Inc(j);
   end;
+end;
+
+function TStringArray.Equals(Other:TStringArray): Boolean; constref;
+var i:Int32;
+begin
+  if (Length(Self) <> Length(Other)) then Exit(False);
+  if (Length(Self) = 0) then Exit(True);
+  
+  for i:=0 to High(self) do
+    if (self[i] <> Other[i]) then
+      Exit(False);
+  Result := True;      
+end;
+
+function TStringArray.Merge(glue:String=''): String; constref;
+var i:Int32;
+begin
+  if Length(result) = 0 then Exit('');
+  Result := self[0];
+  for i:=1 to High(self) do
+    Result += glue + self[i];
 end;

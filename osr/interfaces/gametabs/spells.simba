@@ -106,16 +106,28 @@ type
 
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSSpells.__setup();
-var i:Int32;
+procedure TRSSpells.__Setup();
+var 
+  SlotBounds:TBox = [559,220,726,459];
 begin
   with Self do
   begin
     FName := 'Spells';
     FStatic := True;
-    FBounds := [559,220,726,459];
-    FSlots := FBounds.Partition(10,7);
+    FBounds := [548,206,735,464];
+    FSlots := SlotBounds.Partition(10,7);
   end;
+end;
+
+procedure TRSSpells.__Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FSlots, False, $0000FF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
 end;
 {$ENDIF}
 
@@ -151,17 +163,17 @@ end;
 
 
 (*
-Spells.GetSpellBounds
+Spells.GetSpellBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+  function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
 
 Returns the bounding box covering the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
+function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
 begin
   Result := Self.FSlots[spell]
 end;

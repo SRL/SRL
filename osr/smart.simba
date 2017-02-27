@@ -1,6 +1,7 @@
 type
   TSmart = record(TSmartBase)
     World: Integer;
+    {$IFDEF CODEINSIGHT}Image:TMufasaBitmap;{$ENDIF}
   end;
 
 function TSmart.GetSpawnParams(): Boolean;

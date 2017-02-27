@@ -46,26 +46,38 @@ type
     cbtAggressive, 
     cbtControlled, 
     cbtDefensive, 
-    cbtRetaliate
+    cbtRetaliate,
+    cbtSpecialAttack
   );
   
 {$IFNDEF CODEINSIGHT}
-procedure TRSCombat.__setup();
-var i:Int32;
+procedure TRSCombat.__Setup();
 begin
   with Self do
   begin
     FName := 'Combat';
     FStatic := True;
-    FBounds := [550,206,733,464];
+    FBounds := [548,206,735,464];
     FButtons := [
       [568,251,635,294], //accurate
-      [652,251,719,294], //aggressive
+      [654,254,717,292], //aggressive
       [568,305,635,347], //controlled
       [652,305,719,347], //defensive
-      [568,358,719,301]  //retaliate
+      [568,358,719,401], //retaliate
+      [568,414,715,431]  //spec
     ];
   end;
+end;
+
+procedure TRSCombat.__Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FButtons, False, $0000FF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
 end;
 {$ENDIF}
 
@@ -162,6 +174,43 @@ begin
   OCR.SetFont(NPCFont);
   with Self.FBounds do
     Result := ocr.Recognize(TBox([x1,212,x2,230]), TCompareRules([2070783]), 70);
+end;
+
+function TRSCombat.GetSpecialAttack(): Integer;
+var
+  Text: String;
+  TPA: TPointArray;
+  b: TBox;
+  color: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(-1);
+  
+  for color in [$100000, $00FFFF] do
+    if (FindColors(TPA, color, Self.FButtons[cbtSpecialAttack])) then
+    begin
+      b := GetTPABounds(TPA);
+      b.Expand(1);
+      Text := ocr.Recognize(b, TCompareRules([color]), StatFont);
+      Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
+    end;
+end;
+
+function TRSCombat.SpecialAttackEnabled: Boolean;
+var
+  x, y: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(False);
+  Result := FindColor(x, y, 65535, Self.FButtons[cbtSpecialAttack]);
+end;
+
+function TRSCombat.UseSpecialAttack: Integer;
+begin
+  if (not Self.Open()) then
+    Exit(-1);
+  if (not Self.SpecialAttackEnabled()) then
+    Mouse.Click(Self.FButtons[cbtSpecialAttack], mouse_Left);
 end;
 
 begin

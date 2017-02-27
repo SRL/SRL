@@ -1,4 +1,7 @@
-function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;
+type
+  ENumberFormat = (formatRS, formatSI);
+
+function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;  constref;
 var
   img: Integer;
 begin
@@ -12,7 +15,7 @@ begin
   end;
 end;
 
-function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(var Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
 var
   TPA, TPAText: TPointArray;
   w, h: Integer;
@@ -25,7 +28,7 @@ begin
   Result := FindTextTPAinTPA(h - 1, TPAText, TPA, Matches);
 end;
 
-function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; overload;
+function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
 var
   tmp: TPointArray;
 begin
@@ -34,7 +37,7 @@ begin
     p := tmp[0];
 end;
 
-function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean;
+function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref;
 var
   TPA: TPointArray;
   p: TPoint;
@@ -52,11 +55,10 @@ begin
   end;
 end;
 
-function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; overload;
+function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref; overload;
 var
   TPA, TPA2: TPointArray;
   p: TPoint;
-  i: Integer;
 begin
   Result := FindText(TPA2, Text, Font, Color, Tolerance, SearchBox);
 
@@ -72,7 +74,7 @@ begin
   end;
 end;
 
-function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String;
+function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String; constref;
 var
   ATPA: T2DPointArray;
   b: TBox;
@@ -87,17 +89,39 @@ begin
   Result := GetTextATPA(ATPA, MaxVSpacing, Font);
 end;
 
-function TSRL.FormatInt(n:Int64; dec:Byte=3): String;
+
+(*
+  Adds a single character-suffix to shorten numbers, and turn them into a string.
+  Two modes are defined, one for RS and one using the SI prefix.
+     abbrRS: '', 'K', 'M', 'B', 'T'
+     abbrSI: '', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'
+
+  The RS prefix is default, since SRL mainly focuses on RS.
+*)
+function TSRL.FormatNumber(n:Extended; dec:Byte=3; mode:ENumberFormat=formatRS): String; constref;
 var
   i:Int32;
-  f:Double:=n;
+  f:Extended := n;
 begin
   while (Abs(f) >= 1000) do
-  begin  
+  begin
     Inc(i);
     f := f / 1000;
   end;
-  Result := FloatToStr(Round(f,dec)) + (['','k','m','b','t','qd','qt'])[i-1];
+
+  if (mode = formatRS) and (i > 4) then
+    RaiseException('SRL.FormatNumber: mode `formatRS` does not support number beyond trillion.');
+
+  if (mode = formatRS) then
+    Result := FloatToStr(Round(f,dec)) + (['','K','M','B','T'])[i]
+  else
+    Result := FloatToStr(Round(f,dec)) + (['','K','M','G','T','P','E','Z','Y'])[i];
+end;
+
+// Added for backwards compatibility.
+function TSRL.FormatInt(n:Int64; dec:Byte=3; mode:ENumberFormat=formatRS): String; constref;
+begin
+  Result := Self.FormatNumber(n,dec,mode);
 end;
 
 

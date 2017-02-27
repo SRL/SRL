@@ -182,23 +182,36 @@ TPlayerArray.SwitchTo
 
 .. code-block:: pascal
 
-    procedure TPlayerArray.SwitchTo(PlayerIndex: Integer; IsActive: Boolean = True);
+    function TPlayerArray.SwitchTo(Index: Integer): Boolean;
 
-Switches the current player to the index 'PlayerIndex'. Will set the current player
-active status to 'IsActive'.
+ - Logs out the current player
+ - Sets the current player as in-active and sets the new player as active
+ - Logs in the new (now current) player
 
 Example:
 
 .. code-block:: pascal
 
-    Players.SwitchTo(1, False);
+    Players.SwitchTo(1);
 *)
-procedure TPlayerArray.SwitchTo(PlayerIndex: Integer; IsActive: Boolean = True);
+function TPlayerArray.SwitchTo(Index: Integer): Boolean;
+var
+  curr: TPlayer;
 begin
-  Self.GetCurrent()^.isActive := IsActive;
-  Self.FPlayers[PlayerIndex].isActive := True;
+  srl.Writeln('TPlayerArray.SwitchTo: Switching current player to: ' + IntToStr(Index));
 
-  Self.SetCurrent(PlayerIndex);
+  Self.GetCurrent()^.isActive := False;
+  Self.SetCurrent(Index);
+
+  curr := Self.GetCurrent()^;
+  curr.isActive := True;
+
+  if (srl.isLoggedIn()) and (not Logout.ClickLogout()) then
+    Exit(srl.Writeln('TPlayerArray.SwitchTo: Failed to logout current player', False));
+  if (not curr.Login()) then
+    Exit(srl.Writeln('Failed to login new player', False));
+
+  Result := True;
 end;
 
 (*
@@ -209,28 +222,24 @@ TPlayerArray.Next
 
     function TPlayerArray.Next(): Boolean;
 
-Switches the current player to the next active player.
+Switches and logs in the next player, will terminate the script if no active players exist.
 
 Example:
 
 .. code-block:: pascal
 
     if (Players.Next()) then
-      srl.Writeln('Succesfully switched!');
+      srl.Writeln('Succesfully switched and logged in our next player');
 *)
-function TPlayerArray.Next(): Boolean;
+function TPlayerArray.Next: Boolean;
 var
   i: UInt32;
 begin
-  Result := (Self.GetActive > 1);
+  for i := 0 to Self.GetCount() - 1 do
+    if (i <> FCurrent) and (Self.FPlayers[i].isActive) then
+      Exit(Self.SwitchTo(i));
 
-  if (Result) then
-    for i := 0 to Self.GetCount() - 1 do
-      if (Self.FPlayers[i].LoginName <> Self.getCurrent()^.LoginName) and (Self.FPlayers[i].isActive) then
-      begin
-        Self.SetCurrent(i);
-        Break;
-      end;
+  srl.Writeln('TPlayerArray.Next: No active players to switch to', dtFatal);
 end;
 
 (*

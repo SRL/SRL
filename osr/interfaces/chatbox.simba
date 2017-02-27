@@ -44,9 +44,9 @@ procedure TRSChatbox.__Setup();
 var i:Int32;
 begin
   for i := 0 to 7 do
-    FLines.Append([10,344+(14*i),496,360+(14*i)+1]);
-  FLines.Append([10,458,500,474]); //input-field
-
+    FLines += Box(10, 344+(14*i), 496, 360+(14*i)+1);
+  FLines += Box(10,458,500,474); //input-field
+  
   FTabs := Grid(6, 1, 50, 15, 66, 0, Point(33, 490));
 
   with Self do
@@ -78,13 +78,13 @@ Example:
 *)
 function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
 var
-  i,bmp: Int32;
+  color,bmp: Int32;
   textArr,temp: TPointArray;
   B: TBox := Self.FLines[line];
 begin
-  for i:=0 to High(colors) do
+  for color in colors do
   begin
-    FindColorsTolerance(temp, colors[i], B.x1,B.y1,B.x2,B.y2, 0);
+    FindColorsTolerance(temp, color, B.x1,B.y1,B.x2,B.y2, 0);
     textArr := CombineTPA(textArr, temp);
   end;
   if Length(textArr) = 0 then 
@@ -119,10 +119,10 @@ Example:
 *)
 function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): Boolean;
 var
-  i: Int32;
+  line: Int32;
 begin
-  for i:=0 to High(lines) do
-    if IsArrInStr(txt, Self.GetTextOnLine(lines[i], colors)) then
+  for line in lines do
+    if IsArrInStr(txt, Self.GetTextOnLine(line, colors)) then
       Exit(True);
 end;
 
@@ -217,7 +217,7 @@ function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): 
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  i, j: Integer;
+  i, color: Integer;
   b: TBox;
   s: String;
 begin
@@ -229,33 +229,30 @@ begin
   if (Length(TPA) < 10) then
     Exit;
 
-  ATPA := ClusterTPAEx(TPA, 15, 1);
-  for i := 0 to High(ATPA) do
+  for TPA in ClusterTPAEx(TPA, 15, 1) do
   begin
-    b := GetTPABounds(ATPA[i]);
+    b := GetTPABounds(TPA);
     b.Expand(1);
-    for j := 0 to High(TextColors) do
+    for color in TextColors do
     begin
-      s := OCR.Recognize(b, TCompareRules([TextColors[j]]), NPCFont);
+      s := OCR.Recognize(b, TCompareRules([color]), NPCFont);
       if (s <> '') then
-        Result := Result + TChatOption([s, GetTPABounds(ATPA[i])]);
+        Result += TChatOption([s, GetTPABounds(TPA)]);
     end;
   end;
 end;
 
 function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
-  opts: array of TChatOption;
-  i: Integer;
+  option: TChatOption;
 begin
   Result := False;
-
-  opts := Self.GetOptions(TextColors);
-  for i := 0 to High(opts) do
+  
+  for option in Self.GetOptions(TextColors) do
   begin
-    if (IsArrInStr(Text, opts[i].Text)) then
+    if (IsArrInStr(Text, option.Text)) then
     begin
-      Mouse.Click(opts[i].b, mouse_Left);
+      Mouse.Click(option.b, mouse_Left);
       Exit(True);
     end;
   end;
@@ -307,21 +304,19 @@ end;
 
 function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
-  opts: array of TChatOption;
-  i, c: Integer;
+  opt: TChatOption;
   t: UInt64;
   b: Boolean = False;
 begin
   Result := False;
 
   repeat
-    opts := Self.GetOptions(TextColors);
-    for i := 0 to High(opts) do
+    for opt in Self.GetOptions(TextColors) do
     begin
-      if (IsArrInStr(Option, opts[i].Text)) then
+      if (IsArrInStr(Option, opt.Text)) then
       begin
         if (ClickOption) then
-          Mouse.Click(opts[i].b, mouse_Left);
+          Mouse.Click(opt.b, mouse_Left);
         Exit(True);
       end;
     end;
@@ -411,8 +406,6 @@ begin
 end;
 
 function TRSChatbox.AnswerQuery(Query, Response: String; PressEnter:Boolean; WaitTime: Integer): Boolean;
-var
-  t: UInt64;
 begin
   Result := Self.WaitQuery(Query, WaitTime);
   if result and (Response <> Self.GetQuery(True)) then

@@ -1,4 +1,6 @@
-procedure TIntegerArray.Append(const Value: Integer);
+//--| Type helpers |----------------------------------------------------------->
+//----------------------------------------------------------------------------->
+procedure T2DIntArray.Append(const Value: TIntegerArray);
 var top:Int32;
 begin
   top := Length(Self);
@@ -6,7 +8,7 @@ begin
   Self[top] := Value;
 end;
 
-procedure TIntegerArray.Insert(const Value, Index: Integer);
+procedure T2DIntArray.Insert(const Value: TIntegerArray; Index: Integer);
 var
   l: UInt32;
 begin
@@ -16,23 +18,23 @@ begin
     Self.Append(Value);
     Exit();
   end;
-
+  
   SetLength(Self, l + 1);
-  MemMove(Self[Index], self[Index + 1], (L-Index) * SizeOf(Integer));
+  MemMove(Self[Index], self[Index + 1], (L - Index) * SizeOf(self[0]));
   Self[Index] := Value;
 end;
 
-procedure TIntegerArray.Del(const Index: Integer; const Count: Integer = 1);
+procedure T2DIntArray.Del(const Index:Int32; const Count:Int32=1);
 begin
   Delete(Self, Index, Count);
 end;
 
-function TIntegerArray.Len(): Integer;
+function T2DIntArray.Len(): Integer;
 begin
   Result := Length(Self);
 end;
 
-procedure TIntegerArray.Remove(const Value: Integer; const All: Boolean = False);
+procedure T2DIntArray.Remove(const Value: TIntegerArray; const All: Boolean = False);
 var
   Arr: TIntegerArray;
   i: Integer;
@@ -43,12 +45,12 @@ begin
     SetLength(Arr, 1);
     Arr[0] := Self.Find(Value);
   end;
-
-  for i := 0 to High(Arr) do
+  
+  for i:=0 to High(Arr) do
     Self.Del(Arr[i]);
 end;
 
-function TIntegerArray.Pop(): Integer;
+function T2DIntArray.Pop(): TIntegerArray;
 var
   h: Integer;
 begin
@@ -57,42 +59,38 @@ begin
   SetLength(Self, h);
 end;
 
-procedure TIntegerArray.Extend(Arr:TIntegerArray);
+procedure T2DIntArray.Extend(Arr:T2DIntArray);
 var L:Int32;
 begin
   if Length(arr) > 0 then
   begin
     L := Length(Self);
     SetLength(Self, Length(Arr) + L);
-    MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
+    MemMove(Arr[0], Self[L], Length(Arr)*SizeOf(arr[0]));
   end;
 end; 
 
-function TIntegerArray.Find(const Value: Integer): Integer; constref;
+function T2DIntArray.Find(const Value: TIntegerArray): Integer; constref;
 begin
-  for Result := 0 to High(Self) do
-    if (Value = Self[Result]) then
+  for Result:=0 to High(Self) do
+    if Self[Result].Equals(Value) then
       Exit;
-
   Result := -1;
 end;
 
-function TIntegerArray.FindAll(const Value: Integer): TIntegerArray; constref;
+function T2DIntArray.FindAll(const Value: TIntegerArray): TIntegerArray; constref;
 var
-  i,top: UInt32;
+  i: UInt32;
 begin
   for i:=0 to High(Self) do
-    if (Self[i] = Value) then
-    begin
-      SetLength(Result, top+1);
-      Result[Inc(top)-1] := i;
-    end;
+    if Value.Equals(Self[i]) then
+      Result += i;
 end
 
-function TIntegerArray.Reversed(): TIntegerArray;
+function T2DIntArray.Reversed(): T2DIntArray;
 var
   lo:PtrUInt;
-  p,r:^Integer;
+  p,r:^TIntegerArray;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -110,10 +108,10 @@ begin
   end;
 end;
 
-procedure TIntegerArray.Reverse();
+procedure T2DIntArray.Reverse();
 var
-  tmp:Integer;
-  lo,hi:^Integer;
+  tmp:TIntegerArray;
+  lo,hi:^TIntegerArray;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -130,7 +128,7 @@ begin
   end;
 end;
 
-function TIntegerArray.Combine(Other: TIntegerArray): TIntegerArray; constref;
+function T2DIntArray.Combine(Other: T2DIntArray): T2DIntArray; constref;
 begin
   SetLength(Result, Length(Self) + Length(Other));
   if Length(self) > 0 then
@@ -140,9 +138,21 @@ begin
 end;   
 
 
-function TIntegerArray.Equals(Other:TIntegerArray): Boolean; constref;
+function T2DIntArray.Equals(Other:T2DIntArray): Boolean;
+var i:Int32;
 begin
   if (Length(Self) <> Length(Other)) then Exit(False);
   if (Length(Self) = 0) then Exit(True);
-  Result := CompareMem(Self[0], Other[0], Length(Self)*SizeOf(self[0]));     
+  
+  for i:=0 to High(self) do
+    if not self[i].Equals(Other[i]) then
+      Exit(False);
+  Result := True;      
+end;
+
+function T2DIntArray.Merge(): TIntegerArray;
+var i:Int32;
+begin
+  for i:=0 to High(self) do
+    Result.Extend(self[i]);  
 end;

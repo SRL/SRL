@@ -1,10 +1,11 @@
 type
   TXPBar = record
-    btnMiddle: TPoint;
-    btnBounds: TBox;
-    btnRadius: Byte;
+    FBounds: TBox;
+    FTextArea: TBox;
 
-    TextArea: TBox;
+    FButtonBounds: TBox;
+    FButtonMiddle: TPoint;
+    FButtonRadius: Integer;
  end;
 
 var
@@ -12,65 +13,69 @@ var
 
 procedure TXPBar._Setup;
 begin
-  btnBounds := [519, 23, 541, 45];
-  btnMiddle := [530, 34];
-  btnRadius := 10;
+  FBounds := [396, 7, 512, 33];
+  FTextArea := [402, 9, 512, 28];
 
-  TextArea := [402, 9, 512, 28];
+  FButtonBounds := [517, 21, 542, 47];
+  FButtonMiddle := MiddleBox(FButtonBounds);
+  FButtonRadius := 9;
 end;
 
-function TXPBar.isEnabled(WaitTime: Integer = 0): Boolean;
-var
-  b: TBox;
-  t: UInt64;
-begin
-  b := btnBounds;
-  if (WaitTime = 0) then
-    Result := CountColor(11592943, b) > 0
-  else
-    Result := srl.WaitMinColorCount(11592943, 0, b, 1, WaitTime);
-end;
-
-function TXPBar.Toggle(const Enable: Boolean): Boolean;
-begin
-  Result := True;
-
-  with Self do
-  begin
-    if (Enable) and (not Self.isEnabled) then
-    begin
-      Mouse.Click(btnMiddle, btnRadius, mouse_Left);
-      Result := Self.isEnabled(Random(600, 1000));
-    end
-    else
-    if (not Enable) and (Self.isEnabled) then
-    begin
-      Mouse.Click(btnMiddle, btnRadius, mouse_Left);
-      Result := not Self.isEnabled(Random(250, 500));
-    end;
-  end;
-end;
-
-function TXPBar.Read: Integer;
+function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
+const
+  COL_INNER_BORDER = 4543066;
 var
   TPA: TPointArray;
-  ATPA: T2DPointArray;
+  t: UInt64;
 begin
-  if (not Self.isEnabled()) then
-  begin
-    for 0 to 1 do
-    begin
-      if (Self.Toggle(True)) then
-      begin
-        if (Self.isEnabled(Random(1000, 1200))) then
-          Break;
-      end;
-    end;
-  end;
+  t := GetTickCount64() + WaitTime;
+  repeat
+    if (FindColors(TPA, COL_INNER_BORDER, Self.FBounds)) and
+       (GetTPABounds(TPA) = Self.FBounds) then
+         Exit(True);
+    if (WaitTime > 0) then
+      Wait(Random(50, 100));
+  until (GetTickCount64() >= t);
+end;
 
-  if (not Self.isEnabled()) then
-    Exit(-1);
-  if (not FindColors(TPA, 16777215, Self.TextArea)) then
+function TXPBar.Toggle(Enable: Boolean): Boolean;
+begin
+  if (Enable) and (not Self.isOpen()) then
+  begin
+    Mouse.Click(FButtonMiddle, FButtonRadius, mouse_Left);
+    Result := Self.isOpen(Random(2800, 3200));
+  end else
+  if (not Enable) and (Self.isOpen()) then
+  begin
+    Mouse.Click(FButtonMiddle, FButtonRadius, mouse_Left);
+    Result := True;
+  end;
+end;
+
+(*
+XPBar.Read
+~~~~~~~~~~
+.. code-block:: pascal
+
+  function TXPBar.Read: Integer;
+
+Opens the XPBar if needed and returns the current total.
+*)
+function TXPBar.Read: Integer;
+const
+  COL_TEXT = 16777215;
+var
+  TPA: TPointArray;
+  t: UInt64;
+begin
+  t := GetTickCount64() + 8000;
+  while (not Self.isOpen()) and (t > GetTickCount64()) do
+    if (Self.Toggle(True)) then
+      Break;
+
+  if (not Self.isOpen()) then
+    Exit(-1); // not open
+  if (not FindColors(TPA, COL_TEXT, FTextArea)) then
     Exit(-2); // no color
 
   case GetTPABounds(TPA).Height of // Support all font sizes!
