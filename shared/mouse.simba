@@ -38,14 +38,14 @@
 type
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
   TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
-  TMouseMoveEvent2 = procedure(Sender: TObject; Shift:TShiftState; X,Y: Integer);
-  TMouseEvent2 = procedure(Sender: TObject; Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
+  TMouseMoveEvent2 = procedure(Sender: TObject; Shift:TShiftState; X,Y: Int32);
+  TMouseEvent2 = procedure(Sender: TObject; Button: TMouseButton; Shift:TShiftState; X,Y:Int32);
 
   TMouse = record
   {$IFNDEF CODEINSIGHT}
     FSpeed: Integer;
     FMode: TMouseMode;
-    FGravity, FWind: array [0..2] of Integer;
+    FGravity, FWind: array [0..2] of Extended;
     FOnMouseMove: TMouseMoveEvent2;
     FOnMouseEvent: TMouseEvent2;
     FOnMouseChangeDestEvent: TMouseChangeDestEvent;
@@ -109,22 +109,22 @@ begin
   Self.FSpeed := NewSpeed;
 end;
 
-function TMouse.GetGravity(const Mode: TMouseMode): Integer;
+function TMouse.GetGravity(const Mode: TMouseMode): Double;
 begin
   Result := Self.FGravity[Ord(Mode)];
 end;
 
-procedure TMouse.SetGravity(const Mode: TMouseMode; const NewGravity: Integer);
+procedure TMouse.SetGravity(const Mode: TMouseMode; const NewGravity: Double);
 begin
   Self.FGravity[Ord(Mode)] := NewGravity;
 end;
 
-function TMouse.GetWind(const Mode: TMouseMode): Integer;
+function TMouse.GetWind(const Mode: TMouseMode): Double;
 begin
   Result := Self.FWind[Ord(Mode)];
 end;
 
-procedure TMouse.SetWind(const Mode: TMouseMode; const NewWind: Integer);
+procedure TMouse.SetWind(const Mode: TMouseMode; const NewWind: Double);
 begin
   Self.FWind[Ord(Mode)] := NewWind;
 end;
@@ -180,32 +180,30 @@ begin
 end;
 
 {$IFNDEF CODEINSIGHT}
-procedure TMouse._MoveBrake(xs, ys, xe, ye, gravity, wind, targetArea: extended; double: boolean);
+procedure TMouse._MoveBrake(xs, ys, xe, ye, gravity, wind, targetArea: Extended; doubleUp: Boolean);
 const
   sqrt2 := sqrt(2);
   sqrt3 := sqrt(3);
   sqrt5 := sqrt(5);
 var
-  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
-  lastX,lastY,tempSpeed,W,TDist, xsR, ysR: Integer;
-  t: UInt64;
-  PDist,maxStep,dModA,dModB,nModA,nModB: extended;
+  veloX,veloY,windX,windY,veloMag,baseDist,dist,randomDist,lastDist,D: Extended;
+  lastX,lastY,tempSpeed,W,xsR, ysR: Integer;
+  PDist,maxStep,dModA,dModB,nModA,nModB: Extended;
   Event, doExit: Boolean;
+  t: UInt64;
 begin
-  tempSpeed := Self.getSpeed();
+  tempSpeed := Self.GetSpeed();
   Event := Assigned(@FOnMouseChangeDestEvent);
-  TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
-  if (TDist < 1) then
-    TDist := 1;
+  baseDist := Max(1,Hypot(xs - xe, ys - ye));
 
   dModA := 0.88;
   dModB := 0.95;
 
-  if (TDist > 220) then
+  if (baseDist > 220) then
   begin
     nModA := 0.08;
     nModB := 0.04;
-  end else if (TDist <= 220) then
+  end else if (baseDist <= 220) then
   begin
     nModA := 0.20;
     nModB := 0.10;
@@ -223,48 +221,37 @@ begin
         Exit;
     end;
 
-    dist := hypot(xs - xe, ys - ye);
-    wind := minE(wind, dist);
-    if (dist < 1) then
-      dist := 1;
-    PDist := (dist/TDist);
-    if (PDist < 0.01) then
-      PDist := 0.01;
+    dist := Max(1,Hypot(xs - xe, ys - ye));
+    wind := Min(wind, dist);
+    PDist := Max(0.01,(dist/baseDist));
 
-    if double then
+    if doubleUp then
     begin
       if (PDist <= dModA) then
-      begin
-        D := (round((round(dist)*0.3))/5);
-        if (D < 20) then
-          D := 20;
-
-      end else if (PDist > dModA) then
+        D := Max(20,Round(dist*0.3)/5)
+      else if (PDist > dModA) then
       begin
         if (PDist < dModB) then
-          D := randomRange(5, 8)
+          D := RandomRange(5, 8)
         else if (PDist >= dModB) then
-          D := randomRange(3, 4);
+          D := RandomRange(3, 4);
       end;
     end;
 
     if (PDist >= nModA) then
-    begin
-       D := (round((round(dist)*0.3))/5);
-      if (D < 20) then
-        D := 20;
-    end else if (PDist < nModA) then
+      D := Max(20,round(dist*0.3)/5)
+    else if (PDist < nModA) then
     begin
       if (PDist >= nModB) then
-        D := randomRange(5, 8)
+        D := RandomRange(5, 8)
       else if (PDist < nModB) then
-        D := randomRange(3, 4);
+        D := RandomRange(3, 4);
     end;
 
-    if (D <= round(dist)) then
+    if (D <= Round(dist)) then
       maxStep := D
     else
-      maxStep := round(dist);
+      maxStep := Round(dist);
 
     if dist >= targetArea then
     begin
@@ -276,66 +263,63 @@ begin
       windY := windY / sqrt2;
     end;
 
-    veloX := veloX + windX;
-    veloY := veloY + windY;
-    veloX := veloX + gravity * (xe - xs) / dist;
-    veloY := veloY + gravity * (ye - ys) / dist;
+    veloX += windX;
+    veloY += windY;
+    veloX += gravity * (xe - xs) / dist;
+    veloY += gravity * (ye - ys) / dist;
 
-    if (hypot(veloX, veloY) > maxStep) then
+    if (Hypot(veloX, veloY) > maxStep) then
     begin
-      randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
-      veloMag := sqrt(veloX * veloX + veloY * veloY);
+      randomDist := maxStep / 2.0 + Random(Round(maxStep) div 2);
+      veloMag := Sqrt(veloX * veloX + veloY * veloY);
       veloX := (veloX / veloMag) * randomDist;
       veloY := (veloY / veloMag) * randomDist;
     end;
 
-    lastX := round(xs);
-    lastY := round(ys);
+    lastX := Round(xs);
+    lastY := Round(ys);
     xs := xs + veloX;
     ys := ys + veloY;
     xsR := Round(xs);
     ysR := Round(ys);
 
     if (lastX <> xsR) or (lastY <> ysR) then
-      Self.setPosition([xsR, ysR]);
+      Self.SetPosition([xsR, ysR]);
 
-    W := (random((round(100/tempSpeed)))*6);
-    if (W < 4) then
-      W := 4;
-    if (double) then
+    W := Max(4,Random(Round(100/tempSpeed))*6);
+    if (doubleUp) then        //uhhuh..
       if (PDist > dModA) then
-        W := round(W*2.5)
+        W := Round(W*2.5)
     else
-      W := round(W*1.2);
-
+      W := Round(W*1.2);
     Wait(W);
+
     lastdist := dist;
-  until (hypot(xs - xe, ys - ye) < 1);
+  until Hypot(xs - xe, ys - ye) < 1;
 
   if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
-    Self.setPosition([Round(xe), Round(ye)]);
+    Self.SetPosition([Round(xe), Round(ye)]);
 
-  Self.setSpeed(tempSpeed);
+  Self.SetSpeed(tempSpeed);
 end;
 {$ENDIF}
 
 {$IFNDEF CODEINSIGHT}
-procedure TMouse._MoveHuman(xs, ys, xe, ye, gravity, wind, targetArea: extended);
+procedure TMouse._MoveHuman(xs, ys, xe, ye, gravity, wind, targetArea:Extended);
 const
   sqrt2 := sqrt(2);
   sqrt3 := sqrt(3);
   sqrt5 := sqrt(5);
 var
-  veloX,veloY,windX,windY,veloMag,dist,randomDist,lastDist,D: extended;
-  lastX,lastY, tempSpeed,W,TDist, xsR, ysR: integer;
-  t: UInt64;
-  maxStep,rCnc: extended;
+  veloX,veloY,windX,windY,veloMag,baseDist,dist,randomDist,lastDist,D,maxStep: Extended;
+  lastX,lastY, tempSpeed,W, xsR, ysR: Int32;
   Event, doExit: Boolean;
+  t: UInt64;
 begin
   tempSpeed := Self.getSpeed();
   Event := Assigned(@FOnMouseChangeDestEvent);
 
-  TDist := distance(Round(xs), Round(ys), Round(xe), Round(ye));
+  baseDist := Hypot(xs - xe, ys - ye);
   t := GetTickCount64() + Random(9700, 10000);
   repeat
     if (GetTickCount64() > t) then
@@ -348,72 +332,64 @@ begin
         Exit;
     end;
 
-    dist := hypot(xs - xe, ys - ye);
-    wind := minE(wind, dist);
+    dist := Hypot(xs - xe, ys - ye);
+    wind := Min(wind, dist);
     if (dist < 1) then
       dist := 1;
 
-    D := (round((round(TDist)*0.3))/7);
-    if (D > 25) then
-      D := 25;
-    if (D < 5) then
-      D := 5;
+    if Random(6) = 1 then
+      D := RandomRange(2,3)
+    else
+      D :=  Max(5,Min(Round(baseDist*0.3)/7,25));
 
-    rCnc := random(6);
-    if (rCnc = 1) then
-      D := randomRange(2,3);
-
-    if (D <= round(dist)) then
+    if (D <= Round(dist)) then
       maxStep := D
     else
       maxStep := round(dist);
 
     if dist >= targetArea then
     begin
-      windX := windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
-      windY := windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windX := windX / sqrt3 + (Random(Round(wind) * 2 + 1) - wind) / sqrt5;
+      windY := windY / sqrt3 + (Random(Round(wind) * 2 + 1) - wind) / sqrt5;
     end else
     begin
       windX := windX / sqrt2;
       windY := windY / sqrt2;
     end;
 
-    veloX := veloX + windX;
-    veloY := veloY + windY;
-    veloX := veloX + gravity * (xe - xs) / dist;
-    veloY := veloY + gravity * (ye - ys) / dist;
+    veloX += windX;
+    veloY += windY;
+    veloX += gravity * (xe - xs) / dist;
+    veloY += gravity * (ye - ys) / dist;
 
-    if (hypot(veloX, veloY) > maxStep) then
+    if (Hypot(veloX, veloY) > maxStep) then
     begin
-      randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
-      veloMag := sqrt(veloX * veloX + veloY * veloY);
+      randomDist := maxStep / 2.0 + Random(Round(maxStep) div 2);
+      veloMag := Sqrt(veloX * veloX + veloY * veloY);
       veloX := (veloX / veloMag) * randomDist;
       veloY := (veloY / veloMag) * randomDist;
     end;
 
-    lastX := round(xs);
-    lastY := round(ys);
-    xs := xs + veloX;
-    ys := ys + veloY;
+    lastX := Round(xs);
+    lastY := Round(ys);
+    xs += veloX;
+    ys += veloY;
     xsR := Round(xs);
     ysR := Round(ys);
 
     if (lastX <> xsR) or (lastY <> ysR) then
-      Self.setPosition([xsR, ysR]);
+      Self.SetPosition([xsR, ysR]);
 
-    W := (random((round(100/tempSpeed)))*6);
-    if (W < 4) then
-      W := 4;
-    W := round(W * 0.7);
+    W := Round(Max(4, Random(Round(100/tempSpeed))*6) );
+    Wait(Round(W * 0.7));
 
-    Wait(W);
     lastdist := dist;
-  until (hypot(xs - xe, ys - ye) < 1);
+  until Hypot(xs - xe, ys - ye) < 1;
 
   if (Round(xe) <> Round(xs)) or (Round(ye) <> Round(ys)) then
-    Self.setPosition([Round(xe), Round(ye)]);
+    Self.SetPosition([Round(xe), Round(ye)]);
 
-  Self.setSpeed(tempSpeed);
+  Self.SetSpeed(tempSpeed);
 end;
 {$ENDIF}
 
