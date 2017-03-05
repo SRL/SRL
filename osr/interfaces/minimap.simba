@@ -187,7 +187,6 @@ const
 var
   pt: TPoint;
   TPA, TPAPoles, column: TPointArray;
-  ATPA, ATPAColumns: T2DPointArray;
   w, h, img: Integer;
 begin
   p := [-1, -1];

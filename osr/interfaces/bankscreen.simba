@@ -605,7 +605,6 @@ Example:
 function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
 var
   b:TBox;
-  options:TOptionArray;
 const
   TEXT_AREA:TBox = [200,393,450,412];
 begin

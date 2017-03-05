@@ -1,3 +1,44 @@
+function TPoint.InBox(Box: TBox): Boolean; constref;
+begin
+  Result := PointInBox(Self, Box);
+end;
+
+function TPoint.InCircle(Mid: TPoint; Radius: Double): Boolean; constref;
+begin
+  Result := Hypot(Self.x-Mid.x, Self.y-Mid.y) <= Radius;
+end;
+
+function TPoint.DistanceTo(Other:TPoint): Double; constref;
+begin
+  Result := Hypot(Self.x-other.x, Self.y-other.y);
+end;
+
+function TPoint.Rotate(Angle: Double; Mid: TPoint): TPoint; constref;
+begin
+  Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
+end;
+
+function TPoint.Magnitude(): Double; constref;
+begin
+  Result := Sqrt(Sqr(Self.x) + Sqr(Self.y));
+end;
+
+function TPoint.Equals(Other: TPoint): Boolean; constref; {deprecated;}
+begin
+  Result := (self.X = other.X) and (self.Y = other.Y);
+end;
+
+function TPoint.AngleBetween(Other: TPoint): Double; constref;
+begin
+  Result := srl.Modulo(Degrees(ArcTan2(other.Y - self.Y, other.X - self.X)) - 90, 360);
+end;
+
+procedure TPoint.Offset(p: TPoint);
+begin
+  Self.X += p.X;
+  Self.Y += p.Y;
+end;
+
 function TPoint.Random(Min, Max: Integer; Gauss: Boolean = False): TPoint; constref;
 begin
   if (Gauss) then
@@ -24,45 +65,29 @@ begin
   end;
 end;
 
-procedure TPoint.Offset(p: TPoint);
+
+operator + (L,R:TPoint): TPoint;
 begin
-  Self.X := Self.X + p.X;
-  Self.Y := Self.Y + p.Y;
+  Result.X := L.X + R.X;
+  Result.Y := L.Y + R.Y;
 end;
 
-function TPoint.InBox(Box: TBox): Boolean; constref;
+operator += (var L:TPoint; R:TPoint): TPoint;
 begin
-  Result := PointInBox(Self, Box);
+  L.X += R.X;
+  L.Y += R.Y;
+  Result := L;
 end;
 
-function TPoint.InCircle(Mid: TPoint; Radius: UInt32): Boolean; constref;
+operator - (L,R:TPoint): TPoint;
 begin
-  Result := Distance(Self.x, Self.y, Mid.x, Mid.y) <= Radius;
+  Result.X := L.X - R.X;
+  Result.Y := L.Y - R.Y;
 end;
 
-function TPoint.DistanceTo(Other:TPoint): Extended; constref;
+operator -= (var L:TPoint; R:TPoint): TPoint;
 begin
-  Result := Distance(Self.x, Self.y, other.x, other.y);
+  L.X -= R.X;
+  L.Y -= R.Y;
+  Result := L;
 end;
-
-function TPoint.Rotate(Angle: Extended; Mid: TPoint): TPoint; constref;
-begin
-  Result := RotatePoint(Self, Angle, Mid.X, Mid.Y);
-end;
-
-function TPoint.Magnitude(): Extended; constref;
-begin
-  Result := Sqrt(Sqr(Self.x) + Sqr(Self.y));
-end;
-
-function TPoint.Equals(Other: TPoint): Boolean; constref;
-begin
-  Result := (self.X = other.X) and (self.Y = other.Y);
-end;
-
-function TPoint.AngleBetween(Other: TPoint): Extended; constref;
-begin
-  Result := srl.Modulo(Degrees(ArcTan2(other.Y - self.Y, other.X - self.X)) - 90, 360);
-end;
-
-
