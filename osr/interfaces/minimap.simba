@@ -28,6 +28,7 @@ type
     OrbInfo: array [EMinimapOrb] of TMMOrbInfo;
     MaskBMP: Integer;
     MaskTPA: TPointArray;
+    Center:TPoint;
  end;
 
 var
@@ -46,7 +47,8 @@ begin
     SetName('Minimap');
     SetStatic(True);
     SetBounds([570, 9, 716, 157]);
-
+    Center := [642, 84];
+    
     with (CompassInfo) do
     begin
       Bounds := [545, 4, 576, 36];
@@ -102,6 +104,12 @@ begin
     FindColorsBitmap(Self.MaskBMP, Self.MaskTPA, $000000);
     OffsetTPA(Self.MaskTPA, Point(Self.FBounds.X1, Self.FBounds.Y1));
   end;
+end;
+
+
+function TMinimap.GetMiddle(): TPoint; override;
+begin
+  Result := Self.Center;
 end;
 
 function TMinimap._GetOrbValue(const orb: EMinimapOrb): Integer;
