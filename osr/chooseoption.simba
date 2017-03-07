@@ -300,7 +300,7 @@ failed it clicks the "Close"-option.
 
 .. note:: by slacky
 *)
-function TRSChooseOption.Close(): Boolean;
+function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 var
   B:TBox;
   pt,dest:TPoint;
@@ -313,7 +313,7 @@ var
       RaiseException('Finally');
   end;
 begin
-  if self.IsClosed(0) then Exit(True);
+  if self.IsClosed(tryTime) then Exit(True);
   mouse.SetOnMouseMove(Pointer(@TrackMovment));
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
@@ -328,9 +328,9 @@ begin
   try
     mouse.Move(dest);
     self.Select(['Cancel']);
-    Result := self.IsClosed();
+    Result := self.IsClosed(tryTime);
   except
-    Result := self.IsClosed();
+    Result := self.IsClosed(tryTime);
   end;
   mouse.SetOnMouseMove(nil);
 end;
