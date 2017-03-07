@@ -313,7 +313,7 @@ var
       RaiseException('Finally');
   end;
 begin
-  if not self.Find() then Exit(True);
+  if self.IsClosed(0) then Exit(True);
   mouse.SetOnMouseMove(Pointer(@TrackMovment));
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
