@@ -76,7 +76,6 @@ begin
   self.Rectangle(area, 0);
 end;
 
-
 (*
 TMufasaBitmap.DrawBox
 ~~~~~~~~~~~~~~~~~~~~~
@@ -114,6 +113,31 @@ begin
     end;
   end else
     self.Rectangle(box, color);
+end;
+
+(*
+TMufasaBitmap.DrawBox
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.DrawBox(pt:TPoint; Radius:UInt32; Fill: Boolean; color: TColor);
+
+Draws a TBox onto the TMufasaBitmap
+*)
+procedure TMufasaBitmap.DrawBox(pt:TPoint; Radius:UInt32; fill: Boolean; color: TColor); overload;
+var
+  TPA: TPointArray;
+begin
+  if not fill then
+  begin
+    if Radius = 0 then
+      TPA := [pt]
+    else
+      TPA := EdgeFromBox(TBox([pt.x-Radius,pt.y-Radius, pt.x+Radius,pt.y+Radius]));
+    self.DrawTPA(TPA, color);
+  end else
+    self.Rectangle(TBox([pt.x-Radius,pt.y-Radius, pt.x+Radius,pt.y+Radius]), color);
 end;
 
 (*
