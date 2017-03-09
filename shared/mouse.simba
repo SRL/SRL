@@ -443,7 +443,7 @@ begin
     Self.FOnMouseEvent(@Self, TMouseButton(Abs(Abs(not Button) - 2)), [], p.X, p.Y);
 
   Self.Hold(Button);
-  Wait(Random(60, 155));
+  Wait(Random(50, 110)); //avg of 80ms is quite normal interval
   Self.Release(Button);
 end;
 
@@ -457,7 +457,7 @@ begin
   if (p.X <> Target.X) or (p.Y <> Target.Y) then
   begin
     Self.Move(Target.X, Target.Y);
-    Wait(16 + Random(70));
+    Wait(Random(15,80));
   end;
 
   Self.Click(Button);
