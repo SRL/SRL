@@ -51,12 +51,12 @@ end;
 //Finds the optionbox using a simple bitmap (works very well).
 function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
-  t: UInt64;
+  t,adapt: UInt64;
 begin
   if tryTime < 0 then
     tryTime := Random(1500,2500);
 
-  t := GetTickCount64() + tryTime;
+  t := GetTickCount() + tryTime;
   repeat
     Result := FindBitmap(BoxBitmap, pos.x, pos.y);
     if Result then
@@ -64,8 +64,9 @@ begin
       pos.y += BoxBitmap_Height;
       Exit;
     end;
-    Wait(Random(50,70));
-  until (GetTickCount64() > t);
+    Inc(adapt,2);
+    Wait(Min(adapt,70));
+  until (GetTickCount() > t);
 end;
 {$ENDIF}
 
@@ -120,8 +121,6 @@ Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False`
 function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
 var _:TPoint;
 begin
-  if tryTime < 0 then
-    tryTime := Random(1500,2500);
   Result := self.__find(_, tryTime);
 end;
 
@@ -141,10 +140,10 @@ var t:UInt64;
 begin
   if maxWaitTime < 0 then
     maxWaitTime := Random(500,800);
-  t := GetTickCount64() + maxWaitTime;
-  while self.IsOpen(1) and (GetTickCount64() < t) do
+  t := GetTickCount() + maxWaitTime;
+  while self.IsOpen(0) and (GetTickCount() < t) do
     Wait(IntervalMS);
-  Result := not(self.IsOpen(1));
+  Result := not(self.IsOpen(0));
 end;
 
 (*
@@ -171,8 +170,7 @@ begin
   if Result then
   begin
     B := GetClientBounds();
-    FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2);
-    if (TPA = []) then
+    if not FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2) then
       RaiseException('It''s impossible');
 
     ATPA := ClusterTPAEx(TPA,1,1);
@@ -198,9 +196,10 @@ Returns each option in the menu.
 function TRSChooseOption.GetOptions(): TOptionArray;
 var
   b: TBox;
-  i,bmp,bmp2:Int32;
+  i:Int32;
+  menu,tmp: TMufasaBitmap;
 begin
-  if not(self.Find(1)) then
+  if not(self.Find(0)) then
     self.Open();
   
   with self.Bounds do
@@ -208,10 +207,10 @@ begin
     if (x1=x2) or (y1=y2) then
       Exit;
 
-    bmp := BitmapFromClient(x1,y1,x2,y2);
-    FastReplaceColor(bmp,4674653,0);
-    ThresholdAdaptiveBitmap(bmp,0,255,False,TM_Mean,-1);
-    
+    menu := GetMufasaBitmap(BitmapFromClient(x1,y1,x2,y2));
+    menu.ReplaceColor(4674653, 0);
+    menu.ThresholdAdaptive(0,255,False,TM_Mean,-1);
+
     SetLength(Result, (y2 - y1 + 1) div 15);
     for i:=0 to High(Result) do
     begin
@@ -221,15 +220,15 @@ begin
       B.y2 := B.y1 + 15;
       if B.y2 <= y2-y1 then
       begin
-        bmp2 := CopyBitmap(bmp);
-        CropBitmap(bmp2, B.x1,B.y1,B.x2,B.y2);
-        Result[i].str := ocr.RecognizeEx(BitmapToMatrix(bmp2),FontSetting(255,1), UpFont);
-        FreeBitmap(bmp2);
+        tmp := menu.Copy(B.x1,B.y1,B.x2,B.y2);
+        Client.GetMBitmaps.AddBMP(tmp);
+        Result[i].str := ocr.RecognizeEx(tmp.ToMatrix(),FontSetting(255,1), UpFont);
+        tmp.Free();
       end;
       B.Offset(Point(x1, y1));
       Result[i].bounds := B;
     end;
-    FreeBitmap(bmp);
+    menu.Free();
   end;
 end;
 
@@ -251,10 +250,12 @@ Returns true if the select-action was performed.
 *)
 function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
 var
-  Choices: TOptionArray;
+  choices: TOptionArray;
   i,j,L:Int32;
+  waitOffset:Int64;
 begin
-  Choices := Self.GetOptions();
+  choices := Self.GetOptions(); //this is a lil' slow
+
   L := Length(Choices);
   if L = 0 then
     Exit(False);
@@ -263,22 +264,19 @@ begin
     for j:=0 to High(SubStrings) do
       case CaseSensitive of
         True:
-          if Pos(SubStrings[j],Choices[i].str) <> 0 then
+          if Pos(SubStrings[j],choices[i].str) <> 0 then
           begin
-            Wait(Random(80,270));
-            Mouse.Click(Choices[i].bounds, mouseAction);
+            Mouse.Click(choices[i].bounds, mouseAction);
             Exit(self.IsClosed());
           end;
         False:
           if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str)) <> 0 then
           begin
-            Wait(Random(80,270));
-            Mouse.Click(Choices[i].bounds, mouseAction);
+            Mouse.Click(choices[i].bounds, mouseAction);
             Exit(self.IsClosed());
           end;
       end;
 
-  Wait(Random(80,270));
   if AClose then
     Self.Close();
 end;
@@ -293,27 +291,29 @@ ChooseOption.Close
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSChooseOption.Close(): Boolean;
+  function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 
 Closes the optionbox by dragging the mouse away from it, if that 
 failed it clicks the "Close"-option.
 
 .. note:: by slacky
 *)
-function TRSChooseOption.Close(): Boolean;
+function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 var
   B:TBox;
   pt,dest:TPoint;
   dir:PPoint;
 
-  procedure TrackMovment(a:Pointer; b:TShiftState; x,y:Int32);
+  procedure TrackMovment(a:Pointer; b:TShiftState; x,y:Int32); static;
   var p:TPoint;
   begin
     if not ChooseOption.__find(p,0) then
       RaiseException('Finally');
   end;
 begin
-  if not self.Find() then Exit(True);
+  if not self.IsOpen(tryTime) then
+    Exit(True);
+
   mouse.SetOnMouseMove(Pointer(@TrackMovment));
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
