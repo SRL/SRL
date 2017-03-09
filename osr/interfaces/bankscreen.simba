@@ -21,8 +21,13 @@ type
     FButtons: array [EBankButton] of TBox;
   end;
 
+  TRSPinScreen = record (TInterfaceBase)
+    FSlots: TBoxArray;
+  end;
+
 var
   BankScreen: TRSBankScreen;
+  PinScreen: TRSPinScreen;
 
 
 const
@@ -62,6 +67,17 @@ begin
       FButtons[bbMenu]  := Box(X2-36, Y1+42, X2-12, Y1+66);
       FButtons[bbClose] := Box(X2-27, Y1+7,  X2-7,  Y1+27);
     end;
+  end;
+end;
+
+procedure TRSPinScreen.__Setup();
+begin
+  with Self do
+  begin
+    FSlots := Box(37, 107, 318, 320).Partition(3,3);
+    FSlots.ModifySide('x2',-30);
+    FSlots.ModifySide('y2',-6);
+    FSlots.Append(Box(309, 107, 372, 170));
   end;
 end;
 {$ENDIF}
@@ -650,6 +666,109 @@ begin
 end;
 
 
+function TRSPinScreen._Find(): Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Bank of RuneScape', 'UpChars07_s', 255, 0, Box(21, 30, 151, 50));
+end;
+
+function TRSPinScreen.IsOpen(WaitTime: UInt32 = 0): Boolean;
+var
+  t: UInt64;
+begin
+  t := GetTickCount64() + WaitTime;
+  
+  repeat
+    if (Self._Find()) then
+      Exit(True)
+    else
+      if (WaitTime > 0) then
+        Wait(Random(25, 50));
+  until (GetTickCount64() >= t);
+end;
+
+function TRSPinScreen.EnterPin(): Boolean;
+var
+  I, J, F, Start: Int32;
+  TSA: TStringArray = ['First', 'Now', 'Time', 'Finally'];
+  t: UInt64;
+  P: TPoint;
+
+  function __EnterPin(): Boolean;
+  begin
+    T := GetTickCount64 + RandomRange(4000, 8000);
+    while (CountColor(32767, 37, 107, 372, 318) <> 322) do//waiting for the numbers to load
+    begin
+      Wait(RandomRange(100, 400));
+      if (GetTickCount64 > T) then
+        Exit(False);
+    end;
+    
+    for Start := 1 to 4 do
+    begin
+      if srl.FindText(p, TSA[Start - 1], 'UpChars07_s', Box(160, 80, 350, 100)) then
+        Break;
+    end;
+    
+    for J := Start to 4 do
+    begin
+      p := [0, 0];
+      if srl.FindText(p, Players.GetCurrent()^.BankPin[J], 'UpChars07_s', Box(37, 107, 372, 318)) then
+      begin
+        for I := Low(FSlots) to High(FSlots) do
+        begin
+          if PointInBox(p, FSlots[I]) then
+          begin
+            Mouse.Click(FSlots[I], mouse_Left);
+            Break;
+          end;
+        end;
+      end else
+      begin
+        GetMousePos(p.X, p.Y);
+        for I := Low(FSlots) to High(FSlots) do
+        begin
+          if PointInBox(p, FSlots[I]) then
+          begin
+            Mouse.Click(FSlots[I], mouse_Left);
+            Break;
+          end;
+        end;
+      end;
+      
+      T := GetTickCount64 + RandomRange(4000, 8000);
+      while srl.FindText(p, TSA[J - 1], 'UpChars07_s', Box(160, 80, 350, 100)) and (CountColor(32767, 37, 107, 372, 318) <> 332) do
+      begin
+        Wait(RandomRange(300, 600));
+        if (GetTickCount64 > T) then
+          Exit(False);
+      end;
+      Wait(RandomRange(600, 1200));
+    end;
+  end;
+
+begin
+  if not __EnterPin() then
+    Exit(False);
+  t := GetTickCount64 + RandomRange(15000, 20000);
+  while not BankScreen.IsOpen() do
+  begin
+    if ChatBox.ClickContinue then
+    begin
+      Inc(F);
+      if (F > 2) then
+        srl.WriteLn('Your pin is wrong!', dtFatal);
+      __EnterPin;
+    end;
+    Wait(RandomRange(40, 200));
+    if (GetTickCount64 > t) then
+      Exit(False);
+  end;
+  Result := BankScreen.IsOpen(RandomRange(2000, 6000));
+end;
+
 begin
   BankScreen.__Setup();
+  PinScreen.__Setup();
 end;
