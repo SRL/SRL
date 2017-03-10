@@ -255,7 +255,6 @@ var
   waitOffset:Int64;
 begin
   choices := Self.GetOptions(); //this is a lil' slow
-
   L := Length(Choices);
   if L = 0 then
     Exit(False);
@@ -277,6 +276,7 @@ begin
           end;
       end;
 
+  Wait(Random(200,340)); //Wait so we actually see that the option aint here.
   if AClose then
     Self.Close();
 end;
