@@ -1,6 +1,9 @@
-function Box(x1,y1,x2,y2: Int32): TBox;
+function Box(X1,Y1,X2,Y2: Int32): TBox;
 begin
-  Result := [x1,y1,x2,y2];
+  Result := [X1, Y1, X2, Y2];
+end;
+
+begin
 end;
 
 function GridBox(Slot, Columns, Rows, w, h, diffX, diffY: Integer; Start: TPoint): TBox;
