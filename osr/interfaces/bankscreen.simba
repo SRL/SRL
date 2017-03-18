@@ -697,11 +697,11 @@ var
 
   function __EnterPin(): Boolean;
   begin
-    T := GetTickCount64 + RandomRange(4000, 8000);
+    T := GetTickCount64() + RandomRange(4000, 8000);
     while (CountColor(32767, 37, 107, 372, 318) <> 322) do//waiting for the numbers to load
     begin
       Wait(RandomRange(100, 400));
-      if (GetTickCount64 > T) then
+      if (GetTickCount64() > T) then
         Exit(False);
     end;
     
@@ -737,7 +737,7 @@ var
         end;
       end;
       
-      T := GetTickCount64 + RandomRange(4000, 8000);
+      T := GetTickCount64() + RandomRange(4000, 8000);
       while srl.FindText(p, TSA[J - 1], 'UpChars07_s', Box(160, 80, 350, 100)) and (CountColor(32767, 37, 107, 372, 318) <> 332) do
       begin
         Wait(RandomRange(300, 600));
@@ -751,7 +751,7 @@ var
 begin
   if not __EnterPin() then
     Exit(False);
-  t := GetTickCount64 + RandomRange(15000, 20000);
+  t := GetTickCount64() + RandomRange(15000, 20000);
   while not BankScreen.IsOpen() do
   begin
     if ChatBox.ClickContinue() then
