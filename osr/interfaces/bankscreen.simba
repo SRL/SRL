@@ -754,15 +754,15 @@ begin
   t := GetTickCount64 + RandomRange(15000, 20000);
   while not BankScreen.IsOpen() do
   begin
-    if ChatBox.ClickContinue then
+    if ChatBox.ClickContinue() then
     begin
       Inc(F);
       if (F > 2) then
         srl.WriteLn('Your pin is wrong!', dtFatal);
-      __EnterPin;
+      __EnterPin();
     end;
     Wait(RandomRange(40, 200));
-    if (GetTickCount64 > t) then
+    if (GetTickCount64() > t) then
       Exit(False);
   end;
   Result := BankScreen.IsOpen(RandomRange(2000, 6000));
