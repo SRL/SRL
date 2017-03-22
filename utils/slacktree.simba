@@ -1,4 +1,4 @@
-{$loadlib ..\Includes\SRL\utils\slacktree\slacktree}
+{$loadlib ../Includes/SRL/utils/slacktree/slacktree}
 
 // my answers to FilterTPADistTPA found in AND_TPA.pas
 // solves the problem in roughly O(n log n) time
