@@ -3,7 +3,9 @@ begin
   Result := [X1, Y1, X2, Y2];
 end;
 
+function Box(mid:TPoint; xr,yr:Int32): TBox; overload;
 begin
+  Result := [mid.x-xr, mid.y-yr, mid.x+xr, mid.y+yr];
 end;
 
 function GridBox(Slot, Columns, Rows, w, h, diffX, diffY: Integer; Start: TPoint): TBox;
