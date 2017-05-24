@@ -91,3 +91,16 @@ begin
   L.Y -= R.Y;
   Result := L;
 end;
+
+operator * (L: TPoint; R:Int32): TPoint;
+begin
+  Result.X := L.X * R;
+  Result.Y := L.Y * R;
+end;
+
+operator *= (var L:TPoint; R:Int32): TPoint;
+begin
+  L.X *= R;
+  L.Y *= R;
+  Result := L;
+end;

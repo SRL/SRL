@@ -1,6 +1,9 @@
 type
+  TIntArray = TIntegerArray;
+  TExtArray = TExtendedArray;
   TComparator = (__EQ__, __NE__, __LT__, __GT__);
-
+  
+  
 {$include_once types/TPoint.simba}
 {$include_once types/TBox.simba}
 {$include_once types/String.simba}

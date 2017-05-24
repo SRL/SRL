@@ -36,6 +36,7 @@
 *)
 
 type
+  ERandomStyle = (rndRandom, rndGauss, rndSkewed);
   TMouseMode = (mouse_Human, mouse_Brake, mouse_Accurate);
   TMouseChangeDestEvent = procedure(Sender: TObject; var xe, ye: Extended; var exit_method: Boolean);
   TMouseMoveEvent2 = procedure(Sender: TObject; Shift:TShiftState; X,Y: Int32);
@@ -416,15 +417,16 @@ begin
   Self.Move(Point(X, Y));
 end;
 
-procedure TMouse.Move(const Box: TBox; ForcedMove:Boolean=False; Gauss:Boolean=True); overload;
+procedure TMouse.Move(const Box: TBox; ForcedMove:Boolean=False; RandomStyle:ERandomStyle = rndGauss); overload;
 begin
-  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
+  if PointInBox(Self.GetPosition(),Box) and (not ForcedMove) then
     Exit();
-
-  if (Gauss) then
-    Self.Move(srl.RandomPoint(Box))
-  else
-    Self.Move(Point(Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)));
+  
+  case RandomStyle of
+    rndRandom: Self.Move(Point(Random(Box.X1, Box.X2), Random(Box.Y1, Box.Y2)));
+    rndGauss:  Self.Move(srl.RandomPoint(Box));
+    rndSkewed: Self.Move(srl.RandomPointEx(Self.GetPosition(), Box));
+  end;
 end;
 
 procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
@@ -469,14 +471,10 @@ begin
   Self.Click(Point(X, Y), Button);
 end;
 
-procedure TMouse.Click(const Box: TBox; const Button: Integer; ForcedMove:Boolean=False); overload;
+procedure TMouse.Click(const Box: TBox; const Button: Integer; ForcedMove:Boolean=False; RandomStyle:ERandomStyle = rndGauss); overload;
 begin
-  if not(ForcedMove) and PointInBox(Self.GetPosition(),Box) then
-  begin
-    Self.Click(Button);
-    Exit();
-  end;
-  Self.Click(srl.RandomPoint(Box), Button);
+  Self.Move(Box, ForcedMove, RandomStyle);
+  Self.Click(Button);
 end;
 
 procedure TMouse.Click(const Middle: TPoint; const Radius, Button: Integer); overload;

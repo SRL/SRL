@@ -512,12 +512,12 @@ begin
     if (moveRight) then
     begin
       if (not PointInBox(mp, GetClientBounds())) then
-        Mouse.Move(RIGHT_START, False, False);
+        Mouse.Move(RIGHT_START, False, rndRandom);
 
       if ((mp.x + MIN_X_MOVE) < RIGHT_END_START_X[0]) then
         { No need to move mouse! }
       else
-        Mouse.Move(RIGHT_START, False, False);
+        Mouse.Move(RIGHT_START, False, rndRandom);
 
       mp := Mouse.GetPosition();
       p.x := Random(RIGHT_END_START_X[0], RIGHT_END_START_X[1]);
@@ -525,12 +525,12 @@ begin
     end else // moveLeft
     begin
       if (not PointInBox(mp, GetClientBounds())) then
-        Mouse.Move(LEFT_START, False, False);
+        Mouse.Move(LEFT_START, False, rndRandom);
 
       if ((mp.x - MIN_X_MOVE) > LEFT_END_START_X[1]) then
         { No need to move mouse! }
       else
-        Mouse.Move(LEFT_START, False, False);
+        Mouse.Move(LEFT_START, False, rndRandom);
 
       mp := Mouse.GetPosition();
       p.x := Random(LEFT_END_START_X[0], LEFT_END_START_X[1]);
