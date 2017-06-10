@@ -33,8 +33,9 @@ given range ``[left..right]`` weighted towards ``left``
 *)
 function TSRL.TruncatedGauss(left:Double=0; right:Double=1; CUTOFF:Single=5.5): Double; static;
 begin
-  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
-  Result := Min(Result, CUTOFF);
+  Result := CUTOFF+1;
+  while Result >= CUTOFF do
+    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
   Result := Result / CUTOFF * (right-left) + left;
 end;
 
@@ -49,14 +50,15 @@ srl.SkewedRand
 Random skewed distribution generation. `Peak` is a number between `Lo` and `Hi` which is 
 where the most of the generated numbers will land.
 *)
-function TSRL.SkewedRand(Peak, Lo, Hi: Double; CUTOFF:Single=5.5): Double; static;
+function TSRL.SkewedRand(Mode, Lo, Hi: Double; CUTOFF:Single=5.5): Double; static;
 var top: Double;
 begin
   top := Lo;
-  if Random()*(Hi-Lo) > Peak-Lo then top := Hi;
-  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
-  Result := Min(Result, CUTOFF);
-  Result := Result / CUTOFF * (top-Peak) + Peak;
+  if Random()*(Hi-Lo) > Mode-Lo then top := Hi;
+  Result := CUTOFF+1;
+  while Result >= CUTOFF do
+    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := Result / CUTOFF * (top-Mode) + Mode;
 end;
 
 
@@ -69,11 +71,11 @@ srl.NormalRange
 
 Generates a random integer in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Integer): Integer; constref;
+function TSRL.NormalRange(min, max:Int32; CUTOFF:Single=5.5): Integer; constref;
 begin
   case Random(0,1) of
-    0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2));
-    1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2));
+    0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF));
+    1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF));
   end;
 end;
 
@@ -87,11 +89,11 @@ srl.NormalRange
 
 Generates a random float in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Extended): Extended; constref; overload;
+function TSRL.NormalRange(min, max:Extended; CUTOFF:Single=5.5): Extended; constref; overload;
 begin
   case Random(0,1) of
-    0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2);
-    1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2);
+    0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF);
+    1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF);
   end;
 end;
 

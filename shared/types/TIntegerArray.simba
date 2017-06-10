@@ -221,7 +221,7 @@ end;
 // ----------------------------------------
 // Returns the sample mode of the array, which is the most frequently occurring value in the array.
 // When there are multiple values occurring equally frequently, mode returns the smallest of those values.
-function TIntegerArray.Mode(): Double;
+function TIntegerArray.Mode(): Int32;
 var
   arr: TIntegerArray;
   i,hits,best: Int32;
