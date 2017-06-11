@@ -222,7 +222,7 @@ begin
     SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
     for i := 0 to High(ATPA) do
     begin
-      MinAreaRectEx(ATPA[i], W, H);
+      ATPA[i].MinAreaRectEx(W, H);
       if (W > 15) and (W < 30) and (H >= 6) and (H <= 15) then
       begin
         Matches := 0;
@@ -279,6 +279,7 @@ Calculates and finds where a bank NPC should be based from the bank booth.
 *)
 function TRSBankScreen._MagicalBankerFinder(BoothTopColor: TCTS2Color; BankerColor: EBankerColor; Offset: TPoint): Boolean;
 var
+  Rect: TRectangle;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   b: TBox;
@@ -292,11 +293,9 @@ begin
 
     for i := 0 to High(ATPA) do
     begin
-      TPA := MinAreaRectEx(ATPA[i], W, H);
-
+      Mid := ATPA[i].MinAreaRectEx(W, H).Mean();
       if (W >= 15) and (W <= 30) and (H <= 8) then
       begin
-        Mid := MiddleTPA(TPA);
         pt := [Mid.X + Offset.X, Mid.Y + Offset.Y];
         pt := pt.Rotate(Minimap.GetCompassAngle(False), Mid);
 

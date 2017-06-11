@@ -7,6 +7,7 @@ type
 {$include_once types/TPoint.simba}
 {$include_once types/TBox.simba}
 {$include_once types/String.simba}
+{$include_once types/TRectangle.simba}
 {$include_once types/TIntegerArray.simba}
 {$include_once types/TExtendedArray.simba}
 {$include_once types/TBoolArray.simba}

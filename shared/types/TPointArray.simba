@@ -547,11 +547,11 @@ end;
 //--| Other TPA methods |------------------------------------------------------>
 //----------------------------------------------------------------------------->
 (*
-MinAreaRect
+TPointArray.MinAreaRect
 ~~~~~~~~~~~
 .. code-block:: pascal
 
-     function MinAreaRect(TPA:TPointArray): TPointArray;
+    function TPointArray.MinAreaRect(): TRectangle;
 
 Computes the minimum bounding box (defined by area) around the given shape.
 Four points (which are in order) are always returned.
@@ -566,8 +566,9 @@ Example:
 
     WriteLn('The four box corners are: ', TPA.MinAreaRect());
 *)
-function MinAreaRect(TPA:TPointArray): TPointArray;
+function TPointArray.MinAreaRect(): TRectangle;
 var
+  TPA: TPointArray;
   l,i,ii,j,c: Int32;
   x,y,cosA,cosAP,cosAM: Double;
   xl,yl,xh,yh,angle: Double;
@@ -581,12 +582,11 @@ var
 const
   HALF_PI := PI / 2;
 begin
-  SetLength(Result, 4);
-  if Length(TPA) <= 1 then Exit;
-  TPA := TPA.ConvexHull();
+  if Length(Self) <= 1 then Exit;
+  TPA := Self.ConvexHull();
   L := High(TPA);
   SetLength(angles, L);
-
+  
   j := 0;
   for i:=0 to (L-1) do
   begin
@@ -596,7 +596,7 @@ begin
     for c:=0 to j do
       if (angles[c] = angle) then
         added := True;
-
+    
     if not(added) then
       angles[Inc(j)-1] := angle;
   end;
@@ -627,73 +627,23 @@ begin
     begin
       best[0] := angles[i];       //angle
       best[1] := (xh-xl)*(yh-yl); //area
-      Result[3] := Point(Round((cosAP*yl) + (cosA*xh)), Round((cosA*yl) + (cosAM*xh)));
-      Result[2] := Point(Round((cosAP*yl) + (cosA*xl)), Round((cosA*yl) + (cosAM*xl)));
-      Result[1] := Point(Round((cosAP*yh) + (cosA*xl)), Round((cosA*yh) + (cosAM*xl)));
-      Result[0] := Point(Round((cosAP*yh) + (cosA*xh)), Round((cosA*yh) + (cosAM*xh)));
+      Result.Top   := Point(Round((cosAP*yl) + (cosA*xl)), Round((cosA*yl) + (cosAM*xl)));
+      Result.Right := Point(Round((cosAP*yl) + (cosA*xh)), Round((cosA*yl) + (cosAM*xh)));
+      Result.Btm   := Point(Round((cosAP*yh) + (cosA*xh)), Round((cosA*yh) + (cosAM*xh)));
+      Result.Left  := Point(Round((cosAP*yh) + (cosA*xl)), Round((cosA*yh) + (cosAM*xl)));
     end;
   end;
 end;
 
-function MinAreaRectEx(TPA:TPointArray; out W,H:Int32): TPointArray;
+function TPointArray.MinAreaRectEx(out LongSideLen, ShortSideLen: Int32): TRectangle;
 begin
-  Result := MinAreaRect(TPA);
-  W := Round(Distance(Result[0], Result[3]));
-  H := Round(Distance(Result[0], Result[1]));
-  if (W < H) then
-    Swap(W, H);
+  Result := Self.MinAreaRect();
+  LongSideLen  := Round(Distance(Result.Btm, Result.Right));
+  ShortSideLen := Round(Distance(Result.Btm, Result.Left));
+  if (LongSideLen < ShortSideLen) then
+    Swap(LongSideLen, ShortSideLen);
 end;
 
-
-(*
-ExtractPointsRect
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure ExtractPointsRect(Points: TPointArray; const A, B, C, D: TPoint);
-
-Removes all points not in the rectangle (defined by four points).
-
-Example:
-
-.. code-block:: pascal
-
-    ExtractPointsRect(TPA, mbr[0], mbr[1], mbr[2], mbr[3]);
-
-.. note:: by slacky
-*)
-function ExtractPointsRect(Points: TPointArray; const A, B, C, D: TPoint): TPointArray;
-var
-  i, h, Count: UInt32;
-  Vec: TPoint;
-  Dot: Extended;
-begin
-  h := High(Points);
-  if (h < 0) then
-    Exit;
-
-  SetLength(Result, Length(Points));
-  Count := 0;
-
-  for i := 0 to h do
-  begin
-    Vec := Point(A.x-B.x, A.y-B.y);
-    Dot := ((A.x-Points[i].x) * Vec.x) + ((A.y-Points[i].y) * Vec.y);
-    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
-      Continue;
-
-    Vec := Point(A.x-D.x, A.y-D.y);
-    Dot := ((A.x-Points[i].x) * Vec.x) + ((A.y-Points[i].y) * Vec.y);
-    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
-      Continue;
-
-    Result[Count] := Points[i];
-    Inc(Count);
-  end;
-
-  SetLength(Result, Count);
-end;
 
 
 (*
@@ -708,7 +658,7 @@ A method for increasing the size of any convex polygon.
 
 .. note:: by slacky
 *)
-function ExpandPolygon(Poly:TPointArray; inc:Int32): TPointArray;
+function ExpandPolygon(Poly: TPointArray; inc: Int32): TPointArray;
 type
   TPointF = record x,y:Double; end;
 var
@@ -745,4 +695,19 @@ begin
     end else
       Result[i div 2] := Point(Round(p2.x), Round(p2.y));
   end;
+end;
+
+
+
+// -------------------------------------------------------------------------------------
+// Legacy methods (should be removed at some point, don't use them)
+
+function MinAreaRect(TPA: TPointArray): TPointArray;
+begin
+  Result := TPA.MinAreaRect().ToTPA();
+end;
+
+function MinAreaRectEx(TPA: TPointArray; out LongSideLen, ShortSideLen: Int32): TPointArray;
+begin
+  Result := TPA.MinAreaRectEx(LongSideLen, ShortSideLen).ToTPA();
 end;
