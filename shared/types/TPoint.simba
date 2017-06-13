@@ -1,3 +1,21 @@
+function TPoint.InRect(Rect: TRectangle): Boolean; constref;
+var
+  Vec: TPoint;
+  Dot: Extended;
+begin
+  Vec := Point(Rect.Top.x-Rect.Right.x, Rect.Top.y-Rect.Right.y);
+  Dot := ((Rect.Top.x-Self.x) * Vec.x) + ((Rect.Top.y-Self.y) * Vec.y);
+  if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+    Exit(False);
+
+  Vec := Point(Rect.Top.x-Rect.Left.x, Rect.Top.y-Rect.Left.y);
+  Dot := ((Rect.Top.x-Self.x) * Vec.x) + ((Rect.Top.y-Self.y) * Vec.y);
+  if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+    Exit(False);
+
+  Exit(True);
+end;
+
 function TPoint.InBox(Box: TBox): Boolean; constref;
 begin
   Result := PointInBox(Self, Box);

@@ -566,7 +566,7 @@ Example:
 
     WriteLn('The four box corners are: ', TPA.MinAreaRect());
 *)
-function TPointArray.MinAreaRect(): TRectangle;
+function TPointArray.MinAreaRect(): TRectangle; constref;
 var
   TPA: TPointArray;
   l,i,ii,j,c: Int32;
@@ -635,7 +635,7 @@ begin
   end;
 end;
 
-function TPointArray.MinAreaRectEx(out LongSideLen, ShortSideLen: Int32): TRectangle;
+function TPointArray.MinAreaRectEx(out LongSideLen, ShortSideLen: Int32): TRectangle; constref;
 begin
   Result := Self.MinAreaRect();
   LongSideLen  := Round(Distance(Result.Btm, Result.Right));
