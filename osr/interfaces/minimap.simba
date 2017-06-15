@@ -106,11 +106,20 @@ begin
   end;
 end;
 
+(*
+Minimap.GetMiddle
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+    function TMinimap.GetMiddle(): TPoint;
+
+Returns the center of the minimap
+*)
 function TMinimap.GetMiddle(): TPoint; override;
 begin
   Result := Self.Center;
 end;
+
 
 function TMinimap._GetOrbValue(const orb: EMinimapOrb): Integer;
 const
@@ -131,16 +140,43 @@ begin
   Result := StrToIntDef(Text, 0);
 end;
 
+(*
+Minimap.GetPrayerLevel
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.GetPrayerLevel(): Integer;
+
+Returns your current prayer level
+*)
 function TMinimap.GetPrayerLevel(): Integer;
 begin
   Result := Self._GetOrbValue(MMOrbPrayer);
 end;
 
+(*
+Minimap.GetHPLevel
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.GetHPLevel(): Integer;
+
+Returns your current HP level
+*)
 function TMinimap.GetHPLevel(): Integer;
 begin
   Result := Self._GetOrbValue(MMOrbHP);
 end;
 
+(*
+Minimap.GetHPPercent
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.GetHPPercent(): Byte;
+
+Returns your current HP level as a percentage `0..100`
+*)
 function TMinimap.GetHPPercent(): Byte;
 var
   tb, b: TBox;
@@ -153,11 +189,51 @@ begin
   Result := 100 - Ceil((tb.y2 - tb.y1) / (b.y2 - b.y1) * 100);
 end;
 
+(*
+Minimap.GetRunEnergy
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.GetRunEnergy(): Integer;
+
+Returns your current energy level 
+*)
 function TMinimap.GetRunEnergy(): Integer;
 begin
   Result := Self._GetOrbValue(MMOrbRun);
 end;
 
+(*
+Minimap.isPrayerEnabled
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+
+Returns `True` if you have enabled it otherwise `False`.
+*)
+function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+var
+  b: TBox;
+begin
+  with (Self.OrbInfo[Ord(MMOrbPrayer)].Middle) do
+    b := [X - 7, Y - 7, X + 7, Y + 7];
+
+  if (Time = 0) then
+    Result := (CountColorTolerance(15988210, b, 21) > 15)
+  else
+    Result := srl.WaitColorCount([15988210, 21], b, @GreaterThan, 15, Time);
+end;
+
+(*
+Minimap.isRunEnabled
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
+
+Returns `True` if you have enabled it otherwise `False`.
+*)
 function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
 var
   b: TBox;
@@ -167,26 +243,79 @@ begin
   Result := srl.WaitColorCount([101547, 40], b, @GreaterThan, 5, WaitTime);
 end;
 
-function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
-begin
-  Result := True;
+(*
+Minimap.TogglePrayer
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+    function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+
+A toggle to enable or disable prayer.
+*)
+function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+var t: TCountDown;
+begin
+  if (Enable = Self.isPrayerEnabled()) then Exit(True);
   with (Self.OrbInfo[Ord(MMOrbRun)]) do
   begin
-    if (Enable) and (not Self.isRunEnabled()) then
-    begin
-      Mouse.Click(Middle, Radius, mouse_Left);
-      Result := Self.isRunEnabled(Random(600, 1000));
-    end
-    else
-    if (not Enable) and (Self.isRunEnabled()) then
-    begin
-      Mouse.Click(Middle, Radius, mouse_Left);
-      Result := not Self.isRunEnabled(Random(250, 500));
-    end;
+    Mouse.Click(Middle, Radius, mouse_Left);
+    t.Init(1000);
+    while (not t.IsFinished()) and (Self.isPrayerEnabled() <> Enable) do
+      Wait(40);
+    Result := Self.isPrayerEnabled() = Enable;
   end;
 end;
 
+(*
+Minimap.ToggleRun
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+
+A toggle to enable or disable running.
+*)
+function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+var t: TCountDown;
+begin
+  if (Enable = Self.isRunEnabled()) then Exit(True);
+  with (Self.OrbInfo[Ord(MMOrbRun)]) do
+  begin
+    Mouse.Click(Middle, Radius, mouse_Left);
+    t.Init(1000);
+    while (not t.IsFinished()) and (Self.isRunEnabled() <> Enable) do
+      Wait(40);
+    Result := Self.isRunEnabled() = Enable;
+  end;
+end;
+
+(*
+Minimap.isPlayerMoving
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+
+Returns `True` if your character is moving.
+*)
+function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+var
+  m: TPoint;
+begin
+  m := Self.GetMiddle();
+  Result := srl.GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
+end;
+
+
+(*
+Minimap.FindFlag
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.FindFlag(out p: TPoint): Boolean;
+
+Locate the current postion of the flag on the minimap, returns `False` if it can't be found.
+*)
 function TMinimap.FindFlag(out p: TPoint): Boolean;
 const
   PoleColor = 1127261;
@@ -239,6 +368,15 @@ begin
   Inc(p.y, Self.GetBounds().Y1);
 end;
 
+(*
+Minimap.isFlagPresent
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
+
+Returns True if the flag can be found on the minimap.. otherwise False.
+*)
 function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
 var
   TimeOut: UInt64;
@@ -255,6 +393,16 @@ begin
   until (GetTickCount64() > TimeOut);
 end;
 
+(*
+Minimap.WaitFlag
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
+
+Wait while the flag is present, can return early if the position from it to minimap center is less
+than `dist`.
+*)
 procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
 var
   TimeOut: UInt64;
@@ -281,6 +429,30 @@ begin
 
     LastDist := d;
     Wait(Random(50, 100));
+  end;
+end;
+
+(*
+Minimap.WaitPlayerMoving
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+
+Waits till your character is no longer moving.
+*)
+procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+var
+  t: UInt64;
+begin
+  t := GetTickCount64() + TimeOut;
+  while (t > GetTickCount64()) do
+  begin
+    if (UseFlag) and (Self.isFlagPresent()) then
+      Self.WaitFlag;
+    if (not Self.isPlayerMoving(MinShift)) then
+      Exit;
+    Wait(Random(100, 200));
   end;
 end;
 
@@ -336,6 +508,15 @@ begin
   end;
 end;
 
+(*
+Minimap.GetCompassAngle
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+
+Returns the current compass angle, default as degrees.
+*)
 function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 var
   north,south: TPoint;
@@ -364,8 +545,17 @@ begin
     Result := Degrees(Result);
 end;
 
-function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
 
+(*
+Minimap.MouseSetCompassAngle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
+
+Some long code that does stuff.
+*)
+function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
   procedure MoveRotate(xs, ys, xe, ye, Angle, Tolerance: Extended);
   const
     sqrt2 := sqrt(2);
@@ -545,6 +735,15 @@ begin
   Result := CompassDist < Tolerance;
 end;
 
+(*
+Minimap.SetCompassAngle
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 5): Boolean;
+
+Set the compass angle.
+*)
 function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 5): Boolean;
 
   function Compass_Distance(Angle, Target: Extended): Extended;
@@ -745,62 +944,6 @@ begin
   FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
   Self.FilterPoints(TPA);
   Result := Round((Length(TPA) / Max) * 100);
-end;
-
-function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
-var
-  m: TPoint;
-begin
-  m := Self.getMiddle();
-  Result := srl.GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
-end;
-
-procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
-var
-  t: UInt64;
-begin
-  t := GetTickCount64() + TimeOut;
-  while (t > GetTickCount64()) do
-  begin
-    if (UseFlag) and (Self.isFlagPresent()) then
-      Self.WaitFlag;
-    if (not Self.isPlayerMoving(MinShift)) then
-      Exit;
-    Wait(Random(100, 200));
-  end;
-end;
-
-function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
-var
-  b: TBox;
-begin
-  with (Self.OrbInfo[Ord(MMOrbPrayer)].Middle) do
-    b := [X - 7, Y - 7, X + 7, Y + 7];
-
-  if (Time = 0) then
-    Result := (CountColorTolerance(15988210, b, 21) > 15)
-  else
-    Result := srl.WaitColorCount([15988210, 21], b, @GreaterThan, 15, Time);
-end;
-
-function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
-begin
-  Result := True;
-
-  with (Self.OrbInfo[Ord(MMOrbPrayer)]) do
-  begin
-    if (Enable) and (not Self.isPrayerEnabled()) then
-    begin
-      Mouse.Click(Middle, Radius, mouse_Left);
-      Result := Self.isRunEnabled(Random(600, 1000));
-    end
-    else
-    if (not Enable) and (Self.isPrayerEnabled()) then
-    begin
-      Mouse.Click(Middle, Radius, mouse_Left);
-      Result := not Self.isRunEnabled(Random(250, 500));
-    end;
-  end;
 end;
 
 function TMinimap.RandomCompass(MinMovement, MaxMovement: Integer; UseMouse: Boolean = True): Extended;

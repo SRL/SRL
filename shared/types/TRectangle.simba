@@ -62,6 +62,8 @@ var
       end;
   end;
 begin
+  if m = 0 then m := 1;
+  if n = 0 then n := 1;
   if dir <> rpTopLeft then Swap(m,n);
   SetLength(Result, m*n);
   a  := ArcTan2(Left.y-Btm.y, Left.x-Btm.x) + PI/2;
@@ -111,7 +113,8 @@ Middle of the rectangle
 *)
 function TRectangle.Mean(): TPoint; constref;
 begin
-  Result := MiddleTPA(Self.ToTPA());
+  Result.X := (Top.X + Right.X + Btm.X + Left.X) div 4;
+  Result.Y := (Top.Y + Right.Y + Btm.Y + Left.Y) div 4;
 end;
 
 
@@ -213,4 +216,3 @@ begin
   TPA := Expand(Self.ToTPA(), Inc);
   Result := [TPA[0], TPA[1], TPA[2], TPA[3]];
 end;
-

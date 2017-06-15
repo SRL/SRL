@@ -83,42 +83,43 @@ begin
   end;
 end;
 
-
-operator + (L,R:TPoint): TPoint;
+// -----------------------------------------------------------------
+// Operator overloads
+operator + (L, R: TPoint): TPoint;
 begin
   Result.X := L.X + R.X;
   Result.Y := L.Y + R.Y;
 end;
 
-operator += (var L:TPoint; R:TPoint): TPoint;
+operator += (var L: TPoint; R: TPoint): TPoint;
 begin
   L.X += R.X;
   L.Y += R.Y;
   Result := L;
 end;
 
-operator - (L,R:TPoint): TPoint;
+operator - (L, R:TPoint): TPoint;
 begin
   Result.X := L.X - R.X;
   Result.Y := L.Y - R.Y;
 end;
 
-operator -= (var L:TPoint; R:TPoint): TPoint;
+operator -= (var L: TPoint; R: TPoint): TPoint;
 begin
   L.X -= R.X;
   L.Y -= R.Y;
   Result := L;
 end;
 
-operator * (L: TPoint; R:Int32): TPoint;
+operator * (L: TPoint; R: Double): TPoint;
 begin
-  Result.X := L.X * R;
-  Result.Y := L.Y * R;
+  Result.X := Round(L.X * R);
+  Result.Y := Round(L.Y * R);
 end;
 
-operator *= (var L:TPoint; R:Int32): TPoint;
+operator *= (var L: TPoint; R: Double): TPoint;
 begin
-  L.X *= R;
-  L.Y *= R;
+  L.X := Round(L.X * R);
+  L.Y := Round(L.Y * R);
   Result := L;
 end;
