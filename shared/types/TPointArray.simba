@@ -318,16 +318,22 @@ TPointArray.Cluster
     function TPointArray.Cluster(dist:Int32): T2DPointArray; constref;
     function TPointArray.Cluster(distX,distY:Int32): T2DPointArray; constref; overload;
 
-Wraps Simba's ClusterTPA and ClusterTPAEx
+Smart wrapper of Simba's ClusterTPA and ClusterTPAEx (fall backs to SplitTPA when it's better suited)
 *)
 function TPointArray.Cluster(dist:Int32): T2DPointArray; constref;
 begin
-  Result := ClusterTPA(Self, dist);
-end; 
+  if (Length(Self) < 700) then
+    Result := SplitTPA(Self, dist)
+  else
+    Result := ClusterTPA(Self, dist);
+end;
 
 function TPointArray.Cluster(distX,distY:Int32): T2DPointArray; constref; overload;
 begin
-  Result := ClusterTPAEx(Self, distX, distY);
+  if (Length(Self) < 1200) then
+    Result := SplitTPAEx(Self, distX, distY)
+  else 
+    Result := ClusterTPAEx(Self, distX, distY);
 end;
 
 (*
@@ -543,9 +549,6 @@ begin
   SetLength(result, k-1);
 end;
 
-
-//--| Other TPA methods |------------------------------------------------------>
-//----------------------------------------------------------------------------->
 (*
 TPointArray.MinAreaRect
 ~~~~~~~~~~~
@@ -646,6 +649,8 @@ end;
 
 
 
+//--| Other TPA methods |------------------------------------------------------>
+//----------------------------------------------------------------------------->
 (*
 ExpandPolygon
 ~~~~~~~~~~~~~~~~~
@@ -697,6 +702,13 @@ begin
   end;
 end;
 
+function RandomTPA(n:Int32; B:TBox): TPointArray;
+var i:Int32;
+begin
+  SetLength(Result, n);
+  for i:=0 to n-1 do
+    Result[i] := Point(Random(B.x1,B.x2), Random(B.y1,B.y2));
+end;   
 
 
 // -------------------------------------------------------------------------------------

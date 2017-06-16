@@ -288,3 +288,19 @@ function TCountDown.IsFinished(): Boolean;
 begin
   Result := GetTickCount64() >= self.Timeout;
 end;
+
+
+
+{$IFDEF WINDOWS}
+// switch GetTickCount out with a high performance counter version of it.
+function GetTickCount(): UInt64; override;
+var
+  frequency,count: UInt64;
+  function QPF(out F: UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  function QPC(out C: UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+begin
+  QPF(frequency);
+  QPC(count);
+  Result := Round(count / frequency * 1000);        
+end;
+{$ENDIF}
