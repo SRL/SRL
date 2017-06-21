@@ -126,18 +126,23 @@ const
   IgnoreCols = [4938344, 0];
   Font = 'StatChars07';
 var
-  ATPA: array [0..1] of TPointArray;
+  ATPA: T2DPointArray;
   TextTPA: TPointArray;
-  i: Integer;
   Text: String;
+  i: Int32;
 begin
-  for i := 0 to High(IgnoreCols) do
+  SetLength(ATPA, Length(IgnoreCols));
+  for i:=0 to High(IgnoreCols) do
     FindColors(ATPA[i], IgnoreCols[i], OrbInfo[Ord(orb)].TextBox);
-
-  TextTPA := ReturnPointsNotInTPA(MergeATPA(ATPA), OrbInfo[Ord(orb)].TextBox);
-  // look into a better fix
-  Text := StringReplace(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 'O', '0', [rfReplaceAll]);
-  Result := StrToIntDef(Text, 0);
+  
+  TextTPA := MergeATPA(ATPA);
+  if Length(TextTPA) > 0 then
+  begin
+    TextTPA := ReturnPointsNotInTPA(TextTPA, OrbInfo[Ord(orb)].TextBox);
+    // look into a better fix
+    Text := StringReplace(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 'O', '0', [rfReplaceAll]);
+    Result := StrToIntDef(Text, 0);
+  end;
 end;
 
 (*
