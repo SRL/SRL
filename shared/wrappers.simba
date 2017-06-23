@@ -29,34 +29,10 @@ begin
     Result := Inherited(Box);
 end;
 
-//fix - will be a bit slower, but Simba's version is just... I don't even understand how it got in there.
+//fix
 function ReturnPointsNotInTPA(const TotalTPA: TPointArray; const Box: TBox): TPointArray; override;
-var
-  x,y, w,h, i: Int32;
-  test: array of TBoolArray;
 begin;
-  w := (Box.x2 - Box.x1) + 1;
-  h := (Box.y2 - Box.y1) + 1;
-  if (w = 0) or (h = 0) then
-    Exit;
-  
-  SetLength(test, h,w);
-  for i:=0 to High(TotalTPA) do
-    if ((TotalTPA[i].x >= Box.x1) and (TotalTPA[i].x <= Box.x2) and
-        (TotalTPA[i].y >= Box.y1) and (TotalTPA[i].y <= Box.y2)) then
-      test[TotalTPA[i].y-Box.y1][TotalTPA[i].x-Box.x1] := True;
-  
-  SetLength(Result, w*h);
-  i := 0;
-  for y := 0 to h-1 do
-    for x := 0 to w-1 do
-      if not test[y,x] then
-      begin
-        Result[i].x := x + Box.x1;
-        Result[i].y := y + Box.y1;
-        Inc(i);
-      end;
-  SetLength(Result, i);
+  Result := ClearTPAfromTPA(TPAFromBox(box), TotalTPA); 
 end;
 
 
