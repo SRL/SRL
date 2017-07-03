@@ -194,3 +194,23 @@ begin
         tmp += TPA;
   self := tmp;
 end;
+
+procedure T2DPointArray.SortByMiddle(From: TPoint); overload;
+begin
+  SortATPAFromMidPoint(Self, From);
+end;
+
+procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0); overload;
+var
+  i: Int32;
+  weight: TIntegerArray;
+begin
+  if (Length(self) <= 1) then Exit;
+  SetLength(weight, Length(self));
+  for i:=0 to High(self) do
+  begin
+    if Length(Self[i]) = 0 then continue;
+    weight[i] := Round(Sqr(From.x - self[i][Index].x) + Sqr(From.y - self[i][Index].y));
+  end;
+  QuickATPASort(weight, self, 0, High(self), True);
+end;

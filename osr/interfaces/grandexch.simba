@@ -64,7 +64,6 @@ var
   GrandExchange: TRSGrandExch;
 
 
-
 //====| The base of GE interfaces |===========================================\\
 procedure TGrandExchStub.__Setup();
 begin
@@ -281,7 +280,7 @@ begin
   until (GetTickCount64() > t);
 end;
 
-function TGrandExchOffer.SetQuntity(quantity:Int32): Boolean;
+function TGrandExchOffer.SetQuantity(quantity:Int32): Boolean;
 begin
   Self.Click(abEnterQuantity);
   Result := Chatbox.AnswerQuery('How many', IntToStr(quantity), True, 2500);
@@ -317,7 +316,7 @@ end;
 
 function TGrandExchOffer.ItemValue(): Int32;
 begin
-  Result := self.RecognizeInt(FMiscBoxes[2], clGELiteOrange, 'StatChars07_s');
+  Result := self.RecognizeInt(FMiscBoxes[2], clGELiteOrange, 'StatChars07');
 end;
 
 function TGrandExchOffer.ItemName(): String;
@@ -327,7 +326,7 @@ end;
 
 function TGrandExchOffer.ItemDesc(): String;
 begin
-  Result := self.RecognizeStr(FMiscBoxes[4], clGELiteOrange, 'StatChars07_s');
+  Result := self.RecognizeStr(FMiscBoxes[4], clGELiteOrange, 'StatChars07');
 end;
 
 function TGrandExchOffer.Quantity(): Int32;
@@ -335,7 +334,7 @@ var iface:EGEInterface;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
-    Result := self.RecognizeInt(FMiscBoxes[5], clGELiteOrange, 'StatChars07_s')
+    Result := self.RecognizeInt(FMiscBoxes[5], clGELiteOrange, 'StatChars07')
   else if iface = geOfferStatus then
     Result := self.RecognizeInt(FMiscBoxes[5], clGELiteOrange, 'UpChars07_s')
   else
@@ -347,7 +346,7 @@ var iface:EGEInterface;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
-    Result := self.RecognizeInt(FMiscBoxes[6], clGELiteOrange, 'StatChars07_s')
+    Result := self.RecognizeInt(FMiscBoxes[6], clGELiteOrange, 'StatChars07')
   else if iface = geOfferStatus then
     Result := self.RecognizeInt(FMiscBoxes[6], clGELiteOrange, 'UpChars07_s')
   else
@@ -359,7 +358,7 @@ var iface:EGEInterface;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
-    Result := self.RecognizeInt(FMiscBoxes[7], clWhite, 'StatChars07_s')
+    Result := self.RecognizeInt(FMiscBoxes[7], clWhite, 'StatChars07')
   else if iface = geOfferStatus then
     Result := self.RecognizeInt(FMiscBoxes[7], clWhite, 'UpChars07_s')
   else
@@ -368,7 +367,7 @@ end;
 
 function TGrandExchOffer.Status(): String;
 begin
-  Result := self.RecognizeStr(FMiscBoxes[8], clGEOrange, 'StatChars07_s', 60);
+  Result := self.RecognizeStr(FMiscBoxes[8], clGEOrange, 'StatChars07', 60);
 end;
 
 
