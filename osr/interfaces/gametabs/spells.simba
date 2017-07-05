@@ -15,8 +15,10 @@ type
  function TRSSpells.Open(): Boolean;
  function TRSSpells.IsOpen(): Boolean;
  function TRSSpells.GetSpellBounds(spell: ESpellCast): TBox;
- function TRSSpells.MouseOver(spell: ESpellCast): Int32;
- function TRSSpells.CanCast(Spell: ESpellCast): Boolean;
+ function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+ function TRSSpells.IsActivated(Spell: ESpellCast): Boolean;
+ function TRSSpells.MouseOver(spell: ESpellCast): Boolean;
+ function TRSSpells.Toggle(spell: ESpellCast): Boolean;
 }
 
 (*

@@ -14,9 +14,10 @@ type
  procedure TRSPrayer.__setup();
  function TRSPrayer.Open(): Boolean;
  function TRSPrayer.IsOpen(): Boolean;
- function TRSPrayer.GetPrayerBound(pray: EPrayerType): TBox;
- function TRSPrayer.MouseOver(pray: EPrayerType): Int32;
- function TRSPrayer.CanActivate(pray: EPrayerType): Boolean;
+ function TRSPrayer.GetPrayerBound(prayer: EPrayerType): TBox;
+ function TRSPrayer.CanActivate(prayer: EPrayerType): Boolean;
+ function TRSPrayer.MouseOver(prayer: EPrayerType): Int32;
+ function TRSPrayer.Toggle(prayer: EPrayerType): Boolean;
 }
 
 (*
