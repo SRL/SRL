@@ -222,13 +222,3 @@ end;
 begin
   Prayer.__Setup();
 end;
-
-
-
-
-
-
-
-
-
-

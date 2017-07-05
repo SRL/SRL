@@ -260,16 +260,7 @@ begin
     Mouse.Click(Self.FSlots[Spell], mouse_left, False, rndSkewed);
 end;
 
+
 begin
   Spells.__Setup();
 end;
-
-
-
-
-
-
-
-
-
-
