@@ -82,7 +82,7 @@ begin
   end;
 end;
 
-procedure TRSInventory.__Debug();
+procedure TRSInventory.Debug();
 var
   BMP:TMufasaBitmap;
 begin

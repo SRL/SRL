@@ -48,6 +48,25 @@ begin
   self.DrawClear(0);
 end;
 
+(*
+TMufasaBitmap.FromClient
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.FromClient(Area: TBox);
+
+Copy client to bitmap.
+*)
+procedure TMufasaBitmap.FromClient(Area: TBox=[0,0,-1,-1]);
+var 
+  W,H: Int32;
+begin
+  GetClientDimensions(W,H);
+  if (Area.x1 > Area.x2) then Area := [0,0,W-1,H-1];
+  if (self <> nil) and (self.GetIndex() <> -1) then self.Free();
+  self := GetMufasaBitmap(BitmapFromClient(Area));
+end;
+
 
 (*
 TMufasaBitmap.ClearArea
@@ -75,6 +94,59 @@ procedure TMufasaBitmap.ClearArea(area: TBox);
 begin
   self.Rectangle(area, 0);
 end;
+
+(*
+TMufasaBitmap.AvgBrightness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.AvgBrightness();
+
+Returns a value between 0 and 100 that defines how bright the image is.
+*)
+function TMufasaBitmap.AvgBrightness(): Int32; constref;
+var
+  x,y,t: Int64;
+  px:TRGB32;
+begin
+  for y:=0 to self.GetHeight()-1 do
+  begin
+    t := 0;
+    for x:=0 to self.GetWidth()-1 do
+    begin
+      px := TRGB32(self.GetPixel(x,y));
+      t += Round((px.R+px.G+px.B) / 3 * 0.392);
+    end;
+    Result += t div self.GetWidth();
+  end;
+  Result /= self.GetHeight();
+end;
+
+
+(*
+TMufasaBitmap.PeakBrightness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.PeakBrightness();
+
+Returns the maximum brightness in the image in the range `0..100`.
+*)
+function TMufasaBitmap.PeakBrightness(): Int32; constref;
+var
+  x,y,t: Int64;
+  px:TRGB32;
+begin
+  for y:=0 to self.GetHeight()-1 do
+    for x:=0 to self.GetWidth()-1 do
+    begin 
+      px := TRGB32(self.GetPixel(x,y));
+      t := Max(Max(px.R,px.G),px.B);
+      if t > Result then Result := t;
+    end;
+  Result := Round(Result / 255 * 100);
+end;
+
 
 (*
 TMufasaBitmap.DrawBox
@@ -684,7 +756,7 @@ end;
 
 (*
 TMufasaBitmap.UpdateDebugImage
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     procedure TMufasaBitmap.UpdateDebugImage();
@@ -727,7 +799,7 @@ Example:
     image.DebugTPA(tpa);
 
 *)
-procedure TMufasaBitmap.DebugTPA(tpa: TPointArray; drawPoints: boolean = True);
+procedure TMufasaBitmap.DebugTPA(tpa: TPointArray; drawPoints: Boolean = True);
 var
   mid: TPoint;
   l: Int32;

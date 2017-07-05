@@ -14,8 +14,9 @@ type
  procedure TRSSpells.__setup();
  function TRSSpells.Open(): Boolean;
  function TRSSpells.IsOpen(): Boolean;
- function TRSSpells.GetSpellBounds(spell:ESpellCast): TBox;
- function TRSSpells.MouseOver(spell:ESpellCast): Int32;
+ function TRSSpells.GetSpellBounds(spell: ESpellCast): TBox;
+ function TRSSpells.MouseOver(spell: ESpellCast): Int32;
+ function TRSSpells.CanCast(Spell: ESpellCast): Boolean;
 }
 
 (*
@@ -115,17 +116,22 @@ begin
     FName := 'Spells';
     FStatic := True;
     FBounds := [548,206,735,464];
-    FSlots := SlotBounds.Partition(10,7);
+    FSlots := SlotBounds.Partition(10,7,-2);
   end;
 end;
 
-procedure TRSSpells.__Debug();
+procedure TRSSpells.Debug();
 var
   BMP:TMufasaBitmap;
+  i:Int32;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FSlots, False, $0000FF);
-  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.DrawBox(Self.FBounds, False, $00FF00);
+  if Self.IsOpen() then
+    for i:=0 to High(Self.FSlots) do
+      if self.CanActivate(ESpellCast(i)) then
+	      BMP.DrawBox(Self.FSlots[i], False, $FFFFFF);
   BMP.Debug();
   BMP.Free();
 end;
@@ -152,11 +158,11 @@ Spells.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.IsOpen(maxWait:Int32=0): Boolean;
+  function TRSSpells.IsOpen(maxWait: Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
-function TRSSpells.IsOpen(maxWait:Int32=0): Boolean;
+function TRSSpells.IsOpen(maxWait: Int32=0): Boolean;
 begin
   Result := Gametabs.IsOpen(tabMagic, maxWait);
 end;
@@ -167,15 +173,53 @@ Spells.GetSpellBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
+  function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
 
 Returns the bounding box covering the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
+function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
 begin
-  Result := Self.FSlots[spell]
+  Result := Self.FSlots[spell];
+end;
+
+(*
+Spells.CanActivate
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+
+Returns True if you can use the spell..
+
+.. note:: by slacky
+*)
+function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+var 
+  bmp: TMufasaBitmap;
+begin
+  if not(self.Open()) then Exit(False);
+  bmp.FromClient(self.GetSpellBound(spell));
+  Result := bmp.PeakBrightness() > 35;
+  bmp.Free();
+end;
+
+(*
+Spells.IsActivated
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.IsActivated(Spell: ESpellCast): Boolean;
+
+Returns True if the spell is activated
+
+.. note:: by slacky
+*)
+function TRSSpells.IsActivated(Spell: ESpellCast): Boolean;
+begin
+  if not(self.Open()) then Exit(False);
+  Result := CountColor($FFFFFF, self.GetSpellBound(spell)) > 10;
 end;
 
 
@@ -184,13 +228,13 @@ Spells.MouseOver
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
+  function TRSSpells.MouseOver(spell: ESpellCast): Boolean;
 
 Moves the mouse over the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
+function TRSSpells.MouseOver(Spell: ESpellCast): Boolean;
 begin
   if not(self.Open()) then Exit();
   
@@ -198,10 +242,26 @@ begin
   Mouse.Move(Self.FSlots[spell]);
 end;
 
+(*
+Spells.Toggle
+~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
+
+Click's it if it can be activated.
+
+.. note:: by slacky
+*)
+function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
+begin
+  Result := self.CanActivate(Spell);
+  if Result then
+    Mouse.Click(Self.FSlots[Spell], mouse_left, False, rndSkewed);
+end;
 
 begin
-  Spells.__setup();
+  Spells.__Setup();
 end;
 
 

@@ -106,7 +106,7 @@ begin
   end;
 end;
 
-procedure TRSStats.__Debug();
+procedure TRSStats.Debug();
 var
   BMP:TMufasaBitmap;
 begin

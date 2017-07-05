@@ -137,7 +137,7 @@ srl.RandonPointEx
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.RandonPointEx(From:TPoint; B: TBox; Force:Double=0.25): TPoint; constref;
+  function TSRL.RandonPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
 
 Generates a random point within the bounds of the given box `B`, the point generated is skewed towards towards the `From`-point.
 The last parameter `Force` defines how much the generated point is to be skewed towards or away from `From` - Expects value in the range 0..2
@@ -146,7 +146,7 @@ The last parameter `Force` defines how much the generated point is to be skewed 
   Force = 1: Result in the middle of box is most common
   Force = 2: Result weighs heavily towrads the edge furthest away from `From`
 *)
-function TSRL.RandomPointEx(From:TPoint; B: TBox; Force:Double=0.2): TPoint; constref;
+function TSRL.RandomPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
 var
   p,c: TPoint;
   x,r: Double;
