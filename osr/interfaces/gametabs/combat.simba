@@ -196,7 +196,7 @@ begin
     end;
 end;
 
-function TRSCombat.SpecialAttackEnabled: Boolean;
+function TRSCombat.SpecialAttackEnabled(): Boolean;
 var
   x, y: Integer;
 begin
@@ -205,7 +205,7 @@ begin
   Result := FindColor(x, y, 65535, Self.FButtons[cbtSpecialAttack]);
 end;
 
-function TRSCombat.UseSpecialAttack: Integer;
+function TRSCombat.UseSpecialAttack(): Integer;
 begin
   if (not Self.Open()) then
     Exit(-1);

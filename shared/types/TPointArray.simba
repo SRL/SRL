@@ -94,7 +94,7 @@ end
 function TPointArray.Reversed(): TPointArray;
 var
   lo:PtrUInt;
-  p,r:^TPoint;
+  r, p:^TPoint;
 begin
   if (Length(Self) = 0) then
     Exit();
@@ -214,14 +214,14 @@ end;
 
 (*
 TPointArray.SortByRow
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     procedure TPointArray.SortByRow(reverse:Boolean=False);
 
 The name tells the story
 *)
-procedure TPointArray.SortTPAbyRow(reverse:Boolean=False);
+procedure TPointArray.SortByRow(reverse:Boolean=False);
 var
   i,hi,w: Int32;
   weight: TIntegerArray;
@@ -239,15 +239,15 @@ end;
 
 
 (*
-TPointArray.SortTPAbyColumn
-~~~~~~~~~~~~~~~~~~~
+TPointArray.SortByColumn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TPointArray.SortTPAbyColumn(reverse:Boolean=False);
+    procedure TPointArray.SortByColumn(reverse:Boolean=False);
 
 The name tells the story
 *)
-procedure TPointArray.SortTPAbyColumn(reverse:Boolean=False);
+procedure TPointArray.SortByColumn(reverse:Boolean=False);
 var
   i,Hi,H: Int32;
   weight: TIntegerArray;
@@ -551,7 +551,7 @@ end;
 
 (*
 TPointArray.MinAreaRect
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TPointArray.MinAreaRect(): TRectangle;
@@ -653,7 +653,7 @@ end;
 //----------------------------------------------------------------------------->
 (*
 ExpandPolygon
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. code-block:: pascal
 
