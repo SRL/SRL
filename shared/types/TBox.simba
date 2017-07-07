@@ -8,27 +8,6 @@ begin
   Result := [mid.x-xr, mid.y-yr, mid.x+xr, mid.y+yr];
 end;
 
-function GridBox(Slot, Columns, Rows, w, h, diffX, diffY: Integer; Start: TPoint): TBox;
-begin
-  if (Slot > (Columns * Rows)) then
-    Exit;
-
-  Result.X1 := (Start.x + ((Slot mod Columns) * diffX) - (w div 2));
-  Result.Y1 := (Start.y + ((Slot div Columns) * diffY) - (h div 2));
-  Result.X2 := (Result.X1 + w);
-  Result.Y2 := (Result.Y1 + h);
-end;
-
-function Grid(Columns, Rows, w, h, diffX, diffY: integer; Start: TPoint): TBoxArray;
-var
-  i: Integer;
-begin
-  SetLength(Result, (Columns * Rows));
-
-  for i := 0 to High(Result) do
-    Result[i] := GridBox(i, Columns, Rows, w, h, diffX, diffY, Start);
-end;
-
 procedure TBox.GetDimensions(out w, h: integer); constref;
 begin
   w := Self.X2 - Self.X1 + 1;
@@ -156,15 +135,14 @@ begin
     for x:=0 to Cols-1 do
     begin
       idx := (Y * Cols) + X;
-      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x));
-      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y));
-      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1);
-      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1);
-      Result[idx].Expand(SizeMod);
+      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x)) - SizeMod;
+      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y)) - SizeMod;
+      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1) + SizeMod;
+      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1) + SizeMod;
     end;
 end;
 
-function TBox.PartitionEx(Rows, Cols: Int32; WidMod, HeiMod:Int32): TBoxArray; constref;
+function TBox.PartitionEx(Rows, Cols: Int32; RowMod, ColMod:Int32): TBoxArray; constref;
 var
   idx,x,y: Int32;
   BoxW,BoxH: Single;
@@ -176,11 +154,10 @@ begin
     for x:=0 to Cols-1 do
     begin
       idx := (Y * Cols) + X;
-      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x));
-      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y));
-      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1);
-      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1);
-      Result[idx].Expand(widMod, heiMod);
+      Result[idx].x1 := Ceil(Self.x1 + (BoxW * x)) - ColMod;
+      Result[idx].y1 := Ceil(Self.y1 + (BoxH * y)) - RowMod;
+      Result[idx].x2 := Trunc(Self.x1 + (BoxW * x) + BoxW-1) + ColMod;
+      Result[idx].y2 := Trunc(Self.y1 + (BoxH * y) + BoxH-1) + RowMod;
     end;
 end;
 
