@@ -120,8 +120,8 @@ Example:
 
 .. code-block:: pascal
 
-    // returns true if "Hello" is found on the first 4 lines
-    chatbox.findTextOnLines(['Hello'], [0..3]);
+    // returns True if "Hello" is found on the first 4 lines
+    chatbox.FindTextOnLines(['Hello'], [0..3]);
 *)
 function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): Boolean;
 var
@@ -176,7 +176,7 @@ Chatbox.ClickContinue
     function TRSChatbox.ClickContinue(): Boolean;
 
 Clicks the "Click here to continue"-text in the chatbox.
-Returns True if the text was found.
+Returns `True` if the text was found.
 
 .. note:: by slacky
 *)
@@ -184,7 +184,7 @@ function TRSChatbox.ClickContinue(): Boolean;
 var
   tpa:Array [0..2] of TPoint;
 begin
-  //match each word sepparatly to avoid whitespace-issues.
+  //match each word separately to avoid any future whitespace-issues.
   Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
              srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
              srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds));
@@ -344,6 +344,7 @@ Chatbox.ChatToOption
     function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 
 I have no clue wtf this is. Therefor it's either a stupid or an awesome function!
+Seems to be a function that should have been named something like `ContinueToOption` (as in click continue until it no longer can)
 *)
 function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
@@ -439,7 +440,7 @@ If `answer` is `True` it returns the value you have filled in.
 *)
 function TRSChatbox.GetQuery(answer:Boolean=False): String;
 var
-  color:Int32;
+  color: Int32;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   b: TBox;
@@ -467,17 +468,17 @@ Chatbox.WaitQuery
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TRSChatbox.WaitQuery(Query: String; WaitTime: Integer): Boolean;
+    function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
 
 Wait till the query shows up. If it doesn't show up within `WaitTime` it returns `False`.
 *)
-function TRSChatbox.WaitQuery(Query: String; WaitTime: Integer): Boolean;
+function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
 var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64() + WaitTime;
-  while (t > GetTickCount64()) do
+  t := GetTickCount() + WaitTime;
+  while (t > GetTickCount()) do
   begin
     if (Pos(Query, Self.GetQuery()) > 0) then
       Exit(True);
@@ -490,11 +491,11 @@ Chatbox.AnswerQuery
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TRSChatbox.AnswerQuery(Query, Response: String; PressEnter:Boolean; WaitTime: Integer): Boolean;
+    function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
 
 Answer the query, first it will wait for the quary `Query` to show up, then it fills in the given `Response`.
 *)
-function TRSChatbox.AnswerQuery(Query, Response: String; PressEnter:Boolean; WaitTime: Integer): Boolean;
+function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
 begin
   Result := Self.WaitQuery(Query, WaitTime);
   if result and (Response <> Self.GetQuery(True)) then
