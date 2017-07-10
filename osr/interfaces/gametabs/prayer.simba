@@ -186,18 +186,18 @@ Prayer.MouseOver
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.MouseOver(prayer: EPrayerType): Boolean;
+  function TRSPrayer.MouseOver(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Moves the mouse over the given prayer.
 
 .. note:: by slacky
 *)
-function TRSPrayer.MouseOver(prayer: EPrayerType): Boolean;
+function TRSPrayer.MouseOver(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   if not(self.Open()) then Exit();
   
   Result := True;
-  Mouse.Move(Self.FSlots[prayer]);
+  Mouse.Move(Self.FSlots[prayer], False, Rng);
 end;
 
 
@@ -206,17 +206,17 @@ Prayer.Toggle
 ~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.Toggle(prayer: EPrayerType): Boolean;
+  function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Click's it if it can be activated.
 
 .. note:: by slacky
 *)
-function TRSPrayer.Toggle(prayer: EPrayerType): Boolean;
+function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   Result := self.CanActivate(prayer);
   if Result then
-    Mouse.Click(Self.FSlots[prayer], mouse_left, False, rndSkewed);
+    Mouse.Click(Self.FSlots[prayer], mouse_left, False, Rng);
 end;
 
 

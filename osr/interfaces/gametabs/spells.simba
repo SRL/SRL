@@ -236,12 +236,12 @@ Moves the mouse over the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.MouseOver(Spell: ESpellCast): Boolean;
+function TRSSpells.MouseOver(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   if not(self.Open()) then Exit();
   
   Result := True;
-  Mouse.Move(Self.FSlots[spell]);
+  Mouse.Move(Self.FSlots[spell], False, Rng);
 end;
 
 (*
@@ -249,17 +249,17 @@ Spells.Toggle
 ~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
+  function TRSSpells.Toggle(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
 
 Click's it if it can be activated.
 
 .. note:: by slacky
 *)
-function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
+function TRSSpells.Toggle(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   Result := self.CanActivate(Spell);
   if Result then
-    Mouse.Click(Self.FSlots[Spell], mouse_left, False, rndSkewed);
+    Mouse.Click(Self.FSlots[Spell], mouse_left, False, Rng);
 end;
 
 
