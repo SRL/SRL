@@ -43,10 +43,10 @@ begin
     SetStatic(True);
     SetBounds(srl.DefaultClientBounds);
 
-    LoginBox := [312, 254, 550, 266];
-    PasswordBox := [341, 271, 550, 285];
-    ResponseBox := [210, 190, 550, 233];
-    WorldBox := [12, 464, 99, 496];
+    LoginBox    := [260, 240, 545, 255];
+    PasswordBox := [260, 257, 545, 272];
+    ResponseBox := [210, 190, 545, 233];
+    WorldBox    := [12, 464, 99, 496];
     ExistingUserBox := [390, 272, 529, 307];
   end;
 end;
