@@ -1,11 +1,12 @@
+(*
+Login
+=======
+The file holds functions and procedures that are related to the login screen
+*)
 {$IFNDEF CODEINSIGHT}
 const
   _LOGIN_TEXT_YELLOW = 65535;
   _LOGIN_TEXT_WHITE = 16777215;
-{$ENDIF}
-
-{$IFNDEF CODEINSIGHT}
-const
   _LOGIN_BOX_LOGIN = 0;
   _LOGIN_BOX_PASSWORD = 1;
 {$ENDIF}
@@ -13,27 +14,11 @@ const
 type
   TRSLoginScreen = record(TInterfaceBase)
     LoginBox, PasswordBox, ResponseBox, WorldBox, ExistingUserBox: TBox;
- end;
+  end;
 
 var
   LoginScreen: TRSLoginScreen;
 
-{*
-TRSLoginScreen.__Setup
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-  procedure TRSLoginScreen.__Setup();
-
-Setups the login screen, Called at the end of the file on compile.
-
-Example:
-
-.. code-block:: pascal
-
-    LoginScreen.__Setup();
-*}
 {$IFNDEF CODEINSIGHT}
 procedure TRSLoginScreen.__Setup();
 begin
@@ -50,12 +35,22 @@ begin
     ExistingUserBox := [390, 272, 529, 307];
   end;
 end;
+
+procedure TRSLoginScreen.Debug();
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes([self.WorldBox, self.ExistingUserBox], False, $0000FF);
+  BMP.DrawBoxes([self.LoginBox, self.PasswordBox, self.ResponseBox], False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
+end;
 {$ENDIF}
 
 (*
 TRSLoginScreen.isOpen
 ~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.isOpen(const WaitTime: UInt32 = 0): Boolean;
@@ -87,7 +82,6 @@ end;
 (*
 TRSLoginScreen.isLoginOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.isLoginOpen(): Boolean;
@@ -119,7 +113,6 @@ end;
 (*
 TRSLoginScreen.GetCursor
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.GetCursor(): Byte;
@@ -151,7 +144,6 @@ end;
 (*
 TRSLoginScreen.SetCursor
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   procedure TRSLoginScreen.SetCursor(const New: Integer);
@@ -180,7 +172,6 @@ end;
 (*
 TRSLoginScreen.EnterLoginInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.EnterLoginInfo(Login, Pass: String): Boolean;
@@ -252,7 +243,6 @@ end;
 (*
 TRSLoginScreen.OpenWorldSwitcher
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
@@ -286,7 +276,6 @@ end;
 (*
 TRSLoginScreen.GetResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.GetResponse(): String;
@@ -321,7 +310,6 @@ end;
 (*
 TRSLoginScreen.WaitResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
   function TRSLoginScreen.WaitResponse(): String;
@@ -379,6 +367,7 @@ begin
 
   Result := StrToIntDef(ExtractFromStr(GetTextAtEx(b, 0, 3, 3, $FFFFFF, 0, 'UpChars07_s'), Numbers), -1);
 end;
+
 
 begin
   LoginScreen.__Setup();
