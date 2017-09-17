@@ -972,7 +972,7 @@ Minimap.PointToMainScreen
     function TMinimap.PointToMainScreen(P: TPoint; XMod: Int32 = 0; YMod: Int32 = -20): TPoint;
 
   Converts a minimap point to a mainscreen point, designed for camera to be fully
-  zoomed out and highest pitch.
+  zoomed out, and highest pitch.
 
   Orginally made by Narcle but bruteforced for OSRS. xD
 *)
@@ -988,7 +988,7 @@ begin
   Result.X := Round((261.81982844742 + XMod) + (X * 9.54994541313499 / (8.17378428224474 - (YH / YM * 2.29434042340145))) * 4.36642857501283);
   Result.Y := Round((196.890173501335 + YMod) + Y * (4.55846899766475 + ((YH / YM) * 2.03980166427791)));
 
-  if (not PointInBox(Result, MainScreen.GetBounds())) then
+  if (not PointInBox(Result, [4, 4, 515, 337])) then
     Result := [-1, -1];
 end;
 
@@ -1008,7 +1008,7 @@ begin
   if (P <> [-1, -1]) then
   begin
     Result := [P.X - (Width div 2), P.Y - (Height div 2), P.X + (Width div 2), P.Y + (Height div 2)];
-    Result.LimitTo(MainScreen.GetBounds());
+    Result.LimitTo([4, 4, 515, 337]);
   end;
 end;
 
