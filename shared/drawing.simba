@@ -62,7 +62,7 @@ var
   W,H: Int32;
 begin
   GetClientDimensions(W,H);
-  if (Area.x1 > Area.x2) then Area := [0,0,W-1,H-1];
+  if Area = TBox([0,0,-1,-1]) then Area := [0,0,W-1,H-1];
   if (self <> nil) and (self.GetIndex() <> -1) then self.Free();
   self := GetMufasaBitmap(BitmapFromClient(Area));
 end;
