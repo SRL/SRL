@@ -1,4 +1,7 @@
 {$DEFINE OSR}
+{$IFNDEF SRL:DEBUG}
+  {$IFDEF HINTS}{$DEFINE !HAD_HINTS}{$H-}{$ENDIF}
+{$ENDIF}
 
 {$include_once shared.simba}
 
@@ -51,3 +54,6 @@ begin
 end;
 
 
+{$IFDEF !HAD_HINTS}
+  {$H+}
+{$ENDIF}

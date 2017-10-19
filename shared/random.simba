@@ -31,12 +31,34 @@ srl.TruncatedGauss
 Generates a random gaussian/normal number which is truncated and mapped within then 
 given range ``[left..right]`` weighted towards ``left``
 *)
-function TSRL.TruncatedGauss(left:Double=0; right:Double=1): Double; constref;
-const LIMIT = 5.5; //make this a (defaulted) parameter?
+function TSRL.TruncatedGauss(left:Double=0; right:Double=1; CUTOFF:Single=5.5): Double; static;
 begin
-  Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
-  Result := MinE(Result, LIMIT);
-  Result := Result / LIMIT * (right-left) + left;
+  Result := CUTOFF+1;
+  while Result >= CUTOFF do
+    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := Result / CUTOFF * (right-left) + left;
+end;
+
+
+(*
+srl.SkewedRand
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.SkewedRand(peak, lo, hi: Double): Double; static;
+
+Random skewed distribution generation. `Peak` is a number between `Lo` and `Hi` which is 
+where the most of the generated numbers will land.
+*)
+function TSRL.SkewedRand(Mode, Lo, Hi: Double; CUTOFF:Single=5.5): Double; static;
+var top: Double;
+begin
+  top := Lo;
+  if Random()*(Hi-Lo) > Mode-Lo then top := Hi;
+  Result := CUTOFF+1;
+  while Result >= CUTOFF do
+    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+  Result := Result / CUTOFF * (top-Mode) + Mode;
 end;
 
 
@@ -49,13 +71,14 @@ srl.NormalRange
 
 Generates a random integer in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Integer): Integer; constref;
+function TSRL.NormalRange(min, max:Int32; CUTOFF:Single=5.5): Integer; constref;
 begin
   case Random(0,1) of
-    0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2));
-    1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2));
+    0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF));
+    1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF));
   end;
 end;
+
 
 (*
 srl.NormalRange
@@ -66,11 +89,11 @@ srl.NormalRange
 
 Generates a random float in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Extended): Extended; constref; overload;
+function TSRL.NormalRange(min, max:Extended; CUTOFF:Single=5.5): Extended; constref; overload;
 begin
   case Random(0,1) of
-    0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2);
-    1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2);
+    0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF);
+    1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF);
   end;
 end;
 
@@ -91,6 +114,7 @@ begin
   Result.Y := NormalRange(mean.y-maxRad, mean.y+maxRad);
 end;
 
+
 (*
 srl.RandomPoint (overload)
 ~~~~~
@@ -109,11 +133,43 @@ end;
 
 
 (*
+srl.RandonPointEx
+~~~~~
+.. code-block:: pascal
+
+  function TSRL.RandonPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
+
+Generates a random point within the bounds of the given box `B`, the point generated is skewed towards towards the `From`-point.
+The last parameter `Force` defines how much the generated point is to be skewed towards or away from `From` - Expects value in the range 0..2
+
+  Force = 0: Result weighs heavily towrads the edge closest to `From`
+  Force = 1: Result in the middle of box is most common
+  Force = 2: Result weighs heavily towrads the edge furthest away from `From`
+*)
+function TSRL.RandomPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
+var
+  p,c: TPoint;
+  x,r: Double;
+begin
+  p := From;
+  if p.x < B.x1 then p.x := B.x1 else if p.x > B.x2 then p.x := B.x2;
+  if p.y < B.y1 then p.y := B.y1 else if p.y > B.y2 then p.y := B.y2;
+  c :=  Point((B.X2 + B.X1) div 2, (B.Y2 + B.Y1) div 2);
+  r := Hypot(p.x-c.x, p.y-c.y) * Force;
+  x := ArcTan2(c.y-p.y, c.x-p.x);
+  p.x += Round(Cos(x) * r);
+  p.y += Round(Sin(x) * r);
+  Result.x := Round(SkewedRand(p.x, B.x1, B.x2, 4.1));
+  Result.y := Round(SkewedRand(p.y, B.y1, B.y2, 4.1));
+end;
+
+
+(*
 srl.NormalWait (overload)
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=edMean): TPoint; overload;
+  function TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=wdMean): TPoint; overload;
 
 Waits ... Weighted towards the mean of `min` and `max`
 *)

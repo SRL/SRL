@@ -5,7 +5,6 @@ function TSRL.GetClickType(Area: TBox): EClickType;
 var
   BMP: Int32;
   TPA: TPointArray;
-  found: TIntegerArray;
   i, c, red, yellow: Integer;
 begin
   Result := ctNone;

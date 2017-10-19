@@ -102,8 +102,8 @@ begin
         Exit(True);
       Self.ToggleFKeys(False);
     end;
-
-    Mouse.Click(B, 1);
+    
+    Mouse.Click(B, mouse_Left, False, rndSkewed);
     if self.IsOpen(Tab, Random(1500,2500)) then
       Exit(True);
   end;

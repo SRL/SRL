@@ -44,9 +44,9 @@ var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64() + MaxTime;
+  t := GetTickCount() + MaxTime;
 
-  while (GetTickCount64() < t) do
+  while (GetTickCount() < t) do
   begin
     if (Func()) then
       Exit(True);
@@ -59,9 +59,9 @@ var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64() + MaxTime;
+  t := GetTickCount() + MaxTime;
 
-  while (GetTickCount64() < t) do
+  while (GetTickCount() < t) do
   begin
     if (Func()) then
       Exit(True);
@@ -115,11 +115,11 @@ Example:
 procedure TTimeMarker.Start();
 begin
   if (Self.FStartTime = 0) then
-    Self.FPrevMark := GetTickCount64(); // used for adding time after a pause
+    Self.FPrevMark := GetTickCount(); // used for adding time after a pause
 
   if (not Self.FPaused) and (Self.FStartTime = 0) then
   begin
-    Self.FStartTime := GetTickCount64();
+    Self.FStartTime := GetTickCount();
     Self.FTime := 0;
   end;
 
@@ -178,7 +178,7 @@ Example:
 *)
 procedure TTimeMarker.Pause();
 begin
-  Self.FTime := Self.FTime + (GetTickCount64() - Self.FPrevMark);
+  Self.FTime := Self.FTime + (GetTickCount() - Self.FPrevMark);
   Self.FPaused := True;
 end;
 
@@ -209,7 +209,7 @@ Example:
 function TTimeMarker.GetTime(): UInt64;
 begin
   if not Self.FPaused then
-    Result := Self.FTime + (GetTickCount64() - Self.FPrevMark)
+    Result := Self.FTime + (GetTickCount() - Self.FPrevMark)
   else
     Result := Self.FTime;
 end;
@@ -239,7 +239,7 @@ Example:
 function TTimeMarker.GetTotalTime(): UInt64;
 begin
   if (Self.FStartTime > 0) then
-    Result := GetTickCount64() - Self.FStartTime;
+    Result := GetTickCount() - Self.FStartTime;
 end;
 
 
@@ -270,21 +270,41 @@ type
 procedure TCountDown.Init(Time: UInt32);
 begin
   self.Length  := Time;
-  self.Timeout := GetTickCount64() + Time;
+  self.Timeout := GetTickCount() + Time;
 end;
 
 procedure TCountDown.Restart(Rand:Int32=0);
 begin
-  self.Timeout := GetTickCount64() + (Length + Rand);
+  self.Timeout := GetTickCount() + (Length + Rand);
 end;  
 
 function TCountDown.TimeRemaining(): UInt32;
 begin
   if not self.IsFinished() then
-    Result := self.Timeout - GetTickCount64();
+    Result := self.Timeout - GetTickCount();
 end;
 
 function TCountDown.IsFinished(): Boolean;
 begin
-  Result := GetTickCount64() >= self.Timeout;
+  Result := GetTickCount() >= self.Timeout;
 end;
+
+
+
+{$IFDEF WINDOWS}
+function PerformanceTimer(): Double;
+var
+  frequency,count: UInt64;
+  function QPF(out F: UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  function QPC(out C: UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+begin
+  QPF(frequency);
+  QPC(count);
+  Result := count / frequency * 1000;        
+end;
+{$ELSE}
+function PerformanceTimer(): Double;
+begin
+  Result := GetTickCount();
+end;
+{$ENDIF}

@@ -36,18 +36,19 @@ end;
 
 procedure T2DPointArray.Remove(const Value: TPointArray; const All: Boolean = False);
 var
-  Arr: TIntegerArray;
-  i: Integer;
+  i: Int32;
+  lst: TIntegerArray;
 begin
-  if (All) then
-    Arr := Self.FindAll(Value)
-  else begin
-    SetLength(Arr, 1);
-    Arr[0] := Self.Find(Value);
+  if (not All) then
+  begin
+    i := Self.Find(Value);
+    if i >= 0 then Self.Del(i);
+    Exit;
   end;
   
-  for i:=0 to High(Arr) do
-    Self.Del(Arr[i]);
+  lst := Self.FindAll(Value);
+  for i:=High(lst) downto 0 do
+    Self.Del(lst[i]);
 end;
 
 function T2DPointArray.Pop(): TPointArray;
@@ -192,4 +193,24 @@ begin
       if InRange(x2-x1+1, MinW, MaxW) and InRange(y2-y1+1, MinH, MaxH) then
         tmp += TPA;
   self := tmp;
+end;
+
+procedure T2DPointArray.SortByMiddle(From: TPoint); overload;
+begin
+  SortATPAFromMidPoint(Self, From);
+end;
+
+procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0); overload;
+var
+  i: Int32;
+  weight: TIntegerArray;
+begin
+  if (Length(self) <= 1) then Exit;
+  SetLength(weight, Length(self));
+  for i:=0 to High(self) do
+  begin
+    if Length(Self[i]) = 0 then continue;
+    weight[i] := Round(Sqr(From.x - self[i][Index].x) + Sqr(From.y - self[i][Index].y));
+  end;
+  QuickATPASort(weight, self, 0, High(self), True);
 end;

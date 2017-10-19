@@ -1,10 +1,10 @@
 type
-  TKeyBoard = type TObject;
+  TKeyboard = type TObject;
 
 var
-  Keyboard: TKeyBoard;
+  Keyboard: TKeyboard;
 
-procedure TKeyBoard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); overload;
+procedure TKeyboard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); overload;
 var
   i: UInt32;
 begin
@@ -15,19 +15,19 @@ begin
   end;
 end;
 
-procedure TKeyBoard.Send(const Text: String); overload;
+procedure TKeyboard.Send(const Text: String); overload;
 begin
   Self.Send(Text, Random(30, 60), Random(30, 60), Random(40, 85));
 end;
 
-procedure TKeyBoard.Send(const Text: String; KeyPressAfter: Integer); overload;
+procedure TKeyboard.Send(const Text: String; KeyPressAfter: Integer); overload;
 begin
   Self.Send(Text);
   srl.NormalWait(30, 120, wdLeft);
   Self.PressKey(KeyPressAfter);
 end;
 
-procedure TKeyBoard.PressKey(Key: Integer);
+procedure TKeyboard.PressKey(Key: Integer);
 begin
   {$IFDEF SMART}
   if (Key = 13) then
@@ -35,21 +35,21 @@ begin
   {$ENDIF}
 
   Self.KeyDown(Key);
-  Wait(15 + Random(65));
+  Wait(Random(15,65));
   Self.KeyUp(Key);
 end;
 
-procedure TKeyBoard.KeyDown(const Key: Integer);
+procedure TKeyboard.KeyDown(const Key: Integer);
 begin
   System.KeyDown(Key);
 end;
 
-procedure TKeyBoard.KeyUp(const Key: Integer);
+procedure TKeyboard.KeyUp(const Key: Integer);
 begin
   System.KeyUp(Key);
 end;
 
-function TKeyBoard.isKeyDown(const Key: Integer): Boolean;
+function TKeyboard.IsKeyDown(const Key: Integer): Boolean;
 begin
-  Result := System.isKeyDown(Key);
+  Result := System.IsKeyDown(Key);
 end;

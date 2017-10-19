@@ -106,7 +106,7 @@ begin
   end;
 end;
 
-procedure TRSStats.__Debug();
+procedure TRSStats.Debug();
 var
   BMP:TMufasaBitmap;
 begin
@@ -296,17 +296,17 @@ Stats.HoverSkill
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.HoverSkill(Skill: Int32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
+  function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
 
 Holds the mouse over the given skill.
 *)
-procedure TRSStats.HoverSkill(Skill: Int32; HoverTime: UInt32; ReturnToCurrentTab: Boolean = True);
+procedure TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
 var
   old: EGametab;
 begin
   old := Gametabs.GetCurrent();
   Stats.GetSkillInfo(Skill);
-  Wait(HoverTime);
+  Wait(Max(0,Round(HoverTime)));
   if (ReturnToCurrentTab) then
     Gametabs.Open(old);
 end;

@@ -43,18 +43,24 @@ const
 procedure TRSChatbox.__Setup();
 var i:Int32;
 begin
-  for i := 0 to 7 do
-    FLines += Box(10, 344+(14*i), 496, 360+(14*i)+1);
-  FLines += Box(10,458,500,474); //input-field
-  
-  FTabs := Grid(6, 1, 50, 15, 66, 0, Point(33, 490));
+  Self.FBounds := [6,344,512,474];
+  Self.FName := 'Chatbox';
+  Self.FStatic := True;
+  for i := 0 to 7 do Self.FLines += Box(10, 344+14*i, 496, 360+14*i+1);
+  Self.FLines += Box(10,458,500,474); //input-field
+  Self.FTabs := Box(1,480,394,501).PartitionEx(1,6,0,-6);
+end;
 
-  with Self do
-  begin
-    FBounds := [7,345,512,474];
-    FName := 'Chatbox';
-    FStatic := True;
-  end;
+procedure TRSChatbox.Debug();
+var
+  BMP:TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
+  BMP.DrawBoxes(Self.FTabs, False, $0000FF);
+  BMP.DrawBoxes(Self.FLines, False, $FFFFFF);
+  BMP.DrawBox(FBounds, False, $00FF00);
+  BMP.Debug();
+  BMP.Free();
 end;
 {$ENDIF}
 
@@ -114,8 +120,8 @@ Example:
 
 .. code-block:: pascal
 
-    // returns true if "Hello" is found on the first 4 lines
-    chatbox.findTextOnLines(['Hello'], [0..3]);
+    // returns True if "Hello" is found on the first 4 lines
+    chatbox.FindTextOnLines(['Hello'], [0..3]);
 *)
 function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): Boolean;
 var
@@ -170,7 +176,7 @@ Chatbox.ClickContinue
     function TRSChatbox.ClickContinue(): Boolean;
 
 Clicks the "Click here to continue"-text in the chatbox.
-Returns True if the text was found.
+Returns `True` if the text was found.
 
 .. note:: by slacky
 *)
@@ -178,7 +184,7 @@ function TRSChatbox.ClickContinue(): Boolean;
 var
   tpa:Array [0..2] of TPoint;
 begin
-  //match each word sepparatly to avoid whitespace-issues.
+  //match each word separately to avoid any future whitespace-issues.
   Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
              srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
              srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds));
@@ -213,6 +219,15 @@ begin
     Exit(Self.ClickContinue());
 end;
 
+(*
+Chatbox.GetOptions
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
+
+Returns all the options found in teh chatbox area
+*)
 function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
 var
   TPA: TPointArray;
@@ -242,6 +257,16 @@ begin
   end;
 end;
 
+(*
+Chatbox.ClickOption
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+    function TRSChatbox.ClickOption(const Text: TStringArray; WaitTime: Integer; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean; overload;
+
+Clicks the preferred option by text. If the option cant be found it will return with `False`.
+*)
 function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
   option: TChatOption;
@@ -270,9 +295,18 @@ begin
   until (GetTickCount64() >= t);
 end;
 
+(*
+Chatbox.PleaseWait
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.PleaseWait(): Boolean;
+
+Waits as long as the "Please wait" text exists.
+*)
 function TRSChatbox.PleaseWait(): Boolean;
 var
-  tpa:Array [0..1] of TPoint;
+  tpa: array [0..1] of TPoint;
   t: UInt64;
 begin
   Result := False;
@@ -302,6 +336,16 @@ begin
   end;
 end;
 
+(*
+Chatbox.ChatToOption
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+
+I have no clue wtf this is. Therefor it's either a stupid or an awesome function!
+Seems to be a function that should have been named something like `ContinueToOption` (as in click continue until it no longer can)
+*)
 function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
   opt: TChatOption;
@@ -342,6 +386,15 @@ begin
   until (not srl.isLoggedIn());
 end;
 
+(*
+Chatbox.GetDisplayName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GetDisplayName(): String;
+
+Returns your username / display name
+*)
 function TRSChatbox.GetDisplayName(): String;
 var
   s: String;
@@ -352,6 +405,15 @@ begin
     Result := Copy(s, 1, p - 1);
 end;
 
+(*
+Chatbox.ClickTab
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ClickTab(tab: EChatTab; Option: String = ''): Boolean;
+
+A tab would be the filters for the chatbox. So you click one of them..
+*)
 function TRSChatbox.ClickTab(tab: EChatTab; Option: String = ''): Boolean;
 begin
   Result := True;
@@ -366,15 +428,25 @@ begin
   end;
 end;
 
+(*
+Chatbox.GetQuery
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GetQuery(answer:Boolean=False): String;
+
+Returns the question-text, like "Enter amount:" when doing "Withdraw X" from a bank.
+If `answer` is `True` it returns the value you have filled in.
+*)
 function TRSChatbox.GetQuery(answer:Boolean=False): String;
 var
-  color:Int32;
+  color: Int32;
   TPA: TPointArray;
   ATPA: T2DPointArray;
   b: TBox;
 begin
   if answer then
-    color := 8388608;
+    color := 8388608; //otherwise 0 for black
 
   if (CountColor(8388608, Self.GetChatArea) > 5) then // Color of input text ( "*" is always there )
   begin
@@ -391,13 +463,22 @@ begin
   end;
 end;
 
-function TRSChatbox.WaitQuery(Query: String; WaitTime: Integer): Boolean;
+(*
+Chatbox.WaitQuery
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
+
+Wait till the query shows up. If it doesn't show up within `WaitTime` it returns `False`.
+*)
+function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
 var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64() + WaitTime;
-  while (t > GetTickCount64()) do
+  t := GetTickCount() + WaitTime;
+  while (t > GetTickCount()) do
   begin
     if (Pos(Query, Self.GetQuery()) > 0) then
       Exit(True);
@@ -405,7 +486,16 @@ begin
   end;
 end;
 
-function TRSChatbox.AnswerQuery(Query, Response: String; PressEnter:Boolean; WaitTime: Integer): Boolean;
+(*
+Chatbox.AnswerQuery
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
+
+Answer the query, first it will wait for the quary `Query` to show up, then it fills in the given `Response`.
+*)
+function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
 begin
   Result := Self.WaitQuery(Query, WaitTime);
   if result and (Response <> Self.GetQuery(True)) then
@@ -436,7 +526,7 @@ Returns the title of a chatbox interaction such as the NPC name.
 
 .. note:: by Olly
 *)
-function TRSChatBox.GetTitle: String;
+function TRSChatBox.GetTitle(): String;
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;

@@ -199,7 +199,7 @@ begin
   begin
     srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
 
-    if (LoginScreen.GetCurrentWorld() <> Self.World) then
+    if not (LoginScreen.GetCurrentWorld() in [Self.World, Self.World+300]) then
     begin
       while (Tries < 10) do
       begin
@@ -216,7 +216,7 @@ begin
           WorldSwitcher.SelectWorld(Self.World);
 
         if (LoginScreen.isOpen(Random(3000, 5000))) then
-          if (LoginScreen.getCurrentWorld() = Self.World) then
+          if (LoginScreen.GetCurrentWorld() in [Self.World, Self.World+300]) then
           begin
             srl.Writeln('Succefully selected our world');
             Break;

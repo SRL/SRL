@@ -34,18 +34,19 @@ end;
 
 procedure TBoxArray.Remove(const Value: TBox; const All: Boolean = False);
 var
-  Arr: TIntegerArray;
-  i: Integer;
+  i: Int32;
+  lst: TIntegerArray;
 begin
-  if (All) then
-    Arr := Self.FindAll(Value)
-  else begin
-    SetLength(Arr, 1);
-    Arr[0] := Self.Find(Value);
+  if (not All) then
+  begin
+    i := Self.Find(Value);
+    if i >= 0 then Self.Del(i);
+    Exit;
   end;
-
-  for i := 0 to High(Arr) do
-    Self.Del(Arr[i]);
+  
+  lst := Self.FindAll(Value);
+  for i:=High(lst) downto 0 do
+    Self.Del(lst[i]);
 end;
 
 function TBoxArray.Pop(): TBox;
@@ -220,5 +221,22 @@ begin
     self[i].y1 += pt.y;
     self[i].x2 += pt.x;
     self[i].y2 += pt.y;
+  end;
+end;
+
+(*
+  As found in SRL-6, placed here for lack of a better spot to put.
+*)
+function Grid(Columns, Rows, w, h, diffX, diffY: Int32; Start: TPoint): TBoxArray;
+var
+  i: Int32;
+begin
+  SetLength(Result, Columns * Rows);
+  for i:=0 to High(Result) do
+  begin
+    Result[i].X1 := Start.x + i mod Columns * diffX - w div 2;
+    Result[i].Y1 := Start.y + i div Columns * diffY - h div 2;
+    Result[i].X2 := Result[i].X1 + w;
+    Result[i].Y2 := Result[i].Y1 + h;
   end;
 end;
