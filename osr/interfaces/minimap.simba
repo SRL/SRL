@@ -261,7 +261,7 @@ function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
 var t: TCountDown;
 begin
   if (Enable = Self.isPrayerEnabled()) then Exit(True);
-  with (Self.OrbInfo[Ord(MMOrbRun)]) do
+  with (Self.OrbInfo[Ord(MMOrbPrayer)]) do
   begin
     Mouse.Click(Middle, Radius, mouse_Left);
     t.Init(1000);
