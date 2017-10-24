@@ -37,7 +37,7 @@ const CHATBOX_COLORS
 constant that holds all the possible text-colors
 *)
 const
-  CHATBOX_COLORS = [0, $7F, $FF0000, $7F007F];
+  CHATBOX_COLORS:TIntArray = [0, $7F, $FF0000, $7F007F, $2010EF];
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSChatbox.__Setup();
