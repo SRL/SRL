@@ -171,48 +171,20 @@ Increase or decrease the dimensions of the rectangle.
 
 .. note:: by slacky
 *)
-function TRectangle.Expand(Inc: Int32): TRectangle; constref;
+function TRectangle.Expand(Incr: Single): TRectangle; constref;// override;
 var
-  TPA: TPointArray;
-  function Expand(Poly: TPointArray; inc: Int32): TPointArray;
-  type
-    TPointF = record x,y:Double; end;
-  var
-    i,k:Int32;
-    theta, det: Double;
-    c1,c2:array [0..2] of Double;
-    p1,q1,p2,q2: TPointF;
-    tmp:array of TPointF;
-  begin
-    SetLength(Result, Length(Poly));
-    SetLength(tmp, Length(Poly)*2);
-    for i:=0 to High(Poly) do
-    begin
-      k := (i+1) mod Length(poly);
-      theta := ArcTan2(poly[i].Y - poly[k].Y, poly[i].X - poly[k].X) + PI/2;
-      tmp[i*2]  := TPointF([inc*Cos(theta)+poly[i].x, inc*Sin(theta)+poly[i].y]);
-      tmp[i*2+1]:= TPointF([inc*Cos(theta)+poly[k].x, inc*Sin(theta)+poly[k].y]);
-    end;
-   
-    for i:=0 to High(tmp) with 2 do
-    begin
-      p1 := tmp[i];
-      p2 := tmp[(i+1) mod Length(tmp)];
-      q1 := tmp[(i+2) mod Length(tmp)];
-      q2 := tmp[(i+3) mod Length(tmp)];
-   
-      c1 := [(p1.y-p2.y), (p2.x-p1.x), -(p1.x*p2.y-p2.x*p1.y)];
-      c2 := [(q1.y-q2.y), (q2.x-q1.x), -(q1.x*q2.y-q2.x*q1.y)];
-      det  := c1[0] * c2[1] - c1[1] * c2[0];
-      if (det <> 0) then
-      begin
-        Result[i div 2].x := Round((c1[2] * c2[1] - c1[1] * c2[2]) / det);
-        Result[i div 2].y := Round((c1[0] * c2[2] - c1[2] * c2[0]) / det);
-      end else
-        Result[i div 2] := Point(Round(p2.x), Round(p2.y));
-    end;
-  end;
+  vSides,tmp: array [0..3] of TPoint;
+  len,theta: Single;
+  i,j: Int32;
 begin
-  TPA := Expand(Self.ToTPA(), Inc);
-  Result := [TPA[0], TPA[1], TPA[2], TPA[3]];
+  vSides := [Top, Right, Btm, Left];
+  Incr *= Sqrt(2);
+  for i:=0 to High(vSides) do
+  begin
+    j := srl.Modulo(i+1,4);
+    theta := ArcTan2(vSides[i].y - vSides[j].y, vSides[i].x - vSides[j].x)+radians(45);
+    tmp[i].x := Round(vSides[i].x + Incr * Cos(theta));
+    tmp[i].y := Round(vSides[i].y + Incr * Sin(theta));
+  end;
+  Result := TRectangle(TMP);
 end;

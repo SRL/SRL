@@ -214,3 +214,15 @@ begin
   end;
   QuickATPASort(weight, self, 0, High(self), True);
 end;
+
+
+//--| Type helpers (extended) |------------------------------------------------>
+//----------------------------------------------------------------------------->
+
+function T2DPointArray.Means(): TPointArray; constref;
+var i:Int32;
+begin
+  SetLength(Result, Length(self));
+  for i:=0 to High(Self) do
+    Result[i] := MiddleTPA(Self[i]);
+end;
