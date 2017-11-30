@@ -174,7 +174,7 @@ Increase or decrease the dimensions of the rectangle.
 function TRectangle.Expand(Incr: Single): TRectangle; constref;// override;
 var
   vSides,tmp: array [0..3] of TPoint;
-  len,theta: Single;
+  theta: Single;
   i,j: Int32;
 begin
   vSides := [Top, Right, Btm, Left];
