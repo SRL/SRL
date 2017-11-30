@@ -182,7 +182,7 @@ begin
   for i:=0 to High(vSides) do
   begin
     j := srl.Modulo(i+1,4);
-    theta := ArcTan2(vSides[i].y - vSides[j].y, vSides[i].x - vSides[j].x)+radians(45);
+    theta := ArcTan2(vSides[i].y - vSides[j].y, vSides[i].x - vSides[j].x) + PI/4;
     tmp[i].x := Round(vSides[i].x + Incr * Cos(theta));
     tmp[i].y := Round(vSides[i].y + Incr * Sin(theta));
   end;
