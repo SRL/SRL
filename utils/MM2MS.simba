@@ -33,9 +33,11 @@ const
 var
   v: Vector3;
 begin
-  v := [(pt.x - 642), (pt.y - 85), z];
   if (angle = -1) then
     angle := minimap.GetCompassAngle(False);
+
+  pt := RotatePoint(pt, PI*2 - angle, 642,85);
+  v := [(pt.x - 642), (85 - pt.y), z];
 
   Result := Project([v], Vec3(-0.75, 0.0, PI*2 - angle))[0];
   if checkBounds and (not Result.InBox(Mainscreen.GetBounds)) then
