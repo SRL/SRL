@@ -1,7 +1,7 @@
 // prototype
 {$IFNDECL(Vector3)} {$I structures.simba} {$ENDIF}
 
-function MM2MS(pt: TPoint; z:Single=0; checkBounds:Boolean=True; Angle:Single=-1): TPoint;
+function MM2MS_Core(pt: TPoint; z:Single=0; Angle:Single=-1; PointRot:Boolean=True): TPoint;
 const
   W = 513; //mainscreen W and H
   H = 335;
@@ -36,10 +36,9 @@ begin
   if (angle = -1) then
     angle := minimap.GetCompassAngle(False);
 
-  pt := RotatePoint(pt, PI*2 - angle, 642,85);
-  v := [(pt.x - 642), (85 - pt.y), z];
+  if PointRot then
+    pt := pt.Rotate(PI*2 - angle, Point(642,85));
 
+  v := [(pt.x - 642), (85 - pt.y), z];
   Result := Project([v], Vec3(-0.75, 0.0, PI*2 - angle))[0];
-  if checkBounds and (not Result.InBox(Mainscreen.GetBounds)) then
-    Result := [-1,-1];
 end; 

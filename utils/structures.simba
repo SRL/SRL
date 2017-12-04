@@ -77,6 +77,13 @@ begin
   end;
 end;
 
+function Vector2.Rotate(angle:Single; mx,my:Single): Vector2; constref;
+begin
+  Result.X := mx + Cos(angle) * (Self.x - mx) - Sin(angle) * (Self.y - my);
+  Result.Y := my + Sin(angle) * (Self.x - mx) + Cos(angle) * (Self.y - my);
+end;
+
+
 // -----------------------------------------------------------------------------
 // VECTOR2 operators
 operator * (Left, Right: Vector2): Vector2;
