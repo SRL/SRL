@@ -1,0 +1,43 @@
+// prototype
+{$IFNDECL(Vector3)} {$I structures.simba} {$ENDIF}
+
+function MM2MS(pt: TPoint; z:Single=0; checkBounds:Boolean=True; Angle:Single=-1): TPoint;
+const
+  W = 513; //mainscreen W and H
+  H = 335;
+
+  function Transform(coord: Vector3; matrix: TMatrix4): Vector3;
+  var p: Vector3;
+  begin
+    p := Vector3.TransformCoordinate(coord, matrix);
+    Result.x := ( p.X * W) + (W / 2);
+    Result.y := (-p.Y * H) + (H / 2);
+  end;
+
+  function Project(coords: TVector3Array; Rotation: Vector3): TPointArray;
+  var
+    vec: Vector3;
+    viewMatrix, projMatrix, worldMatrix,transMatrix: TMatrix4;
+  begin
+    viewMatrix := [1,0,0,0,0,1,0,0,0,0,1,0,0,0,-96,1];              //MatrixQuad.LookAtRH([0,0,96], [0,0,0], Vector3_UnitY);
+    projMatrix := [1.3,0,0,0,0,2.5,0,0,0,0,-1.01,-1,0,0,-0.01,0];   //MatrixQuad.PerspectiveFovRH(0.76, 1.92, 0.01, 1.0);
+
+    worldMatrix := TMatrix4.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix_Identity;
+    transMatrix := worldMatrix * viewMatrix * projMatrix;
+    for vec in coords do
+    begin
+      vec := Transform(vec, transMatrix);
+      Result += Point(Round(vec.x),Round(vec.y));
+    end;
+  end;
+var
+  v: Vector3;
+begin
+  v := [(pt.x - 642), (pt.y - 85), z];
+  if (angle = -1) then
+    angle := minimap.GetCompassAngle(False);
+
+  Result := Project([v], Vec3(-0.75, 0.0, PI*2 - angle))[0];
+  if checkBounds and (not Result.InBox(Mainscreen.GetBounds)) then
+    Result := [-1,-1];
+end; 

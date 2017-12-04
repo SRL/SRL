@@ -11,7 +11,7 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
                  bbDepositInv, bbDepositWorn, bbMenu, bbClose);
-  EBankLocation = (blYanille, blAlKharid,
+  EBankLocation = (blYanille, blAlKharid, blLumbridge,
                    blVarrockWest, blVarrockEast,
                    blFaladorEast, blFaladorWest);
   EBankerColor = (bcBlue, bcGray);
@@ -324,12 +324,13 @@ begin
     Exit(True);
 
   case Loc of
-    blYanille: Exit(Self._OpenYanille());
+    blYanille:     Exit(Self._OpenYanille());
+    blLumbridge:   Exit(Self._MagicalBankerFinder([607067,  10, 0.47, 0.28], bcBlue, [0,-30]));
     blVarrockWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]));
     blVarrockEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]));
     blFaladorEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]));
     blFaladorWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [0, 40]));
-    blAlKharid: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
+    blAlKharid:    Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
   end;
 end;
 
