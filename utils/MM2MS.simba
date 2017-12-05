@@ -1,17 +1,44 @@
 // prototype
 {$IFNDECL(Vector3)} {$I structures.simba} {$ENDIF}
 
-function MM2MS_Core(PT: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+type
+  T_MM2MS_CONSTS = record
+    BASE_W,   BASE_H: Int32;
+    ACTUAL_W, ACTUAL_H: Int32;
+    SCALE: Double;
+    MMCX, MMCY: Int32;
+  end;
+
 const
-  W = 513; //mainscreen W and H
-  H = 335;
+  // default settings for fixed client
+  MM2MS_FIXED_CLIENT: T_MM2MS_CONSTS = [
+    513, 335,
+    516, 340,
+    1,
+    642, 84
+  ];
+
+  // settings for resizable within smart.. not sure how this would scale.
+  MM2MS_RESIZABLE_CLIENT1: T_MM2MS_CONSTS = [
+    513, 335,
+    775, 513,
+    1.1,
+    693, 85
+  ];
+
+
+var
+  MM2MS_CONST: T_MM2MS_CONSTS = MM2MS_FIXED_CLIENT;
+
+
+function MM2MS_Core(PT: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
 
   function Transform(coord: Vector3; matrix: TMatrix4): Vector3;
   var p: Vector3;
   begin
     p := Vector3.TransformCoordinate(coord, matrix);
-    Result.x := (+p.X * W) + (W / 2);
-    Result.y := (-p.Y * H) + (H / 2);
+    Result.x := (+p.X * MM2MS_CONST.BASE_W*MM2MS_CONST.SCALE) + MM2MS_CONST.ACTUAL_W/2;
+    Result.y := (-p.Y * MM2MS_CONST.BASE_H*MM2MS_CONST.SCALE) + MM2MS_CONST.ACTUAL_H/2;
   end;
 
   function Project(coords: TVector3Array; Rotation: Vector3): TPointArray;
@@ -19,8 +46,8 @@ const
     vec: Vector3;
     viewMatrix, projMatrix, worldMatrix,transMatrix: TMatrix4;
   begin
-    viewMatrix := TMatrix4.LookAtRH([0,0,57], [0,0,0], Vector3_UnitY);
-    projMatrix := TMatrix4.PerspectiveFovRH(1.41, 1.52, 0.01, 1.0);
+    viewMatrix := TMatrix4.LookAtRH([0,-22,52], [0,0,0], Vector3_UnitY);
+    projMatrix := TMatrix4.PerspectiveFovRH(Sqrt(2), 765/503, 0.01, 1.0);
 
     worldMatrix := TMatrix4.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix_Identity;
     transMatrix := worldMatrix * viewMatrix * projMatrix;
@@ -30,6 +57,7 @@ const
       Result += Point(Round(vec.x),Round(vec.y));
     end;
   end;
+
 var
   v: Vector3;
 begin
@@ -37,8 +65,8 @@ begin
     Roll := minimap.GetCompassAngle(False);
 
   if PointRot then
-    PT := PT.RotateXY(PI*2 - Roll, 642,85);
+    PT := PT.RotateXY(PI*2 - Roll, MM2MS_CONST.MMCX,MM2MS_CONST.MMCY);
 
-  v := [(PT.x - 642), (85 - PT.y), PT.z];
-  Result := Project([v], Vec3(-0.40, 0, PI*2 - Roll))[0];
+  v := [(PT.x - MM2MS_CONST.MMCX), (MM2MS_CONST.MMCY - PT.y), PT.z];
+  Result := Project([v], Vec3(0, 0, PI*2 - Roll))[0];
 end;
