@@ -13,12 +13,12 @@ type
   TVector2Array = array of Vector2; 
   TVector3Array = array of Vector3;
 
-function Vec3(x,y,z: Single): Vector3;
+function Vec3(x:Single=0; y:Single=0; z:Single=0): Vector3;
 begin
   Result := [x,y,z];
 end;
 
-function Vec2(x,y: Single): Vector2;
+function Vec2(x:Single=0; y:Single=0): Vector2;
 begin
   Result := [x,y];
 end;
@@ -206,6 +206,13 @@ begin
     Result.Y := Result.Y * inv;
     Result.Z := Result.Z * inv;
   end;
+end;
+
+function Vector3.RotateXY(Angle:Single; mx,my:Single): Vector3; constref;
+begin
+  Result.X := mx + Cos(angle) * (Self.x - mx) - Sin(angle) * (Self.y - my);
+  Result.Y := my + Sin(angle) * (Self.x - mx) + Cos(angle) * (Self.y - my);
+  Result.Z := Self.Z;
 end;
 
 function Vector3.TransformCoordinate(Coordinate:Vector3; Transform: TMatrix4): Vector3; static;
@@ -431,7 +438,7 @@ begin
   Result.M43 := q * znear;
 end;
 
-function TMatrix4.RotationQuaternion(rotation: vector4): TMatrix4; static;
+function TMatrix4.RotationQuaternion(rotation: Vector4): TMatrix4; static;
 var
   xx,yy,zz,xy,zw,zx,yw,yz,xw: Single;
 begin
@@ -504,20 +511,20 @@ end;
 
 operator * (left: TMatrix4; right: Single): TMatrix4;
 begin
-  result.M11 := left.M11 * right;
-  result.M12 := left.M12 * right;
-  result.M13 := left.M13 * right;
-  result.M14 := left.M14 * right;
-  result.M21 := left.M21 * right;
-  result.M22 := left.M22 * right;
-  result.M23 := left.M23 * right;
-  result.M24 := left.M24 * right;
-  result.M31 := left.M31 * right;
-  result.M32 := left.M32 * right;
-  result.M33 := left.M33 * right;
-  result.M34 := left.M34 * right;
-  result.M41 := left.M41 * right;
-  result.M42 := left.M42 * right;
-  result.M43 := left.M43 * right;
-  result.M44 := left.M44 * right;
+  Result.M11 := left.M11 * right;
+  Result.M12 := left.M12 * right;
+  Result.M13 := left.M13 * right;
+  Result.M14 := left.M14 * right;
+  Result.M21 := left.M21 * right;
+  Result.M22 := left.M22 * right;
+  Result.M23 := left.M23 * right;
+  Result.M24 := left.M24 * right;
+  Result.M31 := left.M31 * right;
+  Result.M32 := left.M32 * right;
+  Result.M33 := left.M33 * right;
+  Result.M34 := left.M34 * right;
+  Result.M41 := left.M41 * right;
+  Result.M42 := left.M42 * right;
+  Result.M43 := left.M43 * right;
+  Result.M44 := left.M44 * right;
 end;

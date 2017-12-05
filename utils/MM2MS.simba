@@ -1,7 +1,7 @@
 // prototype
 {$IFNDECL(Vector3)} {$I structures.simba} {$ENDIF}
 
-function MM2MS_Core(pt: Vector2; z:Single=0; Angle:Single=-1; PointRot:Boolean=True): TPoint;
+function MM2MS_Core(PT: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
 const
   W = 513; //mainscreen W and H
   H = 335;
@@ -33,12 +33,12 @@ const
 var
   v: Vector3;
 begin
-  if (angle = -1) then
-    angle := minimap.GetCompassAngle(False);
+  if (Roll = $FFFF) then
+    Roll := minimap.GetCompassAngle(False);
 
   if PointRot then
-    pt := pt.Rotate(PI*2 - angle, 642,85);
+    PT := PT.RotateXY(PI*2 - Roll, 642,85);
 
-  v := [(pt.x - 642), (85 - pt.y), z];
-  Result := Project([v], Vec3(-0.40, 0, PI*2 - angle))[0];
+  v := [(PT.x - 642), (85 - PT.y), PT.z];
+  Result := Project([v], Vec3(-0.40, 0, PI*2 - Roll))[0];
 end;
