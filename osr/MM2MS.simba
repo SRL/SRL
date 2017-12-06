@@ -95,7 +95,7 @@ begin
   for i:=0 to High(Arr) do
   begin
     VecArr[i].x := Arr[i].x;
-    VecArr[i].x := Arr[i].y;
+    VecArr[i].y := Arr[i].y;
   end;
   Result := MM2MS.Run(VecArr, Roll, PointRot);
 end;
