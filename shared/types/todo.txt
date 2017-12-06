@@ -1,10 +1,5 @@
-Types that lacks helpers currently, that should preferably be implemented:
-- T2DPointArray
-- T2DIntArray
-- T2DExtendedArray
-
-Note (July 2016):
-1. We should get all functions documented, even a very simple documentation does the trick
+Notes:
+1. (July 2016) We should get all functions documented, even a very simple documentation does the trick
    Just so that people have something to refer to.
    
    Currently docs are not hosted anywhere, but we'll get there.  

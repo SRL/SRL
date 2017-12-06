@@ -10,8 +10,9 @@ type
   Vector3 = packed record X,Y,Z: Single; end;
   Vector4 = packed record X,Y,Z,W: Single; end;
 
-  TVector2Array = array of Vector2; 
-  TVector3Array = array of Vector3;
+  Vector2Array = array of Vector2;
+  Vector3Array = array of Vector3;
+
 
 function Vec3(x:Single=0; y:Single=0; z:Single=0): Vector3;
 begin

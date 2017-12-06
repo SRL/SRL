@@ -1,0 +1,132 @@
+(*
+MM2MS
+=======
+The core for out minimap to mainscreen projection.
+*)
+type
+  TMinimapToMS = record
+    BASE_W, BASE_H: Int32;      // the size of the area we project to - static
+    ACTUAL_W, ACTUAL_H: Int32;  // used only for mainscreen center.
+    SCALE: Double;              // direct zoom (relates to BASE)
+    MMCX, MMCY: Int32;          // minimap center
+  end;
+
+
+const
+  // Fixed OSRS client
+  MM2MS_FIXED_CLIENT: TMinimapToMS = [
+    513, 335,
+    516, 340,
+    1,
+    642, 84
+  ];
+  
+  // Resizable OSRS within smart [so it's fixed]
+  MM2MS_RESIZABLE_CLIENT1: TMinimapToMS = [
+    513, 335,
+    775, 513,
+    1.1,
+    693, 85
+  ];
+
+
+var
+  MM2MS: TMinimapToMS = MM2MS_FIXED_CLIENT;
+
+
+function TMinimapToMS.Transform(coord: Vector3; matrix: TMatrix4): Vector3;
+var p: Vector3;
+begin
+  p := Vector3.TransformCoordinate(coord, matrix);
+  Result.x := (+p.X * BASE_W * SCALE) + ACTUAL_W/2;
+  Result.y := (-p.Y * BASE_H * SCALE) + ACTUAL_H/2;
+end;
+
+function TMinimapToMS.Project(coords: Vector3Array; Rotation: Vector3): TPointArray;
+var
+  vec: Vector3;
+  viewMatrix, projMatrix, worldMatrix,transMatrix: TMatrix4;
+begin
+  viewMatrix := TMatrix4.LookAtRH([0,-22,52], [0,0,0], Vector3_UnitY);
+  projMatrix := TMatrix4.PerspectiveFovRH(Sqrt(2), 765/503, 0.01, 1.0);
+
+  worldMatrix := TMatrix4.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix_Identity;
+  transMatrix := worldMatrix * viewMatrix * projMatrix;
+  for vec in coords do
+  begin
+    vec := Transform(vec, transMatrix);
+    Result += Point(Round(vec.x),Round(vec.y));
+  end;
+end;
+
+function TMinimapToMS.Run(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray;
+var
+  i: Int32;
+begin
+  if (Roll = $FFFF) then
+    Roll := minimap.GetCompassAngle(False);
+
+  for i:=0 to High(Arr) do
+  begin
+    if PointRot then
+      Arr[i] := Arr[i].RotateXY(PI*2 - Roll, MMCX, MMCY);
+    Arr[i] := [Arr[i].x - MMCX, (MMCY - Arr[i].y), Arr[i].z];
+  end;
+
+  Result := Project(Arr, Vec3(0, 0, PI*2 - Roll));
+end;
+
+
+// --------------------------------------------------------------------------------------------------------------
+// Extend the minimap-funcionallity with MM2MS functions
+
+// Takes array, returns projected array
+function TMinimap.Arr2MS(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+begin
+  Result := MM2MS.Run(Arr, Roll, PointRot);
+end;
+
+function TMinimap.Arr2MS(Arr: TPointArray; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+var
+  VecArr: Vector3Array;
+  i: Int32;
+begin
+  SetLength(VecArr, Length(Arr));
+  for i:=0 to High(Arr) do
+  begin
+    VecArr[i].x := Arr[i].x;
+    VecArr[i].x := Arr[i].y;
+  end;
+  Result := MM2MS.Run(VecArr, Roll, PointRot);
+end;
+
+
+// Takes single point, returns single point
+function TMinimap.VecToMS(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+begin
+  Result := MM2MS.Run([Vec], Roll, PointRot)[0];
+end;
+
+function TMinimap.PointToMS(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+begin
+  Result := MM2MS.Run([Vec3(PT.x, PT.y)], Roll, PointRot)[0];
+end;
+
+
+// Takes single point, returns a rectangle
+function TMinimap.PointToMSRect(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
+var
+  arr: TPointArray;
+begin
+  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll, PointRot);
+  Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
+end;
+
+// Takes single point, returns a box
+function TMinimap.PointToMSBox(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TBox;
+var
+  arr: TPointArray;
+begin
+  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll, PointRot);
+  Result := GetTPABounds(arr);
+end;
