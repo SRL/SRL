@@ -59,20 +59,13 @@ begin
   end;
 end;
 
-function TMinimapToMS.Run(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray;
+function TMinimapToMS.Run(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray;
 var
   i: Int32;
 begin
-  if (Roll = $FFFF) then
-    Roll := minimap.GetCompassAngle(False);
-
   for i:=0 to High(Arr) do
-  begin
-    if PointRot then
-      Arr[i] := Arr[i].RotateXY(PI*2 - Roll, MMCX, MMCY);
     Arr[i] := [Arr[i].x - MMCX, (MMCY - Arr[i].y), Arr[i].z];
-  end;
-
+  
   Result := Project(Arr, Vec3(0, 0, PI*2 - Roll));
 end;
 
@@ -81,61 +74,85 @@ end;
 // Extend the minimap-funcionallity with MM2MS functions
 
 // Takes array, returns projected array
-function TMinimap.Arr2MS(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+function TMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
+var
+  i: Int32;
 begin
-  Result := MM2MS.Run(Arr, Roll, PointRot);
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  for i:=0 to High(Arr) do
+    Arr[i] := Arr[i].RotateXY(PI*2 - Roll, MM2MS.MMCX, MM2MS.MMCY);
+  
+  Result := MM2MS.Run(Arr, Roll);
 end;
 
-function TMinimap.Arr2MS(Arr: TPointArray; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+function TMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF): TPointArray; overload;
 var
   VecArr: Vector3Array;
   i: Int32;
 begin
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  
   SetLength(VecArr, Length(Arr));
   for i:=0 to High(Arr) do
   begin
     VecArr[i].x := Arr[i].x;
     VecArr[i].y := Arr[i].y;
+    VecArr[i] := VecArr[i].RotateXY(PI*2 - Roll, MM2MS.MMCX, MM2MS.MMCY);
   end;
-  Result := MM2MS.Run(VecArr, Roll, PointRot);
+  Result := MM2MS.Run(VecArr, Roll);
 end;
 
 
 // Takes single point, returns single point
-function TMinimap.VecToMS(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+function TMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF): TPoint;
 begin
-  Result := MM2MS.Run([Vec], Roll, PointRot)[0];
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  Vec := Vec.RotateXY(PI*2 - Roll, MM2MS.MMCX, MM2MS.MMCY);
+  
+  Result := MM2MS.Run([Vec], Roll)[0];
 end;
 
-function TMinimap.PointToMS(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+function TMinimap.PointToMs(PT: TPoint; Roll:Single=$FFFF): TPoint;
 begin
-  Result := MM2MS.Run([Vec3(PT.x, PT.y)], Roll, PointRot)[0];
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  pt := pt.Rotate(PI*2 - Roll, Point(MM2MS.MMCX, MM2MS.MMCY));
+  
+  Result := MM2MS.Run([Vec3(PT.x, PT.y)], Roll)[0];
 end;
 
 
 // Takes single point, returns a rectangle
-function TMinimap.PointToMSRect(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
+function TMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF): TRectangle;
 var
   arr: TPointArray;
 begin
-  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll, PointRot);
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  pt := pt.Rotate(PI*2 - Roll, Point(MM2MS.MMCX, MM2MS.MMCY));
+  
+  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll);
   Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
 end;
 
-// Takes single vector, returns a rectangle
-function TMinimap.VecToMSRect(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
+function TMinimap.VecToMsRect(Vec: Vector3; Roll:Single=$FFFF): TRectangle;
 var
   arr: TPointArray;
 begin
-  Arr := MM2MS.Run([Vec3(Vec.x-2, Vec.y-2, Vec.z), Vec3(Vec.x+2, Vec.y-2, Vec.z), Vec3(Vec.x+2, Vec.y+2, Vec.z), Vec3(Vec.x-2, Vec.y+2, Vec.z)], Roll, PointRot);
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  Vec := Vec.RotateXY(PI*2 - Roll, MM2MS.MMCX, MM2MS.MMCY);
+
+  Arr := MM2MS.Run([Vec3(Vec.x-2, Vec.y-2, Vec.z), Vec3(Vec.x+2, Vec.y-2, Vec.z), Vec3(Vec.x+2, Vec.y+2, Vec.z), Vec3(Vec.x-2, Vec.y+2, Vec.z)], Roll);
   Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
 end;
+
 
 // Takes single point, returns a box
-function TMinimap.PointToMSBox(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TBox;
+function TMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
 var
   arr: TPointArray;
 begin
-  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll, PointRot);
+  if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
+  PT := PT.Rotate(PI*2 - Roll, Point(MM2MS.MMCX, MM2MS.MMCY));
+  
+  Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll);
   Result := GetTPABounds(arr);
 end;
