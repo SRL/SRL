@@ -81,12 +81,12 @@ end;
 // Extend the minimap-funcionallity with MM2MS functions
 
 // Takes array, returns projected array
-function TMinimap.Arr2MS(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+function TMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
 begin
   Result := MM2MS.Run(Arr, Roll, PointRot);
 end;
 
-function TMinimap.Arr2MS(Arr: TPointArray; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
+function TMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF; PointRot:Boolean=True): TPointArray; overload;
 var
   VecArr: Vector3Array;
   i: Int32;
@@ -102,19 +102,19 @@ end;
 
 
 // Takes single point, returns single point
-function TMinimap.VecToMS(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+function TMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
 begin
   Result := MM2MS.Run([Vec], Roll, PointRot)[0];
 end;
 
-function TMinimap.PointToMS(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
+function TMinimap.PointToMs(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TPoint;
 begin
   Result := MM2MS.Run([Vec3(PT.x, PT.y)], Roll, PointRot)[0];
 end;
 
 
 // Takes single point, returns a rectangle
-function TMinimap.PointToMSRect(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
+function TMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
 var
   arr: TPointArray;
 begin
@@ -122,8 +122,7 @@ begin
   Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
 end;
 
-// Takes single vector, returns a rectangle
-function TMinimap.VecToMSRect(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
+function TMinimap.VecToMsRect(Vec: Vector3; Roll:Single=$FFFF; PointRot:Boolean=True): TRectangle;
 var
   arr: TPointArray;
 begin
@@ -131,8 +130,9 @@ begin
   Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
 end;
 
+
 // Takes single point, returns a box
-function TMinimap.PointToMSBox(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TBox;
+function TMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF; PointRot:Boolean=True): TBox;
 var
   arr: TPointArray;
 begin
