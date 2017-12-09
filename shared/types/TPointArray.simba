@@ -168,6 +168,29 @@ begin
   Result := MiddleTPA(self);
 end;
 
+
+(*
+TPointArray.MeanEx
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.MeanEx(): Vector2; constref;
+
+Middle as a Vector.
+*)
+function TPointArray.MeanEx(): Vector2; constref;
+var
+  i,x,y: Int64;
+begin
+  for i:=0 to High(Self) do
+  begin
+    Inc(x, Self[i].x);
+    Inc(y, Self[i].y);
+  end;
+  Result.x := x / Length(Self);
+  Result.y := y / Length(Self);
+end;
+
 (*
 TPointArray.Sort
 ~~~~~~~~~~~~~~~~~~~

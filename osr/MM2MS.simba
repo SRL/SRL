@@ -6,9 +6,9 @@ The core for out minimap to mainscreen projection.
 type
   TMinimapToMS = record
     BASE_W, BASE_H: Int32;      // the size of the area we project to - static
-    ACTUAL_W, ACTUAL_H: Int32;  // used only for mainscreen center.
-    SCALE: Double;              // direct zoom (relates to BASE)
+    MSCX, MSCY: Int32;          // mainscreen center
     MMCX, MMCY: Int32;          // minimap center
+    SCALE: Double;              // direct zoom (relates to BASE)
   end;
 
 
@@ -16,17 +16,17 @@ const
   // Fixed OSRS client
   MM2MS_FIXED_CLIENT: TMinimapToMS = [
     513, 335,
-    516, 340,
-    1,
-    642, 84
+    259, 172,
+    642, 84,
+    1.0
   ];
   
   // Resizable OSRS within smart [so it's fixed]
   MM2MS_RESIZABLE_CLIENT1: TMinimapToMS = [
     513, 335,
-    775, 513,
-    1.1,
-    693, 85
+    388, 256,
+    693, 85,
+    1.1
   ];
 
 
@@ -38,8 +38,8 @@ function TMinimapToMS.Transform(coord: Vector3; matrix: TMatrix4): Vector3;
 var p: Vector3;
 begin
   p := Vector3.TransformCoordinate(coord, matrix);
-  Result.x := (+p.X * BASE_W * SCALE) + ACTUAL_W/2;
-  Result.y := (-p.Y * BASE_H * SCALE) + ACTUAL_H/2;
+  Result.x := (+p.X * BASE_W * SCALE) + MSCX;
+  Result.y := (-p.Y * BASE_H * SCALE) + MSCY;
 end;
 
 function TMinimapToMS.Project(coords: Vector3Array; Rotation: Vector3): TPointArray;

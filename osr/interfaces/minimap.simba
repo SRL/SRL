@@ -542,7 +542,10 @@ begin
   FilterPointsDist(TPA, 0,6, south.x,south.y);
   SortTPAFrom(TPA, M);
   if (Length(TPA) > 0) then
-    Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2))
+  begin
+    Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2));
+    if (Result <> 0) then Result += 0.0333; //compass dial is floored.. this makes us more accurate.
+  end
   else
     srl.Writeln('Minimap.GetCompassAngle: Failed to find compass dial color');
 
