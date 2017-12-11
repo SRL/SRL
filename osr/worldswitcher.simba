@@ -146,8 +146,8 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
   i: Integer;
-  b: TBox;
-  p: TPoint;
+  B: TBox;
+  P: TPoint;
 begin
   Result := False;
   if (not FindColors(TPA, clBlack, Self.GetBounds())) then
@@ -156,28 +156,32 @@ begin
   srl.Writeln('WorldSwitcher.SelectWorld: Searching for world ' + toString(wo));
 
   { Pretty much get everything black, remove the biggest (the background)
-    and then a simple cluster so we have text :) }
+    and then a simple cluster so we have text }
   ATPA := FloodFillTPA(TPA);
   SortATPASize(ATPA, True);
   TPA := MergeATPA(Copy(ATPA, 1, Length(ATPA) - 1));
   ATPA := ClusterTPAEx(TPA, 5, 1);
 
   for i := 0 to High(ATPA) do
-    if (srl.FindText(p, toString(wo), 'UpChars07_s', clBlack, 0, TBox(b := GetTPABounds(ATPA[i])))) then
-    begin
-      b.Expand(-2, 3); { Adjust the bounds so it's the whole button }
-      b.X2 += 60;
-      Mouse.click(b, mouse_Left);
-      Wait(Random(200, 500));
-      Exit(True);
-    end;
+  begin
+    B := GetTPABounds(ATPA[i]);
 
-  srl.Writeln('Failed to find and select world');
+    if srl.FindText(P, toString(wo), 'UpChars07_s', clBlack, 0, B) then
+    begin
+      B.Expand(-2, 3); { Adjust the bounds so it's the whole button }
+      B.X2 += 60;
+      Mouse.Click(B, mouse_Left);
+      Wait(Random(200, 500));
+      Exit(srl.WriteLn('World succesfully selected', True));
+    end;
+  end;
+
+  srl.Writeln('World not found');
 end;
 
 procedure TRSWorldSwitcher.Close;
 begin
-  Mouse.Click(srl.RandomPoint(Point(734,12), 5), mouse_Left);
+  Mouse.Click(srl.RandomPoint(Point(734, 12), 5), mouse_Left);
   Wait(Random(500, 1000));
 end;
 

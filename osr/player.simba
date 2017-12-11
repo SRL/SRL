@@ -6,245 +6,127 @@ type
     BankPin: String;
     isMember: Boolean;
     isActive: Boolean;
-    World: Integer;
-
+    World: Int32;
     Data: Pointer;
-    Variants: array [0..49] of Variant;
   end;
 
-procedure TPlayer._SwitchToMembers;
-var
-  Tries: Integer;
-begin
-  srl.Writeln('Switching player to member state');
-  Self.isMember := True;
-  Self.World := WorldSwitcher.RandomMembers();
-
-  if (LoginScreen.GetCurrentWorld() <> Self.World) then
-  begin
-    while (Tries < 10) do
-    begin
-      if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
-        WorldSwitcher.SelectWorld(Self.World);
-
-      if (LoginScreen.isOpen(Random(3000, 5000))) then
-        if (LoginScreen.getCurrentWorld() = Self.World) then
-        begin
-          srl.Writeln('Succefully selected our world');
-          Break;
-        end else
-          srl.Writeln('Weird missclick world bug? will try again');
-    end;
-
-    if (Tries = 10) then
-      srl.Writeln('Failed to select world')
-    else
-      srl.Writeln('Worldswitch was succesfull');
-  end;
-end;
-
-// Not really related to player, but it's simple if it's here
-{$IFDEF SMART}
-procedure TPlayer._ReloadClient;
-begin
-  Smart.Reload;
-  srl.isClientReady(60000 * 3);
-end;
-{$ENDIF}
-
-// Returning false will kill login instantly
-function TPlayer._HandleResponse(Response: String; var Attempts: UInt32): Boolean;
+function TPlayer.HandleResponse(Response: String; Attempts: Int32): Boolean;
 type
   TResponse = record
     Text: String;
-    MaxAttempts, WaitTime: UInt32;
-    Proc: procedure() of object;
+    Attempts: Int32;
+    WaitTime: Int32;
  end;
 var
   Responses: array of TResponse;
-  i: Integer;
+  i: Int32;
 begin
-  Result := False;
-
-  SetLength(Responses, 9);
   Responses := [
-                ['Invalid username/email or password.', 2, 1000, nil],
-                ['Please enter your', 2, 1000, nil],
-                ['Error connecting to server.', 20, 8000, nil],
-                ['Please enter your username/email address.', 5, 1000, nil],
-                ['You are standing in a members-only area.', 0, 1000, @Self._SwitchToMembers],
-                ['Your account is already logged in', 5, 60000, nil],
-                ['Login server offline.', 15, 60000 * 2, nil],
-                ['Connection timed out.', 15, 60000, nil],
-                ['Login limit exceeded', 15, 30000, nil],
-                ['This world is full', 15, 15000, nil]
+                ['Invalid username or password.', 5, 0],
+                ['Please enter your username/email address.', 5, 0],
+                ['Error connecting to server.', 20, 10000],
+                ['Your account is already logged in', 5, 60000],
+                ['Login server offline.', 20, 60000],
+                ['Connection timed out.', 20, 30000],
+                ['Login limit exceeded', 20, 30000],
+                ['This world is full', 20, 15000]
                ];
 
-  {$IFDEF SMART}
-    Responses := Responses + TResponse(['RuneScape has been updated', 5, 60000 * 5, @Self._ReloadClient]);
-    // test reload
-    // Response := 'RuneScape has been updated';
-  {$ENDIF}
-
-  if (@srl.OnLoginResponse <> nil) and (srl.OnLoginResponse(Response)) then
+  if (@srl.OnLoginResponse <> nil) and srl.OnLoginResponse(Response) then
     Exit(True);
 
-  Inc(Attempts);
-
   for i := 0 to High(Responses) do
-    with (Responses[i]) do
-      if (Pos(Text, Response) > 0) then
-      begin
-        srl.Writeln('Response found: ' + Text + ', handling...');
-        srl.WriteFmt('Waiting %d ms...', [WaitTime]);
-        Wait(WaitTime + Random(2500));
+    if (Pos(Responses[i].Text, Response) > 0) then
+    begin
+      srl.WriteFmt('Found response "%s"', [Responses[i].Text]);
 
-        if (@Proc <> nil) then
-        begin
-          Proc();
-          Exit(True);
-        end;
+      if (Attempts >= Responses[i].Attempts) then
+        Exit(srl.Writeln('Max attempts reached for response', False))
+      if (Responses[i].WaitTime > 0) then
+        Wait(Responses[i].WaitTime + Random(1000));
 
-        if (Attempts >= MaxAttempts) then
-          Exit(srl.Writeln('Max attempts reached for response', False))
-        else
-          Exit(True);
-      end;
+      Exit(True);
+    end;
 
-  srl.WriteFmt('Response: "%s" isn''t supported', [Response], dtFatal);
+  srl.WriteFmt('Unknown login response "%s"', [Response], dtFatal);
 end;
 
-function TPlayer.LoginToLobby(): Boolean;
+function TPlayer.LoginToLobby: Boolean;
 var
   Response: String;
-  Attempts, LoginAttempts: UInt32;
+  Attempts: Int32;
 begin
   srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
-  Result := False;
 
-  if (srl.isLoggedIn()) then
-    Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
-  else if (Lobby.isOpen()) then
-    Exit(srl.Writeln('Player already in lobby!', True, 'TPlayer.LoginToLobby(): Result = True'));
-
-  if (not LoginScreen.isOpen(Random(5000, 6000))) then
-    Exit(srl.Writeln('Login screen isn''t open, is client loaded?', False, 'TPlayer.LoginToLobby(): Result = False'));
-
-  LoginAttempts := 0;
-  Attempts := 0;
-
-  while (LoginAttempts < 10) do
+  while (Attempts < 25) do
   begin
-    srl.WriteFmt('Attempt: %d [Login: %d]', [Attempts, LoginAttempts]);
+    Inc(Attempts);
 
-    if (srl.isLoggedIn()) then
-      Exit(srl.Writeln('Player already logged in!', True, 'TPlayer.LoginToLobby(): Result = True'))
-    else if (Lobby.isOpen()) then
-      Exit(srl.Writeln('Player already in lobby!', True, 'TPlayer.LoginToLobby(): Result = True'));
+    srl.WriteFmt('Login attempt: %d', [Attempts]);
 
-    if (not LoginScreen.isOpen(Random(5000, 6000))) then
-      Exit(srl.Writeln('Welcome screen isn''t open, is client loaded?', False, 'TPlayer.LoginToLobby(): Result = False'));
+    if srl.isLoggedIn() then
+      Exit(srl.Writeln('Already logged in', True, 'TPlayer.LoginToLobby(): Result = True'))
+    if Lobby.IsOpen() then
+      Exit(srl.Writeln('Already in Lobby', True, 'TPlayer.LoginToLobby(): Result = True'));
+    if (not LoginScreen.Open()) then
+      Exit(srl.Writeln('Login screen not open', False, 'TPlayer.LoginToLobby(): Result = False'));
+    LoginScreen.Open();
 
-    if (LoginScreen.EnterLoginInfo(Self.LoginName, Self.Password)) then
+    if LoginScreen.EnterDetails(Self.LoginName, Self.Password) then
     begin
-      srl.Writeln('Entered login info, waiting for a response...');
+      srl.Writeln('Login details entered, waiting for response...');
 
-      Wait(Random(600, 900)); // wait for old response (if any) to go
       Response := LoginScreen.WaitResponse();
 
-      if (Response = 'lobby') then
-        Exit(srl.Writeln('Response found: Lobby is open', True, 'TPlayer.LoginToLobby(): Result = True'))
-      else if (Response <> '') then
-        if (not Self._HandleResponse(Response, Attempts)) then
-          Exit(srl.Writeln('Failed to handle login response', False, 'TPlayer.LoginToLobby(): Result = False'));
-    end else begin
-      srl.Writeln('Failed to enter login info');
-      Inc(LoginAttempts);
+      if Lobby.IsOpen() then
+        Exit(srl.Writeln('Logged into lobby', True, 'TPlayer.LoginToLobby(): Result = True'));
+      if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
+        Break;
     end;
   end;
 
-  if (LoginAttempts >= 10) then
-    srl.Writeln('Max login attempts reached');
-
+  srl.WriteLn('Failed logging into lobby');
   srl.Writeln('TPlayer.LoginToLobby(): Result = False', dtFooter);
 end;
 
-function TPlayer.Login(): Boolean;
+function TPlayer.Login: Boolean;
 var
-  Tries: Integer = 0;
+  Attempts: Int32;
 begin
   srl.Writeln('TPlayer.Login()', dtHeader);
-  Result := False;
 
-  if (srl.isLoggedIn()) then
+  while (Attempts < 20) do
   begin
-    srl.Writeln('We are already logged in!');
-    srl.Writeln('TPlayer.Login(): Result = True', dtFooter);
-    if (@srl.OnLoginPlayer <> nil) then
-      srl.OnLoginPlayer();
-    Exit(True);
-  end;
+    Inc(Attempts);
 
-  if (Lobby.isOpen()) then
-    if (Lobby.Play()) then
-      if (srl.isLoggedIn(Random(6000, 8000))) then
-      begin
-        srl.Writeln('TPlayer.Login(): Result = True (Already in lobby)', dtFooter);
-        if (@srl.OnLoginPlayer <> nil) then
-          srl.OnLoginPlayer();
-        Exit(True);
-      end;
-
-  if (Self.World <> 0) then
-  begin
-    srl.WriteFmt('Selecting our world [Current = %d][Target = %d]', [LoginScreen.GetCurrentWorld(), Self.World]);
-
-    if not (LoginScreen.GetCurrentWorld() in [Self.World, Self.World+300]) then
+    if srl.isLoggedIn() then
     begin
-      while (Tries < 10) do
+      if (@srl.OnLoginPlayer <> nil) then
+        srl.OnLoginPlayer();
+
+      Exit(srl.Writeln('Player logged in', True, 'TPlayer.Login(): Result = True'));
+    end;
+
+    if Lobby.isOpen() then
+      Lobby.EnterGame()
+    else
+    begin
+      LoginScreen.Open();
+
+      if (Self.World > 0) and (LoginScreen.GetCurrentWorld() <> Self.World) then
       begin
-        if (srl.isLoggedIn()) then
-        begin
-          srl.Writeln('We have randomly logged in!');
-          srl.Writeln('TPlayer.Login(): Result = True', dtFooter);
-          if (@srl.OnLoginPlayer <> nil) then
-            srl.OnLoginPlayer();
-          Exit(True);
-        end;
-
-        if (LoginScreen.OpenWorldSwitcher()) then if (WorldSwitcher.isOpen(Random(2000, 4000))) then
+        if LoginScreen.OpenWorldSwitcher() and WorldSwitcher.IsOpen(Random(2500, 3000)) then
           WorldSwitcher.SelectWorld(Self.World);
-
-        if (LoginScreen.isOpen(Random(3000, 5000))) then
-          if (LoginScreen.GetCurrentWorld() in [Self.World, Self.World+300]) then
-          begin
-            srl.Writeln('Succefully selected our world');
-            Break;
-          end else
-            srl.Writeln('Weird missclick world bug? will try again');
-
-        Inc(Tries);
+        if (LoginScreen.GetCurrentWorld() <> Self.World) then
+          Continue;
       end;
 
-      if (Tries = 10) then
-      begin
-        srl.Writeln('Failed to select world');
-        Result := False;
-      end else
-        srl.Writeln('Worldswitch was succesfull');
-    end else
-      srl.Writeln('Already on our world');
+      if (not Self.LoginToLobby()) and (not srl.isLoggedIn()) then
+        Break;
+    end;
+
+    Wait(Random(200, 400));
   end;
 
-  if (Tries < 10) and (Self.LoginToLobby()) then
-  begin
-    srl.Writeln('In lobby, entering the game...');
-    if (Lobby.Play()) then
-      if (srl.isLoggedIn(Random(6000, 8000))) then
-        Result := True;
-  end;
-
-  if (Result) and (@srl.OnLoginPlayer <> nil) then
-    srl.OnLoginPlayer();
-  srl.Writeln('TPlayer.Login(): Result = ' + BoolToStr(Result), dtFooter);
+  srl.Writeln('TPlayer.Login(): Result = False', dtFooter);
 end;
