@@ -7,6 +7,33 @@ type
 
 
 (*
+TRectangle.Contains
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Contains(Pt: TPoint): Boolean; constref;
+
+Returns true if the point `Pt` is inside the rectangle.
+
+.. note:: by slacky
+*)
+function TRectangle.Contains(Pt: TPoint): Boolean; constref;
+var
+  Vec: TPoint;
+  Dot: Double;
+begin
+  Vec := Point(Self.Top.x-Self.Right.x, Self.Top.y-Self.Right.y);
+  Dot := ((Self.Top.x-Pt.x) * Vec.x) + ((Self.Top.y-Pt.y) * Vec.y);
+  if not((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+    Exit(False);
+  Vec := Point(Self.Top.x-Self.Btm.x, Self.Top.y-Self.Btm.y);
+  Dot := ((Self.Top.x-Pt.x) * Vec.x) + ((Self.Top.y-Pt.y) * Vec.y);
+  if not((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
+    Exit(False);
+  Result := True;
+end;
+  
+(*
 TRectangle.DirByLen
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -91,14 +118,45 @@ TRectangle.ToTPA
     function TRectangle.ToTPA(): TPointArray; constref;
 
 TPA from the rectangle.
-
-.. note:: by slacky
 *)
 function TRectangle.ToTPA(): TPointArray; constref;
 begin
   Result := [Top, Right, Btm, Left];
 end;
 
+
+(*
+TRectangle.Bounds
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Bounds(): TBox; constref;
+
+Returns the minimum bounding box covering the rectangle
+*)
+function TRectangle.Bounds(): TBox; constref;
+begin
+  Result := GetTPABounds([Top, Right, Btm, Left]);
+end;
+
+(*
+TRectangle.Radius
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Bounds(): TBox; constref;
+
+Returns the radius of the shortest side
+*)
+function TRectangle.Radius(): Double; constref;
+var
+  X: ESplitDirection;
+begin
+  if (Hypot(Left.y-Top.y, Left.x-Top.x) < Hypot(Left.y-Btm.y, Left.x-Btm.x)) then
+    Result := Hypot(Left.y-Top.y, Left.x-Top.x) / 2
+  else
+    Result := Hypot(Left.y-Btm.y, Left.x-Btm.x) / 2;
+end;
 
 (*
 TRectangle.Mean
@@ -171,7 +229,7 @@ Increase or decrease the dimensions of the rectangle.
 
 .. note:: by slacky
 *)
-function TRectangle.Expand(Incr: Single): TRectangle; constref;// override;
+function TRectangle.Expand(Incr: Single): TRectangle; constref;
 var
   vSides,tmp: array [0..3] of TPoint;
   theta: Single;

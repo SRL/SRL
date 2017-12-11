@@ -60,6 +60,14 @@ begin
   Self.LimitTo(MaxBounds);
 end;
 
+function TBox.ExpandFunc(SizeMod: Int32): TBox; constref;
+begin
+  Result.X1 := Self.X1 - SizeMod;
+  Result.Y1 := Self.Y1 - SizeMod;
+  Result.X2 := Self.X2 + SizeMod;
+  Result.Y2 := Self.Y2 + SizeMod;
+end;
+
 function TBox.Combine(b: TBox): TBox; constref;
 begin
   Result.X1 := Min(Min(Self.X1, b.X2), Min(b.X1, Self.X2));
@@ -80,7 +88,13 @@ begin
             InRange(other.x2, self.x1,self.x2) and
             InRange(other.y1, self.y1,self.y2) and
             InRange(other.y2, self.y1,self.y2);
-end; 
+end;
+
+function TBox.Contains(other: TPoint): Boolean; constref; overload;
+begin
+  Result := InRange(other.x, self.x1,self.x2) and
+            InRange(other.y, self.y1,self.y2);
+end;
 
 procedure TBox.Offset(pt:TPoint);
 begin
@@ -90,13 +104,12 @@ begin
   self.y2 += pt.y;
 end;
 
-function TBox.OffsetEx(pt:TPoint): TBox; constref;
+function TBox.OffsetFunc(pt:TPoint): TBox; constref;
 begin
-  Result    := self;
-  Result.x1 += pt.x;
-  Result.y1 += pt.y;
-  Result.x2 += pt.x;
-  Result.y2 += pt.y;
+  Result.x1 := self.x1 + pt.x;
+  Result.y1 := self.y1 + pt.y;
+  Result.x2 := self.x2 + pt.x;
+  Result.y2 := self.y2 + pt.y;
 end;
 
 procedure TBox.Normalize();

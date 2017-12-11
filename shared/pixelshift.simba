@@ -10,7 +10,7 @@ begin
   FreeBitmap(After);
 end;
 
-function TSRL.IsAnimating(Area:TBox; Shift, WaitTime, Iter:UInt32): Boolean;
+function TSRL.IsAnimating(Area:TBox; Shift, WaitTime:UInt32; Iter:UInt32=1): Boolean;
 var 
   i:Int32;
 begin
