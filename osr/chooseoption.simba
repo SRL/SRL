@@ -36,20 +36,20 @@ var
   ChooseOption: TRSChooseOption;
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSChooseOption.__setup();
+procedure TRSChooseOption.__Setup();
 begin
   BoxBitmap := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
   GetBitmapSize(BoxBitmap, BoxBitmap_Width, BoxBitmap_Height);
 end;
 
-procedure TRSChooseOption.__free(); 
+procedure TRSChooseOption.__Free();
 begin 
   FreeBitmap(BoxBitmap); 
 end;
 
 //Finds the optionbox using a simple bitmap (works very well).
-function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
+function TRSChooseOption.__Find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
   t,adapt: UInt64;
 begin
@@ -304,7 +304,7 @@ var
   pt,dest:TPoint;
   dir:PPoint;
 
-  procedure TrackMovment(a:Pointer; b:TShiftState; x,y:Int32); static;
+  procedure TrackMovment(Sender: Pointer; X, Y: Int32); static;
   var p:TPoint;
   begin
     if not ChooseOption.__find(p,0) then
@@ -314,7 +314,7 @@ begin
   if not self.IsOpen(tryTime) then
     Exit(True);
 
-  mouse.SetOnMouseMove(Pointer(@TrackMovment));
+  mouse.OnMoved := Pointer(@TrackMovment);
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
   pt := mouse.GetPosition();
@@ -332,12 +332,12 @@ begin
   except
     Result := self.IsClosed();
   end;
-  mouse.SetOnMouseMove(nil);
+  mouse.OnMoved := nil;
 end;
 
 begin
-  ChooseOption.__setup();
-  AddOnTerminate(@ChooseOption.__free);
+  ChooseOption.__Setup();
+  AddOnTerminate(@ChooseOption.__Free);
 end;
 
 
