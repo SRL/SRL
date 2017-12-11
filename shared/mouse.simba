@@ -429,8 +429,15 @@ begin
   end;
 end;
 
-procedure TMouse.Move(const Middle: TPoint; const Radius: Integer); overload;
+procedure TMouse.Move(const Middle: TPoint; const Radius: Int32; ForcedMove:Boolean=False); overload;
+var PT: TPoint;
 begin
+  if not ForcedMove then
+  begin
+    PT := self.GetPosition();
+    if Sqr(PT.X - Middle.X) + Sqr(PT.Y - Middle.Y) <= Sqr(Radius) then
+      Exit;
+  end;
   Self.Move(srl.RandomPoint(Middle, Radius));
 end;
 
