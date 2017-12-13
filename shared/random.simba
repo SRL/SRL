@@ -1,23 +1,27 @@
 type
   EWaitDir = (wdLeft,wdMean,wdRight);
 
+//none-zero random
+function nzRandom(): Double; 
+begin 
+  Result := Max(Random(), 1.0e-299); 
+end;
+  
 (*
 srl.GaussRand
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.GaussRand(mean, dev:Extended): Extended;
+  function TSRL.GaussRand(mean, dev: Double): Double;
 
 Generates a random gaussian/normal number.
 *)
-function TSRL.GaussRand(mean, dev:Extended): Extended; constref;
+function TSRL.GaussRand(mean, dev: Double): Double; static;
 var 
-  len:Double;
-  function __random(): Double; 
-  begin Result := MaxE(Random(),1.0e-14); end;
+  len: Double;
 begin
-  len := dev * Sqrt(-2 * Ln(__random()));
-  Result := mean + len * Cos(2 * PI * __random());
+  len := dev * Sqrt(-2 * Ln(nzRandom()));
+  Result := mean + len * Cos(2 * PI * Random());
 end;
 
 
@@ -35,7 +39,7 @@ function TSRL.TruncatedGauss(left:Double=0; right:Double=1; CUTOFF:Single=5.5): 
 begin
   Result := CUTOFF+1;
   while Result >= CUTOFF do
-    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+    Result := Abs(Sqrt(-2 * Ln(nzRandom())) * Cos(2 * PI * Random()));
   Result := Result / CUTOFF * (right-left) + left;
 end;
 
@@ -57,7 +61,7 @@ begin
   if Random()*(Hi-Lo) > Mode-Lo then top := Hi;
   Result := CUTOFF+1;
   while Result >= CUTOFF do
-    Result := Abs(Sqrt(-2 * Ln(Random())) * Cos(2 * PI * Random()));
+    Result := Abs(Sqrt(-2 * Ln(nzRandom())) * Cos(2 * PI * Random()));
   Result := Result / CUTOFF * (top-Mode) + Mode;
 end;
 
@@ -85,11 +89,11 @@ srl.NormalRange
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.NormalRange(min, max: Extended): Extended;
+  function TSRL.NormalRange(min, max: Double): Double;
 
 Generates a random float in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Extended; CUTOFF:Single=5.5): Extended; constref; overload;
+function TSRL.NormalRange(min, max: Double; CUTOFF:Single=5.5): Double; constref; overload;
 begin
   case Random(0,1) of
     0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF);
