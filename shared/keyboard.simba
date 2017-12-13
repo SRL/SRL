@@ -4,6 +4,33 @@ type
 var
   Keyboard: TKeyboard;
 
+procedure TKeyboard.PressKey(Key: Integer);
+begin
+  {$IFDEF SMART}
+  if (Key = 13) then
+    Key := 10;
+  {$ENDIF}
+
+  Self.KeyDown(Key);
+  Wait(Trunc(srl.SkewedRand(50,10,200)));
+  Self.KeyUp(Key);
+end;
+
+procedure TKeyboard.KeyDown(const Key: Integer);
+begin
+  System.KeyDown(Key);
+end;
+
+procedure TKeyboard.KeyUp(const Key: Integer);
+begin
+  System.KeyUp(Key);
+end;
+
+function TKeyboard.IsKeyDown(const Key: Integer): Boolean;
+begin
+  Result := System.IsKeyDown(Key);
+end;
+
 procedure TKeyboard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); overload;
 var
   i: UInt32;
@@ -25,31 +52,4 @@ begin
   Self.Send(Text);
   srl.NormalWait(30, 120, wdLeft);
   Self.PressKey(KeyPressAfter);
-end;
-
-procedure TKeyboard.PressKey(Key: Integer);
-begin
-  {$IFDEF SMART}
-  if (Key = 13) then
-    Key := 10;
-  {$ENDIF}
-
-  Self.KeyDown(Key);
-  Wait(Random(15,65));
-  Self.KeyUp(Key);
-end;
-
-procedure TKeyboard.KeyDown(const Key: Integer);
-begin
-  System.KeyDown(Key);
-end;
-
-procedure TKeyboard.KeyUp(const Key: Integer);
-begin
-  System.KeyUp(Key);
-end;
-
-function TKeyboard.IsKeyDown(const Key: Integer): Boolean;
-begin
-  Result := System.IsKeyDown(Key);
 end;

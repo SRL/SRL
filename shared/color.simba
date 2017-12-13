@@ -10,6 +10,12 @@ type
     HueMod, SatMod: Extended;
   end;
 
+
+function CTS2(Color, Tolerance: Int32; SatMod:Extended=0.2; HueMod:Extended=0.2): TCTS2Color;
+begin
+  Result := [Color, Tolerance, SatMod, HueMod];
+end;
+
 function _FindColors(var TPA: TPointArray; Area: TBox; Col, Tol, CTS: Integer; Hue, Sat: Extended = 0.2): UInt32;
 type
   TCTSContainer = record CTS:Int32; Hue, Sat: Extended; end;
@@ -40,6 +46,9 @@ begin
   Result := Length(TPA);
 end;
 
+// -----------------------------------------------------------------------------
+// Find Colors
+
 function TSRL.FindColors(var TPA: TPointArray; Color: TCTSColor; Area: TBox): UInt32; constref;
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 0);
@@ -54,6 +63,10 @@ function TSRL.FindColors(var TPA: TPointArray; Color: TCTS2Color; Area: TBox): U
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 2, Color.HueMod, Color.SatMod);
 end;
+
+
+// -----------------------------------------------------------------------------
+// Wait functions
 
 type
   TCompareFunc = function(X, Y: Integer): Boolean;

@@ -54,15 +54,15 @@ begin
 
     with Self.GetBounds() do
     begin
-      FButtons[bbSwap]   := TextBtn.OffsetEx([X1+5,  Y2-26]);
-      FButtons[bbInsert] := TextBtn.OffsetEx([X1+81, Y2-26]);
-      FButtons[bbItem]   := TextBtn.OffsetEx([X1+164, Y2-26]);
-      FButtons[bbNote]   := TextBtn.OffsetEx([X1+240, Y2-26]);
+      FButtons[bbSwap]   := TextBtn.OffsetFunc([X1+5,  Y2-26]);
+      FButtons[bbInsert] := TextBtn.OffsetFunc([X1+81, Y2-26]);
+      FButtons[bbItem]   := TextBtn.OffsetFunc([X1+164, Y2-26]);
+      FButtons[bbNote]   := TextBtn.OffsetFunc([X1+240, Y2-26]);
 
-      FButtons[bbPlaceholder] := IconBtn.OffsetEx([X2-164, Y2-41]);
-      FButtons[bbSearch]      := IconBtn.OffsetEx([X2-121, Y2-41]);
-      FButtons[bbDepositInv]  := IconBtn.OffsetEx([X2-78, Y2-41]);
-      FButtons[bbDepositWorn] := IconBtn.OffsetEx([X2-42, Y2-41]);
+      FButtons[bbPlaceholder] := IconBtn.OffsetFunc([X2-164, Y2-41]);
+      FButtons[bbSearch]      := IconBtn.OffsetFunc([X2-121, Y2-41]);
+      FButtons[bbDepositInv]  := IconBtn.OffsetFunc([X2-78, Y2-41]);
+      FButtons[bbDepositWorn] := IconBtn.OffsetFunc([X2-42, Y2-41]);
 
       FButtons[bbMenu]  := Box(X2-36, Y1+42, X2-12, Y1+66);
       FButtons[bbClose] := Box(X2-27, Y1+7,  X2-7,  Y1+27);
