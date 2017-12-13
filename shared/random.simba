@@ -45,9 +45,9 @@ srl.SkewedRand
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.SkewedRand(peak, lo, hi: Double): Double; static;
+  function TSRL.SkewedRand(Mode, Lo, Hi: Double): Double; static;
 
-Random skewed distribution generation. `Peak` is a number between `Lo` and `Hi` which is 
+Random skewed distribution generation. `Mode` is a number between `Lo` and `Hi` which is 
 where the most of the generated numbers will land.
 *)
 function TSRL.SkewedRand(Mode, Lo, Hi: Double; CUTOFF:Single=5.5): Double; static;

@@ -46,6 +46,9 @@ begin
   Result := Length(TPA);
 end;
 
+// -----------------------------------------------------------------------------
+// Find Colors
+
 function TSRL.FindColors(var TPA: TPointArray; Color: TCTSColor; Area: TBox): UInt32; constref;
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 0);
@@ -60,6 +63,10 @@ function TSRL.FindColors(var TPA: TPointArray; Color: TCTS2Color; Area: TBox): U
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 2, Color.HueMod, Color.SatMod);
 end;
+
+
+// -----------------------------------------------------------------------------
+// Wait functions
 
 type
   TCompareFunc = function(X, Y: Integer): Boolean;

@@ -452,7 +452,7 @@ begin
     Self.FOnMouseEvent(@Self, TMouseButton(Abs(Abs(not Button) - 2)), [], p.X, p.Y);
 
   Self.Hold(Button);
-  Wait(Random(50, 110)); //avg of 80ms is quite normal interval
+  Wait(Trunc(srl.SkewedRand(50,15,370)));
   Self.Release(Button);
 end;
 
