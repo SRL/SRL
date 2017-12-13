@@ -133,13 +133,15 @@ end;
 
 procedure TIntegerArray.Sort();
 begin
-  Quicksort(Self);
+  if Length(Self) > 0 then
+    Quicksort(Self);
 end;
 
 function TIntegerArray.Sorted(): TIntegerArray;
 begin
   Result := Copy(Self);
-  Quicksort(Result);
+  if Length(Result) > 0 then
+    Quicksort(Result);
 end;
 
 function TIntegerArray.Combine(Other: TIntegerArray): TIntegerArray; constref;
