@@ -31,7 +31,7 @@ end;
 {$include_once osr/players.simba}
 {$include_once osr/interfaces/bankscreen.simba}
 
-procedure TSRL.Setup(Options: ESRLOptionSet = [srlDebug]); override;
+procedure TSRL.Setup(Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); override;
 begin
   inherited(Options);
 
