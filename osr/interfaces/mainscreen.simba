@@ -352,14 +352,14 @@ end;
 
 procedure TRSMainScreen.SetAngle(Highest: Boolean);
 begin
-  if (Highest) then
+  if Highest then
     Keyboard.KeyDown(VK_UP)
   else
     Keyboard.KeyDown(VK_DOWN);
 
   Wait(1200 + Random(400));
 
-  if (Highest) then
+  if Highest then
     Keyboard.KeyUp(VK_UP)
   else
     Keyboard.KeyUp(VK_DOWN);
@@ -378,33 +378,33 @@ begin
       Wait(Random(200, 500));
 end;
 
-procedure TRSMainScreen.FacePoint(pt: TPoint; rand: Integer = 20);
+procedure TRSMainScreen.FacePoint(P: TPoint; Rand: Integer = 20; UseMouse: Boolean = True);
 var
-  a: Integer;
+  Angle: Int32;
 begin
-  a := Round(Self.getMiddle().AngleBetween(pt));
-  a := Round(FixD(Random(a - rand, a + rand)));
-  Minimap.SetCompassAngle(a, True, Random(7, 10));
+  Angle := Round(Self.GetMiddle().AngleBetween(P));
+  Angle += Random(-Rand, Rand);
+
+  Minimap.SetCompassAngle(FixD(Angle), UseMouse);
 end;
 
-function TRSMainScreen.RotateFind(func: function(): Boolean; Tries: Integer; UseMouse: Boolean = True): Boolean;
+function TRSMainScreen.Find(Finder: function(): Boolean; Tries: Integer; UseMouse: Boolean = True): Boolean;
 var
   Left: Boolean;
 begin
-  if (Tries <= 0) then
-    Exit(False);
-
   Left := Random(2) = 0;
+
   for 0 to Tries do
-    if (func()) then
+    if (Finder()) then
       Exit(True)
-    else begin
-      if (Left) then
-        Minimap.SetCompassAngle(Minimap.GetCompassAngle() + Random(60, 190), UseMouse, 8)
+    else
+    begin
+      if Left then
+        Minimap.SetCompassAngle(Minimap.GetCompassAngle() + Random(60, 190), UseMouse)
       else
-        Minimap.SetCompassAngle(Minimap.GetCompassAngle() - Random(60, 190), UseMouse, 8);
-      Wait(Random(950, 1400));
-      Minimap.WaitFlag;
+        Minimap.SetCompassAngle(Minimap.GetCompassAngle() - Random(60, 190), UseMouse);
+
+      Minimap.WaitFlag();
     end;
 end;
 

@@ -466,14 +466,14 @@ end;
 
 (*
 Inventory.Count
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.Count(): Byte;
+  function TRSInventory.Count: Int32;
 
 Returns the number of used slots
 *)
-function TRSInventory.Count(): Byte;
+function TRSInventory.Count: Int32; overload
 begin
   Result := Length(Self.GetUsedSlots());
 end;

@@ -226,3 +226,12 @@ begin
   for i:=0 to High(Self) do
     Result[i] := MiddleTPA(Self[i]);
 end;
+
+function T2DPointArray.Biggest: TPointArray; constref;
+var
+  TPA: TPointArray;
+begin
+  for TPA in Self do
+    if (Length(TPA) > Length(Result)) then
+      Result := TPA;
+end;

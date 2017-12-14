@@ -185,24 +185,22 @@ begin
   until (GetTickCount64() >= t);
 end;
 
-function TRSBankScreen.OpenAt(pt: TPoint): Boolean;
-var
-  Text: String;
+function TRSBankScreen.OpenAt(P: TPoint): Boolean;
 begin
-  Mouse.Move(pt);
-  if (MainScreen.IsUpText(['Bank Bank', 'Bank booth', 'to Banker', 'nk booth'])) then
-  begin
-    Wait(Random(50, 80));
-    Text := Mainscreen.GetUpText();
-    if (Pos('booth', Text) > 0) and (Random(3) = 0) then
-      Result := Mouse.Click(ctRed)
-    if (not Result) then
-      Result := (ChooseOption.Open()) and (ChooseOption.Select(['Bank Bank']));
+  Mouse.Move(P);
 
-    if (Result) then
+  if (MainScreen.IsUpText(['Use Bank', 'Bank chest', 'Bank Bank', 'Bank booth', 'to Banker'])) then
+  begin
+    if (MainScreen.IsUpText(['booth', 'chest'], Random(50, 80))) and (Random(3) <> 0) then
+      Result := Mouse.Click(ctRed)
+    else
+      Result := ChooseOption.Open() and ChooseOption.Select(['Use Bank', 'Bank Bank']);
+
+    if Result then
     begin
       Minimap.WaitFlag();
-      Result := Bankscreen.IsOpen(Random(4000, 5000));
+
+      Result := Bankscreen.IsOpen(Random(3500, 4000));
     end;
   end;
 end;

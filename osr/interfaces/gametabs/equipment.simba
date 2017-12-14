@@ -53,7 +53,7 @@ begin
   end;
 end;
 
-procedure TRSEquipment.Debug();
+procedure TRSEquipment.__Debug();
 var
   BMP:TMufasaBitmap;
 begin
@@ -93,9 +93,21 @@ begin
   Result := Gametabs.IsOpen(tabEquipment, maxWait);
 end;
 
+function TRSEquipment.MouseSlot(Slot: Int32; Button: Int32 = mouse_Move): Boolean;
+begin
+  if Self.Open() and (CountColor($10000, FBoxes[Slot]) > 0) then
+  begin
+    Mouse.Move(FBoxes[Slot]);
+    if (Button <> mouse_Move) then
+      Mouse.Click(Button);
+
+    Exit(True);
+  end;
+end;
+
 (*
 Equipment.InteractSlot
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.InteractSlot(): Boolean;
@@ -104,15 +116,15 @@ Interacts with the item at the given slot using given option
 *)
 function TRSEquipment.InteractSlot(Slot: Integer; Option: String; UpText: String = ''): Boolean;
 var
-  b: TBox;
+  B: TBox;
 begin
   if (not Self.Open) then
     Exit(False);
-  b := FBoxes[Slot];
-  if (CountColor($10000, b) = 0) then
+  B := FBoxes[Slot];
+  if (CountColor($10000, B) = 0) then
     Exit(False);
-  Mouse.Move(b);
-  if (UpText <> '') and (not Mainscreen.IsUpText(UpText)) then
+  Mouse.Move(B);
+  if (UpText <> '') and (not Mainscreen.isUpText(UpText)) then
     Exit(False);
   Result := ChooseOption.Open() and ChooseOption.Select(Option);
 end;
