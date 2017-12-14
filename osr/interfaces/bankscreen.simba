@@ -11,7 +11,7 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
 type
   EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
                  bbDepositInv, bbDepositWorn, bbMenu, bbClose);
-  EBankLocation = (blYanille, blAlKharid, blLumbridge, blDrynor,
+  EBankLocation = (blYanille, blAlKharid, blLumbridge, blDrynor, blEdgeville,
                    blVarrockWest, blVarrockEast,
                    blFaladorEast, blFaladorWest);
   EBankerColor = (bcBlue, bcGray);
@@ -236,7 +236,7 @@ begin
   end;
 end;
 
-function TRSBankScreen._OpenNPC(Typ: EBankerColor; Area: TBox): Boolean;
+function TRSBankScreen._OpenNPC(Typ: EBankerColor; Area: TBox): Int8;
 const
   colBlue: TCTS2Color = [4533549, 18, 0.75, 0.96];
   colGray: TCTS2Color = [6513771, 9, 0.35, 0.10];
@@ -253,15 +253,17 @@ begin
 
   if (Length(TPA) > 0) then
   begin
-    ATPA := ClusterTPAEx(TPA, 3, 3);
+    ATPA := ClusterTPA(TPA, 3);
     SortATPAFromMidPoint(ATPA, MiddleBox(Area));
 
-    for i := 0 to High(ATPA) do
+    for i:=0 to High(ATPA) do
     begin
       b := GetTPABounds(ATPA[i]);
-      if (b.Width >= 8) and (b.Height >= 8) then
-        if (Self.OpenAt(MiddleTPA(ATPA[i]).Random(-4, -4))) then
-          Exit(True);
+      if (b.Width >= 6) and (b.Height >= 6) then
+        if (Self.OpenAt(MiddleTPA(ATPA[i]).Random(-3,3))) then
+          Exit(1)
+        else
+          Result := 2;
     end;
   end;
 end;
@@ -281,7 +283,7 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
   b: TBox;
-  i, W, H: Integer;
+  testRes, i, W, H: Integer;
   pt, Mid: TPoint;
 begin
   if (srl.FindColors(TPA, BoothTopColor, Mainscreen.GetBounds()) > 5) then
@@ -289,9 +291,10 @@ begin
     ATPA := ClusterTPAEx(TPA, 3, 3);
     SortATPAFromMidPoint(ATPA, Mainscreen.GetMiddle());
 
-    for i := 0 to High(ATPA) do
+    for i:=0 to High(ATPA) do
     begin
-      Mid := ATPA[i].MinAreaRectEx(W, H).Mean();
+      rect := ATPA[i].MinAreaRectEx(W, H);
+      mid := rect.Mean();
       if (W >= 15) and (W <= 30) and (H <= 8) then
       begin
         pt := [Mid.X + Offset.X, Mid.Y + Offset.Y];
@@ -300,7 +303,10 @@ begin
         b := [pt.X - 28, pt.Y - 28, pt.X + 28, pt.Y + 28];
         b.LimitTo(Mainscreen.GetBounds());
 
-        if (Self._OpenNPC(BankerColor, b)) then
+        testRes := Self._OpenNPC(BankerColor, b);
+        if (testRes = 1) then
+          Exit(True)
+        else if (testRes = 2) and Self.OpenAt(mid.Random(-Ceil(rect.Radius), Trunc(rect.Radius))) then
           Exit(True);
       end;
     end;
@@ -325,7 +331,8 @@ begin
     blYanille:     Exit(Self._OpenYanille());
     blLumbridge:   Exit(Self._MagicalBankerFinder([607067,  10, 0.47, 0.28], bcBlue, [0,-30]));
     blAlKharid:    Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
-    blDrynor:      Exit(Self._MagicalBankerFinder([4146507, 10, 0.47, 0.28], bcGray, [-30, 0]));
+    blDrynor:      Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]));
+    blEdgeville:   Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [30, 0]));
     blVarrockWest: Exit(Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]));
     blVarrockEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]));
     blFaladorEast: Exit(Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]));
@@ -612,7 +619,7 @@ Example:
     bankscreen.Withdraw(1, 500, ['Iron'], bbNote);
 
     // withdraw all items from slot 10 if uptext matches
-    bankscreen.Withdraw(10, WITHDRAW_AMOUNT_ALL, ['Iron']);
+    bankscreen.Withdraw(10, WITHDRAW_ALL, ['Iron']);
 
     // withdraw 28 items from slot 1 and will *ignore* uptext
     bankscreen.Withdraw(1, 28);
