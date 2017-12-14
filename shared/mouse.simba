@@ -219,7 +219,7 @@ begin
   begin
     Self.Move(P.X, P.Y);
 
-    srl.NormalWait(15, 90);
+    Wait(15, 90);
   end;
 
   Self.Click(Button);
@@ -263,9 +263,9 @@ end;
 procedure TMouse.DragTo(P: TPoint; Button: Integer = mouse_Left);
 begin
   Self.Hold(Button);
-  srl.NormalWait(80, 120);
+  Wait(80, 120);
   Self.Move(P);
-  srl.NormalWait(80, 120);
+  Wait(80, 120);
   Self.Release(Button);
 end;
 
@@ -297,10 +297,10 @@ begin
     if k mod step = 0 then
     begin
       step := Round(srl.GaussRand(6.0,0.6));
-      srl.NormalWait(215, 410);
+      Wait(215, 410);
       k := 0;
     end else
-      srl.NormalWait(25, 46);
+      Wait(25, 46);
 
     Inc(k);
   end;

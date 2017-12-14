@@ -151,7 +151,7 @@ begin
   if not(self.Open()) then 
     Exit();
   if not(wasOpen) then
-    srl.NormalWait(20,300);
+    Wait(20,300);
 
   if Self.GetCurrentTab() = tab then Exit(True);
 

@@ -134,7 +134,7 @@ end;
 
 (*
 Spells.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSSpells.Open(): Boolean;
@@ -149,7 +149,7 @@ end;
 
 (*
 Spells.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSSpells.IsOpen(maxWait:Int32=0): Boolean;
@@ -181,7 +181,7 @@ end;
 
 (*
 Spells.MouseOver
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
@@ -198,6 +198,14 @@ begin
   Mouse.Move(Self.FSlots[spell]);
 end;
 
+(*
+Spells.Selected
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.Selected(Spell: ESpellCast): Boolean;
+Returns True if the spell is currently selected
+.. note:: by Olly
+*)
 function TRSSpells.Selected(Spell: ESpellCast): Boolean;
 begin
   if not (Self.Open()) then Exit();
@@ -205,6 +213,14 @@ begin
   Result := CountColor(16777215, Self.FSlots[spell]) > 10;
 end;
 
+(*
+Spells.Cast
+~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.Cast(Spell: ESpellCast): Boolean
+Casts the spell
+.. note:: by Olly
+*)
 function TRSSpells.Cast(Spell: ESpellCast): Boolean;
 begin
   if Self.Selected(Spell) then
@@ -213,6 +229,24 @@ begin
   Result := Self.MouseOver(Spell);
   if Result then
     Mouse.Click(mouse_Left);
+end;
+
+(*
+Spells.CanActivate
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+Returns True if you can use the spell..
+.. note:: by slacky
+*)
+function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+var
+  bmp: TMufasaBitmap;
+begin
+  if not(self.Open()) then Exit(False);
+  bmp.FromClient(self.GetSpellBound(spell));
+  Result := bmp.PeakBrightness() > 35;
+  bmp.Free();
 end;
 
 begin
