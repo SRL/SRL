@@ -50,6 +50,6 @@ end;
 procedure TKeyboard.Send(const Text: String; KeyPressAfter: Integer); overload;
 begin
   Self.Send(Text);
-  srl.NormalWait(30, 120, wdLeft);
+  Wait(30, 120, wdLeft);
   Self.PressKey(KeyPressAfter);
 end;

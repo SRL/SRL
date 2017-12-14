@@ -6,7 +6,7 @@ function nzRandom(): Double;
 begin 
   Result := Max(Random(), 1.0e-299); 
 end;
-  
+
 (*
 srl.GaussRand
 ~~~~~
@@ -169,19 +169,33 @@ end;
 
 
 (*
-srl.NormalWait (overload)
-~~~~~
+Wait (overload)
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=wdMean): TPoint; overload;
+  procedure Wait(min, max:Double; weight:EWaitDir=wdMean); overload;
 
 Waits ... Weighted towards the mean of `min` and `max`
 *)
-procedure TSRL.NormalWait(min, max:UInt32; weight:EWaitDir=wdMean); constref;
+procedure Wait(min, max:Double; weight:EWaitDir=wdMean); overload;
 begin
   case weight of
-    wdLeft:  Wait(Round(TruncatedGauss(min, max)));
-    wdMean:  Wait(NormalRange(min, max));
-    wdRight: Wait(Round(TruncatedGauss(max, min)));
+    wdLeft:  System.Wait(Round(srl.TruncatedGauss(min, max)));
+    wdMean:  System.Wait(Round(srl.NormalRange(min, max)));
+    wdRight: System.Wait(Round(srl.TruncatedGauss(max, min)));
   end;
+end;
+
+(*
+WaitEx
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  procedure WaitEx(mean, dev:Double);
+
+Waits ... Regular gauss random
+*)
+procedure WaitEx(mean, dev:Double);
+begin
+  Wait(Abs(Trunc(srl.GaussRand(mean, dev))));
 end;

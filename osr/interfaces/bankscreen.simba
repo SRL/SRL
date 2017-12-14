@@ -474,7 +474,7 @@ begin
   if not(Result) then
   begin
     Mouse.Move(inventory.GetSlotBox(slot));
-    srl.NormalWait(30,70);
+    Wait(30,70);
     if depositAll then
     begin
       ChooseOption.Open();
@@ -506,7 +506,7 @@ begin
       if inventory.IsSlotUsed(slotArr[i]) then
       begin
         self.DepositItem(slotArr[i], False);
-        srl.NormalWait(6,25);
+        Wait(6,25);
       end;
 
     for i:=0 to High(slotArr) do
@@ -521,7 +521,7 @@ begin
     if Result then
       Break
     else
-      srl.NormalWait(180,265); //wait a bit before round 2
+      Wait(180,265); //wait a bit before round 2
   end;
 end;
 
@@ -631,9 +631,9 @@ begin
     Exit(False);
 
   self.WithdrawAs(withdrawMode);
-  srl.NormalWait(90,170);
+  Wait(90,170);
   mouse.Move(b);
-  srl.NormalWait(90,170);
+  Wait(90,170);
 
   if (upText <> []) and not(BankScreen.IsUptext(upText)) then
     Exit(False);

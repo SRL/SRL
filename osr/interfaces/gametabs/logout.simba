@@ -121,7 +121,7 @@ begin
       else
         Wait(25);
     until GetTickCount64() > t;
-    srl.NormalWait(0,seed);
+    Wait(0,seed);
   end;
 end;
 

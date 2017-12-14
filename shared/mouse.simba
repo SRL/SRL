@@ -548,10 +548,10 @@ begin
     if k mod step = 0 then
     begin
       step := Round(srl.GaussRand(6.0,0.6));
-      srl.NormalWait(215,410);
+      Wait(215,410);
       k := 0;
     end else
-      srl.NormalWait(25,46);
+      Wait(25,46);
     Inc(k);
   end;
 end;
