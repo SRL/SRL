@@ -216,7 +216,11 @@ var
   p: TPoint;
 begin
   if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
-    Exit(Self.ClickContinue());
+  begin
+    Result := Self.ClickContinue();
+    Wait(150,250);
+    while Self.ClickContinue() do Wait(150,250);
+  end;
 end;
 
 (*
