@@ -323,15 +323,42 @@ begin
 end;
 
 (*
-  Extract all the integers found in the string.
+  Extract all the numbers found in the string.
 *)
-function AnsiString.ExtractNumbers(): TIntegerArray; constref;
+function String.ExtractNumbers(): TExtendedArray; constref;
+var
+  i,c,l:Int32;
+  Tmp: TStringArray;
+begin
+  L := Length(Self);
+  for i:=1 to Length(Self) do
+  begin
+    if Self[i].IsDigit() then
+    begin
+      Tmp += Self[i];
+      while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      if (i <= L) and (Self[i] = '.') then Tmp[c] += Self[i];
+      while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      if (i > L) then Break;
+      Inc(c);
+    end;
+  end;
+
+  SetLength(Result, Length(tmp));
+  for i:=0 to High(Tmp) do
+    Result[i] := StrToFloat(Tmp[i]);
+end;
+
+(*
+  Extract all the numbers found in the string.
+*)
+function AnsiString.ExtractNumbersEx(): TExtendedArray; constref;
 var
   i, c: Int32;
 begin
   SetLength(Result, 0);
   c := 0;
-  
+
   for i := 1 to High(Self) do
     if (Self[i] in ['0'..'9']) then
     begin
