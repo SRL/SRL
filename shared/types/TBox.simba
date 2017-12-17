@@ -194,3 +194,11 @@ begin
   Result[2] := [Self.X1, Result[0].Y2 + 1, Self.X1 + Size, Result[1].Y1 - 1];
   Result[3] := [Self.X2 - Size, Result[0].Y2 + 1, Self.X2, Result[1].Y1 - 1];
 end;
+
+operator + (Left, Right: TBox): TBox;
+begin
+  Result.X1 := Min(Min(Left.X1, Right.X2), Min(Right.X1, Left.X2));
+  Result.Y1 := Min(Min(Left.Y1, Right.Y2), Min(Right.Y1, Left.Y2));
+  Result.X2 := Max(Max(Left.X1, Right.X2), Max(Right.X1, Left.X2));
+  Result.Y2 := Max(Max(Left.Y1, Right.Y2), Max(Right.Y1, Left.Y2));
+end;
