@@ -1,0 +1,73 @@
+procedure TSRL.HoverRandomPlayer();
+var
+  arr: TOptionArray;
+  TPA: TPointarray;
+  wt: Double;
+  oldPos, pt: TPoint;
+  oldSpeed: Int32;
+begin
+  oldSpeed := mouse.Speed;
+  oldPos := mouse.GetPosition;
+
+  for 0 to Random(0,2) do
+  begin
+    TPA := Minimap.GetDots(MMDotPlayer);
+    FilterPointsDist(TPA,0,33, MM2MS.MMCX, MM2MS.MMCY);
+    if Length(TPA) = 0 then Exit;
+
+    pt := TPA[Random(0,High(TPA))];
+    pt := Minimap.VecToMs(Vec3(pt.x,pt.y,2));
+    Mouse.Move(pt, 10);
+    WaitEx(500, 90);
+    if (Random(10) = 0) and (MainScreen.GetUpText <> 'Walk here') then
+    begin
+      ChooseOption.Open();
+      if (Random(4) = 0) then
+      begin
+        arr := ChooseOption.GetOptions();
+        if (arr <> []) then
+        begin
+          mouse.Speed := 6;
+          WaitEx(400,85);
+          Mouse.Move(arr[Random(0,High(arr))].Bounds.ExpandFunc(5));
+          mouse.Speed := oldSpeed;
+        end;
+      end;
+      WaitEx(1900, 460);
+      ChooseOption.Close();
+    end else
+    begin
+      wt := GetTickCount + srl.GaussRand(4700,700);
+      while (GetTickCount < wt) and (MainScreen.GetUpText <> 'Walk here') do Wait(50);
+      WaitEx(600,80);
+    end;
+  end;
+
+  if Random(10) > 3 then
+    Mouse.Move(oldPos.Random(0,80,False));
+end;
+
+procedure TSRL.MouseOffClient(direction: Byte);
+var
+  i,W,H: Int32;
+  pt: TPoint;
+begin
+  GetClientDimensions(W, H);
+  pt := Mouse.GetPosition();
+  if (pt.X < 0) or (pt.X > W) or (pt.Y < 0) or (pt.Y > H) then
+    Exit();
+  if (direction >= 4) then
+    direction := Random(0,3);
+  case direction of
+    0: Mouse.Move(Box(-300, -300, W, 0)); // top
+    1: Mouse.Move(Box(0, H, W, H+300));   // bottom
+    2: Mouse.Move(Box(-300, 0, 0, H));    // left
+    3: Mouse.Move(Box(W, 0, W+300, H));   // right
+  end;
+end;
+
+
+procedure TSRL.MouseOffClient(); overload;
+begin
+  MouseOffClient(Trunc(srl.TruncatedGauss(0,4.1)));
+end;

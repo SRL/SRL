@@ -30,6 +30,7 @@ end;
 {$include_once osr/player.simba}
 {$include_once osr/players.simba}
 {$include_once osr/interfaces/bankscreen.simba}
+{$include_once osr/antiban.simba}
 
 procedure TSRL.Setup(Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); override;
 begin

@@ -1,11 +1,36 @@
-function TSRL.GetPixelShift(Area: TBox; WaitTime: UInt32): Integer;
+function TSRL.GetPixelShift(Area: TBox; WaitTime: UInt32): Int32;
 var
-  Before, After: Integer;
+  Before, After: Int32;
 begin
   Before := BitmapFromClient(Area);
   Wait(WaitTime);
   After := BitmapFromClient(Area);
   Result := CalculatePixelShift(Before, After, [0, 0, (Area.X2 - Area.X1), (Area.Y2 - Area.Y1)]);
+  FreeBitmap(Before);
+  FreeBitmap(After);
+end;
+
+function TSRL.GetPixelShiftTPA(Area: TBox; WaitTime: UInt32): TPointArray;
+var
+  Before, After: Int32;
+  x,y,c: Int32;
+begin
+  Before := BitmapFromClient(Area);
+  Wait(WaitTime);
+  After := BitmapFromClient(Area);
+
+  SetLength(Result, 1024);
+  for y:=0 to Area.Y2-Area.Y1 do
+    for x:=0 to Area.X2-Area.X1 do
+      if FastGetPixel(Before,x,y) <> FastGetPixel(After,x,y) then
+      begin
+        if c = Length(Result) then
+          SetLength(Result, c*2);
+        Result[c] := Point(x,y);
+        Inc(c);
+      end;
+
+  SetLength(Result, c);
   FreeBitmap(Before);
   FreeBitmap(After);
 end;
