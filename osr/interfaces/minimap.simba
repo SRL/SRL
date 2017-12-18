@@ -745,7 +745,7 @@ end;
 
 function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 const
-  DOT_COLOR: array[EMinimapDotType] of Int32 = [14869218, 204, 52685];
+  DOT_COLOR: array[EMinimapDotType] of Int32 = [$EEEEEE, $0000CC, $00CCCC];
   BORDER_COLOR = 65536;
 var
   BMP, Color: Int32;
