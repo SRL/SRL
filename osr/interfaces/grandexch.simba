@@ -243,7 +243,7 @@ begin
   for i:=1 to times do
   begin
     Mouse.Click(self.FAdjButtons[ord(button)], mouse_left);
-    srl.NormalWait(65,220);
+    Wait(65,220);
   end;
 end;
 
@@ -283,13 +283,13 @@ end;
 function TGrandExchOffer.SetQuantity(quantity:Int32): Boolean;
 begin
   Self.Click(abEnterQuantity);
-  Result := Chatbox.AnswerQuery('How many', IntToStr(quantity), True, 2500);
+  Result := Chatbox.AnswerQuery('How many', IntToStr(quantity), 2500, True);
 end;
 
 function TGrandExchOffer.SetPrice(price:Int32): Boolean;
 begin
   Self.Click(abEnterPrice);
-  Result := Chatbox.AnswerQuery('Set a price', IntToStr(price), True, 2500);
+  Result := Chatbox.AnswerQuery('Set a price', IntToStr(price), 2500, True);
 end;
 
 function TGrandExchOffer.ExchangeType(): EExchType;
@@ -404,7 +404,7 @@ begin
   begin
     Mouse.Click(FMiscBoxes[1], mouse_left);
   end;
-  Result := Chatbox.AnswerQuery('What would you', name, False, 2500);
+  Result := Chatbox.AnswerQuery('What would you', name, 2500, False);
 end;
 
 function TGrandExchOffer.SellItem(invIndex:Int32): Boolean;
@@ -412,7 +412,7 @@ begin
   if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etSell) then
     Exit(False);
 
-  Result := Inventory.SlotIsUsed(invIndex);
+  Result := Inventory.IsSlotUsed(invIndex);
   WriteLn(Result);
   if Result then
     Inventory.MouseSlot(invIndex, mouse_Left);
@@ -650,4 +650,4 @@ end;
 
 begin
   GrandExchange.__Setup();
-end.
+end;
