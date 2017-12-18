@@ -78,7 +78,7 @@ begin
 
       Response := LoginScreen.WaitResponse();
 
-      if Lobby.IsOpen() then
+      if Lobby.IsOpen(1000) then
         Exit(srl.Writeln('Logged into lobby', True, 'TPlayer.LoginToLobby(): Result = True'));
       if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
         Break;

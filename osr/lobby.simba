@@ -18,11 +18,25 @@ begin
   end;
 end;
 
-function TRSLobby.IsOpen: Boolean;
+function TRSLobby.IsOpen: Boolean; overload;
 var
   P: TPoint;
 begin
   Result := srl.FindText(P, 'CLICK HERE TO PLAY', 'UpChars07_s', $FFFFFF, 0, Self.PlayBox);
+end;
+
+function TRSLobby.IsOpen(WaitTime: Int32): Boolean; overload;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + WaitTime;
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsOpen() then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
 end;
 
 function TRSLobby.EnterGame: Boolean;
