@@ -18,12 +18,13 @@ type TRSChooseOption
 The type that holds functions and properties of the Runescape ChooseOption-menu.
 *)
 type
-  TRSChooseOption = record 
-    Bounds:TBox;
+  TRSChooseOption = record
+    Bounds: TBox;
+    MouseSpeed: Int32;
     {$IFNDEF CODEINSIGHT}
-    BoxBitmap: Int32;
-    BoxBitmap_Width:Int32;
-    BoxBitmap_Height:Int32;
+    BoxBitmap: PtrInt;
+    BoxBitmap_Width: Int32;
+    BoxBitmap_Height: Int32;
     {$ENDIF}
   end;
 
@@ -41,6 +42,7 @@ begin
   BoxBitmap := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
   GetBitmapSize(BoxBitmap, BoxBitmap_Width, BoxBitmap_Height);
+  MouseSpeed := Random(7,9);
 end;
 
 procedure TRSChooseOption.__Free();
@@ -245,14 +247,39 @@ Returns true if the select-action was performed.
 - left-clicks it `mouseAction:Int32=mouse_left;`
 - if it's not found option-menu will be closed AClose `AClose:Boolean=True;`
 - search can be case-insensitive `CaseSensitive:Boolean=True`
-  
+
+Slows down the mouse movement for more realistic sliding through the lines of text.
+
 .. note:: by slacky
 *)
 function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
 var
   choices: TOptionArray;
-  i,j,L:Int32;
-  waitOffset:Int64;
+  i,j,l: Int32;
+  waitOffset: Int64;
+
+  procedure RestMouse(Sender: Pointer; X,Y: Int32); static;
+  begin
+    if Random(70) = 0 then
+      WaitEx(400,90);
+  end;
+
+  function SelectOption(i: Int32): Boolean;
+  var
+    oldSpeed: Int32;
+    oldOnMoved: Pointer;
+  begin
+    WaitEx(80,30);
+    oldSpeed   := mouse.Speed;
+    oldOnMoved := @Mouse.OnMoved;
+    Mouse.Speed   := Self.MouseSpeed;
+    Mouse.OnMoved := Pointer(@RestMouse);
+    Mouse.Click(choices[i].Bounds, mouseAction);
+    Mouse.Speed   := oldSpeed;
+    Mouse.OnMoved := oldOnMoved;
+    Result := self.IsClosed();
+  end;
+
 begin
   choices := Self.GetOptions(); //this is a lil' slow
   L := Length(Choices);
@@ -261,22 +288,11 @@ begin
 
   for i:=0 to L-1 do
     for j:=0 to High(SubStrings) do
-      case CaseSensitive of
-        True:
-          if Pos(SubStrings[j],choices[i].str) <> 0 then
-          begin
-            Mouse.Click(choices[i].bounds, mouseAction);
-            Exit(self.IsClosed());
-          end;
-        False:
-          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str)) <> 0 then
-          begin
-            Mouse.Click(choices[i].bounds, mouseAction);
-            Exit(self.IsClosed());
-          end;
-      end;
+      if (CaseSensitive and (SubStrings[j] in Choices[i].Str)) or
+         ((not CaseSensitive) and (Lowercase(SubStrings[j]) in Lowercase(Choices[i].Str))) then
+        Exit(SelectOption(i));
 
-  Wait(Random(200,340)); //Wait so we actually see that the option aint here.
+  WaitEx(360,70); //Wait so we actually see that the option aint here.
   if AClose then
     Self.Close();
 end;
