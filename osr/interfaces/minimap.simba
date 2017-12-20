@@ -806,7 +806,7 @@ var
   Total: Int32;
   TPA: TPointArray;
 begin
-  FindColorsBitmap(Self.MaskBMP, TPA, 0);
+  FindColorsBitmap(Self.MaskBMP, TPA, $FFFFFF);
   Total := Length(TPA);
   FindColorsTolerance(TPA, Color, Self.FBounds, Tolerance);
   Self.FilterPoints(TPA);
