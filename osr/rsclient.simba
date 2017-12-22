@@ -1,0 +1,375 @@
+var
+  RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader'];
+
+type
+  TRSWindow = type PtrUInt;
+  TRSWindowArray = array of TRSWindow;
+  PRSWindowArray = ^TRSWindowArray;
+
+  TRSClient = record
+    Window: TRSWindow;
+    Child: TRSWindow;
+    Offset: TPoint;
+  end;
+
+// Returns the age of the windows process in milliseconds
+function TRSWindow.Age: Int64; constref
+type
+  TFileTime = record
+    LowDateTime: DWord;
+    HighDateTime: DWord;
+  end;
+
+  TSystemTime = record
+    Year: Word;
+    Month: Word;
+    DayOfWeek: Word;
+    Day: Word;
+    Hour: Word;
+    Minute: Word;
+    Second: Word;
+    Millisecond: Word;
+  end;
+
+  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll stdcall';
+  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll stdcall';
+  function GetProcessTimes(ProcessHandle: PtrUInt; var CreationTime, ExitTime, KernelTime, UserTime: TFileTime): LongBool; static; external 'GetProcessTimes@kernel32.dll stdcall';
+  function FileTimeToSystemTime(const FileTime: TFileTime; var SystemTime: TSystemTime): LongBool; static; external 'FileTimeToSystemTime@kernel32.dll stdcall';
+  function FileTimeToLocalFileTime(const FileTime: TFileTime; var LocalFileTime: TFileTime): LongBool; static; external 'FileTimeToLocalFileTime@kernel32.dll stdcall';
+
+  function MilliSecondsBetween(const ANow, AThen: TDateTime): Int64;
+  const
+    TDateTimeEpsilon = 2.2204460493e-16;
+  begin
+    Result := Trunc((Abs(ANow - AThen) + TDateTimeEpsilon) * MSecsPerDay);
+  end;
+
+  function FileTimeToDateTime(FileTime: TFileTime): TDateTime;
+  var
+    SystemTime: TSystemTime;
+  begin
+    FileTimeToLocalFileTime(FileTime, FileTime);
+    FileTimeToSystemTime(FileTime, SystemTime);
+
+    Result := Trunc(EncodeDate(SystemTime.Year, SystemTime.Month, SystemTime.Day)) + Abs(Frac(EncodeTime(SystemTime.Hour, SystemTime.Minute, SystemTime.Second, SystemTime.MilliSecond)));
+  end;
+
+const
+  PROCESS_ALL_ACCESS = $1F0FFF;
+var
+  Process: PtrUInt;
+  ProcessTimes: record Creation, Exit, Kernel, User: TFileTime; end;
+  SystemTime: TSystemTime;
+begin
+  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
+
+  with ProcessTimes do
+    GetProcessTimes(Process, Creation, Exit, Kernel, User);
+
+  CloseHandle(Process);
+
+  Result := MilliSecondsBetween(Now(), FileTimeToDateTime(ProcessTimes.Creation));
+end;
+
+// Closes the window by terminating the windows process
+procedure TRSWindow.Close; constref;
+
+  function TerminateProcess(Process: PtrUInt; ExitCode: UInt32): LongBool; static; external 'TerminateProcess@kernel32.dll stdcall';
+  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll stdcall';
+  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll stdcall';
+
+const
+  PROCESS_ALL_ACCESS = $1F0FFF;
+var
+  PID: UInt32;
+  Process: PtrUInt;
+begin
+  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
+  TerminateProcess(Process, 0);
+  CloseHandle(Process);
+end;
+
+// Returns the PID of windows proceess
+function TRSWindow.PID: UInt32; constref;
+
+  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll stdcall';
+
+begin
+  GetWindowThreadProcessID(Self, Result);
+end;
+
+// Returns true if the window has focus
+function TRSWindow.HasFocus: Boolean; constref;
+
+  function GetForegroundWindow: PtrUInt; external 'GetForegroundWindow@user32.dll stdcall';
+
+begin
+  Result := GetForegroundWindow() = Self;
+end;
+
+// Sets window focus
+// This seems to be the most reliable way. Windows is a bit weird when trying to set focus of a window you don't own.
+procedure TRSWindow.SetFocus; constref;
+const
+  SW_SHOW = 5;
+
+  function GetCurrentThreadID: UInt32; static; external 'GetCurrentThreadId@kernel32.dll stdcall';
+  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll stdcall';
+  function GetForegroundWindow: PtrUInt; static; external 'GetForegroundWindow@user32.dll stdcall';
+  function AttachThreadInput(AttachFrom, AttachTo: UInt32; Attach: LongBool): LongBool; static; external 'AttachThreadInput@user32.dll stdcall';
+  function ShowWindow(Handle: PtrUInt; ShowType: Int32): LongBool; static; external 'ShowWindow@user32.dll stdcall';
+  function BringWindowToTop(Handle: PtrUInt): LongBool; static; external 'BringWindowToTop@user32.dll stdcall';
+
+var
+  Current, Thread, PID: UInt32;
+begin
+  if (not Self.HasFocus()) then
+  begin
+    Current := GetWindowThreadProcessId(GetForegroundWindow(), PID);
+    Thread := GetCurrentThreadId();
+
+    if (Current <> Thread) then
+      AttachThreadInput(Current, Thread, True);
+
+    BringWindowToTop(Self);
+    ShowWindow(Self, SW_SHOW);
+
+    if (Current <> Thread) then
+      AttachThreadInput(Current, Thread, False);
+  end;
+end;
+
+// Returns a TBox of the windows bounds
+function TRSWindow.Bounds: TBox; constref;
+
+  function GetWindowRect(Handle: PtrUInt; Rect: ^TRect): LongBool; static; external 'GetWindowRect@user32.dll stdcall';
+
+var
+  R: TRect;
+begin
+  GetWindowRect(Self, @R);
+
+  Result := [R.Left, R.Top, R.Right, R.Bottom];
+end;
+
+// Returns the windows which title matches
+function TRSWindowArray.GetByTitle(S: String): TRSWindowArray; constref;
+
+  function GetWindowText(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetWindowTextA@user32.dll stdcall';
+
+  function GetTitle(Handle: PtrUInt): String;
+  var
+    Buffer: array[0..256] of Char;
+  begin
+    SetLength(Result, GetWindowText(Handle, @Buffer[0], Length(Buffer)));
+    if (Length(Result) > 0) then
+      MemMove(Buffer[0], Result[1], Length(Result));
+  end;
+
+var
+  Window: TRSWindow;
+begin
+  for Window in Self do
+    if S in GetTitle(Window) then
+      Result += Window;
+end;
+
+// Returns the windows which class name matches
+function TRSWindowArray.GetByClass(S: String): TRSWindowArray; constref;
+
+  function GetClassName(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetClassNameA@user32.dll stdcall';
+
+  function GetClass(Handle: PtrUInt): String;
+  var
+    Buffer: array[0..256] of Char;
+  begin
+    SetLength(Result, GetClassName(Handle, @Buffer[0], Length(Buffer)));
+    if (Length(Result) > 0) then
+      MemMove(Buffer[0], Result[1], Length(Result));
+  end;
+
+var
+  Window: TRSWindow;
+begin
+  for Window in Self do
+    if GetClass(Window) = S then
+      Result += Window;
+end;
+
+// Returns all windows of either the desktop or a parent window
+function TRSWindowArray.GetWindows(Parent: TRSWindow = 0): TRSWindowArray; static;
+type
+  TEnumWindowsFunc__ = function(Window: PtrUInt; Param: Pointer): LongBool;
+  TEnumWindowsFunc = native(TEnumWindowsFunc__, FFI_STDCALL);
+
+  function EnumWindows(Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumWindows@user32.dll stdcall';
+  function EnumChildWindows(Handle: PtrUInt; Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumChildWindows@user32.dll stdcall';
+
+  function GetWindow(Handle: PtrUInt; Param: Pointer): LongBool; static;
+  begin
+    PRSWindowArray(Param)^ += Handle;
+
+    Exit(True);
+  end;
+
+begin
+  if (Parent <> 0) then
+    EnumChildWindows(Parent, @GetWindow, @Result)
+  else
+    EnumWindows(@GetWindow, @Result);
+end;
+
+// Targets the RS client.
+// Some clients do weird stuff with recreating hwnds so we target the main window
+// and set the client area.
+function TRSClient.Target: Boolean;
+var
+  B: TBox;
+var
+  Title: String;
+begin
+  Self := [];
+
+  for Title in RS_CLIENT_TITLES do
+    for Self.Window in TRSWindowArray.GetWindows().GetByTitle(Title) do
+    begin
+      for Self.Child in TRSWindowArray.GetWindows(Window).GetByClass('SunAwtCanvas') do
+      begin
+        FreeTarget(GetImageTarget());
+
+        SetTarget(['', Self.Child]);
+
+        Self.Offset.X := B.X1 - Self.Window.Bounds().X1;
+        Self.Offset.Y := B.Y1 - Self.Window.Bounds().Y1;
+
+        with Self.Offset do
+        begin
+          MouseSetClientArea(X, Y, X + Child.Bounds().Width, Y + Child.Bounds().Height);
+          ImageSetClientArea(X, Y, X + Child.Bounds().Width, Y + Child.Bounds().Height);
+        end;
+
+        if srl.isClientReady() then
+          Exit(True);
+      end;
+    end;
+end;
+
+// Launches the client if needed then sets it as target
+function TRSClient.Setup(Launcher: String): Boolean;
+
+  function GetJavaExecutable: String;
+  var
+    SearchPath, Directory: String;
+  begin
+    for SearchPath in ['C:\Program Files\Java\', 'C:\Program Files (x86)\Java\'] do
+      for Directory in GetDirectories(SearchPath) do
+        if (Copy(Directory, 1, 3) = 'jre') and (IsStrInArr('java.exe', False, GetFiles(SearchPath + Directory + '\bin\', 'exe'))) then
+          Exit(SearchPath + Directory + '\bin\java.exe');
+  end;
+
+var
+  T: UInt64;
+  Process: TProcess;
+begin
+  if Self.Target() then
+    Exit(True);
+
+  if FileExists(Launcher) then
+  begin
+    Process.Init(nil);
+
+    if 'jar' in Launcher then
+      Process.SetCommandLine(Format('"%s" -jar "%s"', [GetJavaExecutable(), Launcher]))
+    else
+      Process.SetCommandLine(Launcher);
+
+    Process.Execute();
+    Process.Free();
+
+    T := GetTickCount() + (5 * 60000);
+    while (T > GetTickCount()) do
+    begin
+      if Self.Target() then
+        Exit(True);
+
+      Wait(1000);
+    end;
+  end;
+end;
+
+// Mouses to a random point off the client
+procedure TRSClient.MouseOff;
+const
+  SM_CXSCREEN = 0;
+  SM_CYSCREEN = 1;
+
+  function GetSystemMetrics(Index: Int32): Int32; static; external 'GetSystemMetrics@user32.dll stdcall';
+
+var
+  P: TPoint;
+begin
+  repeat
+    P.X := Random(GetSystemMetrics(SM_CXSCREEN));
+    P.Y := Random(GetSystemMetrics(SM_CYSCREEN));
+  until (not PointInBox(P, Self.Window.Bounds()));
+
+  // local to global position
+  P.X -= Self.Window.Bounds().X1 - Self.Offset.X;
+  P.Y -= Self.Window.Bounds().Y1 - Self.Offset.Y;
+
+  Mouse.Move(P);
+end;
+
+// Mouses off the client and gives Simba focus
+procedure TRSClient.LoseFocus; overload;
+
+  function GetSimbaWindow: TRSWindow;
+  var
+    Windows: TRSWindowArray;
+  begin
+    Windows := TRSWindowArray.GetWindows().GetByTitle('Simba - ');
+    if Length(Windows) = 0 then
+      raise 'Simba not found';
+
+    Result := Windows[0]
+  end;
+
+var
+  Simba: TRSWindow;
+begin
+  Self.MouseOff();
+
+  Simba := GetSimbaWindow();
+  Simba.SetFocus();
+end;
+
+// Loses focus and waits x millisecoonds
+procedure TRSClient.LoseFocus(Time: Int32); overload;
+begin
+  Self.LoseFocus();
+
+  Wait(Time);
+end;
+
+// Closes the client
+procedure TRSClient.Close;
+begin
+  Self.Window.Close();
+end;
+
+// Returns the clients age
+function TRSClient.Age: Int64;
+begin
+  Result := Self.Window.Age;
+end;
+
+// Simba's windows implemention uses GetPixel which isn't reliable on some targets.
+function GetColor(X, Y: Int32): Int32; override;
+begin
+  try
+    with Client.GetIOManager().ReturnData(X, Y, 1, 1) do
+      Result := RGBtoColor(Ptr^.R, Ptr^.G, Ptr^.B);
+  except
+    Result := -1;
+  end;
+end;
