@@ -89,9 +89,6 @@ procedure TSRL.Setup(AOptions: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
   Self.Options := AOptions;
   Self.StartTime := GetTickCount();
-
-  if (soActivateClient in Self.Options) then
-    ActivateClient();
 end;
 
 begin

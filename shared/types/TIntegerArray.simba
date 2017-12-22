@@ -179,13 +179,11 @@ begin
 end;
 
 function TIntegerArray.Min(): Int32; constref;
-var i:Int32;
 begin
   Result := MinA(Self);
 end;
 
 function TIntegerArray.Max(): Int32; constref;
-var i:Int32;
 begin
   Result := MaxA(Self);
 end;

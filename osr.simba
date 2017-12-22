@@ -46,15 +46,15 @@ begin
 
   Smart.Init();
   {$ELSE}
-  ActivateClient();
+  if (soActivateClient in Options) then
+    ActivateClient();
   {$ENDIF}
 
   if (not Self.isClientReady(60000 * 3)) then
-    Self.Writeln('Client failed to become ready... make sure you are in the correct graphic settings!', dtFatal)
+    Self.Writeln('Client ready timed out. Make sure ORS is setup correctly', dtFatal)
   else
     Self.Writeln('Client ready!');
 end;
-
 
 {$IFDEF !HAD_HINTS}
   {$H+}

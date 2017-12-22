@@ -49,7 +49,7 @@ end;
 
 procedure TSRL.MouseOffClient(direction: Byte);
 var
-  i,W,H: Int32;
+  W,H: Int32;
   pt: TPoint;
 begin
   GetClientDimensions(W, H);

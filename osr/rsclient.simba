@@ -1,3 +1,5 @@
+{.$DEFINE RSCLIENT_AUTOFOCUS} // Automaticlly set focus on mouse/key input
+
 var
   RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader'];
 
@@ -11,6 +13,9 @@ type
     Child: TRSWindow;
     Offset: TPoint;
   end;
+
+var
+  RSClient: TRSClient;
 
 // Returns the age of the windows process in milliseconds
 function TRSWindow.Age: Int64; constref
@@ -59,7 +64,6 @@ const
 var
   Process: PtrUInt;
   ProcessTimes: record Creation, Exit, Kernel, User: TFileTime; end;
-  SystemTime: TSystemTime;
 begin
   Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
 
@@ -81,7 +85,6 @@ procedure TRSWindow.Close; constref;
 const
   PROCESS_ALL_ACCESS = $1F0FFF;
 var
-  PID: UInt32;
   Process: PtrUInt;
 begin
   Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
@@ -320,6 +323,12 @@ begin
   Mouse.Move(P);
 end;
 
+// Gives the client focus
+procedure TRSClient.SetFocus;
+begin
+  Self.Window.SetFocus();
+end;
+
 // Mouses off the client and gives Simba focus
 procedure TRSClient.LoseFocus; overload;
 
@@ -373,3 +382,40 @@ begin
     Result := -1;
   end;
 end;
+
+{$IFDEF RSCLIENT_AUTOFOCUS}
+procedure TMouse.Move(P: TPoint); override;
+begin
+  RSClient.SetFocus();
+
+  inherited(P);
+end;
+
+procedure TKeyBoard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); override;
+begin
+  RSClient.SetFocus();
+
+  inherited(Text, KeyWait, KeyModWait, KeyPressWait);
+end;
+
+procedure TKeyBoard.PressKey(Key: Integer); override;
+begin
+  RSClient.SetFocus();
+
+  inherited(Key);
+end;
+
+procedure TKeyBoard.KeyDown(const Key: Integer); override;
+begin
+  RSClient.SetFocus();
+
+  inherited(Key);
+end;
+
+procedure TKeyBoard.KeyUp(const Key: Integer); override;
+begin
+  RSClient.SetFocus();
+
+  inherited(Key);
+end;
+{$ENDIF}
