@@ -17,6 +17,24 @@ type
 var
   RSClient: TRSClient;
 
+// Set a TIOManager to a RSClient.
+procedure TIOManager.SetTarget(RSClient: TRSClient); constref; overload;
+var
+  X, Y, W, H: Int32;
+begin
+  X := RSClient.Offset.X;
+  Y := RSClient.Offset.Y;
+  W := RSClient.Child.Bounds().Width();
+  H := RSClient.Child.Bounds().Height();
+
+  Self.FreeTarget(0);
+
+  Self.SetTargetEx(['', RSClient.Window]);
+
+  Self.MouseSetClientArea(X, Y, X + W, Y + H);
+  Self.ImageSetClientArea(X, Y, X + W, Y + H);
+end;
+
 // Returns the age of the windows process in milliseconds
 function TRSWindow.Age: Int64; constref
 type
@@ -222,12 +240,8 @@ begin
     EnumWindows(@GetWindow, @Result);
 end;
 
-// Targets the RS client.
-// Some clients do weird stuff with recreating hwnds so we target the main window
-// and set the client area.
-function TRSClient.Target: Boolean;
-var
-  B: TBox;
+// Targets the RS client, loops though each canvas child until we find a match
+function TRSClient.Target: Boolean; overload;
 var
   Title: String;
 begin
@@ -238,18 +252,10 @@ begin
     begin
       for Self.Child in TRSWindowArray.GetWindows(Window).GetByClass('SunAwtCanvas') do
       begin
-        FreeTarget(GetImageTarget());
+        Self.Offset.X := Self.Child.Bounds().X1 - Self.Window.Bounds().X1;
+        Self.Offset.Y := Self.Child.Bounds().Y1 - Self.Window.Bounds().Y1;
 
-        SetTarget(['', Self.Child]);
-
-        Self.Offset.X := B.X1 - Self.Window.Bounds().X1;
-        Self.Offset.Y := B.Y1 - Self.Window.Bounds().Y1;
-
-        with Self.Offset do
-        begin
-          MouseSetClientArea(X, Y, X + Child.Bounds().Width, Y + Child.Bounds().Height);
-          ImageSetClientArea(X, Y, X + Child.Bounds().Width, Y + Child.Bounds().Height);
-        end;
+        Client.GetIOManager().SetTarget(Self);
 
         if srl.isClientReady() then
           Exit(True);
@@ -258,7 +264,7 @@ begin
 end;
 
 // Launches the client if needed then sets it as target
-function TRSClient.Setup(Launcher: String): Boolean;
+function TRSClient.Setup(Launcher: String = ''): Boolean;
 
   function GetJavaExecutable: String;
   var
