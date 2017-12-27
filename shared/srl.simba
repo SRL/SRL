@@ -13,6 +13,7 @@ type
     DebugLevel: Int32;
     StartTime: UInt64;
     DefaultClientBounds: TBox;
+    OnSetup: procedure;
     OnLoginPlayer: procedure();
     OnLoginResponse: function(Response: String): Boolean;
     OnFatalMessage: procedure(Message: String);

@@ -264,6 +264,18 @@ begin
   end;
 end;
 
+function TRSChatbox.FindOption(Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+var
+  i: Int32;
+  Options: array of TChatOption;
+begin
+  Options := Self.GetOptions(TextColors);
+
+  for i := 0 to High(Options) do
+    if IsArrInStr(Text, Options[i].Text) then
+      Exit(True);
+end;
+
 (*
 Chatbox.ClickOption
 ~~~~~~~~~~~~~~~~~~~

@@ -743,6 +743,11 @@ begin
   end;
 end;
 
+procedure TMinimap.ClickCompass;
+begin
+  Mouse.Click(Self.CompassInfo.Middle, Self.CompassInfo.Radius, mouse_Left);
+end;
+
 function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 const
   DOT_COLOR: array[EMinimapDotType] of Int32 = [$EEEEEE, $0000CC, $00CCCC];

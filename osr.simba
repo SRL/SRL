@@ -14,6 +14,10 @@ end;
   {$include_once osr/smart.simba}
 {$ENDIF}
 
+{$IFDEF RSCLIENT}
+  {$include_once osr/rsclient.simba}
+{$ENDIF}
+
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
 {$include_once osr/lobby.simba}
@@ -36,6 +40,9 @@ procedure TSRL.Setup(Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); override;
 begin
   inherited(Options);
 
+  if (@Self.OnSetup <> nil) then
+    Self.OnSetup();
+
   Self.WriteLn('Setting up SRL for OSR');
   Self.Writeln('Waiting for client to load...');
 
@@ -55,6 +62,16 @@ begin
   else
     Self.Writeln('Client ready!');
 end;
+
+{$IFDEF RSCLIENT}
+procedure TSRL.Setup(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); overload;
+begin
+  if (not RSClient.Setup(Launcher)) then
+    Self.WriteLn('Failed to setup RSClient', dtFatal);
+
+  Self.Setup(Options);
+end;
+{$ENDIF}
 
 {$IFDEF !HAD_HINTS}
   {$H+}
