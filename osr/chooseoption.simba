@@ -266,17 +266,13 @@ var
 
   function SelectOption(i: Int32): Boolean;
   var
-    oldSpeed: Int32;
-    oldOnMoved: Pointer;
+    Mouse: TMouse;
   begin
     WaitEx(80,30);
-    oldSpeed   := mouse.Speed;
-    oldOnMoved := @Mouse.OnMoved;
+    Mouse.Setup();
     Mouse.Speed   := Self.MouseSpeed;
     Mouse.OnMoved := Pointer(@RestMouse);
     Mouse.Click(choices[i].Bounds, mouseAction);
-    Mouse.Speed   := oldSpeed;
-    Mouse.OnMoved := oldOnMoved;
     Result := self.IsClosed();
   end;
 
