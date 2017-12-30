@@ -44,7 +44,7 @@ Cross-product of rp and rq vectors.
 *)
 function TSRL.CrossProduct(rx,ry, px,py, qx,qy: Double): Double; static;
 begin
-	Result := (px - rx) * (qy - ry) - (py - ry) * (qx - rx);
+  Result := (px - rx) * (qy - ry) - (py - ry) * (qx - rx);
 end;
 
 (*
@@ -58,7 +58,7 @@ Cross-product of rp and rq vectors.
 *)
 function TSRL.CrossProduct(r, p, q: TPoint): Int64; static; overload;
 begin
-	Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
+  Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
 end;
 
 

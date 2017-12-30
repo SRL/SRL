@@ -8,7 +8,7 @@ type
 
 function TCircle.Contains(p: TPoint): Boolean; constref;
 begin
-	Result := (Distance(p.x, p.y, self.x, self.y) <= self.Radius);
+  Result := (Distance(p.x, p.y, self.x, self.y) <= self.Radius);
 end; 
 
 function TCircle.ToTPA(): TPointArray; constref;
