@@ -541,10 +541,6 @@ function TPointArray.ConvexHull(): TPointArray; constref;
 var
   pts: TPointArray;
   h,i,k,u: Int32;
-  function CrossProd(r, p, q: TPoint): Int32;
-  begin //cross-product of rp and rq vectors.
-    Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
-  end;
 begin
   if High(self) <= 2 then Exit(self);
   pts := Copy(self);
@@ -555,7 +551,7 @@ begin
 
   for i:=0 to h do
   begin
-    while (k >= 2) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+    while (k >= 2) and (srl.CrossProduct(result[k-2], result[k-1], pts[i]) <= 0) do
       Dec(k);
     result[k] := pts[i];
     Inc(k)
@@ -564,7 +560,7 @@ begin
   u := k+1;
   for i:=h-1 downto 0 do
   begin
-    while (k >= u) and (CrossProd(result[k-2], result[k-1], pts[i]) <= 0) do
+    while (k >= u) and (srl.CrossProduct(result[k-2], result[k-1], pts[i]) <= 0) do
       Dec(k);
     result[k] := pts[i];
     Inc(k);
@@ -670,6 +666,133 @@ begin
     Swap(LongSideLen, ShortSideLen);
 end;
 
+
+(*
+TPointArray.MinAreaCircle
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.MinAreaCircle(): TCircle;
+
+Computes the minimum bounding circle around the given shape.
+
+See: https://en.wikipedia.org/wiki/Smallest-circle_problem for more information.
+
+Implementation is derived from a number of implementations I've seen circulating the internet.
+*)
+function TPointArray.MinAreaCircle(): TCircle; constref;
+  function NewCircle2(p0, p1: TPoint): TCircle;
+  var
+    x,y: Int32;
+  begin
+	  x := (p0.x + p1.x) div 2;
+	  y := (p0.y + p1.y) div 2;
+	  Result := [x,y, Max(Distance(x,y, p0.x,p0.y),Distance(x,y, p1.x,p1.y))];
+  end;
+
+  function NewCircle3(p0, p1, p2: TPoint): TCircle;
+  var
+    d,ax,ay,bx,by,cx,cy,ox,oy,x,y,ra,rb,rc: Int32;
+  begin
+	  // Mathematical algorithm from Wikipedia: Circumscribed circle
+	  ax := p0.x; ay := p0.y;
+	  bx := p1.x; by := p1.y;
+	  cx := p2.x; cy := p2.y;
+	  ox := (Min(Min(ax, bx), cx) + Max(Max(ax, bx), cx)) div 2;
+	  oy := (Min(Min(ay, by), cy) + Max(Max(ay, by), cy)) div 2;
+	  ax -= ox; ay -= oy;
+	  bx -= ox; by -= oy;
+	  cx -= ox; cy -= oy;
+	  d := (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
+	  if (d = 0) then
+		  Exit;
+	  x := ox + ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) div d;
+	  y := oy + ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) div d;
+	  ra := Distance(x, y, p0.x, p0.y);
+	  rb := Distance(x, y, p1.x, p1.y);
+	  rc := Distance(x, y, p2.x, p2.y);
+	  Result := [x,y, Max(Max(ra, rb), rc)];
+  end;
+
+  // Two boundary points known
+  function makeCircleTwoPoints(points:TPointArray; p, q: TPoint): TCircle;
+  var
+    c, circ, left, right: TCircle;
+    r: TPoint;
+    cross: Double;
+  begin
+	  circ := NewCircle2(p, q);
+
+	  // For each point not in the two-point circle
+    for r in points do
+    begin
+		  if (circ.Contains(r)) then
+			  continue;
+
+		  // Form a circumcircle and classify it on left or right side
+		  cross := srl.CrossProduct(p.x, p.y, q.x, q.y, r.x, r.y);
+		  c := NewCircle3(p, q, r);
+		  if (c.Radius = 0) then
+			  continue
+		  else if (cross > 0) and ((left.Radius = 0) or (srl.CrossProduct(p.x, p.y, q.x, q.y, c.x, c.y) > srl.CrossProduct(p.x, p.y, q.x, q.y, left.x, left.y))) then
+			  left := c
+		  else if (cross < 0) and ((right.Radius = 0) or (srl.CrossProduct(p.x, p.y, q.x, q.y, c.x, c.y) < srl.CrossProduct(p.x, p.y, q.x, q.y, right.x, right.y))) then
+			  right := c;
+	  end;
+
+	  // Select which circle to return
+	  if (left.Radius = 0) and (right.Radius = 0) then
+		  Exit(circ)
+	  else if (left.Radius = 0) then
+		  Exit(right)
+	  else if (right.Radius = 0) or (left.Radius <= right.Radius) then
+		  Exit(left)
+	  else
+		  Exit(right);
+  end;
+
+
+  // One boundary point known
+  function makeCircleOnePoint(Points:TPointArray; p:TPoint): TCircle;
+  var
+    i:Int32;
+    q:TPoint;
+  begin
+    Result := [p.x, p.y, 0];
+	  for i:=0 to High(Points) do
+    begin
+		  q := points[i];
+		  if (not Result.Contains(q)) then
+      begin
+			  if (Result.Radius = 0) then
+				  Result := NewCircle2(p, q)
+			  else
+				  Result := makeCircleTwoPoints(Copy(points, 0, i + 1), p, q);
+		  end;
+	  end;
+  end;
+
+var
+  TPA: TPointArray;
+  i,j: Int32;
+  p: TPoint;
+begin
+  if Length(Self) = 0 then Exit();
+  if Length(Self) = 1 then Exit(TCircle([Self[0].x, Self[0].y, 0]));
+
+	// Clone list to preserve the caller's data, do Durstenfeld shuffle
+	TPA := Copy(Self);
+	for i := High(TPA) downto 0 do
+    Swap(TPA[i], TPA[Random(0,i)]);
+
+	// Progressively add points to circle or recompute circle
+	for i:=0 to High(TPA) do
+  begin
+		p := TPA[i];
+		if (Result.Radius = 0) or (not Result.Contains(p)) then
+			Result := makeCircleOnePoint(Copy(TPA, 0, i + 1), p);
+	end;
+end;
 
 
 //--| Other TPA methods |------------------------------------------------------>

@@ -1,13 +1,12 @@
 (*
 srl.Modulo
-~~~~~~
-
+~~~~~~~~~~
 .. code-block:: pascal
 
     function TSRL.Modulo(X, Y: Double): Double;
 
 This function returns the remainder from the division of the first argument by the second.
-Though it always returns a result with the same sign as its second operand (or zero).
+It will always returns a result with the same sign as its second operand (or zero).
 
 Example:
 
@@ -15,31 +14,53 @@ Example:
 
     Writeln(srl.Modulo(a, b));
 *)
-function TSRL.Modulo(X, Y: Double): Double; constref;
+function TSRL.Modulo(X, Y: Double): Double; static;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
 
 (*
 srl.Modulo; overload
-~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TSRL.Modulo(X, Y: Integer): Integer; overload;
+    function TSRL.Modulo(X, Y: Int32): Int32; overload;
 
 Integer overload for Modulo.
-
-Example:
-
-.. code-block:: pascal
-
-    Writeln(srl.Modulo(a, b));
 *)
-function TSRL.Modulo(X, Y: Integer): Integer; constref; overload;
+function TSRL.Modulo(X, Y: Int32): Int32; static; overload;
 begin
   Result := X - Floor(X / Y) * Y;
 end;
+
+(*
+srl.CrossProduct
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.CrossProduct(ry,ry, px,py, qx,qy: Double): Double;
+    
+Cross-product of rp and rq vectors.
+*)
+function TSRL.CrossProduct(rx,ry, px,py, qx,qy: Double): Double; static;
+begin
+	Result := (px - rx) * (qy - ry) - (py - ry) * (qx - rx);
+end;
+
+(*
+srl.CrossProduct; overload;
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.CrossProduct(r, p, q: TPoint): Int64; overload;
+    
+Cross-product of rp and rq vectors.
+*)
+function TSRL.CrossProduct(r, p, q: TPoint): Int64; static; overload;
+begin
+	Result := (p.x-r.x) * (q.y-r.y) - (p.y-r.y) * (q.x-r.x);
+end;
+
 
 (*
 srl.DeltaAngle
@@ -57,7 +78,7 @@ Example:
 
     Writeln(srl.DeltaAngle(350.0, 10.0));
 *)
-function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double; constref;
+function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double; static;
 begin
   Result := Modulo((DegA - DegB + R/2), R) - R/2;
 end;
@@ -80,7 +101,7 @@ Example:
 
     Writeln(PointInRect(Point(100, 100), Point(0, 0), Point(200, 1), Point(201, 201), Point(0, 225)));
 *)
-function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean; constref;
+function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean; static;
 var
   Vec:TPoint;
   Dot:Extended;
@@ -100,7 +121,7 @@ end;
 {*
  Check if a point is within a circle.
 *}
-function TSRL.PointInCircle(PT, Center: TPoint; Radius: Double): Boolean; constref;
+function TSRL.PointInCircle(PT, Center: TPoint; Radius: Double): Boolean; static;
 begin
   Result := Sqr(PT.X - Center.X) + Sqr(PT.Y - Center.Y) <= Sqr(Radius);
 end;
@@ -109,7 +130,7 @@ end;
 {*
  Check if a point is within a ellipse.
 *}
-function TSRL.PointInEllipse(PT, Center:TPoint; YRad, XRad: Double): Boolean; constref;
+function TSRL.PointInEllipse(PT, Center:TPoint; YRad, XRad: Double): Boolean; static;
 var
   X, Y: Integer;
 begin
@@ -124,7 +145,7 @@ end;
  
  Winding number algorithm
 *}
-function TSRL.PointInPoly(pt:TPoint; Poly:TPointArray): Boolean; constref; 
+function TSRL.PointInPoly(pt:TPoint; Poly:TPointArray): Boolean; static; 
 var
   wn,H,i,j:Int32;
 begin

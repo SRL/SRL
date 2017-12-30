@@ -1,0 +1,77 @@
+type
+  TCircle = record 
+    X,Y:Int32; 
+    Radius: Int32; 
+  end;
+  TCircleArray = array of TCircle;   
+
+
+function TCircle.Contains(p: TPoint): Boolean; constref;
+begin
+	Result := (Distance(p.x, p.y, self.x, self.y) <= self.Radius);
+end; 
+
+function TCircle.ToTPA(): TPointArray; constref;
+begin
+  Result := TPAFromCircle(Self.X, Self.Y, Self.Radius);
+end;
+
+function TCircle.Bounds(): TBox; constref;
+begin
+  Result := GetTPABounds(Self.ToTPA);
+end;
+
+function TCircle.Mean(): TPoint; constref;
+begin
+  Result.X := Self.X;
+  Result.Y := Self.Y;
+end;
+
+
+(*
+TCircle.Filter
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TCircle.Filter(TestSet: TPointArray): TPointArray; constref;
+
+Extract all the points from `TestSet` that fits within this circle.
+*)
+function TCircle.Filter(TestSet: TPointArray): TPointArray; constref;
+var
+  i, h, count: UInt32;
+  Vec: TPoint;
+  Dot: Extended;
+begin
+  h := High(TestSet);
+  if (h < 0) then
+    Exit;
+  
+  SetLength(Result, Length(TestSet));
+  count := 0;
+  for i := 0 to h do
+  begin
+    if Sqr(TestSet[i].X - Self.X) + Sqr(TestSet[i].Y - Self.Y) <= Sqr(Self.Radius) then
+    begin
+      Result[count] := TestSet[i];
+      Inc(count);
+    end;
+  end;
+  SetLength(Result, Count);
+end;
+
+
+(*
+TCircle.Expand
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TCircle.Expand(Inc: Int32): TCircle; constref;
+
+Increase or decrease the radius of the circle.
+*)
+function TCircle.Expand(Incr: Int32): TCircle; constref;
+begin
+  Result := Self;
+  Result.Radius += Incr;
+end;
