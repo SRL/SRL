@@ -64,29 +64,49 @@ end;
 
 (*
 srl.DeltaAngle
-~~~~~~~~~~
-
+~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double;
 
 Returns the shortest difference between two given angles.
-
-Example:
-
-.. code-block:: pascal
-
-    Writeln(srl.DeltaAngle(350.0, 10.0));
 *)
 function TSRL.DeltaAngle(DegA, DegB: Double; R: Double = 360): Double; static;
 begin
   Result := Modulo((DegA - DegB + R/2), R) - R/2;
 end;
 
+
+(*
+srl.DistToLine
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.DistToLine(Pt, sA, sB: TPoint): Double;
+
+Returns the distance to the nearest point on the line `sA`..`sB`
+*)
+function TSRL.DistToLine(Pt, sA, sB: TPoint): Double; static;
+var
+  dx,dy,d:Int32;
+  f: Single;
+  qt:TPoint;
+begin
+  dx := sB.x - sA.x;
+  dy := sB.y - sA.y;
+  d := dx*dx + dy*dy;
+  if (d = 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
+  f := ((pt.x - sA.x) * (dx) + (pt.y - sA.y) * (dy)) / d;
+  if (f < 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
+  if (f > 1) then Exit(Hypot(pt.x-sB.x, pt.y-sB.y));
+  qt.x := Round(sA.x + f * dx);
+  qt.y := Round(sA.y + f * dy);
+  Result := Hypot(pt.x-qt.x, pt.y-qt.y);
+end;
+
 (*
 srl.PointInRect
-~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean;

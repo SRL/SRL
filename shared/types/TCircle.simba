@@ -8,7 +8,7 @@ type
 
 function TCircle.Contains(p: TPoint): Boolean; constref;
 begin
-  Result := (Distance(p.x, p.y, self.x, self.y) <= self.Radius);
+  Result := Hypot(p.x-Self.x, p.y-Self.Y) <= Self.Radius;
 end; 
 
 function TCircle.ToTPA(): TPointArray; constref;
@@ -16,15 +16,30 @@ begin
   Result := TPAFromCircle(Self.X, Self.Y, Self.Radius);
 end;
 
+function TCircle.CircumferenceTPA(): TPointArray; constref;
+begin
+  Result := TPAFromCircle(Self.X, Self.Y, Self.Radius);
+end;
+
 function TCircle.Bounds(): TBox; constref;
 begin
-  Result := GetTPABounds(Self.ToTPA);
+  Result := [Self.X-Self.Radius, Self.Y-Self.Radius, Self.X+Self.Radius, Self.Y+Self.Radius];
 end;
 
 function TCircle.Mean(): TPoint; constref;
 begin
   Result.X := Self.X;
   Result.Y := Self.Y;
+end;
+
+function TCircle.Circumference(): Double; constref;
+begin
+  Result := 2*PI*Self.Radius;
+end;
+
+function TCircle.Area(): Double; constref;
+begin
+  Result := PI*Sqr(Self.Radius);
 end;
 
 
