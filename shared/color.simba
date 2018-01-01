@@ -16,7 +16,11 @@ begin
   Result := [Color, Tolerance, SatMod, HueMod];
 end;
 
-function _FindColors(var TPA: TPointArray; Area: TBox; Col, Tol, CTS: Integer; Hue, Sat: Extended = 0.2): UInt32;
+
+// -----------------------------------------------------------------------------
+// Find Colors
+
+function TSRL._FindColors(var TPA: TPointArray; Area: TBox; Col, Tol, CTS: Integer; Hue, Sat: Extended = 0.2): UInt32; constref;
 type
   TCTSContainer = record CTS:Int32; Hue, Sat: Extended; end;
 var
@@ -45,9 +49,6 @@ begin
 
   Result := Length(TPA);
 end;
-
-// -----------------------------------------------------------------------------
-// Find Colors
 
 function TSRL.FindColors(var TPA: TPointArray; Color: TCTSColor; Area: TBox): UInt32; constref;
 begin
@@ -351,8 +352,8 @@ Example:
 
   var
     CTS1_Color: TColorEx = [clRed, 20, [1]];
-    CTS2_Color: TColorEx = [clRed, 20, [2, [0.50, 1.00]]];
-    CTS3_Color: TColorEx = [clRed, 20, [3, 0.00, 0.00, 0.50]]];
+    CTS2_Color: TColorEx = [clRed, 20, [2, 0.50, 1.00]];
+    CTS3_Color: TColorEx = [clRed, 20, [3, 0.00, 0.00, 0.50]];
 *)
 type
   TColorEx = record
