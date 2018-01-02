@@ -287,6 +287,28 @@ begin
 end;
 
 (*
+TPointArray.SortFromLine
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TPointArray.SortFromLine(p,q:TPoint; reverse:Boolean=False);
+
+The name tells the story
+*)
+procedure TPointArray.SortFromLine(p,q:TPoint; reverse:Boolean=False);
+var
+  i,hi: Int32;
+  weight: TIntegerArray;
+begin
+  Hi := High(self);
+  if Hi <= 1 then Exit;
+  SetLength(weight, hi+1);
+  for i:=0 to Hi do
+    weight[i] := Ceil(srl.DistToLine(self[i],p,q));
+  QuickTPASort(Weight, self, 0, Hi, not reverse);
+end;
+
+(*
 TPointArray.Bounds
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal

@@ -228,7 +228,7 @@ begin
         tmp.Free();
       end;
       B.Offset(Point(x1, y1));
-      Result[i].bounds := B;
+      Result[i].Bounds := B;
     end;
     menu.Free();
   end;
