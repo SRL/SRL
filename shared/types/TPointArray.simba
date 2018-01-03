@@ -205,6 +205,21 @@ begin
   SortTPAFrom(self, From);
 end;
 
+(*
+TPointArray.Sorted
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.Sorted(From:TPoint=[0,0]): TPointArray;
+
+Wraps Simba's SortTPAFrom, produces a sorted copy.
+*)
+function TPointArray.Sorted(From:TPoint=[0,0]): TPointArray;
+begin
+  Result := Copy(Self);
+  SortTPAFrom(Result, From);
+end;
+
 
 (*
 TPointArray.SortByX
