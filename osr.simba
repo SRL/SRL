@@ -26,14 +26,14 @@ end;
 {$include_once osr/client.simba}
 {$include_once osr/chooseoption.simba}
 {$include_once osr/xpbar.simba}
-{$include_once osr/interfaces/chatbox.simba}
 {$include_once osr/interfaces/minimap.simba}
-{$include_once osr/MM2MS.simba}
 {$include_once osr/interfaces/mainscreen.simba}
+{$include_once osr/interfaces/chatbox.simba}
 {$include_once osr/interfaces/gametabs.simba}
 {$include_once osr/player.simba}
 {$include_once osr/players.simba}
 {$include_once osr/interfaces/bankscreen.simba}
+{$include_once osr/MM2MS.simba}
 {$include_once osr/antiban.simba}
 
 procedure TSRL.Setup(Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); override;

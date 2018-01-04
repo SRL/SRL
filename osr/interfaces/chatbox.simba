@@ -535,6 +535,149 @@ begin
 end;
 
 (*
+Chatbox.GetButtonQuery
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GetButtonQuery(): String;
+
+Returns the question-text, like "What would you like to smelt"
+*)
+function TRSChatbox.GetButtonQuery(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  FindColors(TPA, $203040, Self.GetChatArea());
+  if (Length(TPA) > 10) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10, 4);
+    SortATPAFromFirstPointY(ATPA, Point(0, 0));
+    b := GetTPABounds(ATPA[0]);
+    Result := GetTextAtEx(B, 0,3,4, $203040,0, 'UpChars07_s');
+  end;
+end;
+
+(*
+Chatbox.WaitButtonQuery
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.WaitButtonQuery(Query: String; WaitTime: Int32): Boolean;
+
+Wait till the query shows up. If it doesn't show up within `WaitTime` it returns `False`.
+*)
+function TRSChatbox.WaitButtonQuery(Query: String; WaitTime: Int32): Boolean;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount() + WaitTime;
+  while (t > GetTickCount()) do
+  begin
+    if (Pos(Query, Self.GetButtonQuery()) > 0) then
+      Exit(True);
+    Wait(Random(100, 200));
+  end;
+end;
+
+(*
+Chatbox.ClickButtonId
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ClickButtonId(Query: String; Id:Int32; UpText:String; WaitTime: Int32): Boolean;
+
+Clicks the button `Id`, checks uptext to verify that the corrrect button was clicked
+If the given button id doesn't match the UpText it will sift through the other buttons looking for it.
+*)
+function TRSChatbox.ClickButtonId(Query: String; Id:Int32; UpText:String; WaitTime: Int32): Boolean;
+var
+  i: Int32;
+  TPA: TPointArray;
+  Buttons: TBoxArray;
+  B: TBox;
+begin
+  if not Self.WaitButtonQuery(Query, WaitTime) then
+    Exit;
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+
+    if (B.Width > 30) and (B.Height > 60) then
+      Buttons += B;
+  end;
+
+  if Id <= Length(Buttons) then
+  begin
+    Buttons.SortFromMidPoint(Buttons[Id-1].Middle);
+    for i:=0 to High(Buttons) do
+    begin
+      Mouse.Move(Buttons[i]);
+      Result := MainScreen.IsUpText(uptext);
+      if Result then
+      begin
+        Wait(60,120);
+        Mouse.Click(mouse_Left);
+        Exit;
+      end;
+    end;
+  end;
+end;
+
+(*
+Chatbox.ClickButtonColor
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;
+
+Clicks the button matching both color and uptext, starting with the one that had the best
+initial match, and then sifting down to less good matches.
+*)
+function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;
+var
+  i, tmp: Int32;
+  TPA: TPointArray;
+  buttons: TBoxArray;
+  B: TBox;
+  best: array of record Box: TBox; Count: Int32; end;
+begin
+  if not Self.WaitButtonQuery(Query, WaitTime) then
+    Exit;
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      tmp := CountColorTolerance(Color, B.ExpandFunc(-6), Tolerance);
+      if (tmp = 0) then continue;
+
+      if (Length(best) = 0) or (tmp > best[0].Count) then
+        Insert([B,tmp], best, 0);
+    end;
+  end;
+
+  for i:=0 to High(best) do
+  begin
+    Mouse.Move(best[i].Box);
+    Result := MainScreen.IsUpText(uptext);
+    if Result then
+    begin
+      Wait(60,120);
+      Mouse.Click(mouse_Left);
+      Exit();
+    end;
+  end;
+end;
+
+
+(*
 Chatbox.GetTitle
 ~~~~~~~~~~~~~~~~
 .. code-block:: pascal
