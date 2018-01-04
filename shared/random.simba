@@ -2,9 +2,12 @@ type
   EWaitDir = (wdLeft,wdMean,wdRight);
 
 //none-zero random
-function nzRandom(): Double; 
-begin 
-  Result := Max(Random(), 1.0e-299); 
+function nzRandom(): Extended;
+begin
+  if SizeOf(Extended) = 10 then
+    Result := Max(Random(), 1.0e-4900) //10^-4900 seems to be our safe limit
+  else
+    Result := Max(Random(), 1.0e-320);
 end;
 
 (*
