@@ -13,7 +13,7 @@
 {$ENDIF}
 
 var
-  RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader'];
+  RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader', 'SMART'];
 
 type
   TRSWindow = type PtrUInt;
