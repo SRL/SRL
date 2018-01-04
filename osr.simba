@@ -14,9 +14,9 @@ end;
   {$include_once osr/smart.simba}
 {$ENDIF}
 
-{$IFDEF RSCLIENT}
+{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
   {$include_once osr/rsclient.simba}
-{$ENDIF}
+{$ENDIF}{$ENDIF}
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}

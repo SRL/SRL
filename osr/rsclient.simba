@@ -1,5 +1,17 @@
 {.$DEFINE RSCLIENT_AUTOFOCUS} // Automaticlly set focus on mouse/key input
 
+{$IFNDECL WINAPI_CC}
+  {$IFDEF CPU386}
+    const WINAPI_CC = ' stdcall';
+  {$ELSE}
+    const WINAPI_CC = ' win64';
+  {$ENDIF}
+{$ENDIF}
+
+{$IFNDECL ffi_winapi}
+  const ffi_winapi = {$IFDEF CPU386}ffi_stdcall{$ELSE}ffi_win64{$ENDIF};
+{$ENDIF}
+
 var
   RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader'];
 
@@ -54,11 +66,11 @@ type
     Millisecond: Word;
   end;
 
-  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll stdcall';
-  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll stdcall';
-  function GetProcessTimes(ProcessHandle: PtrUInt; var CreationTime, ExitTime, KernelTime, UserTime: TFileTime): LongBool; static; external 'GetProcessTimes@kernel32.dll stdcall';
-  function FileTimeToSystemTime(const FileTime: TFileTime; var SystemTime: TSystemTime): LongBool; static; external 'FileTimeToSystemTime@kernel32.dll stdcall';
-  function FileTimeToLocalFileTime(const FileTime: TFileTime; var LocalFileTime: TFileTime): LongBool; static; external 'FileTimeToLocalFileTime@kernel32.dll stdcall';
+  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll'+WINAPI_CC;
+  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll'+WINAPI_CC;
+  function GetProcessTimes(ProcessHandle: PtrUInt; var CreationTime, ExitTime, KernelTime, UserTime: TFileTime): LongBool; static; external 'GetProcessTimes@kernel32.dll'+WINAPI_CC;
+  function FileTimeToSystemTime(const FileTime: TFileTime; var SystemTime: TSystemTime): LongBool; static; external 'FileTimeToSystemTime@kernel32.dll'+WINAPI_CC;
+  function FileTimeToLocalFileTime(const FileTime: TFileTime; var LocalFileTime: TFileTime): LongBool; static; external 'FileTimeToLocalFileTime@kernel32.dll'+WINAPI_CC;
 
   function MilliSecondsBetween(const ANow, AThen: TDateTime): Int64;
   const
@@ -96,9 +108,9 @@ end;
 // Closes the window by terminating the windows process
 procedure TRSWindow.Close; constref;
 
-  function TerminateProcess(Process: PtrUInt; ExitCode: UInt32): LongBool; static; external 'TerminateProcess@kernel32.dll stdcall';
-  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll stdcall';
-  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll stdcall';
+  function TerminateProcess(Process: PtrUInt; ExitCode: UInt32): LongBool; static; external 'TerminateProcess@kernel32.dll'+WINAPI_CC;
+  function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll'+WINAPI_CC;
+  function CloseHandle(Handle: PtrUInt): LongBool; static; external 'CloseHandle@kernel32.dll'+WINAPI_CC;
 
 const
   PROCESS_ALL_ACCESS = $1F0FFF;
@@ -113,7 +125,7 @@ end;
 // Returns the PID of windows proceess
 function TRSWindow.PID: UInt32; constref;
 
-  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll stdcall';
+  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll'+WINAPI_CC;
 
 begin
   GetWindowThreadProcessID(Self, Result);
@@ -122,7 +134,7 @@ end;
 // Returns true if the window has focus
 function TRSWindow.HasFocus: Boolean; constref;
 
-  function GetForegroundWindow: PtrUInt; external 'GetForegroundWindow@user32.dll stdcall';
+  function GetForegroundWindow: PtrUInt; external 'GetForegroundWindow@user32.dll'+WINAPI_CC;
 
 begin
   Result := GetForegroundWindow() = Self;
@@ -134,12 +146,12 @@ procedure TRSWindow.SetFocus; constref;
 const
   SW_SHOW = 5;
 
-  function GetCurrentThreadID: UInt32; static; external 'GetCurrentThreadId@kernel32.dll stdcall';
-  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll stdcall';
-  function GetForegroundWindow: PtrUInt; static; external 'GetForegroundWindow@user32.dll stdcall';
-  function AttachThreadInput(AttachFrom, AttachTo: UInt32; Attach: LongBool): LongBool; static; external 'AttachThreadInput@user32.dll stdcall';
-  function ShowWindow(Handle: PtrUInt; ShowType: Int32): LongBool; static; external 'ShowWindow@user32.dll stdcall';
-  function BringWindowToTop(Handle: PtrUInt): LongBool; static; external 'BringWindowToTop@user32.dll stdcall';
+  function GetCurrentThreadID: UInt32; static; external 'GetCurrentThreadId@kernel32.dll'+WINAPI_CC;
+  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll'+WINAPI_CC;
+  function GetForegroundWindow: PtrUInt; static; external 'GetForegroundWindow@user32.dll'+WINAPI_CC;
+  function AttachThreadInput(AttachFrom, AttachTo: UInt32; Attach: LongBool): LongBool; static; external 'AttachThreadInput@user32.dll'+WINAPI_CC;
+  function ShowWindow(Handle: PtrUInt; ShowType: Int32): LongBool; static; external 'ShowWindow@user32.dll'+WINAPI_CC;
+  function BringWindowToTop(Handle: PtrUInt): LongBool; static; external 'BringWindowToTop@user32.dll'+WINAPI_CC;
 
 var
   Current, Thread, PID: UInt32;
@@ -163,7 +175,7 @@ end;
 // Returns a TBox of the windows bounds
 function TRSWindow.Bounds: TBox; constref;
 
-  function GetWindowRect(Handle: PtrUInt; Rect: ^TRect): LongBool; static; external 'GetWindowRect@user32.dll stdcall';
+  function GetWindowRect(Handle: PtrUInt; Rect: ^TRect): LongBool; static; external 'GetWindowRect@user32.dll'+WINAPI_CC;
 
 var
   R: TRect;
@@ -176,7 +188,7 @@ end;
 // Returns the windows which title matches
 function TRSWindowArray.GetByTitle(S: String): TRSWindowArray; constref;
 
-  function GetWindowText(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetWindowTextA@user32.dll stdcall';
+  function GetWindowText(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetWindowTextA@user32.dll'+WINAPI_CC;
 
   function GetTitle(Handle: PtrUInt): String;
   var
@@ -198,7 +210,7 @@ end;
 // Returns the windows which class name matches
 function TRSWindowArray.GetByClass(S: String): TRSWindowArray; constref;
 
-  function GetClassName(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetClassNameA@user32.dll stdcall';
+  function GetClassName(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetClassNameA@user32.dll'+WINAPI_CC;
 
   function GetClass(Handle: PtrUInt): String;
   var
@@ -221,10 +233,10 @@ end;
 function TRSWindowArray.GetWindows(Parent: TRSWindow = 0): TRSWindowArray; static;
 type
   TEnumWindowsFunc__ = function(Window: PtrUInt; Param: Pointer): LongBool;
-  TEnumWindowsFunc = native(TEnumWindowsFunc__, FFI_STDCALL);
+  TEnumWindowsFunc = native(TEnumWindowsFunc__, ffi_winapi);
 
-  function EnumWindows(Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumWindows@user32.dll stdcall';
-  function EnumChildWindows(Handle: PtrUInt; Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumChildWindows@user32.dll stdcall';
+  function EnumWindows(Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumWindows@user32.dll'+WINAPI_CC;
+  function EnumChildWindows(Handle: PtrUInt; Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumChildWindows@user32.dll'+WINAPI_CC;
 
   function GetWindow(Handle: PtrUInt; Param: Pointer): LongBool; static;
   begin
@@ -312,7 +324,7 @@ const
   SM_CXSCREEN = 0;
   SM_CYSCREEN = 1;
 
-  function GetSystemMetrics(Index: Int32): Int32; static; external 'GetSystemMetrics@user32.dll stdcall';
+  function GetSystemMetrics(Index: Int32): Int32; static; external 'GetSystemMetrics@user32.dll'+WINAPI_CC;
 
 var
   P: TPoint;
