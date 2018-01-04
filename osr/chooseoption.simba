@@ -260,8 +260,8 @@ var
 
   procedure RestMouse(Sender: Pointer; X,Y: Int32); static;
   begin
-    if Random(70) = 0 then
-      WaitEx(400,90);
+    if Random(140) = 0 then
+      WaitEx(500,90);
   end;
 
   function SelectOption(i: Int32): Boolean;
