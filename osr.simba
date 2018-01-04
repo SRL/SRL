@@ -64,7 +64,7 @@ begin
 end;
 
 {$IFDEF RSCLIENT}
-procedure TSRL.Setup(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS); overload;
+procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
   if (not RSClient.Setup(Launcher)) then
     Self.WriteLn('Failed to setup RSClient', dtFatal);
