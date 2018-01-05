@@ -783,6 +783,13 @@ begin
   Result := FindMaskTolerance(Mask, x, y, SearchArea.X1, SearchArea.Y1, SearchArea.X2, SearchArea.Y2, Tolerance, ContourTolerance);
 end;
 
+procedure TerminateScript(Reason: String); overload;
+begin
+  WriteLn('Terminating: '+Reason);
+  TerminateScript();
+end;
+
+
 {$ifndecl GetTickCount64}
 var GetTickCount64: function():UInt64 := GetTickCount;
 {$endif}

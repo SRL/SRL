@@ -1,13 +1,11 @@
-procedure TSRL.HoverRandomPlayer();
+procedure TSRL.HoverRandomPlayer(waitMean:Double=3500);
 var
   arr: TOptionArray;
   TPA: TPointarray;
   wt: Double;
   oldPos, pt: TPoint;
-  oldSpeed: Int32;
 begin
-  oldSpeed := mouse.Speed;
-  oldPos := mouse.GetPosition;
+  oldPos := mouse.GetPosition();
 
   for 0 to Trunc(srl.TruncatedGauss(0,3.1)) do
   begin
@@ -18,33 +16,31 @@ begin
     pt := TPA[Random(0,High(TPA))];
     pt := Minimap.VecToMs(Vec3(pt.x,pt.y,2));
     Mouse.Move(pt,10);
-    WaitEx(500, 90);
-    if (Random(0,2) <> 0) and (MainScreen.GetUpText <> 'Walk here') then
+
+    WaitEx(70,10);
+    if (Random(3) <> 0) and (MainScreen.IsUpText('level')) then
     begin
       ChooseOption.Open();
-
-      if (Random(0,4) = 0) then
+      if (Random(2) = 0) then
       begin
         arr := ChooseOption.GetOptions();
         if (arr <> []) then
         begin
-          mouse.Speed := 6;
-          WaitEx(400,85);
-          Mouse.Move(arr[Random(0,High(arr))].Bounds.ExpandFunc(5));
-          mouse.Speed := oldSpeed;
+          WaitEx(220,30);
+          Mouse.Move(arr[Random(0,High(arr))].Bounds);
         end;
       end;
-      Wait(600, 4500);
+      WaitEx(waitMean,waitMean*0.08);
       ChooseOption.Close();
     end else
     begin
-      wt := GetTickCount + srl.GaussRand(4700,700);
-      while (GetTickCount < wt) and (MainScreen.GetUpText <> 'Walk here') do Wait(50);
+      wt := GetTickCount + srl.GaussRand(waitMean,waitMean*0.08);
+      while (GetTickCount < wt) and (MainScreen.IsUpText('level')) do Wait(50);
       WaitEx(600,80);
     end;
   end;
 
-  if Random(0,4) <> 4 then
+  if Random(4) <> 0 then
     Mouse.Move(oldPos.Random(0,80,False));
 end;
 
