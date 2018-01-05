@@ -10,13 +10,16 @@ begin
   for 0 to Trunc(srl.TruncatedGauss(0,3.1)) do
   begin
     TPA := Minimap.GetDots(MMDotPlayer);
-    FilterPointsDist(TPA,0,30, MM2MS.MMCX, MM2MS.MMCY);
+    FilterPointsDist(TPA,0,24, MM2MS.MMCX, MM2MS.MMCY);
     if Length(TPA) = 0 then Exit;
 
     pt := TPA[Random(0,High(TPA))];
     pt := Minimap.VecToMs(Vec3(pt.x,pt.y,2));
-    Mouse.Move(pt,10);
 
+    if not MainScreen.GetBounds.Contains(pt) then
+      Continue;
+
+    Mouse.Move(pt,8);
     WaitEx(70,10);
     if (Random(3) <> 0) and (MainScreen.IsUpText('level')) then
     begin
@@ -36,7 +39,7 @@ begin
     begin
       wt := GetTickCount + srl.GaussRand(waitMean,waitMean*0.08);
       while (GetTickCount < wt) and (MainScreen.IsUpText('level')) do Wait(50);
-      WaitEx(600,80);
+      WaitEx(70,10);
     end;
   end;
 
@@ -67,4 +70,45 @@ end;
 procedure TSRL.MouseOffClient(); overload;
 begin
   MouseOffClient(Trunc(srl.TruncatedGauss(0,4.1)));
+end;
+
+// experimental
+function TSRL.DismissRandom(): Boolean;
+var
+  i: Int32;
+  textAt: TPoint;
+  TPA, Dots: TPointarray;
+  msText: TMSTextArray := MainScreen.GetText(clYellow);
+  name: String := Chatbox.GetDisplayName();
+begin
+  for i:=0 to High(msText) do
+    if(name in msText[i].Text) then
+    begin
+      textAt := msText[i].Bounds.Middle + Point(0,10);
+      break;
+    end;
+
+  if (textAt = Point(0,0)) then
+    Exit;
+
+  Dots := Minimap.GetDots(MMDotNPC);
+  for i:=0 to High(Dots) do
+    TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
+
+  TPA.Sort(textAt);
+  for i:=0 to High(TPA) do
+  begin
+    if Distance(TPA[i], Mainscreen.GetMiddle()) > 80 then
+      Break;
+
+    Mouse.Move(TPA[i],5);
+    WaitEx(60,30);
+    if not MainScreen.IsUpText('Talk-to') then
+      Continue;
+    if ChooseOption.Select('Dismiss') then
+    begin
+      while minimap.isPlayerMoving() do Wait(40);
+      Exit(True);
+    end;
+  end;
 end;
