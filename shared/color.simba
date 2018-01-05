@@ -10,6 +10,15 @@ type
     HueMod, SatMod: Extended;
   end;
 
+function CTS0(Color, Tolerance: Int32): TCTSColor;
+begin
+  Result := [Color, Tolerance];
+end;
+
+function CTS1(Color, Tolerance: Int32): TCTS1Color;
+begin
+  Result := [Color, Tolerance];
+end;
 
 function CTS2(Color, Tolerance: Int32; SatMod:Extended=0.2; HueMod:Extended=0.2): TCTS2Color;
 begin

@@ -33,6 +33,7 @@ end;
 {$include_once osr/player.simba}
 {$include_once osr/players.simba}
 {$include_once osr/interfaces/bankscreen.simba}
+{$include_once osr/interfaces/makescreen.simba}
 {$include_once osr/MM2MS.simba}
 {$include_once osr/antiban.simba}
 
@@ -63,7 +64,7 @@ begin
     Self.Writeln('Client ready!');
 end;
 
-{$IFDEF RSCLIENT}
+{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
 procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
   if (not RSClient.Setup(Launcher)) then
@@ -71,7 +72,7 @@ begin
 
   Self.Setup(Options);
 end;
-{$ENDIF}
+{$ENDIF}{$ENDIF}
 
 {$IFDEF !HAD_HINTS}
   {$H+}
