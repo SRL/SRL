@@ -105,8 +105,10 @@ begin
     WaitEx(60,30);
     if not MainScreen.IsUpText('Talk-to') then
       Continue;
+
     if ChooseOption.Select('Dismiss') then
     begin
+      WaitEx(320,40);
       while minimap.isPlayerMoving() do Wait(40);
       Exit(True);
     end;
