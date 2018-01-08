@@ -326,6 +326,12 @@ begin
   if not(self.Open()) then
     Exit();
 
+  if shiftDrop then
+  begin
+    Keyboard.KeyDown(VK_SHIFT);
+    WaitEx(80,10);
+  end;
+
   for idx in Slots do
     if self.IsSlotValid(idx) and self.IsSlotUsed(idx, False) then
     begin
@@ -339,15 +345,15 @@ begin
       if (not shiftDrop) then
         ChooseOption.Select(['Drop'])
       else
-      begin
-        Keyboard.KeyDown(VK_SHIFT);
-        Wait(Trunc(srl.SkewedRand(50,10,200)));
         Mouse.Click(mouse_Left);
-        Wait(Trunc(srl.SkewedRand(50,10,200)));
-        Keyboard.KeyUp(VK_SHIFT);
-      end;
-      Wait(Random(103,219));
+      WaitEx(80,10);
     end;
+
+  if shiftDrop then
+  begin
+    WaitEx(80,10);
+    Keyboard.KeyUp(VK_SHIFT);
+  end;
 end;
 
 
