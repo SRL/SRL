@@ -341,7 +341,9 @@ begin
       else
       begin
         Keyboard.KeyDown(VK_SHIFT);
+        Wait(Trunc(srl.SkewedRand(50,10,200)));
         Mouse.Click(mouse_Left);
+        Wait(Trunc(srl.SkewedRand(50,10,200)));
         Keyboard.KeyUp(VK_SHIFT);
       end;
       Wait(Random(103,219));
