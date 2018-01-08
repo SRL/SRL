@@ -14,6 +14,7 @@ type
   TRSInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
     LowSlot, HighSlot: Byte;
+    ShiftDrop: Boolean;
   end;
 
 {==| Table of Contents |=======================
@@ -335,7 +336,14 @@ begin
         if not mainscreen.IsUpText(UpText) then
           Continue;
       end;
-      ChooseOption.Select(['Drop']);
+      if (not shiftDrop) then
+        ChooseOption.Select(['Drop'])
+      else
+      begin
+        Keyboard.KeyDown(VK_SHIFT);
+        Mouse.Click(mouse_Left);
+        Keyboard.KeyUp(VK_SHIFT);
+      end;
       Wait(Random(103,219));
     end;
 end;
