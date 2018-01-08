@@ -73,8 +73,8 @@ function AnsiString.After(SubStr: String): String; constref;
 var
   p: UInt32;
 begin
-  p := System.Pos(Self, SubStr);
-  if (p = 0) then Exit('');
+  p := System.Pos(SubStr, Self);
+  if (p = 0) then Exit(Self);
   Inc(p, Length(SubStr));
   Result := Copy(Self, p, Length(Self) - p + 1);
 end;
@@ -86,8 +86,8 @@ function AnsiString.Before(SubStr: String): String; constref;
 var
   p: UInt32;
 begin
-  p := Self.Pos(SubStr);
-  if (p = 0) then Exit('');
+  p := System.Pos(SubStr, Self);
+  if (p = 0) then Exit(Self);
   Result := Copy(Self, 1, p - 1);
 end;
 

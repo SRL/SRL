@@ -82,18 +82,18 @@ begin
             (Self.Y1 <= b.Y2) and (Self.Y2 >= b.Y1);
 end;
 
-function TBox.Contains(other: TBox): Boolean; constref;
+function TBox.Contains(other: TPoint): Boolean; constref;
+begin
+  Result := InRange(other.x, self.x1,self.x2) and
+            InRange(other.y, self.y1,self.y2);
+end;
+
+function TBox.Contains(other: TBox): Boolean; constref; overload;
 begin
   Result := InRange(other.x1, self.x1,self.x2) and
             InRange(other.x2, self.x1,self.x2) and
             InRange(other.y1, self.y1,self.y2) and
             InRange(other.y2, self.y1,self.y2);
-end;
-
-function TBox.Contains(other: TPoint): Boolean; constref; overload;
-begin
-  Result := InRange(other.x, self.x1,self.x2) and
-            InRange(other.y, self.y1,self.y2);
 end;
 
 procedure TBox.Offset(pt:TPoint);

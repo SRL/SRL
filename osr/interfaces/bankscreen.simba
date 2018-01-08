@@ -431,8 +431,29 @@ end;
 
 function TRSBankScreen.GetSlotBox(Slot: UInt32): TBox;
 begin
-  if InRange(Slot, 0,High(Self.FSlots)) then
-    Result := fSlots[Slot]; // range check.
+  if InRange(Slot, 0, High(Self.FSlots)) then
+    Result := Self.FSlots[Slot];
+end;
+
+(*
+Bankscreen.PointToSlot
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.PointToSlot(pt:TPoint): Int32;
+
+Returns the slot-index under the given TPoint.
+If it's not over a slot then -1 is returned
+*)
+function TRSBankScreen.PointToSlot(pt:TPoint): Int32;
+begin
+  if not(PointInBox(Pt, Self.FBounds)) then
+    Exit(-1);
+
+  for Result:=0 to High(self.FSlots) do
+    if PointInBox(pt, Self.FSlots[Result]) then
+      Exit;
+  Result := -1;
 end;
 
 

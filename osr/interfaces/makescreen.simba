@@ -1,7 +1,7 @@
 (*
 MakeScreen
 ==============
-This file stores all methods that are used in the MakeScreen-interfaces like SmithingScreen.
+This file stores all methods that are used for simpler interfaces like SmithingScreen.
 
 .. code-block:: pascal
 
@@ -10,7 +10,7 @@ This file stores all methods that are used in the MakeScreen-interfaces like Smi
 type
   TRSMakeScreen = record (TInterfaceBase)
     FTitleBounds, FItemBounds: TBox;
-    FSlots,FItemSlots: TBoxArray;
+    FBoxes, FItemBoxes: TBoxArray;
     CloseButton: TBox;
 
     // styles
@@ -103,19 +103,19 @@ begin
       Self.FItemBounds.X2 + Padding.X2,
       Self.FItemBounds.Y2 + Padding.Y2
     ];
-    Self.FSlots := B.Partition(Rows, Columns);
+    Self.FBoxes := B.Partition(Rows, Columns);
 
-    SetLength(Self.FItemSlots, Length(Self.FSlots));
-    for i:=0 to High(Self.FSlots) do
+    SetLength(Self.FItemBoxes, Length(Self.FBoxes));
+    for i:=0 to High(Self.FBoxes) do
     begin
-      srl.FindColors(TPA, CTS2(3424329,10), Self.FSlots[i]);
+      srl.FindColors(TPA, CTS2(3424329,10), Self.FBoxes[i]);
       TPA := TPA.Invert();
       if Length(TPA) > 0 then
       begin
         ItemATPA := TPA.Cluster(1);
         SortATPAFromSize(ItemATPA, 0, False);
-        Self.FItemSlots[i] := ItemATPA[0].Bounds();
-        Self.FItemSlots[i].LimitTo(Self.FSlots[i]);
+        Self.FItemBoxes[i] := ItemATPA[0].Bounds();
+        Self.FItemBoxes[i].LimitTo(Self.FBoxes[i]);
       end;
     end;
 
@@ -141,10 +141,10 @@ begin
   DrawTPABitmap(BMP, EdgeFromBox(Self.CloseButton), $00FFFF);
 
   c := 255;
-  for i:=0 to High(Self.FSlots) do
+  for i:=0 to High(Self.FBoxes) do
   begin
-    DrawTPABitmap(BMP, EdgeFromBox(Self.FSlots[i]), c);
-    DrawTPABitmap(BMP, EdgeFromBox(Self.FItemSlots[i]), c);
+    DrawTPABitmap(BMP, EdgeFromBox(Self.FBoxes[i]), c);
+    DrawTPABitmap(BMP, EdgeFromBox(Self.FItemBoxes[i]), c);
     c := i + ((c * 126) and $FFFFFF);
   end;
 
@@ -185,12 +185,19 @@ begin
 end;
 
 
+function TRSMakeScreen.GetTitle(): String;
+begin
+  with Self.FTitleBounds do
+    Result := GetTextAtEx(X1,Y1,X2,Y2, 1,3,4, 2070783, 1, UpChars07_s);
+end;
+
+
 function TRSMakeScreen.Select(Id: Int32; Amount: Int32; UpText: String): Boolean;
 var
   Opt: TOptionArray;
   str: String;
 begin
-  if Id >= Length(Self.FSlots) then
+  if Id >= Length(Self.FBoxes) then
     Exit(False);
 
   if Amount <= 28 then
@@ -198,7 +205,7 @@ begin
   else
     str := ' All ';
 
-  Mouse.Move(Self.FItemSlots[id]);
+  Mouse.Move(Self.FItemBoxes[id]);
   WaitEx(75,20);
   if Self.IsUpText([UpText]) then
   begin

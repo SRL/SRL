@@ -24,9 +24,9 @@ type
 
 
   TGtButton = record
-    stateEnabled: UInt32;
-    stateDisabled: UInt32;
-    bounds: TBox;
+    StateEnabled: UInt32;
+    StateDisabled: UInt32;
+    Bounds: TBox;
   end;
 
 var
@@ -57,6 +57,14 @@ end;
 function TRSGametab.GetBounds(Tab:EGametab): TBox;
 begin
   Result := Self.Tabs[Ord(Tab)];
+end;
+
+function TRSGametab.PointToSlot(pt: TPoint): Int32;
+begin
+  for Result:=0 to High(Self.Tabs) do
+    if Self.Tabs[Result].Contains(pt) then
+      Exit(Result);
+  Result := -1;
 end;
 
 function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;

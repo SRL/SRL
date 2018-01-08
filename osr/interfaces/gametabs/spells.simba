@@ -167,15 +167,33 @@ Spells.GetSpellBound
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
+  function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
 
 Returns the bounding box covering the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.GetSpellBound(spell:ESpellCast): TBox;
+function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
 begin
   Result := Self.FSlots[spell]
+end;
+
+
+(*
+Spells.PointToSlot
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSSpells.PointToSlot(pt: TPoint): Int32;
+
+Returns the index of the slot under `pt`
+*)
+function TRSSpells.PointToSlot(pt: TPoint): Int32;
+begin
+  for Result:=0 to High(Self.FSlots) do
+    if Self.FSlots[Result].Contains(pt) then
+      Exit(Result);
+  Result := -1;
 end;
 
 
