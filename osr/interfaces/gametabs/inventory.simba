@@ -96,17 +96,19 @@ end;
 {$ENDIF}
 
 
-//given a pattern an a upper limit of "errors", it will swap around some values and return a "errorized" drop-pattern
-function TRSInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; MaxErrors:Int32=5): TIntegerArray;
-var i,j,h,errors:Integer;
+//given a pattern an a upper limit of errors, it will swap around some values and return a "errorized" drop-pattern
+function TRSInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; ErrorChance:Int32=5): TIntegerArray;
+var i,j,h: Int32;
 begin
   Result := Copy(Pattern);
   h := High(Pattern);
-  errors := Trunc(srl.TruncatedGauss(0,MaxErrors));
-  for i:=1 to Errors do
+  for i:=1 to H do
   begin
-    j := RandomRange(1,h);
-    Swap(Result[j], Result[j-1]);
+    if Random(100) < ErrorChance then
+    begin
+      j := RandomRange(1,h);
+      Swap(Result[j], Result[j-1]);
+    end;
   end;
 end;
 
@@ -374,21 +376,21 @@ Inventory.DropItemsExcept
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; Slots:TIntegerArray = DROP_PATTERN_REGULAR);
 
-Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots``
+Drops all the given items ``Slots`` except for the items in ``IgnoreSolots``
 
 .. note:: by slacky
 *)
-procedure TRSInventory.DropItemsExcept(IgnoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSInventory.DropItemsExcept(IgnoreSlots:TIntegerArray; Slots:TIntegerArray = DROP_PATTERN_REGULAR);
 var
   i,j: Int32;
   ptrn: TIntegerArray;
 begin
   SetLength(ptrn, 28);
-  for i:=0 to High(dropPattern) do
-    if not(InIntArray(ignoreSlots,dropPattern[i])) then
-      ptrn[inc(j)-1] := dropPattern[i];
+  for i:=0 to High(Slots) do
+    if not(InIntArray(ignoreSlots,Slots[i])) then
+      ptrn[inc(j)-1] := Slots[i];
 
   SetLength(ptrn, j);
   Self.DropItems(ptrn);
