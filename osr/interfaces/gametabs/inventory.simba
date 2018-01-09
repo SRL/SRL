@@ -322,14 +322,18 @@ Examples:
 procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
   idx: Int32;
+label
+  START;
 begin
   if not(self.Open()) then
     Exit();
 
+  START:
+
   if shiftDrop then
   begin
     Keyboard.KeyDown(VK_SHIFT);
-    WaitEx(80,10);
+    WaitEx(120,10);
   end;
 
   for idx in Slots do
@@ -342,16 +346,24 @@ begin
         if not mainscreen.IsUpText(UpText) then
           Continue;
       end;
-      if (not shiftDrop) then
+
+      if (not ShiftDrop) then
         ChooseOption.Select(['Drop'])
       else
+      begin
         Mouse.Click(mouse_Left);
+        if (self.GetActiveSlot() <> -1) then
+        begin
+          Self.MouseSlot(self.GetActiveSlot(), mouse_Left);
+          goto START;
+        end;
+      end;
       WaitEx(80,10);
     end;
 
-  if shiftDrop then
+  if ShiftDrop then
   begin
-    WaitEx(80,10);
+    WaitEx(120,10);
     Keyboard.KeyUp(VK_SHIFT);
   end;
 end;
