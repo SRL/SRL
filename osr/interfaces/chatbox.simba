@@ -194,7 +194,10 @@ begin
     mouse.Click(GetTPABounds(tpa), mouse_Left);
     if SpamClick then
       for 5 to Round(srl.TruncatedGauss(0,14)) do
+      begin
         Mouse.Click(mouse_Left); //spam click
+        WaitEx(80,10);
+      end;
     Exit();
   end;
 end;
