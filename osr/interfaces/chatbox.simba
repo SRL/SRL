@@ -173,16 +173,16 @@ Chatbox.ClickContinue
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TRSChatbox.ClickContinue(): Boolean;
+    function TRSChatbox.ClickContinue(SpamClick: Boolean = False): Boolean;
 
 Clicks the "Click here to continue"-text in the chatbox.
 Returns `True` if the text was found.
 
 .. note:: by slacky
 *)
-function TRSChatbox.ClickContinue(): Boolean;
+function TRSChatbox.ClickContinue(SpamClick: Boolean = False): Boolean;
 var
-  tpa:Array [0..2] of TPoint;
+  tpa: array [0..2] of TPoint;
 begin
   //match each word separately to avoid any future whitespace-issues.
   Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
@@ -191,11 +191,31 @@ begin
   if Result then
   begin
     tpa[2].y += 15;
-    mouse.Click(GetTPABounds(tpa), mouse_left);
+    mouse.Click(GetTPABounds(tpa), mouse_Left);
+    if SpamClick then
+      for 5 to Round(srl.TruncatedGauss(0,14)) do
+        Mouse.Click(mouse_Left); //spam click
     Exit();
   end;
 end;
 
+
+(*
+Chatbox.GotLevelUp
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatbox.GotLevelUp(): Boolean;
+
+Returns `True` if text containing `Congratulations` was found
+*)
+function TRSChatbox.GotLevelUp(): Boolean;
+var
+  TEXT_COL = 8388608;
+  p: TPoint;
+begin
+  Result := (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds));
+end;
 
 (*
 Chatbox.HandleLevelUp
@@ -209,19 +229,14 @@ Clicks the "Click here to continue" if text containing `Congratulations` was fou
 .. note:: by Olly
 *)
 function TRSChatbox.HandleLevelUp(): Boolean;
-const
-  C_CHAR_POS: TPoint = [107, 383];
-  TEXT_COL = 8388608;
-var
-  p: TPoint;
 begin
-  if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
+  if self.GotLevelUp() then
   begin
-    Result := Self.ClickContinue();
+    Result := Self.ClickContinue(True);
     while Self.GetDisplayName() = '' do
     begin
       Wait(60);
-      Self.ClickContinue();
+      Self.ClickContinue(True);
     end;
   end;
 end;
