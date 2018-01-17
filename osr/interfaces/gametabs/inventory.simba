@@ -63,7 +63,7 @@ const
 procedure TRSInventory.__Setup();
 var 
   i:Int32;
-  SlotBounds:TBox = [558,211,725,462];
+  SlotBounds:TBox = [559,211,726,462];
 begin
   with Self do
   begin

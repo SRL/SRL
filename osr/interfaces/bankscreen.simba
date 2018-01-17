@@ -38,7 +38,7 @@ const
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
 var 
-  slotBounds:TBox = [73, 83, 456, 298];
+  slotBounds:TBox = [74, 83, 457, 298];
   TextBtn:TBox = [0,0,75,21];
   IconBtn:TBox = [0,0,35,35];
 begin
