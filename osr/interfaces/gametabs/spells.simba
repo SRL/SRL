@@ -208,7 +208,7 @@ Moves the mouse over the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
+function TRSSpells.MouseOver(spell:ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   if not (Self.Open()) then Exit();
   
@@ -217,41 +217,8 @@ begin
 end;
 
 (*
-Spells.Selected
-~~~~~~~~~~~~~~~
-.. code-block:: pascal
-  function TRSSpells.Selected(Spell: ESpellCast): Boolean;
-Returns True if the spell is currently selected
-.. note:: by Olly
-*)
-function TRSSpells.Selected(Spell: ESpellCast): Boolean;
-begin
-  if not (Self.Open()) then Exit();
-
-  Result := CountColor(16777215, Self.FSlots[spell]) > 10;
-end;
-
-(*
-Spells.Cast
-~~~~~~~~~~~
-.. code-block:: pascal
-  function TRSSpells.Cast(Spell: ESpellCast): Boolean
-Casts the spell
-.. note:: by Olly
-*)
-function TRSSpells.Cast(Spell: ESpellCast): Boolean;
-begin
-  if Self.Selected(Spell) then
-    Exit(True);
-
-  Result := Self.MouseOver(Spell);
-  if Result then
-    Mouse.Click(mouse_Left);
-end;
-
-(*
 Spells.CanActivate
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
   function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
 Returns True if you can use the spell..
@@ -266,6 +233,62 @@ begin
   Result := bmp.PeakBrightness() > 35;
   bmp.Free();
 end;
+
+(*
+Spells.Selected
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.Selected(Spell: ESpellCast): Boolean;
+
+Returns True if the spell is currently selected
+.. note:: by Olly
+*)
+function TRSSpells.Selected(Spell: ESpellCast): Boolean;
+begin
+  if not (Self.Open()) then Exit();
+
+  Result := CountColor(16777215, Self.FSlots[spell]) > 10;
+end;
+
+(*
+Spells.Toggle
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
+
+Click's it if it can be activated, nice for teleports.
+.. note:: by slacky
+*)
+function TRSSpells.Toggle(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
+begin
+  Result := self.CanActivate(Spell);
+  if Result then
+  begin
+    Self.MouseOver(Spell, Rng);
+    Mouse.Click(mouse_Left);
+  end;
+end;
+
+
+(*
+Spells.Cast
+~~~~~~~~~~~
+.. code-block:: pascal
+  function TRSSpells.Cast(Spell: ESpellCast): Boolean
+
+Casts the spell
+.. note:: by Olly
+*)
+function TRSSpells.Cast(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
+begin
+  if Self.Selected(Spell) then
+    Exit(True);
+
+  Result := Self.MouseOver(Spell, Rng);
+  if Result then
+    Mouse.Click(mouse_Left);
+end;
+
 
 begin
   Spells.__setup();

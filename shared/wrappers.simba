@@ -57,7 +57,7 @@ function GetClientBounds(): TBox;
 var
   W, H: Integer;
 begin
-  GetClientDimensions(W, H);
+  client.GetIOManager().GetDimensions(W,H);
   Result := TBox([0, 0, Max(0, W-1), Max(0, H-1)])
 end;
 
@@ -194,7 +194,7 @@ Example:
 *)
 function FindColorsTolerance(var Points: TPointArray; const Color: Integer; const SearchBox: TBox; const Tolerance: Integer): Boolean; overload;
 begin
-  Result := FindColorsTolerance(Points, Color, SearchBox.x1, SearchBox.y1, SearchBox.x2, SearchBox.y2, Tolerance);
+  Result := System.FindColorsTolerance(Points, Color, SearchBox.x1, SearchBox.y1, SearchBox.x2, SearchBox.y2, Tolerance);
 end;
 
 (*

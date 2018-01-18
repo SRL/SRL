@@ -108,7 +108,7 @@ begin
 
     if ChooseOption.Select('Dismiss') then
     begin
-      WaitEx(320,40);
+      WaitEx(670,40);
       while minimap.isPlayerMoving() do Wait(40);
       Exit(True);
     end;

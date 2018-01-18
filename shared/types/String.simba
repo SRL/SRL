@@ -368,6 +368,20 @@ begin
     end;
 end;
 
+(*
+  File extension and name
+*)
+function AnsiString.FileExt(): String; constref;
+begin
+  Result := ExtractFileExt(Self);
+end;
+
+function AnsiString.FileName(): String; constref;
+begin
+  if Length(Self) <> 0 then
+    Result := Self.Explode('.')[0];
+end;
+
 //---| operator overloads bellow this |---------------------------------------\\
 
 operator * (left:AnsiString; Right:Int32): String;
