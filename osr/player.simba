@@ -59,7 +59,7 @@ begin
   srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
 
   while (Attempts < 25) do
-  begin
+  try
     Inc(Attempts);
 
     srl.WriteFmt('Login attempt: %d', [Attempts]);
@@ -83,6 +83,7 @@ begin
       if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
         Break;
     end;
+  except
   end;
 
   srl.WriteLn('Failed logging into lobby');
@@ -96,7 +97,7 @@ begin
   srl.Writeln('TPlayer.Login()', dtHeader);
 
   while (Attempts < 20) do
-  begin
+  try
     Inc(Attempts);
 
     if srl.isLoggedIn() then
@@ -126,6 +127,7 @@ begin
     end;
 
     Wait(Random(200, 400));
+  except
   end;
 
   srl.Writeln('TPlayer.Login(): Result = False', dtFooter);
