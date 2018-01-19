@@ -226,13 +226,11 @@ Returns True if you can use the spell..
 .. note:: by slacky
 *)
 function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
-var
-  bmp: TMufasaBitmap;
 begin
-  if not(self.Open()) then Exit(False);
-  bmp.FromClient(self.GetSpellBox(spell));
-  Result := bmp.PeakBrightness() > 35;
-  bmp.Free();
+  if not Self.Open() then 
+    Exit();
+  
+  Result := srl.PeakBrightness(self.GetSpellBox(Spell)) > 35;
 end;
 
 (*
@@ -247,31 +245,11 @@ Returns True if the spell is currently selected
 *)
 function TRSSpells.Selected(Spell: ESpellCast): Boolean;
 begin
-  if not (Self.Open()) then Exit();
+  if not (Self.Open()) then 
+    Exit();
 
   Result := CountColor(16777215, Self.FSlots[spell]) > 10;
 end;
-
-(*
-Spells.Toggle
-~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
-
-Click's it if it can be activated, nice for teleports.
-.. note:: by slacky
-*)
-function TRSSpells.Toggle(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
-begin
-  Result := self.CanActivate(Spell);
-  if Result then
-  begin
-    Self.MouseOver(Spell, Rng);
-    Mouse.Click(mouse_Left);
-  end;
-end;
-
 
 (*
 Spells.Cast
@@ -287,10 +265,12 @@ function TRSSpells.Cast(Spell: ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
 begin
   if Self.Selected(Spell) then
     Exit(True);
-
-  Result := Self.MouseOver(Spell, Rng);
-  if Result then
+  
+  if self.CanActivate(Spell) then
+  begin
+    Result := Self.MouseOver(Spell, Rng);
     Mouse.Click(mouse_Left);
+  end;
 end;
 
 

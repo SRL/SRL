@@ -95,3 +95,21 @@ begin
     end;
 end;
 
+function TSRL.AvgBrightness(B: TBox): Int32;
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP.FromClient(B);
+  Result := BMP.AvgBrightness();
+  BMP.Free();
+end;
+
+function TSRL.PeakBrightness(B: TBox): Int32;
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP.FromClient(B);
+  Result := BMP.PeakBrightness();
+  BMP.Free();
+end;
+
