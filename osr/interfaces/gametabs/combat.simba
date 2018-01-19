@@ -71,7 +71,7 @@ end;
 
 procedure TRSCombat.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FButtons, False, $0000FF);

@@ -37,30 +37,30 @@ var
   Stats: TRSStats;
 
 const
-  SKILL_ATTACK     = 0;
-  SKILL_HITPOINTS  = 1;
-  SKILL_MINING     = 2;
-  SKILL_STRENGTH   = 3;
-  SKILL_AGILITY    = 4;
-  SKILL_SMITHING   = 5;
-  SKILL_DEFENCE    = 6;
-  SKILL_HERBLORE   = 7;
-  SKILL_FISHING    = 8;
-  SKILL_RANGE      = 9;
-  SKILL_THIEVING   = 10;
-  SKILL_COOKING    = 11;
-  SKILL_PRAYER     = 12;
-  SKILL_CRAFTING   = 13;
-  SKILL_FIREMAKING = 14;
-  SKILL_MAGIC      = 15;
-  SKILL_FLETCHING  = 16;
-  SKILL_WOODCUTTING = 17;
+  SKILL_ATTACK       = 0;
+  SKILL_HITPOINTS    = 1;
+  SKILL_MINING       = 2;
+  SKILL_STRENGTH     = 3;
+  SKILL_AGILITY      = 4;
+  SKILL_SMITHING     = 5;
+  SKILL_DEFENCE      = 6;
+  SKILL_HERBLORE     = 7;
+  SKILL_FISHING      = 8;
+  SKILL_RANGE        = 9;
+  SKILL_THIEVING     = 10;
+  SKILL_COOKING      = 11;
+  SKILL_PRAYER       = 12;
+  SKILL_CRAFTING     = 13;
+  SKILL_FIREMAKING   = 14;
+  SKILL_MAGIC        = 15;
+  SKILL_FLETCHING    = 16;
+  SKILL_WOODCUTTING  = 17;
   SKILL_RUNECRAFTING = 18;
-  SKILL_SLAYER     = 19;
-  SKILL_FARMING    = 20;
+  SKILL_SLAYER       = 19;
+  SKILL_FARMING      = 20;
   SKILL_CONSTRUCTION = 21;
-  SKILL_HUNTER     = 22;
-  SKILL_TOTAL      = 23;
+  SKILL_HUNTER       = 22;
+  SKILL_TOTAL        = 23;
 
 
 const
@@ -108,7 +108,7 @@ end;
 
 procedure TRSStats.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FSlots, False, $0000FF);
@@ -175,7 +175,7 @@ Returns the bounding box covering the given skill-index.
 
 .. note:: by slacky
 *)
-function TRSStats.GetSkillBox(Skill:Int32): TBox;
+function TRSStats.GetSkillBox(Skill: Int32): TBox;
 begin
   if Self.IsSkillVaild(Skill) then
     Result := Self.FSlots[Skill]

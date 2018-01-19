@@ -53,9 +53,9 @@ begin
   end;
 end;
 
-procedure TRSEquipment.__Debug();
+procedure TRSEquipment.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FBoxes, False, $0000FF);

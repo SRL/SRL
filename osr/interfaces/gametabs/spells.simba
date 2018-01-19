@@ -119,9 +119,9 @@ begin
   end;
 end;
 
-procedure TRSSpells.__Debug();
+procedure TRSSpells.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FSlots, False, $0000FF);
@@ -163,35 +163,35 @@ end;
 
 
 (*
-Spells.GetSpellBound
+Spells.GetSpellBox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
+  function TRSSpells.GetSpellBox(Spell: ESpellCast): TBox;
 
 Returns the bounding box covering the given spell.
 
 .. note:: by slacky
 *)
-function TRSSpells.GetSpellBound(spell: ESpellCast): TBox;
+function TRSSpells.GetSpellBox(Spell: ESpellCast): TBox;
 begin
-  Result := Self.FSlots[spell]
+  Result := Self.FSlots[Spell];
 end;
 
 
 (*
 Spells.PointToSlot
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSSpells.PointToSlot(pt: TPoint): Int32;
+  function TRSSpells.PointToSlot(PT: TPoint): Int32;
 
-Returns the index of the slot under `pt`
+Returns the index of the slot under `PT`
 *)
-function TRSSpells.PointToSlot(pt: TPoint): Int32;
+function TRSSpells.PointToSlot(PT: TPoint): Int32;
 begin
   for Result:=0 to High(Self.FSlots) do
-    if Self.FSlots[Result].Contains(pt) then
+    if Self.FSlots[Result].Contains(PT) then
       Exit(Result);
   Result := -1;
 end;
@@ -205,22 +205,23 @@ Spells.MouseOver
   function TRSSpells.MouseOver(spell:ESpellCast): Boolean;
 
 Moves the mouse over the given spell.
-
 .. note:: by slacky
 *)
-function TRSSpells.MouseOver(spell:ESpellCast; Rng:ERandomStyle=rndGauss): Boolean;
+function TRSSpells.MouseOver(Spell: ESpellCast; Rng: ERandomStyle=rndGauss): Boolean;
 begin
   if not (Self.Open()) then Exit();
   
   Result := True;
-  Mouse.Move(Self.FSlots[spell]);
+  Mouse.Move(Self.FSlots[Spell]);
 end;
 
 (*
 Spells.CanActivate
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
+
   function TRSSpells.CanActivate(Spell: ESpellCast): Boolean;
+
 Returns True if you can use the spell..
 .. note:: by slacky
 *)
@@ -229,7 +230,7 @@ var
   bmp: TMufasaBitmap;
 begin
   if not(self.Open()) then Exit(False);
-  bmp.FromClient(self.GetSpellBound(spell));
+  bmp.FromClient(self.GetSpellBox(spell));
   Result := bmp.PeakBrightness() > 35;
   bmp.Free();
 end;
@@ -238,6 +239,7 @@ end;
 Spells.Selected
 ~~~~~~~~~~~~~~~
 .. code-block:: pascal
+
   function TRSSpells.Selected(Spell: ESpellCast): Boolean;
 
 Returns True if the spell is currently selected
@@ -254,6 +256,7 @@ end;
 Spells.Toggle
 ~~~~~~~~~~~~~~
 .. code-block:: pascal
+
   function TRSSpells.Toggle(Spell: ESpellCast): Boolean;
 
 Click's it if it can be activated, nice for teleports.
@@ -274,6 +277,7 @@ end;
 Spells.Cast
 ~~~~~~~~~~~
 .. code-block:: pascal
+
   function TRSSpells.Cast(Spell: ESpellCast): Boolean
 
 Casts the spell
@@ -293,13 +297,3 @@ end;
 begin
   Spells.__setup();
 end;
-
-
-
-
-
-
-
-
-
-
