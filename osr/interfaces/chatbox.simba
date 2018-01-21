@@ -725,6 +725,34 @@ begin
   Result := OCR.Recognize(b, TCompareRules([128]), NPCFont);
 end;
 
+(*
+Chatbox.GetNotification
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSChatBox.GetNotification: String;
+
+Returns the title of a chatbox notification such as the "inventory is too full".
+*)
+function TRSChatBox.GetNotification(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  FindColors(TPA, 0, Self.GetChatArea());
+  if (Length(TPA) < 10) then
+    Exit;
+
+  ATPA := ClusterTPAEX(TPA, 1, 5);
+  SortATPAFromFirstPointX(ATPA, Point(0, 0));
+  b := GetTPABounds(ATPA[0]);
+  b.Y1 -= 1;
+  b.X2 := GetTPABounds(ATPA[High(ATPA)]).X2;
+  b.Y2 += 5;
+  Result := OCR.Recognize(b, TCompareRules([0,5]), NPCFont);
+end;
+
 begin
   Chatbox.__Setup();
 end;

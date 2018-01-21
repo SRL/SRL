@@ -1,4 +1,4 @@
-procedure TSRL.HoverRandomPlayer(waitMean:Double=3500);
+procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);
 var
   arr: TOptionArray;
   TPA: TPointarray;
@@ -7,7 +7,7 @@ var
 begin
   oldPos := mouse.GetPosition();
 
-  for 0 to Trunc(srl.TruncatedGauss(0,3.1)) do
+  for 0 to Trunc(srl.TruncatedGauss(0,3.5)) do
   begin
     TPA := Minimap.GetDots(MMDotPlayer);
     FilterPointsDist(TPA,0,24, MM2MS.MMCX, MM2MS.MMCY);
@@ -21,7 +21,7 @@ begin
 
     Mouse.Move(pt,8);
     WaitEx(70,10);
-    if (Random(3) <> 0) and (MainScreen.IsUpText('level')) then
+    if (Random()*100 <= OptionChance) and (MainScreen.IsUpText('level')) then
     begin
       ChooseOption.Open();
       if (Random(2) = 0) then
