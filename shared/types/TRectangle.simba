@@ -202,29 +202,19 @@ Extract all the points from `TestSet` that fits within this rectangle.
 function TRectangle.Filter(TestSet: TPointArray): TPointArray; constref;
 var
   i, h, count: UInt32;
-  Vec: TPoint;
-  Dot: Extended;
 begin
-  h := High(TestSet);
-  if (h < 0) then
+  if (High(TestSet) < 0) then
     Exit;
   
   SetLength(Result, Length(TestSet));
   count := 0;
-  for i := 0 to h do
+  for i := 0 to High(TestSet) do
   begin
-    Vec := Point(Top.x-Right.x, Top.y-Right.y);
-    Dot := ((Top.x-TestSet[i].x) * Vec.x) + ((Top.y-TestSet[i].y) * Vec.y);
-    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
-      Continue;
-    
-    Vec := Point(Top.x-Left.x, Top.y-Left.y);
-    Dot := ((Top.x-TestSet[i].x) * Vec.x) + ((Top.y-TestSet[i].y) * Vec.y);
-    if not ((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
-      Continue;
-    
-    Result[count] := TestSet[i];
-    Inc(count);
+    if TestSet[i].InRect(Self) then
+    begin
+      Result[count] := TestSet[i];
+      Inc(count);
+    end;
   end;
   SetLength(Result, Count);
 end;
