@@ -1,7 +1,4 @@
 type
-  TRectangle = record 
-    Top, Right, Btm, Left: TPoint; 
-  end;
   TRectArray = array of TRectangle;   
   ESplitDirection = (rpTopLeft, rpBtmRight);
 
@@ -173,6 +170,21 @@ function TRectangle.Mean(): TPoint; constref;
 begin
   Result.X := (Top.X + Right.X + Btm.X + Left.X) div 4;
   Result.Y := (Top.Y + Right.Y + Btm.Y + Left.Y) div 4;
+end;
+
+(*
+TRectangle.OffsetFunc
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.OffsetFunc(pt: TPoint): TRectangle; constref;
+
+Offset the rectangle
+*)
+function TRectangle.OffsetFunc(pt: TPoint): TRectangle; constref;
+begin
+  Result := [Point(Top.X+pt.x, top.y+pt.y), Point(Right.X+pt.x, Right.y+pt.y),
+             Point(Btm.X+pt.x, Btm.y+pt.y), Point(Left.X+pt.x, Left.y+pt.y)];
 end;
 
 

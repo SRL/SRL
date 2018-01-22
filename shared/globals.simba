@@ -34,3 +34,8 @@ const
 const
   LineEnding = #13#10;
 {$endif}
+
+type
+  TRectangle = record 
+    Top, Right, Btm, Left: TPoint; 
+  end;     
