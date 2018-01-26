@@ -1,0 +1,376 @@
+type
+  TRSItemImage = type TMufasaBitmap;
+  TRSItemFinder = record
+    Images: array of TRSItemImage;
+    Similarity: Double;
+    Hue: Double;
+    Sat: Double;
+  end;
+
+  TRSItemMatch = record
+    Item, Edge: Double;
+  end;
+
+var
+  ItemFinder: TRSItemFinder;
+
+procedure TRSItemImage.FromData(Data: String);
+var
+  Stream: TStringStream;
+  Picture: TPicture;
+begin
+  Stream.Init(Data);
+  Picture.Init();
+
+  try
+    Picture.LoadFromStream(Stream);
+    LoadFromTBitmap(Picture.GetBitmap());
+  finally
+    Picture.Free();
+    Stream.Free();
+  end;
+end;
+
+procedure TRSItemImage.FromFile(FilePath: String);
+begin
+  if (Self = nil) then
+    Self.Init(Client.GetMBitmaps());
+
+  LoadFromFile(FilePath);
+end;
+
+procedure TRSItemImage.FromURL(URL: String);
+begin
+  if (Self = nil) then
+    Self.Init(Client.GetMBitmaps());
+
+  FromData(GetPage(URL));
+end;
+
+procedure TRSItemImage.FromGE(Identifer: String);
+
+  function FindID: Int32;
+  const
+    URL = 'http://services.runescape.com/m=itemdb_oldschool/results';
+  var
+    Data: String;
+  begin
+    Data := GetPage(URL + '?query=' + LowerCase(Identifer));
+    Data := Between('class=''table-item-link''', '</a>', Data);
+
+    Result := StrToIntDef(Between('obj=', '"', Data), -1);
+  end;
+
+  function FindImage(ID: Int32): String;
+  var
+    Data: String;
+  begin
+    Data := GetPage('http://services.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json?item=' + IntToStr(ID));
+
+    Result := Between('"icon":"', '"', Data);
+  end;
+
+var
+  ID: Int32;
+begin
+  ID := StrToIntDef(Identifer, -1);
+  if (ID = -1) then
+    ID := FindID();
+  if (ID = -1) then
+    raise 'Unknown item ID for "' + Identifer + '"';
+
+  Self.FromURL(FindImage(ID));
+  Self.ReplaceColor(16711935, 0);
+end;
+
+procedure TRSItemImage.Align(Other: TRSItemImage);
+var
+  TPA1, TPA2: TPointArray;
+  P1, P2: TPoint;
+  BMP: TMufasaBitmap;
+begin
+  if Self.FindColors(TPA1, $10000) and Other.FindColors(TPA2, $10000) then
+  begin
+    TPA1.SortByRow(True);
+    TPA2.SortByRow(True);
+    P1 := TPA1[0];
+    P2 := TPA2[0];
+
+    BMP := Self.Copy();
+    BMP.DrawTransparent(Max(0, P2.X - P1.X), Max(0, P2.Y - P1.Y), Self);
+    BMP.Free();
+
+    Self.Crop(Abs(Min(0, P2.X - P1.X)), Abs(Min(0, P2.Y - P1.Y)), 31, 31);
+    Self.SetSize(32, 32);
+  end;
+end;
+
+function TRSItemFinder.Get(Identifer: String): TRSItemImage;
+const
+  IMAGES_PATH = IncludePath + 'SRL/utils/items/';
+var
+  i: Int32;
+begin
+  for i := 0 to High(Self.Images) do
+    if (Self.Images[i].GetName() = Identifer) then
+      Exit(Self.Images[i]);
+
+  if (not DirectoryExists(IMAGES_PATH)) then
+    CreateDirectory(IMAGES_PATH);
+
+  if FileExists(Identifer) then
+    Result.FromFile(Identifer)
+  else
+  if FileExists(IMAGES_PATH + Identifer + '.png') then
+    Result.FromFile(IMAGES_PATH + Identifer + '.png')
+  else
+  begin
+    Result.FromGE(Identifer);
+    Result.SaveToFile(IMAGES_PATH + Identifer + '.png');
+  end;
+
+  Result.SetName(Identifer);
+
+  if (Result.GetWidth() <> 32) or (Result.GetHeight() <> 32) then
+    raise 'Invaild image dimensions';
+
+  Self.Images += Result;
+end;
+
+procedure TRSItemFinder.Free;
+var
+  i: Int32;
+begin
+  for i := 0 to High(Self.Images) do
+    Self.Images[i].Free();
+end;
+
+function TRSItemFinder.IsIgnoreColor(Color: Int32): Boolean;
+begin
+  Result := (Color = 0) or (Color = $FFFFFF) or (Color = $00FFFF) or (Color = $80FF00);
+end;
+
+function TRSItemFinder.Match(Img1, Img2: TMufasaBitmap; HueMod: Double = 4.0; SatMod: Double = 1.0): TRSItemMatch;
+var
+  i, Off, W, H, Color1, Color2, EdgeCount: Int32;
+  deltaH, H1, S1, L1, H2, S2, L2, Diff, Sum, EdgeDiff: Extended;
+  Data1, Data2: PRGB32;
+  FACT := 1 / Sqrt(Sqr(100) + Sqr(100 * SatMod) + Sqr(50 * HueMod));
+begin
+  W := Img1.GetWidth();
+  H := Img1.GetHeight();
+  Data1 := Img1.GetData();
+  Data2 := Img2.GetData();
+
+  for i := 0 to W * H - 1 do
+  begin
+    Color1 := RGBToColor(Data1^.R, Data1^.G, Data1^.B);
+    Color2 := RGBToColor(Data2^.R, Data2^.G, Data2^.B);
+
+    if (not IsIgnoreColor(Color1)) and (not IsIgnoreColor(Color2)) then
+    begin
+      RGBToHSL(Data1^.R, Data1^.G, Data1^.B, H1, S1, L1);
+      RGBToHSL(Data2^.R, Data2^.G, Data2^.B, H2, S2, L2);
+
+      deltaH := Abs(H1 - H2);
+      if (deltaH >= 50) then deltaH := 100 - deltaH;
+
+      Diff := Sqrt(Sqr(deltaH * HueMod) + Sqr((S1 - S2) * SatMod) + Sqr(L1 - L2)) * FACT;
+      Sum  := Sum + Diff;
+      if (Color1 = $10000) then
+      begin
+        if (Color2 = $10000) then
+          EdgeDiff := EdgeDiff + 1;
+        Inc(EdgeCount);
+      end;
+    end else
+      Inc(Off);
+
+    Inc(Data1); Inc(Data2);
+  end;
+
+  if ((W * H - Off) <> 0) and (EdgeCount > 0) then
+    Result := [1 - Sum / (W * H - Off), EdgeDiff / EdgeCount];
+end;
+
+function TRSItemFinder.FindAll(Identifer: String; Arr: TBoxArray): TIntegerArray;
+var
+  i, X, Y: Int32;
+  imgDB, imgRS: TRSItemImage;
+  Matches: array of TRSItemMatch;
+  Match, Best: TRSItemMatch;
+begin
+  SetLength(Matches, Length(Arr));
+
+  for i := 0 to High(Arr) do
+  begin
+    imgDB := Self.Get(Identifer).Copy();
+    imgRS.FromClient(Arr[i].ExpandFunc(2));
+    imgRS.Align(imgDB);
+
+    Match := Self.Match(imgDB, imgRS, Self.Hue, Self.Sat);
+    Matches[i] := Match;
+    if (Match.Item >= Best.Item) then
+      Best := Match;
+
+    imgDB.Free();
+    imgRS.Free();
+  end;
+
+  for i := 0 to High(Arr) do
+    if (Matches[i].Edge >= Self.Similarity) and (Matches[i].Item >= Self.Similarity) and (Matches[i].Item >= Best.Item - 0.01) then
+      Result += i;
+end;
+
+// ------------------------------ Inventory --------------------------------- \\
+
+// Indices of all matches
+function TRSInventory.FindAll(Identifers: TStringArray): TIntegerArray; overload;
+var
+  Identifer: String;
+begin
+  if Self.Open() then
+    for Identifer in Identifers do
+      Result += ItemFinder.FindAll(Identifer, Self.FSlots);
+end;
+
+function TRSInventory.FindAll(Identifer: String): TIntegerArray; overload;
+begin
+  Result := Self.FindAll([Identifer]);
+end;
+
+// Index of first match
+function TRSInventory.Find(Identifers: TStringArray): Int32; overload;
+var
+  Identifer: String;
+  Matches: TIntegerArray;
+begin
+  for Identifer in Identifers do
+  begin
+    Matches := Self.FindAll(Identifer);
+    if Length(Matches) > 0 then
+      Exit(Matches[0]);
+  end;
+
+  Exit(-1);
+end;
+
+function TRSInventory.Find(Identifer: String): Int32; overload;
+begin
+  Result := Self.Find([Identifer]);
+end;
+
+// Counts all items
+function TRSInventory.Count(Identifers: TStringArray): Int32; overload;
+var
+  Identifer: String;
+begin
+  for Identifer in Identifers do
+    Result += Length(Self.FindAll(Identifer));
+end;
+
+// Counts a item
+function TRSInventory.Count(Identifer: String): Int32; overload;
+begin
+  Result := Self.Count([Identifer]);
+end;
+
+// Counts a item stack
+function TRSInventory.CountStack(Identifer: String): Int32;
+var
+  Slot: Int32;
+begin
+  Slot := Self.Find(Identifer);
+  if (Slot > -1) then
+    Result := srl.GetItemAmount(Self.GetSlotBox(Slot));
+end;
+
+// Clicks first item match
+function TRSInventory.Click(Identifers: TStringArray; Option: String = ''): Boolean; overload;
+var
+  Slot: Int32;
+begin
+  Slot := Self.Find(Identifers);
+
+  if (Slot > -1) then
+  begin
+    Self.MouseSlot(Slot, mouse_Move);
+
+    if (Option = '') then
+      Mouse.Click(mouse_Left)
+    else
+    if (not ChooseOption.Open()) or (not ChooseOption.Select(Option)) then
+      Exit(False);
+
+    Exit(True);
+  end;
+end;
+
+function TRSInventory.Click(Identifer: String; Option: String = ''): Boolean; overload;
+begin
+  Result := Self.Click([Identifer], Option);
+end;
+
+// -------------------------------- Bank ------------------------------------ \\
+
+// Index of first match
+function TRSBankScreen.Find(Identifers: TStringArray): Int32; overload;
+var
+  Identifer: String;
+  Matches: TIntegerArray;
+begin
+  Self.FixSlots();
+
+  for Identifer in Identifers do
+  begin
+    Matches := ItemFinder.FindAll(Identifer, Self.FSlots);
+    if Length(Matches) > 0 then
+      Exit(Matches[0]);
+  end;
+
+  Exit(-1);
+end;
+
+function TRSBankScreen.Find(Identifer: String): Int32; overload;
+begin
+  Result := Self.Find([Identifer]);
+end;
+
+// Withdraw first match
+function TRSBankScreen.Withdraw(Identifier: String; Amount: Int32; Mode: EBankButton = bbItem): Boolean; overload;
+var
+  Slot: Int32;
+begin
+  Slot := Self.Find(Identifier);
+  if (Slot > -1) then
+    Result := Self.Withdraw(Slot, Amount, TStringArray([]), Mode);
+end;
+
+// Contains
+function TRSBankScreen.Count(Identifer: String): Int32;
+begin
+  Self.FixSlots();
+
+  Result := Length(ItemFinder.FindAll(Identifer, Self.FSlots));
+end;
+
+// Counts a item stack
+function TRSBankScreen.CountStack(Identifer: String): Int32;
+var
+  Slot: Int32;
+begin
+  Slot := Self.Find(Identifer);
+  if (Slot > -1) then
+    Result := srl.GetItemAmount(Self.GetSlotBox(Slot));
+end;
+
+begin
+  with ItemFinder do
+  begin
+    Similarity := 0.95;
+    Hue := 6.0;
+    Sat := 1.0;
+
+    AddOnTerminate(@Free);
+  end;
+end;
