@@ -80,6 +80,21 @@ begin
 end;
 
 (*
+Equipment.IsSlotUsed
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
+
+Opens the eqiupment tab and checks if a slot is used.
+*)
+function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
+begin
+  if Self.Open() then
+    Result := CountColor($10000, FBoxes[Slot]) > 0;
+end;
+
+(*
 Equipment.IsOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
