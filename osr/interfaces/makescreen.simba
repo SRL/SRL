@@ -63,7 +63,7 @@ begin
   if Self.FTitleBounds.Width < 100 then Exit(True);
 
   if maxWaitTime < 0 then
-    maxWaitTime := Random(3000,4000);
+    maxWaitTime := Random(1000,1600);
 
   t.Init(maxWaitTime);
   repeat
@@ -143,6 +143,7 @@ begin
   c := 255;
   for i:=0 to High(Self.FBoxes) do
   begin
+    DrawTextBitmap(BMP, ToStr(i), StatChars07,Point(Self.FBoxes[i].x1+3,Self.FBoxes[i].y1+3), False, $FFFFFF);
     DrawTPABitmap(BMP, EdgeFromBox(Self.FBoxes[i]), c);
     DrawTPABitmap(BMP, EdgeFromBox(Self.FItemBoxes[i]), c);
     c := i + ((c * 126) and $FFFFFF);
@@ -206,8 +207,8 @@ begin
     str := ' All ';
 
   Mouse.Move(Self.FItemBoxes[id]);
-  WaitEx(75,20);
-  if Self.IsUpText([UpText]) then
+  WaitEx(120,20);
+  if Self.IsUpText([UpText]) or (UpText = '') then
   begin
     Result := ChooseOption.Select(str, mouse_left, False);
     if (not Result) and ChooseOption.Select(' X ') then
