@@ -530,9 +530,9 @@ begin
   begin
     Result := True;
     for i:=0 to High(slotArr) do
-      if inventory.IsSlotUsed(slotArr[i]) then
+      if Inventory.IsSlotUsed(slotArr[i]) then
       begin
-        self.DepositItem(slotArr[i], False);
+        self.DepositItem(slotArr[i], srl.GetItemAmount(Inventory.GetSlotBox(slotArr[i])) > 0);
         Wait(6,25);
       end;
 

@@ -20,9 +20,9 @@ begin
   Result := [Color, Tolerance];
 end;
 
-function CTS2(Color, Tolerance: Int32; SatMod:Extended=0.2; HueMod:Extended=0.2): TCTS2Color;
+function CTS2(Color, Tolerance: Int32; HueMod:Extended=0.2; SatMod:Extended=0.2): TCTS2Color;
 begin
-  Result := [Color, Tolerance, SatMod, HueMod];
+  Result := [Color, Tolerance, HueMod, SatMod];
 end;
 
 
