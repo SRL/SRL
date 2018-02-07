@@ -14,9 +14,8 @@
 {$include_once shared/time.simba}
 {$include_once shared/text.simba}
 {$include_once shared/color.simba}
-{$include_once shared/drawing.simba}
-
 {$include_once shared/types.simba}
+{$include_once shared/drawing.simba}
 
 begin
 

@@ -1,7 +1,105 @@
-type
-  TRectArray = array of TRectangle;   
+// type definition is found in shared/globals.simba
+
+type 
   ESplitDirection = (rpTopLeft, rpBtmRight);
 
+(*
+TRectangle.ToTPA
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.ToTPA(): TPointArray; constref;
+
+TPA from the rectangle.
+*)
+function TRectangle.ToTPA(): TPointArray; constref;
+begin
+  Result := [Top, Right, Btm, Left];
+end;
+
+
+(*
+TRectangle.Bounds
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Bounds(): TBox; constref;
+
+Returns the minimum bounding box covering the rectangle
+*)
+function TRectangle.Bounds(): TBox; constref;
+begin
+  Result := GetTPABounds([Top, Right, Btm, Left]);
+end;
+
+(*
+TRectangle.Radius
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Bounds(): TBox; constref;
+
+Returns the radius of the shortest side
+*)
+function TRectangle.Radius(): Double; constref;
+var
+  X: ESplitDirection;
+begin
+  if (Hypot(Left.y-Top.y, Left.x-Top.x) < Hypot(Left.y-Btm.y, Left.x-Btm.x)) then
+    Result := Hypot(Left.y-Top.y, Left.x-Top.x) / 2
+  else
+    Result := Hypot(Left.y-Btm.y, Left.x-Btm.x) / 2;
+end;
+
+(*
+TRectangle.Mean
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Mean(): TPoint; constref;
+
+Middle of the rectangle
+
+.. note:: by slacky
+*)
+function TRectangle.Mean(): TPoint; constref;
+begin
+  Result.X := (Top.X + Right.X + Btm.X + Left.X) div 4;
+  Result.Y := (Top.Y + Right.Y + Btm.Y + Left.Y) div 4;
+end;
+
+(*
+TRectangle.Rotate
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Rotate(angle: Double): TRectangle; constref;
+
+Returns a rotated copy of the rectangle
+*)
+function TRectangle.Rotate(angle: Double): TRectangle; constref;
+var
+  i,topI: Int32;
+  m: TPoint;
+  TPA: TPointArray;
+begin
+  with Self.Mean() do
+  begin
+    TPA += RotatePoint(Self.Top,  angle, x,y);
+    TPA += RotatePoint(Self.Right,angle, x,y);
+    TPA += RotatePoint(Self.Btm,  angle, x,y);
+    TPA += RotatePoint(Self.Left, angle, x,y);
+  end;
+
+  for i:=1 to High(TPA) do
+    if TPA[i].y < TPA[topI].y then
+      topI := i;
+
+  Result.Top   := TPA[topI];
+  Result.Right := TPA[(topI+1) mod 4];
+  Result.Btm   := TPA[(topI+2) mod 4];
+  Result.Left  := TPA[(topI+3) mod 4];
+end;
 
 (*
 TRectangle.Contains
@@ -106,71 +204,6 @@ begin
   end;
 end;
 
-
-(*
-TRectangle.ToTPA
-~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRectangle.ToTPA(): TPointArray; constref;
-
-TPA from the rectangle.
-*)
-function TRectangle.ToTPA(): TPointArray; constref;
-begin
-  Result := [Top, Right, Btm, Left];
-end;
-
-
-(*
-TRectangle.Bounds
-~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRectangle.Bounds(): TBox; constref;
-
-Returns the minimum bounding box covering the rectangle
-*)
-function TRectangle.Bounds(): TBox; constref;
-begin
-  Result := GetTPABounds([Top, Right, Btm, Left]);
-end;
-
-(*
-TRectangle.Radius
-~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRectangle.Bounds(): TBox; constref;
-
-Returns the radius of the shortest side
-*)
-function TRectangle.Radius(): Double; constref;
-var
-  X: ESplitDirection;
-begin
-  if (Hypot(Left.y-Top.y, Left.x-Top.x) < Hypot(Left.y-Btm.y, Left.x-Btm.x)) then
-    Result := Hypot(Left.y-Top.y, Left.x-Top.x) / 2
-  else
-    Result := Hypot(Left.y-Btm.y, Left.x-Btm.x) / 2;
-end;
-
-(*
-TRectangle.Mean
-~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRectangle.Mean(): TPoint; constref;
-
-Middle of the rectangle
-
-.. note:: by slacky
-*)
-function TRectangle.Mean(): TPoint; constref;
-begin
-  Result.X := (Top.X + Right.X + Btm.X + Left.X) div 4;
-  Result.Y := (Top.Y + Right.Y + Btm.Y + Left.Y) div 4;
-end;
 
 (*
 TRectangle.OffsetFunc

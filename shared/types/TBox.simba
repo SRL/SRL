@@ -3,12 +3,20 @@ begin
   Result := [X1, Y1, X2, Y2];
 end;
 
-function Box(mid:TPoint; xr,yr:Int32): TBox; overload;
+function Box(mid:TPoint; xr,yr: Int32): TBox; overload;
 begin
   Result := [mid.x-xr, mid.y-yr, mid.x+xr, mid.y+yr];
 end;
 
-procedure TBox.GetDimensions(out w, h: integer); constref;
+function TBox.ToRectangle(): TRectangle; constref;
+begin
+  Result.Top   := [Self.X1, Self.Y1];
+  Result.Right := [Self.X2, Self.Y1];
+  Result.Btm   := [Self.X2, Self.Y2];
+  Result.Left  := [Self.X1, Self.Y2];
+end;
+
+procedure TBox.GetDimensions(out w, h: Int32); constref;
 begin
   w := Self.X2 - Self.X1 + 1;
   h := Self.Y2 - Self.Y1 + 1;

@@ -35,7 +35,18 @@ const
   LineEnding = #13#10;
 {$endif}
 
+
+// ---------------------------------------------------------------------------------------------
+// Some types may need to be declared early on so that they can be used throughout the include
+// You may do so bellow
 type
   TRectangle = record 
     Top, Right, Btm, Left: TPoint; 
-  end;     
+  end; 
+  TRectArray = array of TRectangle;
+  
+  TCircle = record 
+    X,Y:Int32; 
+    Radius: Int32; 
+  end;
+  TCircleArray = array of TCircle; 

@@ -374,6 +374,34 @@ begin
 end;
 
 (*
+TMufasaBitmap.DrawRect
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.DrawRect(Rect: TRectangle; color: TColor);
+
+Draws a TRectangle onto the TMufasaBitmap
+*)
+procedure TMufasaBitmap.DrawRect(Rect: TRectangle; color: TColor);
+begin
+  Self.DrawTPA(Rect.ToTPA().Connect(), color);
+end;
+
+(*
+TMufasaBitmap.DrawPoly
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.DrawPoly(Poly: TPointArray; color: TColor);
+
+Draws a polygon onto the TMufasaBitmap
+*)
+procedure TMufasaBitmap.DrawPoly(Poly: TPointArray; color: TColor);
+begin
+  Self.DrawTPA(Poly.Connect(), color);
+end;
+
+(*
 TMufasaBitmap.DrawBitmap
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
