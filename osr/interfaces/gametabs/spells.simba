@@ -212,7 +212,7 @@ begin
   if not (Self.Open()) then Exit();
   
   Result := True;
-  Mouse.Move(Self.FSlots[Spell]);
+  Mouse.Move(Self.FSlots[Spell],,Rng);
 end;
 
 (*

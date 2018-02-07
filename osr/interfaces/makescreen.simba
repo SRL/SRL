@@ -126,12 +126,7 @@ end;
 
 procedure TRSMakeScreen.Debug();
 var
-  BMP, i, c, rows,cols: Integer;
-  TPA: TPointArray;
-  ATPA: T2DPointArray;
-  pt,maxPt: TPoint;
-  B: TBox;
-  TBA: TBoxArray;
+  BMP, i, c: Integer;
 begin
   BMP := BitmapFromClient(GetClientBounds());
 
@@ -195,7 +190,6 @@ end;
 
 function TRSMakeScreen.Select(Id: Int32; Amount: Int32; UpText: String): Boolean;
 var
-  Opt: TOptionArray;
   str: String;
 begin
   if Id >= Length(Self.FBoxes) then

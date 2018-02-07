@@ -354,7 +354,7 @@ begin
   end;
 end;
 
-function Vector3Array.Mean(Vec: Vector3): Vector3;
+function Vector3Array.Mean(): Vector3;
 var
   i: Int32;
 begin

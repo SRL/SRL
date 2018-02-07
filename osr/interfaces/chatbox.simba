@@ -660,7 +660,6 @@ function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpTe
 var
   i, tmp: Int32;
   TPA: TPointArray;
-  buttons: TBoxArray;
   B: TBox;
   best: array of record Box: TBox; Count: Int32; end;
 begin

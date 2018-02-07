@@ -206,6 +206,14 @@ begin
   Self.Move(srl.RandomPoint(Middle, Radius));
 end;
 
+procedure TMouse.Move(Rect: TRectangle; ForcedMove: Boolean = False); overload;
+begin
+  if (not ForcedMove) and Rect.Contains(Self.GetPosition()) then
+    Exit();
+
+  Self.Move(srl.RandomPoint(Rect));
+end;
+
 procedure TMouse.Click(Button: Integer);
 begin
   Self.Hold(Button);
@@ -239,6 +247,12 @@ end;
 procedure TMouse.Click(Middle: TPoint; Radius, Button: Int32); overload;
 begin
   Self.Click(srl.RandomPoint(Middle, Radius), Button);
+end;
+
+procedure TMouse.Click(Rect: TRectangle; Button: Integer; ForcedMove: Boolean = False); overload;
+begin
+  Self.Move(Rect, ForcedMove);
+  Self.Click(Button);
 end;
 
 procedure TMouse.Miss(P: TPoint; Correct: Boolean = False; CorrectDelay: Int32 = 0);

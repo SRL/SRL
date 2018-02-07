@@ -811,7 +811,7 @@ function TPointArray.MinAreaCircle(): TCircle; constref;
 
 var
   TPA: TPointArray;
-  i,j: Int32;
+  i: Int32;
   p: TPoint;
 begin
   if Length(Self) = 0 then Exit();

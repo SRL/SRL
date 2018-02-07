@@ -112,8 +112,6 @@ Extract all the points from `TestSet` that fits within this circle.
 function TCircle.Filter(TestSet: TPointArray): TPointArray; constref;
 var
   i, h, count: UInt32;
-  Vec: TPoint;
-  Dot: Extended;
 begin
   h := High(TestSet);
   if (h < 0) then

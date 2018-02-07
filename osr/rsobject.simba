@@ -1,0 +1,141 @@
+type 
+  TRange = array [0..1] of Int64;
+  
+  TRSObject = record
+    Name   : String;
+    UpText : TStringArray;
+    Colors : array of TCTS2Color;
+    Width  : TRange;
+    Height : TRange;
+    Count  : TRange;
+  end;
+  
+  TRSObjectArray = array of TRSObject;
+
+var
+  RSObjects: TRSObjectArray;
+  RSObject: TRSObject;
+
+ 
+// ----------------------------------------------------------------------------
+// TRSObjectArray
+ 
+procedure TRSObjectArray.Add(Obj: TRSObject);
+var i: Int32;
+begin
+  for i:=0 to High(Self) do
+    if Self[i].Name = Obj.Name then
+    begin
+      Self[i] := Obj;
+      Exit;
+    end;
+  
+  Self := Self + Obj;
+end;
+
+function TRSObjectArray.Get(Name: String): TRSObject; constref;
+var i: Int32;
+begin
+  for i:=0 to High(Self) do
+    if Self[i].Name = Name then
+      Exit(Self[i]);
+end;
+
+
+// ----------------------------------------------------------------------------
+// TRSObject
+
+function TRSObject.Create(AName: String; AUpText: TStringArray; AColors: array of TCTS2Color; AWidth, AHeight, ACount: TRange=[0,$FFFFFF]): TRSObject; static;
+begin
+  Result.Name   := AName;
+  Result.UpText := AUpText;
+  Result.Colors := AColors;
+  Result.Width  := AWidth;
+  Result.Height := AHeight;
+  Result.Count  := ACount;
+end;
+
+
+function TRSObject.Find(SplitDist: Int32; Area: TBox; CheckUpText: Boolean=True; SortFrom:TPoint=[259,172]): TRectangle; constref;
+var 
+  i,sz,ss,ls: Int32;
+  TPA, TempTPA: TPointArray;
+  ATPA: T2DPointArray;
+  rect: TRectangle;
+begin
+  for i:=0 to High(Self.Colors) do
+  begin
+    if (srl.FindColors(TempTPA, Self.Colors[i], Area) <> 0) then
+      TPA += TempTPA;
+  end;
+  
+  ATPA := ClusterTPA(TPA, SplitDist);
+  SortATPAFromMidPoint(ATPA, SortFrom);
+  
+  for TPA in ATPA do
+  begin
+    rect := TPA.MinAreaRectEx(ss,ls);
+    sz   := Length(TPA);
+    WriteLn [ss,ls,sz];
+    if (not InRange(ss, Self.Height[0], Self.Height[1])) or
+       (not InRange(ls, Self.Width [0], Self.Width [1])) or
+       (not InRange(sz, Self.Count [0], Self.Count [1])) then
+      Continue;
+    
+    if CheckUpText and (Self.UpText <> []) then
+    begin
+      Mouse.Move(rect.Mean, Trunc(rect.Radius));
+      if MainScreen.IsUpText(Self.UpText) then
+        Exit(rect)
+    end else
+      Exit(rect);
+  end;
+end;
+
+
+function TRSObject.FindAll(SplitDist: Int32; Area: TBox; CheckUpText: Boolean=True; SortFrom:TPoint=[259,172]): array of TRectangle; constref;
+var 
+  i,sz,ss,ls: Int32;
+  TPA, TempTPA: TPointArray;
+  ATPA: T2DPointArray;
+  rect: TRectangle;
+begin
+  for i:=0 to High(Self.Colors) do
+  begin
+    if (srl.FindColors(TempTPA, Self.Colors[i], Area) <> 0) then
+      TPA += TempTPA;
+  end;
+  
+  ATPA := ClusterTPA(TPA, SplitDist);
+  SortATPAFromMidPoint(ATPA, SortFrom);
+  
+  for TPA in ATPA do
+  begin
+    rect := TPA.MinAreaRectEx(ss,ls);
+    sz   := Length(TPA);
+
+    if (not InRange(ss, Self.Height[0], Self.Height[1])) or 
+       (not InRange(ls, Self.Width [0], Self.Width [1])) or
+       (not InRange(sz, Self.Count [0], Self.Count [1])) then
+      Continue;
+    
+    if CheckUpText and (Self.UpText <> []) then
+    begin
+      Mouse.Move(rect.Mean, Trunc(rect.Radius));
+      if MainScreen.IsUpText(Self.UpText) then
+        Result += rect;
+    end else
+      Result += rect;
+  end;
+end;
+
+
+function TRSObject.Click(SplitDist: Int32; Area: TBox; CheckUpText: Boolean=True; SortFrom:TPoint=[259,172]): Boolean; constref;
+begin
+  if Self.Find(SplitDist, Area, CheckUptext, SortFrom).Bounds() <> [0,0,0,0] then
+  begin
+    WaitEx(50,6);
+    Mouse.Click(mouse_Left);
+    Result := True;
+  end;
+end;

@@ -107,7 +107,7 @@ end;
 
 (*
 srl.RandomPoint
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.RandomPoint(mean: TPoint; maxRad: Int32): TPoint;
@@ -115,7 +115,7 @@ srl.RandomPoint
 Generates a random TPoint which weights around ``mean``, with a max distance 
 from mean defined by ``maxRad``.
 *)
-function TSRL.RandomPoint(mean:TPoint; maxRad:Int32): TPoint; constref;
+function TSRL.RandomPoint(mean: TPoint; maxRad:Int32): TPoint; constref;
 begin
   Result.X := NormalRange(mean.x-maxRad, mean.x+maxRad);
   Result.Y := NormalRange(mean.y-maxRad, mean.y+maxRad);
@@ -124,7 +124,7 @@ end;
 
 (*
 srl.RandomPoint (overload)
-~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.RandomPoint(bounds:TBox): TPoint; overload;
@@ -132,10 +132,40 @@ srl.RandomPoint (overload)
 Generates a random TPoint in the bounds of the given box `bounds`, 
 the point weights towards the middle of the box.
 *)
-function TSRL.RandomPoint(bounds:TBox): TPoint; constref; overload;
+function TSRL.RandomPoint(bounds: TBox): TPoint; constref; overload;
 begin
   Result.X := NormalRange(bounds.x1, bounds.x2);
   Result.Y := NormalRange(bounds.y1, bounds.y2);
+end;
+
+(*
+srl.RandomPoint (overload)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TSRL.RandomPoint(rect: TRectangle): TPoint; overload;
+
+Generates a random TPoint in the given rectangle `rect`,
+The point weights towards the middle of the rectangle.
+*)
+function TSRL.RandomPoint(rect: TRectangle): TPoint; constref; overload;
+var
+  a,x,y,x1,y1,x2,y2: Double;
+begin
+  with rect do
+  begin
+    a := ArcTan2(Left.Y-Top.Y, Left.X-Top.X);
+    X := (Top.X + Right.X + Btm.X + Left.X) / 4;
+    Y := (Top.Y + Right.Y + Btm.Y + Left.Y) / 4;
+    x1 := x-Hypot(Left.y-Top.y, Left.x-Top.x) / 2;
+    y1 := y-Hypot(Left.y-Btm.y, Left.x-Btm.x) / 2;
+    x2 := x+Hypot(Left.y-Top.y, Left.x-Top.x) / 2;
+    y2 := y+Hypot(Left.y-Btm.y, Left.x-Btm.x) / 2;
+  end;
+
+  Result.X := Round(srl.NormalRange(x1+1, x2-1));
+  Result.Y := Round(srl.NormalRange(y1+1, y2-1));
+  Result := RotatePoint(Result, a, (X2+X1)/2+Random()-0.5, (Y2+Y1)/2+Random()-0.5);
 end;
 
 
