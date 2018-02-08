@@ -497,14 +497,15 @@ Example:
     image.DrawCross(Point(200, 200), 4, clLime);
 
 *)
-procedure TMufasaBitmap.DrawCross(pt: TPoint; size: Integer; color: TColor);
+procedure TMufasaBitmap.DrawCross(pt: TPoint; Radius: Integer; color: TColor);
 begin
-  if (size < 1) then
+  Radius := Round(Radius/2*Sqrt(2));
+  if (Radius < 1) then
     exit();
 
-  try self.LineTo(Point(pt.x - size, pt.y - size), Point(pt.x + size, pt.y + size), color);
+  try self.LineTo(Point(pt.x - Radius, pt.y - Radius), Point(pt.x + Radius, pt.y + Radius), color);
   except end;
-  try self.LineTo(Point(pt.x + size, pt.y - size), Point(pt.x - size, pt.y + size), color);
+  try self.LineTo(Point(pt.x + Radius, pt.y - Radius), Point(pt.x - Radius, pt.y + Radius), color);
   except end;
 end;
 
