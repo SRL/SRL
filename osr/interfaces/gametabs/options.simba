@@ -220,47 +220,67 @@ begin
   until GetTickCount64() > t;
 end;
 
-
 (*
-Options.ToggleOrbs
+Options.GetZoom
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.ToggleOrbs(enable:Boolean; tryTime:Int32=2000): Boolean;
+  function TRSOptions.GetZoom(): Int32;
 
-Changes the state of the orb button to the given state.
+Returns the mainscreen zoom
 *)
-function TRSOptions.ToggleOrbs(enable:Boolean; tryTime:Int32=2000): Boolean;
+function TRSOptions.GetZoom(): Int32;
+var
+  TPA:TPointArray;
+  p: TPoint;
+  range:TBox = [610,268,705,278];
 begin
-  Result := self.__toggleButton([567,326,604,363], optDisplay, enable, tryTime);
+  if not(self.SetCurrentTab(optDisplay)) then
+    Exit(-1);
+  if not(FindColorsTolerance(TPA, 2200868, range, 35)) then
+    Exit(-1);
+  p := MiddleTPA(TPA);
+  Result := Round((p.x - range.x1)*100/93);
 end;
 
 (*
-Options.ToggleRoofRemoval
-~~~~~~~~~~~~~~~~~~~~~~~~
+Options.SetZoom
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSOptions.ToggleRoofRemoval(enable:Boolean; tryTime:Int32=2000): Boolean;
+  function TRSOptions.SetZoom(APosition: Byte): Boolean;
 
-Changes the state of the button to the given state.
+Sets the zoom of the mainscreen. 0 = Zoomed out, 100 = Zoomed in.
 *)
-function TRSOptions.ToggleRoofRemoval(enable:Boolean; tryTime:Int32=2000): Boolean;
+function TRSOptions.SetZoom(APosition: Byte): Boolean;
+var
+  r: Integer;
 begin
-  Result := self.__toggleButton([623,326,661,363], optDisplay, enable, tryTime);
-end;
+  if (not Self.Open()) then
+    Exit(False);
 
-(*
-Options.ToggleRemainingXP
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+  // Disabled mouse wheel
+  if (GetColor(573, 272) = 200) then
+    Mouse.Click(Point(573, 272), 8, mouse_Left);
 
-  function TRSOptions.ToggleRemainingXP(enable:Boolean; tryTime:Int32=2000): Boolean;
+  while (Self.IsOpen()) and (not InRange(GetZoom(), APosition-2, APosition+2)) do
+  begin
+    r := Abs(GetZoom() - APosition);
+    if (r < Random(12, 15)) then
+      r := Random(1, 2)
+    else
+      r := Random(3, 6);
 
-Changes the state of the button to the given state.
-*)
-function TRSOptions.ToggleRemainingXP(enable:Boolean; tryTime:Int32=2000): Boolean;
-begin
-  Result := self.__toggleButton([680,326,718,363], optDisplay, enable, tryTime);
+    if (GetZoom() < APosition) then
+      Mouse.Scroll(Mainscreen.GetBounds(), r, False)
+    else
+      Mouse.Scroll(Mainscreen.GetBounds(), r, True);
+
+    Wait(Random(10, 100));
+  end;
+  if APosition in [0,100] then //can't have it +/-2 for these two
+    Mouse.Scroll(Mainscreen.GetBounds(), Random(3,4), APosition = 0);
+  Result := True;
 end;
 
 (*
@@ -275,7 +295,7 @@ Changes the state of the button to the given state.
 function TRSOptions.ToggleAcceptAid(enable:Boolean; tryTime:Int32=2000): Boolean;
 var
   enabled:Boolean;
-  button:TBox = [566,425,604,464];
+  button:TBox = [555,425,590,464];
 begin
   if not self.Open() then Exit(False);
   if GtButton(button).IsEnabled() = enable then
@@ -296,7 +316,7 @@ Changes the state of the button to the given state.
 function TRSOptions.ToggleRun(enable:Boolean; tryTime:Int32=2000): Boolean;
 var
   enabled:Boolean;
-  button:TBox = [622,425,661,464];
+  button:TBox = [600,425,635,464];
 begin
   if not self.Open() then Exit(False);
   if GtButton(button).IsEnabled() = enable then
@@ -317,7 +337,7 @@ Changes the state of the button to the given state.
 *)
 function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
 begin
-  Result := self.__toggleButton([586,284,625,323], optChat, enable, tryTime);
+  Result := self.__toggleButton([568,268,602,305], optChat, enable, tryTime);
 end;
 
 (*
@@ -331,7 +351,7 @@ Changes the state of the button to the given state.
 *)
 function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
 begin
-  Result := self.__toggleButton([658,284,697,323], optChat, enable, tryTime);
+  Result := self.__toggleButton([625,268,658,305], optChat, enable, tryTime);
 end;
 
 
@@ -346,7 +366,7 @@ Changes the state of the button to the given state.
 *)
 function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
 begin
-  Result := self.__toggleButton([586,347,625,386], optChat, enable, tryTime);
+  Result := self.__toggleButton([568,322,603,358], optChat, enable, tryTime);
 end;
 
 (*
@@ -360,7 +380,7 @@ Changes the state of the button for "Login/Logout notification timeout" to the g
 *)
 function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
 begin
-  Result := self.__toggleButton([658,347,697,386], optChat, enable, tryTime);
+  Result := self.__toggleButton([680,322,716,358], optChat, enable, tryTime);
 end;
 
 (*
@@ -377,52 +397,6 @@ begin
   Result := self.__toggleButton([624,299,659,334], optControls, enable, tryTime);
 end;
 
-(*
-Options.SetZoom
-~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.SetZoom(APosition: Byte): Boolean;
-
-Sets the zoom of the mainscreen. 0 = Zoomed out, 100 = Zoomed in.
-*)
-function TRSOptions.SetZoom(APosition: Byte): Boolean;
-
-  function Position: Byte;
-  var
-    TPA: TPointArray;
-    b: TBox = [602, 266, 698, 279];
-  begin
-    if (FindColors(TPA, 11053482, b)) then
-      Result := Round(((GetTPABounds(TPA).X1 - b.X1) / b.Width) * 100);
-  end;
-
-var
-  r: Integer;
-begin
-  if (not Self.Open()) then
-    Exit(False);
-
-  // Disabled mouse wheel
-  if (GetColor(573, 272) = 200) then
-    Mouse.Click(Point(573, 272), 8, mouse_Left);
-
-  while (Self.IsOpen()) and (not InRange(Position(), APosition-2, APosition+2)) do
-  begin
-    r := Abs(Position() - APosition);
-    if (r < Random(12, 15)) then
-      r := Random(1, 2)
-    else
-      r := Random(3, 6);
-
-    if (Position() < APosition) then
-      Mouse.Scroll(Mainscreen.getBounds(), r, False)
-    else
-      Mouse.Scroll(Mainscreen.getBounds(), r, True);
-
-    Wait(Random(10, 100));
-  end;
-end;
 
 begin
   Options.__setup();
