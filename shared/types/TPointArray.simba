@@ -198,7 +198,7 @@ TPointArray.Sort
 
     procedure TPointArray.Sort(From:TPoint=[0,0]);
 
-Wraps Simba's SortTPAFrom
+Wraps Simba's `SortTPAFrom`
 *)
 procedure TPointArray.Sort(From:TPoint=[0,0]);
 begin
@@ -212,7 +212,7 @@ TPointArray.Sorted
 
     function TPointArray.Sorted(From:TPoint=[0,0]): TPointArray;
 
-Wraps Simba's SortTPAFrom, produces a sorted copy.
+Wraps Simba's `SortTPAFrom`, produces a sorted copy.
 *)
 function TPointArray.Sorted(From:TPoint=[0,0]): TPointArray;
 begin
@@ -228,7 +228,7 @@ TPointArray.SortByX
 
     procedure TPointArray.SortByX(LowToHi:Boolean=True);
 
-Wraps Simba's SortTPAByX
+Wraps Simba's `SortTPAByX`
 *)
 procedure TPointArray.SortByX(LowToHi:Boolean=True);
 begin
@@ -242,7 +242,7 @@ TPointArray.SortByY
 
     procedure TPointArray.SortByY(LowToHi:Boolean=True);
 
-Wraps Simba's SortTPAByY
+Wraps Simba's `SortTPAByY`
 *)
 procedure TPointArray.SortByY(LowToHi:Boolean=True);
 begin
@@ -363,7 +363,9 @@ TPointArray.Edges
 
     function TPointArray.Edges(): TPointArray; constref;
 
-Wraps Simba's FindTPAEdges
+Filters all points out of the given TPointArray which aren't edge-points. 
+Edge-points are points that are on the edge of the TPA, not completely surrounded by other points. 
+Same as Simba's `FindTPAEdges`
 *)
 function TPointArray.Edges(): TPointArray; constref;
 begin
@@ -378,9 +380,9 @@ TPointArray.Cluster
     function TPointArray.Cluster(dist:Int32): T2DPointArray; constref;
     function TPointArray.Cluster(distX,distY:Int32): T2DPointArray; constref; overload;
 
-Smart wrapper of Simba's ClusterTPA and ClusterTPAEx (fall backs to SplitTPA when it's better suited)
+Smart wrapper of Simba's `ClusterTPA` and `ClusterTPAEx` (fall backs to `SplitTPA` when it's better suited)
 *)
-function TPointArray.Cluster(dist:Int32): T2DPointArray; constref;
+function TPointArray.Cluster(dist: Int32): T2DPointArray; constref;
 begin
   if (Length(Self) < 700) then
     Result := SplitTPA(Self, dist)
@@ -388,7 +390,7 @@ begin
     Result := ClusterTPA(Self, dist);
 end;
 
-function TPointArray.Cluster(distX,distY:Int32): T2DPointArray; constref; overload;
+function TPointArray.Cluster(distX,distY: Int32): T2DPointArray; constref; overload;
 begin
   if (Length(Self) < 1200) then
     Result := SplitTPAEx(Self, distX, distY)
@@ -404,14 +406,14 @@ TPointArray.Split
     function TPointArray.Split(dist:Int32): T2DPointArray; constref;
     function TPointArray.Split(distX,distY:Int32): T2DPointArray; constref; overload;
 
-Wraps Simba's SplitTPA and SplitTPAEx
+Wraps Simba's `SplitTPA` and `SplitTPAEx`
 *)
-function TPointArray.Split(dist:Int32): T2DPointArray; constref;
+function TPointArray.Split(dist: Int32): T2DPointArray; constref;
 begin
   Result := SplitTPA(Self, dist);
 end; 
 
-function TPointArray.Split(distX,distY:Int32): T2DPointArray; constref; overload;
+function TPointArray.Split(distX,distY: Int32): T2DPointArray; constref; overload;
 begin
   Result := SplitTPAEx(Self, distX, distY);
 end;
@@ -425,7 +427,7 @@ TPointArray.ToATPA
     function TPointArray.ToATPA(WH:Int32): T2DPointArray; constref;
     function TPointArray.ToATPA(W,H:Int32): T2DPointArray; constref; overload;
 
-Wraps Simba's TPAToATPA and TPAToATPAEx
+Wraps Simba's `TPAToATPA` and `TPAToATPAEx`
 *)
 function TPointArray.ToATPA(WH:Int32): T2DPointArray; constref;
 begin
@@ -442,13 +444,28 @@ TPointArray.Offset
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TPointArray.Offset(off:TPoint);
+    procedure TPointArray.Offset(off: TPoint);
 
-Wraps Simba's OffsetTPA
+Wraps Simba's `OffsetTPA`
 *)
-procedure TPointArray.Offset(off:TPoint);
+procedure TPointArray.Offset(off: TPoint);
 begin
   OffsetTPA(self, off);
+end;
+
+(*
+TPointArray.OffsetFunc
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.OffsetFunc(off: TPoint): TPointArray;
+
+Wraps Simba's `OffsetTPA`, but offsets a copy, and returns it.
+*)
+function TPointArray.OffsetFunc(off: TPoint);
+begin
+  Result := Copy(Self);
+  OffsetTPA(Result, off);
 end;
 
 (*
@@ -459,13 +476,90 @@ TPointArray.Invert
     function TPointArray.Invert(Area:TBox=[0,0,-1,-1]): TPointArray; constref;
 
 Inverts the shape based on the area covered, alternatively the given area.
-Same as ReturnPointsNotInTPA in Simba.
+Same as `ReturnPointsNotInTPA` in Simba.
 *)
 function TPointArray.Invert(Area:TBox=[0,0,-1,-1]): TPointArray; constref;
 begin
   if Area = Box(0,0,-1,-1) then
     Area := Self.Bounds();
   Result := ReturnPointsNotInTPA(Self, Area);
+end;
+
+(*
+TPointArray.FilterBox
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.FilterBox(Box: TBox): TPointArray; constref;
+
+Returns a filtered version of the TPA.
+Same as Simba's `FilterPointsBox`
+*)
+function TPointArray.FilterBox(Box: TBox): TPointArray; constref;
+begin
+  Result := Copy(Self);
+  FilterPointsBox(Result, Box);
+end;
+
+(*
+TPointArray.FilterBox
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.FilterDist(MinDist,MaxDist: Double; Mx,My: Int32): TPointArray; constref;
+
+Returns a filtered version of the TPA.
+Same as Simba's `FilterPointsDist`
+*)
+function TPointArray.FilterDist(MinDist,MaxDist: Double; Mx,My: Int32): TPointArray; constref;
+begin
+  Result := Copy(Self);
+  FilterPointsDist(Result, MinDist, MaxDist, Mx,My);
+end;
+
+
+(*
+TPointArray.FilterDuplicates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.FilterDuplicates(): TPointArray;
+
+Returns a copy where all duplicate points are removed.
+*)
+function TPointArray.FilterDuplicates(): TPointArray;
+begin
+  Result := Copy(Self);
+  ClearDoubleTPA(Result);
+end;
+
+(*
+TPointArray.ClearDuplicates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TPointArray.ClearDuplicates();
+
+Removes all the duplicate points from self.
+*)
+function TPointArray.ClearDuplicates(): TPointArray;
+begin
+  ClearDoubleTPA(Self);
+end;
+
+(*
+TPointArray.Rotate
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TPointArray.Rotate(AngleRad, MidX, MidY: Double): TPointArray;
+
+Returns a copy where all points are rotated around MidX, MidY.
+Same as Simba's `RotatePoints`.
+*)
+function TPointArray.Rotate(AngleRad, MidX, MidY: Double): TPointArray;
+begin
+  Result := RotatePoints(Self, AngleRad, MidX, MidY);
 end;
 
 (*
@@ -715,7 +809,7 @@ Computes the minimum bounding circle around the given shape.
 
 See: https://en.wikipedia.org/wiki/Smallest-circle_problem for more information.
 
-Implementation is derived from a number of implementations I've seen circulating the internet.
+Implementation is a mixture of a few implementations I've seen.
 *)
 function TPointArray.MinAreaCircle(): TCircle; constref;
   function NewCircle2(p0, p1: TPoint): TCircle;
@@ -788,7 +882,6 @@ function TPointArray.MinAreaCircle(): TCircle; constref;
       Exit(right);
   end;
 
-
   // One boundary point known
   function makeCircleOnePoint(Points:TPointArray; p:TPoint): TCircle;
   var
@@ -817,12 +910,12 @@ begin
   if Length(Self) = 0 then Exit();
   if Length(Self) = 1 then Exit(TCircle([Self[0].x, Self[0].y, 0]));
 
-  // Clone list to preserve the caller's data, do Durstenfeld shuffle
+  // Copy the list and shuffle
   TPA := Copy(Self);
   for i := High(TPA) downto 0 do
     Swap(TPA[i], TPA[Random(0,i)]);
-
-  // Progressively add points to circle or recompute circle
+  
+  // Add points to circle one by one, and if needed recompute circle
   for i:=0 to High(TPA) do
   begin
     p := TPA[i];
@@ -865,14 +958,14 @@ begin
     tmp[i*2]  := TPointF([inc*Cos(theta)+poly[i].x, inc*Sin(theta)+poly[i].y]);
     tmp[i*2+1]:= TPointF([inc*Cos(theta)+poly[k].x, inc*Sin(theta)+poly[k].y]);
   end;
- 
+
   for i:=0 to High(tmp) with 2 do
   begin
     p1 := tmp[i];
     p2 := tmp[(i+1) mod Length(tmp)];
     q1 := tmp[(i+2) mod Length(tmp)];
     q2 := tmp[(i+3) mod Length(tmp)];
- 
+
     c1 := [(p1.y-p2.y), (p2.x-p1.x), -(p1.x*p2.y-p2.x*p1.y)];
     c2 := [(q1.y-q2.y), (q2.x-q1.x), -(q1.x*q2.y-q2.x*q1.y)];
     det  := c1[0] * c2[1] - c1[1] * c2[0];
