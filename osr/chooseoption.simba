@@ -260,7 +260,7 @@ var
 
   procedure RestMouse(Sender: Pointer; X,Y: Int32); static;
   begin
-    if Random(140) = 0 then
+    if Random(300) = 0 then
       WaitEx(500,90);
   end;
 
