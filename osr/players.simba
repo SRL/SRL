@@ -286,6 +286,7 @@ begin
   Self.SetCount(c + 1);
 
   Result := @Self.FPlayers[c];
+  Result^.WorldFilter := DEFAULT_WORLD_FILTER;
 end;
 
 (*

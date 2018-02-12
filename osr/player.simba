@@ -6,7 +6,8 @@ type
     BankPin: String;
     isMember: Boolean;
     isActive: Boolean;
-    World: Int32;
+    World: Int32; // if not defined, will use random world using the filter
+    WorldFilter: TRSWorldFilter;
     Data: Pointer;
   end;
 
@@ -114,9 +115,18 @@ begin
     begin
       LoginScreen.Open();
 
-      if (Self.World > 0) and (LoginScreen.GetCurrentWorld() <> Self.World) then
+      if (Self.World < 1) then
       begin
-        if LoginScreen.OpenWorldSwitcher() and WorldSwitcher.IsOpen(Random(2500, 3000)) then
+        if Self.isMember then
+          Self.WorldFilter.Properties += WORLD_FREE
+        else
+          Self.WorldFilter.Properties += WORLD_MEMBERS;
+
+        Self.World := WorldSwitcher.GetWorld(Self.WorldFilter);
+      end;
+      if (LoginScreen.GetCurrentWorld() <> Self.World) then
+      begin
+        if LoginScreen.OpenWorldSwitcher() and WorldSwitcher.IsOpen(Random(6000, 8000)) then
           WorldSwitcher.SelectWorld(Self.World);
         if (LoginScreen.GetCurrentWorld() <> Self.World) then
           Continue;

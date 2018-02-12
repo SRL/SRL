@@ -1,20 +1,27 @@
 type
-  EWorldProperty = (WORLD_FREE, WORLD_MEMBERS,
-                    WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT,
-                    WORLD_USA, WORLD_GERMANY, WORLD_UK, WORLD_AUSTRALIA
-                   );
+  ERSWorldProperty = (WORLD_FREE, WORLD_MEMBERS,
+                      WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT,
+                      WORLD_USA, WORLD_GERMANY, WORLD_UK, WORLD_AUSTRALIA
+                     );
+  TRSWorldProperties = set of ERSWorldProperty;
 
   TRSWorld = record
     ID: Int32;
-    Properties: set of EWorldProperty;
+    Properties: TRSWorldProperties;
   end;
-
   TRSWorldArray = array of TRSWorld;
 
-  TRSWorldSwitcher = record(TInterfaceBase)
-    Worlds: TRSWorldArray; // If used init with WorldSwitcher.Load()
+  TRSWorldFilter = record
+    Properties: TRSWorldProperties;
+    Worlds: TIntegerArray;
+  end;
 
-    GetWorldFilter: record Worlds: TIntegerArray; Properties: set of EWorldProperty; end;
+var
+  DEFAULT_WORLD_FILTER: TRSWorldFilter = [[WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT, WORLD_AUSTRALIA], [302, 330]]; // 302 & 330 are often full.
+
+type
+  TRSWorldSwitcher = record(TInterfaceBase)
+    Worlds: TRSWorldArray; // Must be initalized once with WorldSwitcher.Worlds.Load()
  end;
 
 var
@@ -81,10 +88,6 @@ begin
     SetName('World switcher');
     SetStatic(True);
     SetBounds(srl.DefaultClientBounds);
-
-    //  Average botting. (sorry aussies & F2P people!)
-    GetWorldFilter.Properties := [WORLD_SKILL, WORLD_PVP, WORLD_AUSTRALIA, WORLD_FREE, WORLD_DEADMAN, WORLD_EVENT];
-    GetWorldFilter.Worlds := [302, 330];
   end;
 end;
 
@@ -166,7 +169,7 @@ end;
 WorldSwitcher.GetWorld
 ~~~~~~~~~~~~~~~~~~~~~~
 
-  function TRSWorldSwitcher.GetWorld(filterWorlds: TIntegerArray; filterPropertys: set of EWorldProperty): Int32; overload;
+  function TRSWorldSwitcher.GetWorld(Filter: TRSWorldFilter): Int32; overload;
 
 Selects a random world which isn't a filter world and has no filter properties.
 
@@ -174,13 +177,13 @@ Example:
 .. code-block:: pascal
 
   // Returns a random world that isn't world 302 and isn't a free world.
-  World := WorldSwitcher.GetWorld([302], [WORLD_FREE]);
+  World := WorldSwitcher.GetWorld([[WORLD_FREE], [302]]);
 *)
-function TRSWorldSwitcher.GetWorld(filterWorlds: TIntegerArray; filterPropertys: set of EWorldProperty): Int32; overload;
+function TRSWorldSwitcher.GetWorld(Filter: TRSWorldFilter): Int32; overload;
 var
   World: TRSWorld;
   Filtered: TRSWorldArray;
-  Prop: EWorldProperty;
+  Prop: ERSWorldProperty;
   i: Int32;
 label
   Rejected;
@@ -190,11 +193,11 @@ begin
 
   for World in Self.Worlds do
   begin
-    for i := 0 to High(filterWorlds) do
-      if (Self.FixWorld(World.ID) = Self.FixWorld(filterWorlds[i])) then
+    for i := 0 to High(Filter.Worlds) do
+      if (Self.FixWorld(World.ID) = Self.FixWorld(Filter.Worlds[i])) then
         goto Rejected;
-    for Prop := Low(EWorldProperty) to High(EWorldProperty) do
-       if (Prop in World.Properties) and (Prop in filterPropertys) then
+    for Prop := Low(ERSWorldProperty) to High(ERSWorldProperty) do
+       if (Prop in World.Properties) and (Prop in Filter.Properties) then
          goto Rejected;
 
     Filtered += World;
@@ -206,18 +209,6 @@ begin
     srl.WriteLn('All worlds have been filtered', dtFatal);
 
   Result := Filtered[Random(Length(Filtered))].ID;
-end;
-
-(*
-WorldSwitcher.GetWorld (overload)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Gets a world using WorldSwitcher.GetWorldFilter
-
-*)
-function TRSWorldSwitcher.GetWorld: Int32; overload;
-begin
-  Result := Self.GetWorld(Self.GetWorldFilter.Worlds, Self.GetWorldFilter.Properties);
 end;
 
 begin
