@@ -462,7 +462,7 @@ TPointArray.OffsetFunc
 
 Wraps Simba's `OffsetTPA`, but offsets a copy, and returns it.
 *)
-function TPointArray.OffsetFunc(off: TPoint);
+function TPointArray.OffsetFunc(off: TPoint): TPointArray;
 begin
   Result := Copy(Self);
   OffsetTPA(Result, off);
@@ -498,7 +498,7 @@ Same as Simba's `FilterPointsBox`
 function TPointArray.FilterBox(Box: TBox): TPointArray; constref;
 begin
   Result := Copy(Self);
-  FilterPointsBox(Result, Box);
+  FilterPointsBox(Result, Box.X1, Box.Y1, Box.X2, Box.Y2);
 end;
 
 (*

@@ -238,6 +238,7 @@ end;
 
 
 function TAntiban.Init(Skill: Int32; Tasks: array of TAntibanTask=[]; IntervalRnd:Double=0.1): Boolean;
+var i: Int32;
 begin
   Self.ActiveSkill := Skill;
   Self.Tasks := Tasks;
