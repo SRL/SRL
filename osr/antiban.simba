@@ -1,3 +1,24 @@
+type
+  TAntibanTask = record
+    BaseInterval: Double;
+    NextAtTime: Double;
+    Method: procedure of object;
+  end;
+
+  TAntiban = record
+    ActiveSkill: Int32;
+    Tasks: array of TAntibanTask;
+    TasksDone: TStringArray;
+  end; 
+
+{$IFDEF RSCLIENT}
+  {$DEFINE LOSE_FOCUS := RSClient.LoseFocus();}
+  {$DEFINE GAIN_FOCUS := RSClient.SetFocus();}
+{$ELSE}
+  {$DEFINE LOSE_FOCUS := srl.MouseOfClient();}
+  {$DEFINE GAIN_FOCUS := }
+{$ENDIF} 
+  
 procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);
 var
   arr: TOptionArray;
@@ -114,3 +135,137 @@ begin
     end;
   end;
 end;
+
+// ------------------------------------------------------------------------
+// TAntiban
+procedure TAntiban.DebugNote(s: String);
+begin
+  Self.TasksDone += '['+FormatDateTime('hh:mm:ss', Now())+']' + s;
+  WriteLn(Self.TasksDone[High(Self.TasksDone)]);
+end;
+
+procedure TAntiban.LoseFocus();
+begin
+  DebugNote('[RND] Losing focus');
+  {$MACRO LOSE_FOCUS}
+  WaitEx(19211,2000);
+  {$MACRO GAIN_FOCUS}
+  Players.GetCurrent()^.Login();
+  if Random(4)=0 then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
+end;
+
+procedure TAntiban.HoverPlayers();
+begin
+  DebugNote('[RND] Hovering players');
+  srl.HoverRandomPlayer(25);
+end;
+
+procedure TAntiban.CheckSkill();
+begin
+  DebugNote('[RND] Check Skill Stats');
+  Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(2500,300), Random(5) > 1);
+end;
+
+procedure TAntiban.RandomCompass();
+begin
+  DebugNote('[RND] Rotate Compass');
+  Minimap.RandomCompass(-180,180, Random(5)=0);
+end;
+
+procedure TAntiban.CheckStats();
+begin
+  DebugNote('[RND] Look at Stats');
+  Stats.Open();
+  WaitEx(3000,300);
+  if Random(2) = 0 then Inventory.Open();
+end;
+
+procedure TAntiban.OpenRandomTab();
+begin
+  DebugNote('[RND] Open Random Tab');
+  Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
+  WaitEx(1600,100);
+  if Random(4) = 0 then Inventory.Open()
+  else if Random(4) = 0 then Stats.Open();
+end;
+
+procedure TAntiban.VeryShortBreak();
+begin
+  DebugNote('[RND] Taking a breather');
+  if(Random(2)=0) then {$MACRO LOSE_FOCUS}
+  WaitEx(40000,5000);
+  {$MACRO GAIN_FOCUS}
+  Players.GetCurrent()^.Login();
+  Wait(60,600, wdLeft);
+  Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
+end;
+
+procedure TAntiban.DoMiscStuff();
+begin
+  DebugNote('[RND] Doing misc stuff');
+  for 0 to Random(2) do
+  begin
+    if Random(3) = 0 then
+      Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
+
+    WaitEx(1500,200);
+    if(Random(8) = 0) then
+    begin
+      if(Random(2) = 0) then {$MACRO LOSE_FOCUS}
+      WaitEx(40000,4500);
+      {$MACRO GAIN_FOCUS}
+    end;
+
+    if(Random(4) > 1) then
+    begin
+      Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400), Random(5) > 1);
+      WaitEx(2500,300);
+    end;
+  end;
+end;
+
+procedure TAntiban.TakeBreak();
+begin
+  DebugNote('[RND] Taking a longer break');
+  if(Random(2)=0) then Logout.ClickLogout();
+  if(Random(2)=0) then {$MACRO LOSE_FOCUS}
+  WaitEx(ONE_MINUTE*35,ONE_MINUTE*7);
+  {$MACRO GAIN_FOCUS}
+  Players.GetCurrent()^.Login();
+  Wait(60,600, wdLeft);
+  if Random(2) then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
+end;
+
+
+function TAntiban.Init(Skill: Int32; Tasks: array of TAntibanTask=[]; IntervalRnd:Double=0.1): Boolean;
+begin
+  Self.ActiveSkill := Skill;
+  Self.Tasks := Tasks;
+
+  for i:=0 to High(Self.Tasks) do
+    with Self.Tasks[i] do
+    begin
+      BaseInterval := srl.GaussRand(BaseInterval, BaseInterval*IntervalRnd);
+      NextAtTime   := GetTimeRunning() + Random() * BaseInterval;
+    end;
+end;
+
+function TAntiban.AddTask(Task: TAntibanTask; IntervalRnd:Double=0.1): Boolean;
+begin
+  Task.BaseInterval := srl.GaussRand(Task.BaseInterval, Task.BaseInterval*IntervalRnd);
+  Task.NextAtTime   := GetTimeRunning() + Random() * Task.BaseInterval;
+  Self.Tasks += Task;
+end;
+
+function TAntiban.DoAntiban(): Boolean;
+var
+  i,j,PauseLen: Int32;
+begin
+  for i:=0 to High(Self.Tasks) do
+    if GetTimeRunning() > Self.Tasks[i].NextAtTime then
+    begin
+      Self.Tasks[i].Method();
+      Self.Tasks[i].NextAtTime := GetTimeRunning() + srl.GaussRand(Self.Tasks[i].BaseInterval, Self.Tasks[i].BaseInterval*0.125);
+      Result := True;
+    end;
+end;  

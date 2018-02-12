@@ -1,6 +1,12 @@
 type
   TTimeFormat = (Time_Formal, Time_Short, Time_Abbrev, Time_Bare, Time_FStop, Time_Formal_Long);
 
+const
+  ONE_SECOND = 1000;
+  ONE_MINUTE = ONE_SECOND * 60;
+  ONE_HOUR   = ONE_MINUTE * 60;
+  ONE_DAY    = ONE_HOUR   * 24; 
+  
 function TSRL.MsToTime(const MS: UInt64; const Format: TTimeFormat): String; constref;
 var
   STA: array [0..5] of TVariantArray;
