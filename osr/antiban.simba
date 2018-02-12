@@ -15,8 +15,8 @@ type
   {$DEFINE LOSE_FOCUS := RSClient.LoseFocus();}
   {$DEFINE GAIN_FOCUS := RSClient.SetFocus();}
 {$ELSE}
-  {$DEFINE LOSE_FOCUS := srl.MouseOfClient();}
-  {$DEFINE GAIN_FOCUS := }
+  {$DEFINE LOSE_FOCUS := srl.MouseOffClient();}
+  {$DEFINE GAIN_FOCUS := (*nothing*);}
 {$ENDIF} 
   
 procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);

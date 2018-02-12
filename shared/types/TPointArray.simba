@@ -542,7 +542,7 @@ TPointArray.ClearDuplicates
 
 Removes all the duplicate points from self.
 *)
-function TPointArray.ClearDuplicates(): TPointArray;
+procedure TPointArray.ClearDuplicates();
 begin
   ClearDoubleTPA(Self);
 end;
