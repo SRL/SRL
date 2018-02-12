@@ -337,13 +337,13 @@ begin
 end;
 
 // Withdraw first match
-function TRSBankScreen.Withdraw(Identifier: String; Amount: Int32; Mode: EBankButton = bbItem): Boolean; overload;
+function TRSBankScreen.Withdraw(Identifier: String; Amount: Int32; UpText:TStringArray=[]; Mode: EBankButton = bbItem): Boolean; overload;
 var
   Slot: Int32;
 begin
   Slot := Self.Find(Identifier);
   if (Slot > -1) then
-    Result := Self.Withdraw(Slot, Amount, TStringArray([]), Mode);
+    Result := Self.Withdraw(Slot, Amount, UpText, Mode);
 end;
 
 // Contains
