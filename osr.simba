@@ -2,9 +2,6 @@
 {$IFNDEF SRL:DEBUG}
   {$IFDEF HINTS}{$DEFINE !HAD_HINTS}{$H-}{$ENDIF}
 {$ENDIF}
-{$IFDEF RSCLIENT}
-  {$include_once srl/utils/rsclient.simba}
-{$ENDIF}
 
 {$include_once shared.simba}
 
@@ -63,19 +60,6 @@ begin
   else
     Self.Writeln('Client ready!');
 end;
-
-{$IFDEF RSCLIENT}
-procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
-begin
-  RSClient.IsRS := @Self.isClientReady;
-  RSClient.MoveMouse := @Mouse.Move;
-
-  if (not RSClient.Setup(Launcher)) then
-    Self.WriteLn('Failed to setup RSClient', dtFatal);
-
-  Self.Setup(Options);
-end;
-{$ENDIF}
 
 {$IFDEF !HAD_HINTS}
   {$H+}
