@@ -60,7 +60,7 @@ begin
   srl.Writeln('TPlayer.LoginToLobby()', dtHeader);
 
   while (Attempts < 25) do
-  try
+  begin
     Inc(Attempts);
 
     srl.WriteFmt('Login attempt: %d', [Attempts]);
@@ -71,6 +71,7 @@ begin
       Exit(srl.Writeln('Already in Lobby', True, 'TPlayer.LoginToLobby(): Result = True'));
     if (not LoginScreen.Open()) then
       Exit(srl.Writeln('Login screen not open', False, 'TPlayer.LoginToLobby(): Result = False'));
+
     LoginScreen.Open();
 
     if LoginScreen.EnterDetails(Self.LoginName, Self.Password) then
@@ -84,7 +85,6 @@ begin
       if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
         Break;
     end;
-  except
   end;
 
   srl.WriteLn('Failed logging into lobby');

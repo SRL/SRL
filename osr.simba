@@ -2,6 +2,9 @@
 {$IFNDEF SRL:DEBUG}
   {$IFDEF HINTS}{$DEFINE !HAD_HINTS}{$H-}{$ENDIF}
 {$ENDIF}
+{$IFDEF RSCLIENT}
+  {$include_once srl/utils/rsclient.simba}
+{$ENDIF}
 
 {$include_once shared.simba}
 
@@ -14,9 +17,6 @@ end;
   {$include_once osr/smart.simba}
 {$ENDIF}
 
-{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
-  {$include_once osr/rsclient.simba}
-{$ENDIF}{$ENDIF}
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
@@ -64,15 +64,18 @@ begin
     Self.Writeln('Client ready!');
 end;
 
-{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
+{$IFDEF RSCLIENT}
 procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
+  RSClient.IsRS := @Self.isClientReady;
+  RSClient.MoveMouse := @Mouse.Move;
+
   if (not RSClient.Setup(Launcher)) then
     Self.WriteLn('Failed to setup RSClient', dtFatal);
 
   Self.Setup(Options);
 end;
-{$ENDIF}{$ENDIF}
+{$ENDIF}
 
 {$IFDEF !HAD_HINTS}
   {$H+}

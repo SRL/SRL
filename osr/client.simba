@@ -16,21 +16,6 @@ begin
   until GetTickCount64() > t;
 end;
 
-function TSRL.isClientReady(WaitTime: Integer = 0): Boolean;
-var
-  TimeOut: UInt64;
-begin
-  Result := False;
-  TimeOut := GetTickCount64() + WaitTime;
-
-  while (not Result) and (TimeOut >= GetTickCount64()) do
-  begin
-    if (WorldSwitcher.isOpen()) then
-      WorldSwitcher.Close();
-    Result := (Self.isLoggedIn()) or (LoginScreen.isOpen()) or (Lobby.isOpen());
-  end;
-end;
-
 function TSRL.isClientLoading(WaitTime: Integer = 0): Boolean;
 
   function isLoading: Boolean;
@@ -62,4 +47,30 @@ begin
     Result := not Self.isClientLoading();
     Wait(Random(500, 1000));
   until Result;
+end;
+
+function TSRL.isClientReady(WaitTime: Integer): Boolean; overload;
+var
+  T: UInt64;
+  W, H: Int32;
+begin
+  GetClientDimensions(W, H);
+  if (W < 765) or (H < 503) then
+    Exit(False);
+
+  T := GetTickCount() + WaitTime;
+  repeat
+    if Self.IsClientLoading() then
+      Self.WaitClientLoading();
+    if WorldSwitcher.isOpen() then
+      WorldSwitcher.Close();
+
+    if Self.isLoggedIn() or LoginScreen.isOpen() or Lobby.isOpen() then
+      Exit(True);
+  until (GetTickCount() >= T);
+end;
+
+function TSRL.isClientReady: Boolean; overload;
+begin
+  Result := Self.isClientReady(0);
 end;

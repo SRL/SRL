@@ -1,4 +1,5 @@
-{.$DEFINE RSCLIENT_AUTOFOCUS} // Automaticlly set focus on mouse/key input
+{$DEFINE RSCLIENT_AUTOFOCUS} // Automaticly gain focus on mouse and key input.
+{$DEFINE RSCLIENT_RETARGET} //  Automaticly retarget the client if RS changes handles.
 
 {$IFNDECL WINAPI_CC}
   {$IFDEF CPU386}
@@ -16,39 +17,21 @@ var
   RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader', 'SMART'];
 
 type
-  TRSWindow = type PtrUInt;
-  TRSWindowArray = array of TRSWindow;
-  PRSWindowArray = ^TRSWindowArray;
-
   TRSClient = record
-    Window: TRSWindow;
-    Child: TRSWindow;
-    Offset: TPoint;
+    Window: PtrUInt;
+    Child: PtrUInt;
+    PID: UInt64;
+    LoseFocusWindow: PtrUInt;
+
+    IsRS: function: Boolean of object;
+    MoveMouse: procedure(P: TPoint) of object;
   end;
 
 var
   RSClient: TRSClient;
 
-// Set a TIOManager to a RSClient.
-procedure TIOManager.SetTarget(RSClient: TRSClient); constref; overload;
-var
-  X, Y, W, H: Int32;
-begin
-  X := RSClient.Offset.X;
-  Y := RSClient.Offset.Y;
-  W := RSClient.Child.Bounds().Width();
-  H := RSClient.Child.Bounds().Height();
-
-  Self.FreeTarget(0);
-
-  Self.SetTargetEx(['', RSClient.Window]);
-
-  Self.MouseSetClientArea(X, Y, X + W, Y + H);
-  Self.ImageSetClientArea(X, Y, X + W, Y + H);
-end;
-
 // Returns the age of the windows process in milliseconds
-function TRSWindow.Age: Int64; constref
+function TRSClient.Age: Int64; constref
 type
   TFileTime = record
     LowDateTime: DWord;
@@ -95,7 +78,7 @@ var
   Process: PtrUInt;
   ProcessTimes: record Creation, Exit, Kernel, User: TFileTime; end;
 begin
-  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
+  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID);
 
   with ProcessTimes do
     GetProcessTimes(Process, Creation, Exit, Kernel, User);
@@ -106,7 +89,7 @@ begin
 end;
 
 // Closes the window by terminating the windows process
-procedure TRSWindow.Close; constref;
+procedure TRSClient.Close; constref;
 
   function TerminateProcess(Process: PtrUInt; ExitCode: UInt32): LongBool; static; external 'TerminateProcess@kernel32.dll'+WINAPI_CC;
   function OpenProcess(DesiredAccess: DWord; InheritHandle: LongBool; PID: DWord): PtrUInt; static; external 'OpenProcess@kernel32.dll'+WINAPI_CC;
@@ -117,32 +100,23 @@ const
 var
   Process: PtrUInt;
 begin
-  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID());
+  Process := OpenProcess(PROCESS_ALL_ACCESS, False, Self.PID);
   TerminateProcess(Process, 0);
   CloseHandle(Process);
 end;
 
-// Returns the PID of windows proceess
-function TRSWindow.PID: UInt32; constref;
-
-  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll'+WINAPI_CC;
-
-begin
-  GetWindowThreadProcessID(Self, Result);
-end;
-
 // Returns true if the window has focus
-function TRSWindow.HasFocus: Boolean; constref;
+function TRSClient.HasFocus: Boolean; constref;
 
   function GetForegroundWindow: PtrUInt; external 'GetForegroundWindow@user32.dll'+WINAPI_CC;
 
 begin
-  Result := GetForegroundWindow() = Self;
+  Result := GetForegroundWindow() = Self.Window;
 end;
 
 // Sets window focus
 // This seems to be the most reliable way. Windows is a bit weird when trying to set focus of a window you don't own.
-procedure TRSWindow.SetFocus; constref;
+procedure TRSClient.SetFocus(Handle: PtrUInt); constref; overload;
 const
   SW_SHOW = 5;
 
@@ -164,118 +138,137 @@ begin
     if (Current <> Thread) then
       AttachThreadInput(Current, Thread, True);
 
-    BringWindowToTop(Self);
-    ShowWindow(Self, SW_SHOW);
+    BringWindowToTop(Handle);
+    ShowWindow(Handle, SW_SHOW);
 
     if (Current <> Thread) then
       AttachThreadInput(Current, Thread, False);
   end;
 end;
 
-// Returns a TBox of the windows bounds
-function TRSWindow.Bounds: TBox; constref;
-
-  function GetWindowRect(Handle: PtrUInt; Rect: ^TRect): LongBool; static; external 'GetWindowRect@user32.dll'+WINAPI_CC;
-
-var
-  R: TRect;
+procedure TRSClient.SetFocus; constref; overload;
 begin
-  GetWindowRect(Self, @R);
-
-  Result := [R.Left, R.Top, R.Right, R.Bottom];
+  Self.SetFocus(Self.Window);
 end;
 
-// Returns the windows which title matches
-function TRSWindowArray.GetByTitle(S: String): TRSWindowArray; constref;
-
-  function GetWindowText(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetWindowTextA@user32.dll'+WINAPI_CC;
-
-  function GetTitle(Handle: PtrUInt): String;
-  var
-    Buffer: array[0..256] of Char;
-  begin
-    SetLength(Result, GetWindowText(Handle, @Buffer[0], Length(Buffer)));
-    if (Length(Result) > 0) then
-      MemMove(Buffer[0], Result[1], Length(Result));
-  end;
-
-var
-  Window: TRSWindow;
-begin
-  for Window in Self do
-    if S in GetTitle(Window) then
-      Result += Window;
-end;
-
-// Returns the windows which class name matches
-function TRSWindowArray.GetByClass(S: String): TRSWindowArray; constref;
-
-  function GetClassName(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetClassNameA@user32.dll'+WINAPI_CC;
-
-  function GetClass(Handle: PtrUInt): String;
-  var
-    Buffer: array[0..256] of Char;
-  begin
-    SetLength(Result, GetClassName(Handle, @Buffer[0], Length(Buffer)));
-    if (Length(Result) > 0) then
-      MemMove(Buffer[0], Result[1], Length(Result));
-  end;
-
-var
-  Window: TRSWindow;
-begin
-  for Window in Self do
-    if GetClass(Window) = S then
-      Result += Window;
-end;
-
-// Returns all windows of either the desktop or a parent window
-function TRSWindowArray.GetWindows(Parent: TRSWindow = 0): TRSWindowArray; static;
+// Targets the RS client, loops though each canvas child until we find a match
+// if PID > 0 will only target a window under with the same PID.
+function TRSClient.Target: Boolean; overload;
 type
+  TWindowArray = array of PtrUInt;
+  PWindowArray = ^TWindowArray;
+
   TEnumWindowsFunc__ = function(Window: PtrUInt; Param: Pointer): LongBool;
   TEnumWindowsFunc = native(TEnumWindowsFunc__, ffi_winapi);
 
   function EnumWindows(Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumWindows@user32.dll'+WINAPI_CC;
   function EnumChildWindows(Handle: PtrUInt; Func: TEnumWindowsFunc; Param: Pointer = nil): LongBool; static; external 'EnumChildWindows@user32.dll'+WINAPI_CC;
 
+  function GetWindowText(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetWindowTextA@user32.dll'+WINAPI_CC;
+  function GetWindowThreadProcessID(Handle: PtrUInt; var PID: UInt32): UInt32; static; external 'GetWindowThreadProcessId@user32.dll'+WINAPI_CC;
+
+  function GetClassName(Handle: PtrUInt; Buffer: PChar; MaxCount: Int32): Int32; static; external 'GetClassNameA@user32.dll'+WINAPI_CC;
+
   function GetWindow(Handle: PtrUInt; Param: Pointer): LongBool; static;
+  var
+    Arr: PWindowArray;
   begin
-    PRSWindowArray(Param)^ += Handle;
+    Arr := Param;
+    Arr^ += Handle;
 
     Exit(True);
   end;
 
-begin
-  if (Parent <> 0) then
-    EnumChildWindows(Parent, @GetWindow, @Result)
-  else
-    EnumWindows(@GetWindow, @Result);
-end;
+  function GetWindowsByTitle(Title: String): TWindowArray;
+  var
+    Windows: TWindowArray;
+    Window: PtrUInt;
+    Buffer: array[0..255] of Char;
+    Text: String;
+  begin
+    EnumWindows(@GetWindow, @Windows);
 
-// Targets the RS client, loops though each canvas child until we find a match
-function TRSClient.Target: Boolean; overload;
+    for Window in Windows do
+    begin
+      SetLength(Text, GetWindowText(Window, @Buffer[0], Length(Buffer)));
+      if (Length(Text) > 0) then
+        MemMove(Buffer[0], Text[1], Length(Text));
+
+      if Title in Text then
+        Result += Window;
+     end;
+  end;
+
+  function GetRSWindows(Parent: PtrUInt): TWindowArray;
+  var
+    Buffer: array[0..255] of Char;
+    Text: String;
+    Window: PtrUInt;
+    Windows: TWindowArray;
+  begin
+    EnumChildWindows(Parent, @GetWindow, @Windows);
+
+    for Window in Windows do
+    begin
+      SetLength(Text, GetClassName(Window, @Buffer[0], Length(Buffer)));
+      if (Length(Text) > 0) then
+        MemMove(Buffer[0], Text[1], Length(Text));
+
+      if (Text = 'SunAwtCanvas') then
+        Result += Window;
+    end;
+  end;
+
 var
   Title: String;
+  Window, Child: PtrUInt;
+  PID: UInt32;
 begin
-  Self := [];
+  if (@Self.IsRS = nil) then
+    raise 'IsRS callback not set';
+
+  Self.PID := 0;
+  Self.Window := 0;
+  Self.Child := 0;
 
   for Title in RS_CLIENT_TITLES do
-    for Self.Window in TRSWindowArray.GetWindows().GetByTitle(Title) do
-    begin
-      for Self.Child in TRSWindowArray.GetWindows(Window).GetByClass('SunAwtCanvas') do
+    for Window in GetWindowsByTitle(Title) do
+      for Child in GetRSWindows(Window) do
       begin
-        Self.Offset.X := Self.Child.Bounds().X1 - Self.Window.Bounds().X1;
-        Self.Offset.Y := Self.Child.Bounds().Y1 - Self.Window.Bounds().Y1;
+        FreeTarget(0);
+        SetTarget(['', Child]);
 
-        Client.GetIOManager().SetTarget(Self);
+        if Self.IsRS() then
+        begin
+          Self.Child := Child;
+          Self.Window := Window;
+          Self.PID := PID;
+          if (Self.LoseFocusWindow = 0) then
+            Self.LoseFocusWindow := GetWindowsByTitle('Simba - ')[0];
 
-        if srl.isClientReady() then
           Exit(True);
-      end;
+        end;
     end;
+
+  Exit(False);
 end;
 
-// Launches the client if needed then sets it as target
+procedure TRSClient.Update;
+
+  function IsWindow(Handle: PtrUInt): LongBool; static; external 'IsWindow@user32.dll' + WINAPI_CC;
+
+begin
+  if (Self.Child > 0) and (not IsWindow(Self.Child)) then
+  begin
+    WriteLn('TRSClient.Update');
+
+    if (not Self.Target()) then
+      raise 'Failed to update RSClient';
+  end;
+end;
+
+// Targets the first found RS window
+// If no RS windows are found the launcher is executed
 function TRSClient.Setup(Launcher: String = ''): Boolean;
 
   function GetJavaExecutable: String;
@@ -325,49 +318,34 @@ const
   SM_CYSCREEN = 1;
 
   function GetSystemMetrics(Index: Int32): Int32; static; external 'GetSystemMetrics@user32.dll'+WINAPI_CC;
+  function GetWindowRect(Handle: PtrUInt; Rect: ^TRect): LongBool; static; external 'GetWindowRect@user32.dll'+WINAPI_CC;
 
 var
+  R: TRect;
   P: TPoint;
 begin
+  GetWindowRect(Self.Window, @R);
+
   repeat
     P.X := Random(GetSystemMetrics(SM_CXSCREEN));
     P.Y := Random(GetSystemMetrics(SM_CYSCREEN));
-  until (not PointInBox(P, Self.Window.Bounds()));
+  until (not PointInBox(P, [R.Left, R.Top, R.Right, R.Bottom]));
 
   // local to global position
-  P.X -= Self.Window.Bounds().X1 - Self.Offset.X;
-  P.Y -= Self.Window.Bounds().Y1 - Self.Offset.Y;
+  P.X -= R.Left;
+  P.Y -= R.Top;
 
-  Mouse.Move(P);
-end;
+  if (@Self.MoveMouse = nil) then
+    raise 'Mouse callback not set';
 
-// Gives the client focus
-procedure TRSClient.SetFocus;
-begin
-  Self.Window.SetFocus();
+  Self.MoveMouse(P);
 end;
 
 // Mouses off the client and gives Simba focus
 procedure TRSClient.LoseFocus; overload;
-
-  function GetSimbaWindow: TRSWindow;
-  var
-    Windows: TRSWindowArray;
-  begin
-    Windows := TRSWindowArray.GetWindows().GetByTitle('Simba - ');
-    if Length(Windows) = 0 then
-      raise 'Simba not found';
-
-    Result := Windows[0]
-  end;
-
-var
-  Simba: TRSWindow;
 begin
   Self.MouseOff();
-
-  Simba := GetSimbaWindow();
-  Simba.SetFocus();
+  Self.SetFocus(Self.LoseFocusWindow);
 end;
 
 // Loses focus and waits x millisecoonds
@@ -378,62 +356,5 @@ begin
   Wait(Time);
 end;
 
-// Closes the client
-procedure TRSClient.Close;
-begin
-  Self.Window.Close();
-end;
+{$include_once rsclient_overrides.simba}
 
-// Returns the clients age
-function TRSClient.Age: Int64;
-begin
-  Result := Self.Window.Age;
-end;
-
-// Simba's windows implemention uses GetPixel which isn't reliable on some targets.
-function GetColor(X, Y: Int32): Int32; override;
-begin
-  try
-    with Client.GetIOManager().ReturnData(X, Y, 1, 1) do
-      Result := RGBtoColor(Ptr^.R, Ptr^.G, Ptr^.B);
-  except
-    Result := -1;
-  end;
-end;
-
-{$IFDEF RSCLIENT_AUTOFOCUS}
-procedure TMouse.Move(P: TPoint); override;
-begin
-  RSClient.SetFocus();
-
-  inherited(P);
-end;
-
-procedure TKeyBoard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); override;
-begin
-  RSClient.SetFocus();
-
-  inherited(Text, KeyWait, KeyModWait, KeyPressWait);
-end;
-
-procedure TKeyBoard.PressKey(Key: Integer); override;
-begin
-  RSClient.SetFocus();
-
-  inherited(Key);
-end;
-
-procedure TKeyBoard.KeyDown(const Key: Integer); override;
-begin
-  RSClient.SetFocus();
-
-  inherited(Key);
-end;
-
-procedure TKeyBoard.KeyUp(const Key: Integer); override;
-begin
-  RSClient.SetFocus();
-
-  inherited(Key);
-end;
-{$ENDIF}
