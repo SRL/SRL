@@ -300,6 +300,20 @@ begin
 end;
 
 (*
+Inventory.Count
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Count: Int32;
+
+Returns the number of used slots
+*)
+function TRSInventory.Count: Int32; overload
+begin
+  Result := Length(Self.GetUsedSlots());
+end;
+
+(*
 Inventory.DropItems
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -402,10 +416,14 @@ Inventory.FindItem
 .. code-block:: pascal
 
   function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
+  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
 
-Find the slots of the given item defined by a TMask
+Find the slots of the given item defined by a `TMask`, `DTM`, or `BMP`.
 
-Examples:
+_Note: Last parameter is not defaulted in the last overload `FindItem(BMP..)` for technical reasons._
+
+Example:
 .. code-block:: pascal
 
     itemArr := Inventory.FindItem(myMask);
@@ -417,6 +435,8 @@ var
   i,j: Int32;
   p: TPoint;
 begin
+  if not(self.Open()) then Exit();
+
   SetLength(Result, MaxToFind);
   for i := Self.LowSlot to Self.HighSlot do
     if (FindMaskTolerance(Mask, p.x, p.y, Self.GetSlotBox(i), Tolerance, ContourTolerance)) then
@@ -428,27 +448,13 @@ begin
   SetLength(Result, j);
 end;
 
-(*
-Inventory.FindItem
-~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
-
-Find the slots of the given item defined my a DTM
-
-Examples:
-.. code-block:: pascal
-
-    itemArr := Inventory.FindItem(myDTM);
-    if itemArr = [] then
-      WriteLn('Not found');
-*)
 function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
 var
   i,j: Int32;
   pt: TPoint;
 begin
+  if not(self.Open()) then Exit();
+
   SetLength(Result, MaxToFind);
   for i:=Self.LowSlot to Self.HighSlot do
     if FindDTM(DTM, pt.x, pt.y, Self.GetSlotBox(i)) then
@@ -460,29 +466,13 @@ begin
   SetLength(Result, j);
 end;
 
-(*
-Inventory.FindItem
-~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
-
-Find the slots of the given item defined by a bitmap
-
-_Note: Last parameter is not defaulted to avoid an overload limitation in lape (DTM is also Integer)._
-
-Examples:
-.. code-block:: pascal
-
-    itemArr := Inventory.FindItem(bmp, 40, 28);
-    if itemArr = [] then
-      WriteLn('Not found');
-*)
 function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
 var
   i,j: Int32;
   pt: TPoint;
 begin
+  if not(self.Open()) then Exit();
+
   SetLength(Result, MaxToFind);
   for i := Self.LowSlot to Self.HighSlot do
     if (FindBitmapToleranceIn(BMP, pt.x, pt.y, Self.GetSlotBox(i), Tolerance)) then
@@ -496,17 +486,56 @@ end;
 
 (*
 Inventory.Count
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.Count: Int32;
+  function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32;
+  function TRSInventory.Count(DTM: Integer): Int32; overload;
+  function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
 
-Returns the number of used slots
+Counts the number of slots containing this item
 *)
-function TRSInventory.Count: Int32; overload
+function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32;
 begin
-  Result := Length(Self.GetUsedSlots());
+  Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,28));
 end;
+
+function TRSInventory.Count(DTM: Integer): Int32; overload;
+begin
+  Result := Length(Self.FindItem(DTM));
+end;
+
+function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
+begin
+  Result := Length(Self.FindItem(BMP,Tolerance,28));
+end;
+
+(*
+Inventory.Contains
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Contains(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Boolean;
+  function TRSInventory.Contains(DTM: Integer): Boolean; overload;
+  function TRSInventory.Contains(BMP: Integer; Tolerance:Int32): Boolean; overload;
+
+Returns true if the inventory contains the given item
+*)
+function TRSInventory.Contains(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Boolean;
+begin
+  Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,1)) <> 0;
+end;
+
+function TRSInventory.Contains(DTM: Integer): Int32; overload;
+begin
+  Result := Length(Self.FindItem(DTM,1)) <> 0;
+end;
+
+function TRSInventory.Contains(BMP: Integer; Tolerance:Int32): Boolean; overload;
+begin
+  Result := Length(Self.FindItem(BMP,Tolerance,1)) <> 0;
+end;
+
 
 (*
 Inventory.GetActiveSlot
@@ -522,6 +551,8 @@ var
   i: Integer;
   b: TBox;
 begin
+  if not(self.Open()) then Exit();
+
   Result := -1;
   for i := 0 to High(Self.FSlots) do
   begin
@@ -533,7 +564,7 @@ end;
 
 (*
 Inventory.ActivateSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
@@ -543,7 +574,7 @@ Activates (Presses) the given slot, however if `Slot` is `-1` then it will disab
 function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 var
   i: Int32;
-  procedure DeActivate(Slot: Int32);
+  procedure Deactivate(Slot: Int32);
   begin
     if (Slot > -1) then
     begin
@@ -554,10 +585,10 @@ var
 begin
   Result := True;
 
-  // DeActivate whatever is activated
+  // Deactivate whatever is activated
   if (Slot = -1) and (Self.GetActiveSlot() <> -1) then
   begin
-    DeActivate(Self.GetActiveSlot());
+    Deactivate(Self.GetActiveSlot());
     Exit;
   end;
 
@@ -569,8 +600,28 @@ begin
     DeActivate(i);
 
   Inventory.MouseSlot(Slot);
-  Result := ChooseOption.Select(['Use']);
+  if Mainscreen.IsUptext('Use ') then
+  begin
+    Mouse.Click(mouse_Left);
+    Result := True;
+  end else
+    Result := ChooseOption.Select(['Use']);
 end;
+
+(*
+Inventory.Use
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Use(Slot: Int32): Boolean;
+
+RS correct alias for Inventory.ActivateSlot.
+*)
+function TRSInventory.Use(Slot: Int32): Boolean;
+begin
+  Result := ActivateSlot(Slot);
+end;
+
 
 begin
   Inventory.__Setup();
