@@ -489,13 +489,13 @@ Inventory.Count
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32;
+  function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32; overload;
   function TRSInventory.Count(DTM: Integer): Int32; overload;
   function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
 
 Counts the number of slots containing this item
 *)
-function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32;
+function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32; overload;
 begin
   Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,28));
 end;
@@ -526,7 +526,7 @@ begin
   Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,1)) <> 0;
 end;
 
-function TRSInventory.Contains(DTM: Integer): Int32; overload;
+function TRSInventory.Contains(DTM: Integer): Boolean; overload;
 begin
   Result := Length(Self.FindItem(DTM,1)) <> 0;
 end;
