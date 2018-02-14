@@ -1,11 +1,11 @@
 type
-  ESRLOption = (soDebug, soDebugTimeStamp, soActivateClient);
+  ESRLOption = (soDebug, soDebugAntiban, soDebugTimeStamp, soActivateClient);
   ESRLOptionSet = set of ESRLOption;
 
   EDebugType = (dtHeader, dtFooter, dtFatal, dtNone);
 
 const
-  SRL_DEFAULT_OPTIONS = [soDebug, soDebugTimeStamp];
+  SRL_DEFAULT_OPTIONS = [soDebug, soDebugAntiban, soDebugTimeStamp];
 
 type
   TSRL = record
@@ -52,7 +52,7 @@ begin
         Self.DebugLevel -= 1;
     end;
 
-    System.WriteLn(Format('%s %s %s', [Prefix, StringOfChar('-', Self.DebugLevel), Message]));
+    System.WriteLn(Format('%s %s%s', [Prefix, '-' * Self.DebugLevel, Message]));
 
     case DebugType of
       dtHeader:
@@ -94,7 +94,7 @@ begin
 end;
 
 begin
-  srl.DebugLevel := 1;
+  srl.DebugLevel := 0;
   srl.StartTime := GetTickCount();
   srl.Options := SRL_DEFAULT_OPTIONS;
 end;

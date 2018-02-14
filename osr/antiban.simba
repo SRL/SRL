@@ -141,7 +141,10 @@ end;
 procedure TAntiban.DebugNote(s: String);
 begin
   Self.TasksDone += '['+FormatDateTime('hh:mm:ss', Now())+']' + s;
-  WriteLn(Self.TasksDone[High(Self.TasksDone)]);
+  if soDebugAntiban in srl.Options then
+    WriteLn(Self.TasksDone[High(Self.TasksDone)]);
+  if Length(Self.TasksDone) > 50 then
+    Self.TasksDone.Del(0);
 end;
 
 procedure TAntiban.LoseFocus();
