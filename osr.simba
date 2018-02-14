@@ -14,9 +14,6 @@ end;
   {$include_once osr/smart.simba}
 {$ENDIF}
 
-{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
-  {$include_once osr/rsclient.simba}
-{$ENDIF}{$ENDIF}
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
@@ -63,16 +60,6 @@ begin
   else
     Self.Writeln('Client ready!');
 end;
-
-{$IFDEF WINDOWS}{$IFDEF RSCLIENT}
-procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
-begin
-  if (not RSClient.Setup(Launcher)) then
-    Self.WriteLn('Failed to setup RSClient', dtFatal);
-
-  Self.Setup(Options);
-end;
-{$ENDIF}{$ENDIF}
 
 {$IFDEF !HAD_HINTS}
   {$H+}

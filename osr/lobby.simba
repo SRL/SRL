@@ -22,7 +22,7 @@ function TRSLobby.IsOpen: Boolean; overload;
 var
   P: TPoint;
 begin
-  Result := srl.FindText(P, 'CLICK HERE TO PLAY', 'UpChars07_s', $FFFFFF, 0, Self.PlayBox);
+  Result := srl.FindText(P, 'CLICK HERE TO PLAY', 'UpChars07_s', $FFFFFF, 0, Self.PlayBox) and (P = [361, 333]);
 end;
 
 function TRSLobby.IsOpen(WaitTime: Int32): Boolean; overload;

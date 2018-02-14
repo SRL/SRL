@@ -58,7 +58,7 @@ function TRSLoginScreen.IsOpen: Boolean;
 var
   P: TPoint;
 begin
-  Result := srl.FindText(p, 'Click to switch', 'StatChars07', COL_LOGIN_WHITE, 1, Self.WorldBox);
+  Result := srl.FindText(p, 'Click to switch', 'StatChars07', COL_LOGIN_WHITE, 1, Self.WorldBox) and (P = [21, 485]);
 end;
 
 function TRSLoginScreen.IsWelcomeOpen: Boolean;
