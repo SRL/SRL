@@ -168,3 +168,26 @@ begin
   Arr := MM2MS.Run([Vec3(PT.x-2, PT.y-2), Vec3(PT.x+2, PT.y-2), Vec3(PT.x+2, PT.y+2), Vec3(PT.x-2, PT.y+2)], Roll);
   Result := GetTPABounds(arr);
 end;
+
+
+// Takes static minimap coordinate, rotates it to compass angle,
+// and returns mainscreen rectangle
+function TMinimap.StaticToMsRect(StaticMMPoint: TPoint; Height:Int32=0): TRectangle;
+var
+  angle: Double;
+begin
+  angle := Minimap.GetCompassAngle(False);
+  with StaticMMPoint.Rotate(angle, Point(MM2MS.MMCX, MM2MS.MMCY)) do
+    Result := Minimap.VecToMSRect(Vec3(X,Y, Height), angle);
+end;
+
+// Takes static minimap coordinate, rotates it to compass angle,
+// and returns mainscreen point
+function TMinimap.StaticToMs(StaticMMPoint: TPoint; Height:Int32=0): TPoint;
+var
+  angle: Double;
+begin
+  angle := Minimap.GetCompassAngle(False);
+  with StaticMMPoint.Rotate(angle, Point(MM2MS.MMCX, MM2MS.MMCY)) do
+    Result := Minimap.VecToMS(Vec3(X,Y, Height), angle);
+end;
