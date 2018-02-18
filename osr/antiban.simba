@@ -25,13 +25,18 @@ type
     TasksDone: TStringArray;
   end;
 
-{$IFDEF RSCLIENT}
-  {$DEFINE LOSE_FOCUS := RSClient.LoseFocus();}
-  {$DEFINE GAIN_FOCUS := RSClient.SetFocus();}
-{$ELSE}
-  {$DEFINE LOSE_FOCUS := srl.MouseOffClient();}
-  {$DEFINE GAIN_FOCUS := (*nothing*);}
-{$ENDIF}
+{$ifndef codeinsight}
+procedure TSRL.LoseFocus();
+begin
+  srl.MouseOffClient();
+  //this is just a stub - use rsclient for this funcionallity
+end;
+
+procedure TSRL.SetFocus();
+begin
+  //this is just a stub - use rsclient for this funcionallity
+end;
+{$endif}
 
 procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);
 var
@@ -177,9 +182,9 @@ end;
 procedure TAntiban.LoseFocus();
 begin
   DebugNote('[RND] Losing focus');
-  {$MACRO LOSE_FOCUS}
+  SRL.LoseFocus();
   WaitEx(20000, 2000);
-  {$MACRO GAIN_FOCUS}
+  SRL.SetFocus();
   Players.GetCurrent()^.Login();
   if Random(4)=0 then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
 end;
@@ -226,9 +231,9 @@ end;
 procedure TAntiban.VeryShortBreak();
 begin
   DebugNote('[RND] Taking a breather');
-  if(Random(2)=0) then {$MACRO LOSE_FOCUS}
+  if(Random(2)=0) then SRL.LoseFocus();
   WaitEx(40000,5000);
-  {$MACRO GAIN_FOCUS}
+  SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
   if Random(2) = 0 then Self.CheckSkill();
@@ -238,9 +243,10 @@ procedure TAntiban.FiveMinBreak();
 begin
   DebugNote('[RND] Taking 5 minutes');
   if(Random(2) = 0) then Logout.ClickLogout();
-  if(Random(2) = 0) then {$MACRO LOSE_FOCUS}
+  if(Random(2) = 0) then SRL.LoseFocus();
   WaitEx(ONE_MINUTE*5, ONE_MINUTE);
-  {$MACRO GAIN_FOCUS}
+  SRL.SetFocus
+  ();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
   if Random(2) = 0 then Self.CheckSkill();
@@ -257,9 +263,9 @@ begin
     WaitEx(1500,200);
     if(Random(8) = 0) then
     begin
-      if(Random(2) = 0) then {$MACRO LOSE_FOCUS}
+      if(Random(2) = 0) then SRL.LoseFocus();
       WaitEx(40000,4500);
-      {$MACRO GAIN_FOCUS}
+      SRL.SetFocus();
     end;
 
     if(Random(4) > 1) then
@@ -278,7 +284,7 @@ begin
 
   Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(len, Time_Formal_Long));
   if(Random() > Task.LogoutChance) then Logout.ClickLogout();
-  if(Random() > Task.LogoutChance) then {$MACRO LOSE_FOCUS}
+  if(Random() > Task.LogoutChance) then SRL.LoseFocus();
 
   while(len > 0) do
   begin
@@ -290,7 +296,7 @@ begin
     Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left');
   end;
 
-  {$MACRO GAIN_FOCUS}
+  SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
   if Random(2)=0 then Self.CheckSkill();
@@ -389,14 +395,14 @@ end;
 
 function TAntiban.ResidualBreakValue(): Int64;
 var
-  TwoHoursAgo: Int64 := GetTimeRunning() - ONE_HOUR*2;
+  TwoHoursAgo: Int64 := Max(0, GetTimeRunning() - ONE_HOUR*2);
   Rem: Double;
   i: Int32;
 begin
   for i:=0 to High(Self.Breaks) do
-    if Self.Breaks[i].PrevAtTime > TwoHoursAgo then
+    if Self.Breaks[i].PrevAtTime >= TwoHoursAgo then
     begin
-      Rem := Min(Abs(TwoHoursAgo), Abs(Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length));
+      Rem := Min(ONE_HOUR*2, Max(0,Self.Breaks[i].Length - Self.Breaks[i].PrevAtTime));
       Result += Trunc(Rem);
     end;
 end;
