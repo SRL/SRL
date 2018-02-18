@@ -345,10 +345,11 @@ begin
   Self.Breaks += Task;
 end;
 
+
+// checks for antibans, and breaks, and runs it if it should
 function TAntiban.DoAntiban(): Boolean;
 var
   i, PauseStart: Int32;
-
   procedure OffsetBreaks(UpTo, Length: Int32);
   var i:Int32;
   begin
@@ -384,6 +385,8 @@ begin
       end;
 end;
 
+
+// how long since last break, in ms
 function TAntiban.TimeSinceBreak(): UInt64;
 var i: Int32;
 begin
@@ -393,25 +396,34 @@ begin
   Result := GetTimeRunning() - Result;
 end;
 
-function TAntiban.ResidualBreakValue(): Int64;
+// The idea here is that we gather the time the past two hours that has
+// gone into being pauses.
+function TAntiban.BreaksPastTwoHours(): Int64;
 var
-  TwoHoursAgo: Int64 := Max(0, GetTimeRunning() - ONE_HOUR*2);
-  Rem: Double;
+  TwoHoursAgo: Int64 := GetTimeRunning() - ONE_HOUR*2;
+  active, started: Double;
   i: Int32;
 begin
+  Active := Min(ONE_HOUR*2, GetTimeRunning());
   for i:=0 to High(Self.Breaks) do
     if Self.Breaks[i].PrevAtTime >= TwoHoursAgo then
     begin
-      Rem := Min(ONE_HOUR*2, Max(0,Self.Breaks[i].Length - Self.Breaks[i].PrevAtTime));
-      Result += Trunc(Rem);
+      if Self.Breaks[i].PrevAtTime = 0 then
+        Continue;
+      started := Max(TwoHoursAgo, Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length);
+      Active -= Self.Breaks[i].PrevAtTime - started;
     end;
+  Result := Min(ONE_HOUR*2, Round(ONE_HOUR*2 - Active));
 end;
 
+// Combines ratio of pause to active past 2 hours, and time since last break
+// to produce a energy level that ranges from 0 to 100.
 function TAntiban.EnergyLevel(): Double;
 var
   eLeftFromBreak, eBreakValue: Double;
 begin
   eLeftFromBreak := 1-Power((Self.TimeSinceBreak() / (ONE_HOUR*12)), 1/3);
-  eBreakValue    := Min(1,Power(Self.ResidualBreakValue() / (ONE_HOUR*2), 1/2));
+  eBreakValue    := Min(1,Power(Self.BreaksPastTwoHours() / (ONE_HOUR*2), 1/2));
   Result := Max(0,Min(100, 100 * (eLeftFromBreak + eBreakValue) / 2));
 end;
+
