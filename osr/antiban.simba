@@ -1,15 +1,29 @@
+// Experimental antiban, and breaksystem.
+// Could contain some issues, and for that reason breaking changes may happen.
 type
   TAntibanTask = record
-    BaseInterval: Double;
-    NextAtTime: Double;
     Method: procedure of object;
+    Interval: Double;
+    StdVar: Double;
+    NextAtTime: Double;
+  end;
+
+  TBreakTask = record
+    Interval: Double;
+    Length: Double;
+    LogoutChance: Double;
+    StdVar: Double;
+    NextAtTime, PrevAtTime: Double;
   end;
 
   TAntiban = record
     ActiveSkill: Int32;
     Tasks: array of TAntibanTask;
+    Breaks: array of TBreakTask;
+
+    HistorySize: Int32;
     TasksDone: TStringArray;
-  end; 
+  end;
 
 {$IFDEF RSCLIENT}
   {$DEFINE LOSE_FOCUS := RSClient.LoseFocus();}
@@ -17,8 +31,8 @@ type
 {$ELSE}
   {$DEFINE LOSE_FOCUS := srl.MouseOffClient();}
   {$DEFINE GAIN_FOCUS := (*nothing*);}
-{$ENDIF} 
-  
+{$ENDIF}
+
 procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);
 var
   arr: TOptionArray;
@@ -136,22 +150,35 @@ begin
   end;
 end;
 
+
 // ------------------------------------------------------------------------
-// TAntiban
-procedure TAntiban.DebugNote(s: String);
+// utilities
+
+procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
+var
+  text: String;
 begin
-  Self.TasksDone += '['+FormatDateTime('hh:mm:ss', Now())+']' + s;
+  text := '['+FormatDateTime('hh:mm:ss', Now())+']' + s;
   if soDebugAntiban in srl.Options then
-    WriteLn(Self.TasksDone[High(Self.TasksDone)]);
-  if Length(Self.TasksDone) > 50 then
-    Self.TasksDone.Del(0);
+    WriteLn(text);
+
+  if AddToList then
+  begin
+    Self.TasksDone += text;
+    if Length(Self.TasksDone) > Self.HistorySize then
+      Self.TasksDone.Del(0);
+  end;
 end;
+
+
+// ------------------------------------------------------------------------
+// tasks
 
 procedure TAntiban.LoseFocus();
 begin
   DebugNote('[RND] Losing focus');
   {$MACRO LOSE_FOCUS}
-  WaitEx(19211,2000);
+  WaitEx(20000, 2000);
   {$MACRO GAIN_FOCUS}
   Players.GetCurrent()^.Login();
   if Random(4)=0 then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
@@ -179,8 +206,12 @@ procedure TAntiban.CheckStats();
 begin
   DebugNote('[RND] Look at Stats');
   Stats.Open();
-  WaitEx(3000,300);
-  if Random(2) = 0 then Inventory.Open();
+  if Random(4)=0 then
+    Stats.HoverSkill(Random(SKILL_TOTAL), srl.GaussRand(3000,300))
+  else
+    WaitEx(3000,300);
+  if Random(2) = 0 then
+    Inventory.Open();
 end;
 
 procedure TAntiban.OpenRandomTab();
@@ -200,7 +231,19 @@ begin
   {$MACRO GAIN_FOCUS}
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
-  Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
+  if Random(2) = 0 then Self.CheckSkill();
+end;
+
+procedure TAntiban.FiveMinBreak();
+begin
+  DebugNote('[RND] Taking 5 minutes');
+  if(Random(2) = 0) then Logout.ClickLogout();
+  if(Random(2) = 0) then {$MACRO LOSE_FOCUS}
+  WaitEx(ONE_MINUTE*5, ONE_MINUTE);
+  {$MACRO GAIN_FOCUS}
+  Players.GetCurrent()^.Login();
+  Wait(60,600, wdLeft);
+  if Random(2) = 0 then Self.CheckSkill();
 end;
 
 procedure TAntiban.DoMiscStuff();
@@ -221,55 +264,148 @@ begin
 
     if(Random(4) > 1) then
     begin
-      Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400), Random(5) > 1);
-      WaitEx(2500,300);
+      Self.CheckSkill();
+      WaitEx(2000,200);
     end;
   end;
 end;
 
-procedure TAntiban.TakeBreak();
+procedure TAntiban.TakeBreak(Task: TBreakTask);
+var
+  len: Int64;
 begin
-  DebugNote('[RND] Taking a longer break');
-  if(Random(2)=0) then Logout.ClickLogout();
-  if(Random(2)=0) then {$MACRO LOSE_FOCUS}
-  WaitEx(ONE_MINUTE*35,ONE_MINUTE*7);
+  len := Round(srl.GaussRand(Task.Length, Task.Length * Task.StdVar));
+
+  Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(len, Time_Formal_Long));
+  if(Random() > Task.LogoutChance) then Logout.ClickLogout();
+  if(Random() > Task.LogoutChance) then {$MACRO LOSE_FOCUS}
+
+  while(len > 0) do
+  begin
+    Wait(Trunc(Min(ONE_MINUTE*5, len)));
+    len -= Min(ONE_MINUTE*5, len);
+
+    if soDebugAntiban in srl.Options then
+      WriteLn(Self.TasksDone[High(Self.TasksDone)]);
+    Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left');
+  end;
+
   {$MACRO GAIN_FOCUS}
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
-  if Random(2) then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
+  if Random(2)=0 then Self.CheckSkill();
 end;
 
 
-function TAntiban.Init(Skill: Int32; Tasks: array of TAntibanTask=[]; IntervalRnd:Double=0.1): Boolean;
+// ----------------------------------------------------------------------------
+// TAntiban setup and such
+
+function TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean;
 var i: Int32;
 begin
   Self.ActiveSkill := Skill;
-  Self.Tasks := Tasks;
+  Self.HistorySize := LogSize;
+end;
 
+function TAntiban.RestartAntiban(): Boolean;
+var
+  i: Int32;
+begin
   for i:=0 to High(Self.Tasks) do
     with Self.Tasks[i] do
     begin
-      BaseInterval := srl.GaussRand(BaseInterval, BaseInterval*IntervalRnd);
-      NextAtTime   := GetTimeRunning() + Random() * BaseInterval;
+      if StdVar = 0 then StdVar := 0.1;
+      NextAtTime := GetTimeRunning() + Random() * Interval;
     end;
 end;
 
-function TAntiban.AddTask(Task: TAntibanTask; IntervalRnd:Double=0.1): Boolean;
+function TAntiban.AddTask(Task: TAntibanTask): Boolean;
 begin
-  Task.BaseInterval := srl.GaussRand(Task.BaseInterval, Task.BaseInterval*IntervalRnd);
-  Task.NextAtTime   := GetTimeRunning() + Random() * Task.BaseInterval;
+  with Task do
+  begin
+    if StdVar = 0 then StdVar := 0.1;
+    NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+  end;
   Self.Tasks += Task;
+end;
+
+function TAntiban.AddBreak(Task: TBreakTask): Boolean;
+begin
+  with Task do
+  begin
+    if StdVar = 0 then StdVar := 0.1;
+    NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+  end;
+  Self.Breaks += Task;
 end;
 
 function TAntiban.DoAntiban(): Boolean;
 var
-  i,j,PauseLen: Int32;
+  i, PauseStart: Int32;
+
+  procedure OffsetBreaks(UpTo, Length: Int32);
+  var i:Int32;
+  begin
+    for i:=0 to UpTo do
+      Self.Breaks[i].NextAtTime += Length;
+  end;
 begin
+  // check for antiban
   for i:=0 to High(Self.Tasks) do
     if GetTimeRunning() > Self.Tasks[i].NextAtTime then
+      with Self.Tasks[i] do
+      begin
+        Method();
+        NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+        Result := True;
+        i := -1;
+      end;
+
+  // check for breaks
+  for i:=0 to High(Self.Breaks) do
+    if GetTimeRunning() > Self.Breaks[i].NextAtTime then
+      with Self.Breaks[i] do
+      begin
+        NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+
+        PauseStart := GetTimeRunning();
+        Self.TakeBreak(Self.Breaks[i]);
+        OffsetBreaks(i, GetTimeRunning() - PauseStart );
+
+        PrevAtTime := GetTimeRunning();
+        Self.RestartAntiban();
+        Exit(True);
+      end;
+end;
+
+function TAntiban.TimeSinceBreak(): UInt64;
+var i: Int32;
+begin
+  for i:=0 to High(Self.Breaks) do
+    if(Self.Breaks[i].PrevAtTime >= Result) then
+      Result := Trunc(Self.Breaks[i].PrevAtTime);
+  Result := GetTimeRunning() - Result;
+end;
+
+function TAntiban.ResidualBreakValue(): Int64;
+var
+  TwoHoursAgo: Int64 := GetTimeRunning() - ONE_HOUR*2;
+  Rem: Double;
+  i: Int32;
+begin
+  for i:=0 to High(Self.Breaks) do
+    if Self.Breaks[i].PrevAtTime > TwoHoursAgo then
     begin
-      Self.Tasks[i].Method();
-      Self.Tasks[i].NextAtTime := GetTimeRunning() + srl.GaussRand(Self.Tasks[i].BaseInterval, Self.Tasks[i].BaseInterval*0.125);
-      Result := True;
+      Rem := Min(Abs(TwoHoursAgo), Abs(Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length));
+      Result += Trunc(Rem);
     end;
-end;  
+end;
+
+function TAntiban.EnergyLevel(): Double;
+var
+  eLeftFromBreak, eBreakValue: Double;
+begin
+  eLeftFromBreak := 1-Power((Self.TimeSinceBreak() / (ONE_HOUR*12)), 1/3);
+  eBreakValue    := Min(1,Power(Self.ResidualBreakValue() / (ONE_HOUR*2), 1/2));
+  Result := Max(0,Min(100, 100 * (eLeftFromBreak + eBreakValue) / 2));
+end;
