@@ -140,7 +140,6 @@ begin
 
     buffer.DrawBox(Box(0,z,W-1,H-1), True, HSLToColor(Hue, S*0.5, Min(24,L*0.7)));
     buffer.DrawTPA([[0,z],[W-1,z],[0,H-1],[W-1,H-1]], 0);
-    WriteLn(Light(Color));
 
     buffer.DrawPrecentBar(
       [5,5+z+zp], 220, 22, percent,    //pos, w,h, percent
