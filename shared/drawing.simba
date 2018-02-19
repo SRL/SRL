@@ -21,33 +21,7 @@ Integer constant that stores the shadow color for adding a shadow for text drawi
 const
   __SHADOW_COLOR = 65536;
 
-(*
-TMufasaBitmap.Clear
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: pascal
-
-    procedure TMufasaBitmap.Clear();
-
-Will clear the entire TMufasaBitmap
-
-.. note::
-
-    - by Ollybest
-    - Last Updated: 19 July 2013 by Ollybest
-
-Example:
-
-.. code-block:: pascal
-
-    image.clear();
-
-*)
-procedure TMufasaBitmap.Clear();
-begin
-  self.DrawClear(0);
-end;
-
+  
 (*
 TMufasaBitmap.FromClient
 ~~~~~~~~~~~~~~~~~~~
@@ -66,7 +40,32 @@ begin
   if (self <> nil) and (self.GetIndex() <> -1) then self.Free();
   self := GetMufasaBitmap(BitmapFromClient(Area));
 end;
+  
+(*
+TMufasaBitmap.Clear
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+    procedure TMufasaBitmap.Clear();
+
+Will clear the entire TMufasaBitmap
+
+.. note::
+
+    - by Ollybest
+    - Last Updated: 19 July 2013 by Ollybest
+
+Example:
+
+.. code-block:: pascal
+
+    image.Clear();
+
+*)
+procedure TMufasaBitmap.Clear();
+begin
+  self.DrawClear(0);
+end;
 
 (*
 TMufasaBitmap.ClearArea
@@ -93,6 +92,36 @@ Example:
 procedure TMufasaBitmap.ClearArea(area: TBox);
 begin
   self.Rectangle(area, 0);
+end;
+
+
+(*
+TMufasaBitmap.ClearAllBut
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TMufasaBitmap.ClearAllBut(Area: TBox);
+
+Will clear the image, except for the given area.
+*)
+procedure TMufasaBitmap.ClearAllBut(Area: TBox);
+var
+  CL: TBox;
+begin
+  CL := [0, 0, Self.GetWidth()-1, Self.GetHeight()-1];
+  Area.X1 := Max(CL.X1, Area.X1-1); 
+  Area.X2 := Min(CL.X2, Area.X2+1);
+  Area.Y1 := Max(CL.Y1, Area.Y1-1); 
+  Area.Y2 := Min(CL.Y2, Area.Y2+1);
+  
+  Self.Rectangle(TBox([CL.X1,   CL.Y1,   Area.x1, Area.y1]), 0);  //Top Left
+  Self.Rectangle(TBox([CL.X1,   Area.y1, Area.x1, Area.y2]), 0);  //Mid Left
+  Self.Rectangle(TBox([CL.X1,   Area.y1, Area.x1, CL.y2  ]), 0);  //Btm Left
+  Self.Rectangle(TBox([Area.x1, CL.Y1,   Area.x2, Area.y1]), 0);  //Top Mid
+  Self.Rectangle(TBox([Area.x1, Area.y2, Area.x2, CL.y2  ]), 0);  //Btm Mid
+  Self.Rectangle(TBox([Area.x2, CL.Y1,   CL.x2,   Area.y1]), 0);  //Top Right
+  Self.Rectangle(TBox([Area.x2, Area.y1, CL.x2,   Area.y2]), 0);  //Mid Right
+  Self.Rectangle(TBox([Area.x2, Area.y1, CL.x2,   CL.y2  ]), 0);  //Btm Right
 end;
 
 (*
