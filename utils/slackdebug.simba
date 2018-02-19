@@ -107,7 +107,7 @@ begin
   Self.DrawText(rText,Point(pt.x+w-5,ty), PROGGY_FONT, $FFFFFF, 1, True, 4);
 end;
 
-function TMufasaBitmap.DrawProggyAt(At: TPoint; Color:Int32; CurrentXP, GainedXP, Objectives: Int32; Skill:String=''): TBox;
+function TMufasaBitmap.DrawSkillReport(At: TPoint; Color:Int32; CurrentXP, GainedXP, Objectives: Int32; Skill:String=''): TBox;
 var
   w,h,z,zp,currLvl,atNextLvl,atCurrLvl,rem,percent: Int32;
   runtime: UInt32;
