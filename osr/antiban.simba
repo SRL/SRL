@@ -183,7 +183,7 @@ procedure TAntiban.LoseFocus();
 begin
   DebugNote('[RND] Losing focus');
   SRL.LoseFocus();
-  WaitEx(20000, 2000);
+  WaitEx(15000, 2000);
   SRL.SetFocus();
   Players.GetCurrent()^.Login();
   if Random(4)=0 then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
@@ -232,7 +232,7 @@ procedure TAntiban.VeryShortBreak();
 begin
   DebugNote('[RND] Taking a breather');
   if(Random(2)=0) then SRL.LoseFocus();
-  WaitEx(40000,5000);
+  WaitEx(30000,5000);
   SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);

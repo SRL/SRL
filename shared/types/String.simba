@@ -325,7 +325,7 @@ end;
 (*
   Extract all the numbers found in the string.
 *)
-function String.ExtractNumbers(): TExtendedArray; constref;
+function AnsiString.ExtractNumbers(): TExtendedArray; constref;
 var
   i,c,l:Int32;
   Tmp: TStringArray;

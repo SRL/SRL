@@ -18,7 +18,7 @@ type
  procedure TRSCombat.__setup();
  function TRSCombat.Open(): Boolean;
  function TRSCombat.IsOpen(): Boolean;
- function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
  function TRSCombat.GetCombatLevel(): Int32;
  function TRSCombat.GetWeapon(): String;
 }
@@ -32,16 +32,16 @@ var
   Combat: TRSCombat;
 
 (*
-type ECombatButton
+type ECombatStyle
 ~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  ECombatButton = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
+  ECombatStyle = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
 
 identifiers that is used for pressing the different buttons in the combat interface
 *) 
 type
-  ECombatButton = (
+  ECombatStyle = (
     cbtAccurate, 
     cbtAggressive, 
     cbtControlled, 
@@ -114,11 +114,11 @@ Combat.ToggleButton
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+  function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the given button ``btn`` (if needed) to the given state ``enable``.
 *)
-function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
 var 
   state:boolean;
   t:UInt64;
