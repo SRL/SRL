@@ -42,7 +42,7 @@ begin
   BoxBitmap := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
   GetBitmapSize(BoxBitmap, BoxBitmap_Width, BoxBitmap_Height);
-  MouseSpeed := Random(7,9);
+  MouseSpeed := Random(8,10);
 end;
 
 procedure TRSChooseOption.__Free();
@@ -256,23 +256,29 @@ function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse
 var
   choices: TOptionArray;
   i,j,l: Int32;
-  waitOffset: Int64;
-
-  procedure RestMouse(Sender: Pointer; X,Y: Int32); static;
-  begin
-    if Random(300) = 0 then
-      WaitEx(500,90);
-  end;
 
   function SelectOption(i: Int32): Boolean;
   var
     Mouse: TMouse;
+    r,j: Int32;
   begin
     WaitEx(80,30);
     Mouse.Setup();
-    Mouse.Speed   := Self.MouseSpeed;
-    Mouse.OnMoved := Pointer(@RestMouse);
-    Mouse.Click(choices[i].Bounds, mouseAction);
+    Mouse.Speed := Self.MouseSpeed;
+
+    repeat
+      if Random() > 0.5 then
+      begin
+        r := Round(srl.SkewedRand(r+6,r+0,High(choices)));
+        if r < i then
+        begin
+          Mouse.Move(choices[r].Bounds, False, rndSkewed);
+          Wait(250,900, wdLeft);
+        end;
+      end;
+    until (Random() > 0.10) or (r >= i);
+
+    Mouse.Click(choices[i].Bounds, mouseAction, False, rndSkewed);
     Result := self.IsClosed();
   end;
 

@@ -226,10 +226,8 @@ begin
   if (Self.GetPosition() <> P) then
   begin
     Self.Move(P.X, P.Y);
-
-    Wait(15, 90);
+    Wait(Trunc(srl.SkewedRand(50,15,250)));
   end;
-
   Self.Click(Button);
 end;
 

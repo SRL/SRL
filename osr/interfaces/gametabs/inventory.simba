@@ -337,7 +337,7 @@ Examples:
 *)
 procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
-  idx: Int32;
+  idx,swt: Int32;
 label
   START;
 begin
@@ -349,16 +349,19 @@ begin
   if shiftDrop then
   begin
     Keyboard.KeyDown(VK_SHIFT);
-    WaitEx(120,10);
+    WaitEx(110,10);
   end;
 
   for idx in Slots do
     if self.IsSlotValid(idx) and self.IsSlotUsed(idx, False) then
     begin
       Mouse.Move(self.FSlots[idx]);
+
       if (UpText <> []) then
       begin
-        Wait(Random(70,100)); //for uptext to refresh
+        swt := GetTimeRunning() + 50;
+        Wait(0,250,wdLeft);                //for uptext to refresh, and antiban
+        Wait(Max(1,swt-GetTimeRunning())); //we need min 50ms tho
         if not mainscreen.IsUpText(UpText) then
           Continue;
       end;
@@ -374,7 +377,7 @@ begin
           goto START;
         end;
       end;
-      WaitEx(80,10);
+      Wait(0,250,wdLeft);
     end;
 
   if ShiftDrop then
