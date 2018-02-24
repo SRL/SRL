@@ -423,3 +423,18 @@ begin
   Result := Max(0,Min(100, 100 * (eLeftFromBreak + eBreakValue) / 2));
 end;
 
+// Energy based wait, if energy is 100% then wait length is 0.
+// It scales exponentially, by default (Exp = 0.2):
+//   1%  of the length at 97% energy
+//   11% of the length at 75% energy
+//   25% of the length at 50% energy
+//   48% of the length at 25% energy
+//   73% of the length at 10% energy
+//   90% of the length at 5%  energy
+procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.2);
+begin
+  System.Wait(Trunc(2*t * (1-Power(System.Max(0.0001, Self.EnergyLevel()/100),Exp))));
+end;
+
+
+
