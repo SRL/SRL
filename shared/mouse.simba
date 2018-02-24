@@ -217,7 +217,7 @@ end;
 procedure TMouse.Click(Button: Integer);
 begin
   Self.Hold(Button);
-  Wait(Trunc(srl.SkewedRand(50,15,370)));
+  Wait(Trunc(srl.SkewedRand(60,45,350)));
   Self.Release(Button);
 end;
 
@@ -226,7 +226,7 @@ begin
   if (Self.GetPosition() <> P) then
   begin
     Self.Move(P.X, P.Y);
-    Wait(Trunc(srl.SkewedRand(50,15,250)));
+    Wait(Trunc(srl.SkewedRand(50,10,250)));
   end;
   Self.Click(Button);
 end;
