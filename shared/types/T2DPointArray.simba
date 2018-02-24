@@ -195,12 +195,12 @@ begin
   self := tmp;
 end;
 
-procedure T2DPointArray.SortByMiddle(From: TPoint); overload;
+procedure T2DPointArray.SortByMiddle(From: TPoint);
 begin
   SortATPAFromMidPoint(Self, From);
 end;
 
-procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0); overload;
+procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0);
 var
   i: Int32;
   weight: TIntegerArray;
@@ -213,6 +213,11 @@ begin
     weight[i] := Round(Sqr(From.x - self[i][Index].x) + Sqr(From.y - self[i][Index].y));
   end;
   QuickATPASort(weight, self, 0, High(self), True);
+end;
+
+procedure T2DPointArray.SortBySize(Size:Int32=0; ClosestFirst: Boolean=False);
+begin
+  SortATPAFromSize(Self, Size, ClosestFirst);
 end;
 
 
