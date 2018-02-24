@@ -565,6 +565,21 @@ begin
   end;
 end;
 
+
+(*
+Inventory.Use
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Use(Slot: Int32): Boolean;
+
+RS correct alias for Inventory.ActivateSlot.
+*)
+function TRSInventory.Use(Slot: Int32): Boolean;
+begin
+  Result := Self.ActivateSlot(Slot);
+end;
+
 (*
 Inventory.ActivateSlot
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -609,20 +624,6 @@ begin
     Result := True;
   end else
     Result := ChooseOption.Select(['Use']);
-end;
-
-(*
-Inventory.Use
-~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSInventory.Use(Slot: Int32): Boolean;
-
-RS correct alias for Inventory.ActivateSlot.
-*)
-function TRSInventory.Use(Slot: Int32): Boolean;
-begin
-  Result := ActivateSlot(Slot);
 end;
 
 
