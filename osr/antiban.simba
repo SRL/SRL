@@ -245,8 +245,7 @@ begin
   if(Random(2) = 0) then Logout.ClickLogout();
   if(Random(2) = 0) then SRL.LoseFocus();
   WaitEx(ONE_MINUTE*5, ONE_MINUTE);
-  SRL.SetFocus
-  ();
+  SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
   if Random(2) = 0 then Self.CheckSkill();
@@ -290,10 +289,7 @@ begin
   begin
     Wait(Trunc(Min(ONE_MINUTE*5, len)));
     len -= Min(ONE_MINUTE*5, len);
-
-    if soDebugAntiban in srl.Options then
-      WriteLn(Self.TasksDone[High(Self.TasksDone)]);
-    Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left');
+    Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left', False);
   end;
 
   SRL.SetFocus();
