@@ -343,7 +343,7 @@ end;
 
 
 // checks for antibans, and breaks, and runs it if it should
-function TAntiban.DoAntiban(): Boolean;
+function TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
 var
   i, PauseStart: Int32;
   procedure OffsetBreaks(UpTo, Length: Int32);
@@ -365,20 +365,21 @@ begin
       end;
 
   // check for breaks
-  for i:=0 to High(Self.Breaks) do
-    if GetTimeRunning() > Self.Breaks[i].NextAtTime then
-      with Self.Breaks[i] do
-      begin
-        NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+  if CheckBreaks then
+    for i:=0 to High(Self.Breaks) do
+      if GetTimeRunning() > Self.Breaks[i].NextAtTime then
+        with Self.Breaks[i] do
+        begin
+          NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
 
-        PauseStart := GetTimeRunning();
-        Self.TakeBreak(Self.Breaks[i]);
-        OffsetBreaks(i, GetTimeRunning() - PauseStart );
+          PauseStart := GetTimeRunning();
+          Self.TakeBreak(Self.Breaks[i]);
+          OffsetBreaks(i, GetTimeRunning() - PauseStart );
 
-        PrevAtTime := GetTimeRunning();
-        Self.RestartAntiban();
-        Exit(True);
-      end;
+          PrevAtTime := GetTimeRunning();
+          Self.RestartAntiban();
+          Exit(True);
+        end;
 end;
 
 
