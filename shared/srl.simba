@@ -13,12 +13,15 @@ type
     DebugLevel: Int32;
     StartTime: UInt64;
     DefaultClientBounds: TBox;
+
     OnSetup: procedure;
     OnLoginPlayer: procedure();
     OnLoginResponse: function(Response: String): Boolean;
     OnFatalMessage: procedure(Message: String);
     CloseInterfacesWithEscape: Boolean;
- end;
+
+    GAUSS_CUTOFF: Double;
+  end;
 
 var
   srl: TSRL;
@@ -97,6 +100,7 @@ begin
   srl.DebugLevel := 0;
   srl.StartTime := GetTickCount();
   srl.Options := SRL_DEFAULT_OPTIONS;
+  srl.GAUSS_CUTOFF := 4.5;
 end;
 
 
