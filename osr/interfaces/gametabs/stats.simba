@@ -296,16 +296,16 @@ Stats.HoverSkill
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
+  function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True): TSkillInfo;
 
-Holds the mouse over the given skill.
+Holds the mouse over the given skill. Returns skill info, in case you care about it.
 *)
-procedure TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
+function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True): TSkillInfo;
 var
   old: EGametab;
 begin
   old := Gametabs.GetCurrent();
-  Stats.GetSkillInfo(Skill);
+  Result := Stats.GetSkillInfo(Skill);
   Wait(Max(0,Round(HoverTime)));
   if (ReturnToCurrentTab) then
     Gametabs.Open(old);
