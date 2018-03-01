@@ -17,7 +17,7 @@ type
   end;
 
   TAntiban = record
-    ActiveSkill: Int32;
+    ActiveSkills: TIntArray;
     Tasks: array of TAntibanTask;
     Breaks: array of TBreakTask;
 
@@ -54,12 +54,12 @@ begin
     if Length(TPA) = 0 then Exit;
 
     pt := TPA[Random(0,High(TPA))];
-    pt := Minimap.VecToMs(Vec3(pt.x,pt.y,2));
-
+    pt := srl.RandomPoint(Minimap.VecToMsRect(Vec3(pt.x,pt.y,2)));
+    
     if not MainScreen.GetBounds.Contains(pt) then
       Continue;
 
-    Mouse.Move(pt,8);
+    Mouse.Move(pt);
     WaitEx(70,10);
     if (Random()*100 <= OptionChance) and (MainScreen.IsUpText('level')) then
     begin
@@ -186,7 +186,6 @@ begin
   WaitEx(15000, 2000);
   SRL.SetFocus();
   Players.GetCurrent()^.Login();
-  if Random(4)=0 then Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(3000,400));
 end;
 
 procedure TAntiban.HoverPlayers();
@@ -196,15 +195,27 @@ begin
 end;
 
 procedure TAntiban.CheckSkill();
+var
+  Skill:Int32;
 begin
   DebugNote('[RND] Check Skill Stats');
-  Stats.HoverSkill(Self.ActiveSkill, srl.GaussRand(2500,300), Random(5) > 1);
+  if Length(ActiveSkills) > 0 then
+  begin
+    Skill := Self.ActiveSkills[Random(Length(Self.ActiveSkills))];
+    Stats.HoverSkill(Skill, srl.GaussRand(2500,300), Random(3)=0);
+  end;
 end;
 
 procedure TAntiban.RandomCompass();
 begin
   DebugNote('[RND] Rotate Compass');
   Minimap.RandomCompass(-180,180, Random(5)=0);
+end;
+
+procedure TAntiban.RandomCompassNESW();
+begin
+  DebugNote('[RND] Rotate Compass [N,E,S,W]');
+  Minimap.SetCompassAngle([0,270,180,90][Random(4)]+Random(-10,10), Random(5)=0);
 end;
 
 procedure TAntiban.CheckStats();
@@ -236,7 +247,7 @@ begin
   SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
-  if Random(2) = 0 then Self.CheckSkill();
+  if Random(4) = 0 then Self.CheckSkill();
 end;
 
 procedure TAntiban.FiveMinBreak();
@@ -248,7 +259,7 @@ begin
   SRL.SetFocus();
   Players.GetCurrent()^.Login();
   Wait(60,600, wdLeft);
-  if Random(2) = 0 then Self.CheckSkill();
+  if Random(4) = 0 then Self.CheckSkill();
 end;
 
 procedure TAntiban.DoMiscStuff();
@@ -267,9 +278,9 @@ begin
       SRL.SetFocus();
     end;
 
-    if(Random(4) > 1) then
+    if(Random(3) = 0) then
     begin
-      Self.CheckSkill();
+      Self.CheckStats();
       WaitEx(2000,200);
     end;
   end;
@@ -302,10 +313,10 @@ end;
 // ----------------------------------------------------------------------------
 // TAntiban setup and such
 
-function TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean;
+function TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
 var i: Int32;
 begin
-  Self.ActiveSkill := Skill;
+  Self.ActiveSkills := Skills;
   Self.HistorySize := LogSize;
 end;
 
@@ -384,44 +395,57 @@ end;
 
 
 // how long since last break, in ms
-function TAntiban.TimeSinceBreak(): UInt64;
+function TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
 var i: Int32;
 begin
   for i:=0 to High(Self.Breaks) do
-    if(Self.Breaks[i].PrevAtTime >= Result) then
+    if (Self.Breaks[i].Length >= LongerThan) and (Self.Breaks[i].PrevAtTime >= Result) then
       Result := Trunc(Self.Breaks[i].PrevAtTime);
   Result := GetTimeRunning() - Result;
 end;
 
-// The idea here is that we gather the time the past two hours that has
+
+// The idea here is that we gather the time the past ?? that has
 // gone into being pauses.
-function TAntiban.BreaksPastTwoHours(): Int64;
+function TAntiban.BreaksPast(Timespan: Double): Int64;
 var
-  TwoHoursAgo: Int64 := GetTimeRunning() - ONE_HOUR*2;
+  XHoursAgo: Double := GetTimeRunning() - Timespan;
   active, started: Double;
   i: Int32;
 begin
-  Active := Min(ONE_HOUR*2, GetTimeRunning());
+  Active := Min(Timespan, GetTimeRunning());
   for i:=0 to High(Self.Breaks) do
-    if Self.Breaks[i].PrevAtTime >= TwoHoursAgo then
+    if Self.Breaks[i].PrevAtTime >= XHoursAgo then
     begin
       if Self.Breaks[i].PrevAtTime = 0 then
         Continue;
-      started := Max(TwoHoursAgo, Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length);
+      started := Max(XHoursAgo, Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length);
       Active -= Self.Breaks[i].PrevAtTime - started;
     end;
-  Result := Min(ONE_HOUR*2, Round(ONE_HOUR*2 - Active));
+
+  Result := Round(Min(Timespan, Timespan - Active));
 end;
 
 // Combines ratio of pause to active past 2 hours, and time since last break
 // to produce a energy level that ranges from 0 to 100.
 function TAntiban.EnergyLevel(): Double;
 var
-  eLeftFromBreak, eBreakValue: Double;
+  zz: Int32;
+  t,eLeftFromSleep, eLeftFromBreak, eBreakValue: Double;
 begin
-  eLeftFromBreak := 1-Power((Self.TimeSinceBreak() / (ONE_HOUR*12)), 1/3);
-  eBreakValue    := Min(1,Power(Self.BreaksPastTwoHours() / (ONE_HOUR*2), 1/2));
-  Result := Max(0,Min(100, 100 * (eLeftFromBreak + eBreakValue) / 2));
+  eLeftFromBreak := Max(0,Min(1,1-Power((Self.TimeSinceBreak() / (18*ONE_HOUR)), 1/3)));
+  eBreakValue    := Power(Self.BreaksPast(2*ONE_HOUR) / (2*ONE_HOUR), 1/3);
+  Result         := Max(0,Min(1,(eLeftFromBreak + eBreakValue) / 1.8));
+
+  zz := High(Self.Breaks);
+  if (Self.Breaks[zz].Length) > 5*ONE_HOUR then // if we have a sleep
+  begin
+    t := GetTimeRunning() - Trunc(Self.Breaks[zz].PrevAtTime);
+    eLeftFromSleep := Max(0,Min(1,t / (20*ONE_HOUR)));
+    eLeftFromSleep := Power(1-eLeftFromSleep, 1/4);
+    Result := eLeftFromSleep * Result;
+  end;
+  Result := 100 * Result;
 end;
 
 // Energy based wait, if energy is 100% then wait length is 0.
