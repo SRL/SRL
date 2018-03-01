@@ -320,23 +320,18 @@ begin
   Self.HistorySize := LogSize;
 end;
 
-function TAntiban.RestartAntiban(): Boolean;
-var
-  i: Int32;
+function TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
+var i: Int32;
 begin
-  for i:=0 to High(Self.Tasks) do
-    with Self.Tasks[i] do
-    begin
-      if StdVar = 0 then StdVar := 0.1;
-      NextAtTime := GetTimeRunning() + Random() * Interval;
-    end;
+  Self.ActiveSkills := [Skill];
+  Self.HistorySize := LogSize;
 end;
 
 function TAntiban.AddTask(Task: TAntibanTask): Boolean;
 begin
   with Task do
   begin
-    if StdVar = 0 then StdVar := 0.1;
+    if StdVar = 0 then StdVar := 0.25;
     NextAtTime := GetTimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
   end;
   Self.Tasks += Task;
@@ -352,6 +347,14 @@ begin
   Self.Breaks += Task;
 end;
 
+// resets all antibans, but to a completely randomized start time.
+function TAntiban.RestartAntiban(): Boolean;
+var i: Int32;
+begin
+  for i:=0 to High(Self.Tasks) do
+    with Self.Tasks[i] do
+      NextAtTime := GetTimeRunning() + Random() * Interval;
+end;
 
 // checks for antibans, and breaks, and runs it if it should
 function TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
