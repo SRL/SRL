@@ -12,6 +12,7 @@ const
   clProgYellow = $16D4F4;
   clProgGray   = $B4BCBE;
 
+
 function TFont.Create(name:String; size:Int32; fs:TFontStyles; fq:TFontQuality): TFont; static;
 begin
   Result.Init();
@@ -21,6 +22,7 @@ begin
   Result.SetQuality(fq);
   Result.SetColor($FFFFFF);
 end;
+
 
 var
   PROGGY_FONT := TFont.Create('Tahoma', 7, [fsBold], fqCleartype);
@@ -157,11 +159,11 @@ begin
     buffer.DrawTextNL(txt2, Point(115,24+z), PROGGY_FONT, $FFFFFF, 0, True, 4);
 
     if Skill <> '' then
-      buffer.DrawText(Skill, Point(5,0), PROGGY_FONT, $FFFFFF, 0, True, 4);
+      buffer.DrawText(Skill, Point(5,0), PROGGY_FONT, $FFFFFF);
 
     buffer.DrawTransparent(At.X,At.Y, Self);
   except
-    WriteLn('Error: Something went wrong');
+    WriteLn('Error: DrawSkillReport -> Something went wrong');
   finally
     buffer.Free();
   end;
