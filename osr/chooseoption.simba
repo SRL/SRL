@@ -282,9 +282,9 @@ begin
 
     if (not didRnd) then
     begin
-      avg := choices[Random(Max(ID-1,0), Min(L-1,ID+2))].Bounds;
+      avg := choices[Max(0,Min(L-1,srl.NormalRange(ID-2, ID+2)))].Bounds;
       Mouse2.Move(avg,False,rndSkewed);
-      WaitEx(90,30);
+      WaitEx(80,20);
       with choices[ID].Bounds do with Mouse2.GetPosition() do
         avg := [Max(X-10,X1), Y1, Min(X+10,X2), Y2];
       Mouse2.Move(avg,False,rndSkewed);
