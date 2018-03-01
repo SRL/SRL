@@ -151,7 +151,7 @@ begin
   Result := True;      
 end;
 
-function T2DPointArray.Merge(): TPointArray;
+function T2DPointArray.Merge(): TPointArray; constref;
 begin
   Result := MergeATPA(self);    
 end;
