@@ -76,34 +76,43 @@ begin
   Result.Y := (Top.Y + Right.Y + Btm.Y + Left.Y) div 4;
 end;
 
+function TRectangle.FixOrder(): TRectangle; constref;
+type T4PTS = array [0..3] of TPoint;
+var
+  i,t: Int32;
+  pts: T4PTS;
+begin
+  pts := T4PTS(Self);
+  for i:=1 to High(pts) do
+    if (pts[i].y < pts[t].y) or ((pts[i].y = pts[t].y) and (pts[i].x < pts[t].x)) then
+      t := i;
+
+  Result.Top   := pts[t];
+  Result.Right := pts[(t+1) mod 4];
+  Result.Btm   := pts[(t+2) mod 4];
+  Result.Left  := pts[(t+3) mod 4];
+end;
+
 (*
 TRectangle.Rotate
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
-    function TRectangle.Rotate(angle: Double): TRectangle; constref;
+    function TRectangle.Rotate(Angle: Double): TRectangle; constref;
 Returns a rotated copy of the rectangle
 *)
-function TRectangle.Rotate(angle: Double): TRectangle; constref;
+function TRectangle.Rotate(Angle: Double): TRectangle; constref;
 var
   i,topI: Int32;
   TPA: TPointArray;
 begin
   with Self.Mean() do
   begin
-    TPA += RotatePoint(Self.Top,  angle, x,y);
-    TPA += RotatePoint(Self.Right,angle, x,y);
-    TPA += RotatePoint(Self.Btm,  angle, x,y);
-    TPA += RotatePoint(Self.Left, angle, x,y);
+    Result.Top   := RotatePoint(Self.Top,  Angle, X,Y);
+    Result.Right := RotatePoint(Self.Right,Angle, X,Y);
+    Result.Btm   := RotatePoint(Self.Btm,  Angle, X,Y);
+    Result.Left  := RotatePoint(Self.Left, Angle, X,Y);
   end;
-
-  for i:=1 to High(TPA) do
-    if TPA[i].y < TPA[topI].y then
-      topI := i;
-
-  Result.Top   := TPA[topI];
-  Result.Right := TPA[(topI+1) mod 4];
-  Result.Btm   := TPA[(topI+2) mod 4];
-  Result.Left  := TPA[(topI+3) mod 4];
+  Result := Result.FixOrder();
 end;
 
 (*
