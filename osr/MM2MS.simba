@@ -1,53 +1,66 @@
 (*
 MM2MS
 =======
-The core for out minimap to mainscreen projection.
+The core for our minimap to mainscreen projection.
+Supports rotation, and zoom, and resizable client.
 *)
 type
   TMinimapToMS = record
-    BASE_W, BASE_H: Int32;      // the size of the area we project to - static
-    MSCX, MSCY: Int32;          // mainscreen center
-    MMCX, MMCY: Int32;          // minimap center
-    SCALE: Double;              // direct zoom (relates to BASE)
+    BASE_W, BASE_H: Int32;        // the size of the area we project to (mainscreen size)
+    MSCX, MSCY: Int32;            // the center of the area we project to (mainscreen center)
+    MMCX, MMCY: Int32;            // the center of the area we project from (minimap center)
+    SCALE_MIN, SCALE_MAX: Double; // direct zoom (relates to BASE)
+    ZOOM: Double;                 // current zoom
+    YSHIFT: Double;               // zooming may cause mid-Y to shift
   end;
 
 
-const
-  // Fixed OSRS client
-  MM2MS_FIXED_CLIENT: TMinimapToMS = [
-    513, 335,
-    259, 172,
-    642, 84,
-    1.0
-  ];
-  
-  // Resizable OSRS within smart [so it's fixed]
-  MM2MS_RESIZABLE_CLIENT1: TMinimapToMS = [
-    513, 335,
-    388, 256,
-    693, 85,
-    1.1
-  ];
-
-
+function TMinimapToMS.Init(Resizable: Boolean): TPointArray;
 var
-  MM2MS: TMinimapToMS = MM2MS_FIXED_CLIENT;
+  B: TBox;
+begin
+  if not Resizable then
+  begin
+    Self := [
+      513, 335,     // ms size
+      259, 172,     // ms center
+      642, 84,      // mm center
+      1.0, 3.5,     // scale min, scale max
+      0.0,          // current zoom
+      12            // zoom Y offset (imperfect)
+    ];
+  end else
+  begin
+    B := GetClientBounds();
+    Self := [
+      513, 335,
+      B.Middle.X, B.Middle.Y,
+      B.X2 - 81, B.Y2 - 81,
+      1.10 * B.Height / 503, 4.4 * B.Height / 503,
+      0.0,
+      24
+    ];
+  end;
+end;
 
 
 function TMinimapToMS.Transform(coord: Vector3; matrix: TMatrix4): Vector3;
-var p: Vector3;
+var
+  p: Vector3;
+  scale: Double;
 begin
+  scale := SCALE_MIN + ZOOM * (SCALE_MAX-SCALE_MIN);
   p := Vector3.TransformCoordinate(coord, matrix);
-  Result.x := (+p.X * BASE_W * SCALE) + MSCX;
-  Result.y := (-p.Y * BASE_H * SCALE) + MSCY;
+  Result.x := (+p.X * BASE_W * scale) + MSCX;
+  Result.y := (-p.Y * BASE_H * scale) + MSCY + (zoom*YSHIFT);
 end;
 
 function TMinimapToMS.Project(coords: Vector3Array; Rotation: Vector3): TPointArray;
 var
   vec: Vector3;
   viewMatrix, projMatrix, worldMatrix,transMatrix: TMatrix4;
-begin
-  viewMatrix := TMatrix4.LookAtRH([0,-22,52], [0,0,0], Vector3_UnitY);
+begin           //low angle test  [0,-28.5,13]
+  viewMatrix := TMatrix4.LookAtRH([0,-21,  53], [0,0,1.3], Vector3_UnitY);
   projMatrix := TMatrix4.PerspectiveFovRH(Sqrt(2), 765/503, 0.01, 1.0);
 
   worldMatrix := TMatrix4.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix_Identity;
@@ -69,9 +82,24 @@ begin
   Result := Project(Arr, Vec3(0, 0, PI*2 - Roll));
 end;
 
+function TMinimapToMS.SetZoom(ZoomLevel: Double): TPointArray;
+begin
+  Self.ZOOM := ZoomLevel / 100;
+end;
 
-// --------------------------------------------------------------------------------------------------------------
-// Extend the minimap-funcionallity with MM2MS functions
+
+var
+  MM2MS: TMinimapToMS;
+begin
+  MM2MS.Init(False);
+end;
+
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Extend the minimap-functionality with MM2MS functions
+
 
 // Takes array, returns projected array
 function TMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
@@ -157,7 +185,6 @@ begin
   Result := GetTPABounds(arr);
 end;
 
-// Takes single point, returns a box
 function TMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
 var
   arr: TPointArray;
