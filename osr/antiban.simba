@@ -624,7 +624,7 @@ end;
 
 procedure TAntiban.FiveMinBreak();
 begin
-  Self.TakeBreak([0, FIVE_MINUTES, 0.33, 0.50]);
+  Self.TakeBreak([0, FIVE_MINUTES, 0.50, 0.50]);
 end;
 
 procedure TAntiban.DoMiscStuff();
