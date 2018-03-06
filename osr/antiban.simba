@@ -624,7 +624,7 @@ end;
 
 procedure TAntiban.FiveMinBreak();
 begin
-  Self.TakeBreak([0, FIVE_MINUTES, 0.33, 0.25]);
+  Self.TakeBreak([0, FIVE_MINUTES, 0.33, 0.50]);
 end;
 
 procedure TAntiban.DoMiscStuff();
@@ -665,8 +665,8 @@ begin
   len := Round(srl.GaussRand(Task.Length, Task.Length * Task.StdVar));
 
   Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(len, Time_Formal_Long));
-  if(Random() > Task.LogoutChance) then Logout.ClickLogout();
-  if(Random() > Task.LogoutChance) then SRL.LoseFocus();
+  if(Random() < Task.LogoutChance) then Logout.ClickLogout();
+  if(Random() < Task.LogoutChance) then SRL.LoseFocus();
 
   while(len > 0) do
   begin
