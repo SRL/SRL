@@ -269,16 +269,14 @@ var
   end;
 
 var
-  area,step: Double;
+  area: Double;
 begin
-  Result := FindNearest(48, 16.0, Vec3(MM2MS.MMCX, MM2MS.MMCY), False);
-  area := 16;
-  step := 8;
-  while step > accuracy do
+  area := 48;
+  Result := FindNearest(area, area, Vec3(MM2MS.MMCX, MM2MS.MMCY), False);
+  while area > accuracy do
   begin
-    Result := FindNearest(area, step, Result, False);
+    Result := FindNearest(area, area, Result, False);
     area /= 2;
-    step /= 2;
   end;
   Result := FindNearest(area, accuracy, Result, True);
 end;
