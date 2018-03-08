@@ -102,7 +102,14 @@ end;
 (*
   Replace occurrences of the given SubStr with with ReplaceStr
   For larger string this algorithm is way faster than `Replace` in Simba.
+
+  Fix me!!!
 *)
+function AnsiString.Replace(SubStr, ReplaceStr: String; Flags: TReplaceFlags=[rfReplaceAll]): String; constref;
+begin
+  Result := StringReplace(Self, SubStr, ReplaceStr, Flags);
+end;
+{
 function AnsiString.Replace(SubStr, ReplaceStr: String; Flags: TReplaceFlags=[rfReplaceAll]): String; constref;
 var
   Hi,HiSub,HiRep,i,j,k: Integer;
@@ -122,7 +129,7 @@ begin
   
   k := 1;
   Prev := 1;
-  case (rfReplaceAll in Flags) and True of
+  case (rfReplaceAll in Flags) of
   True:
     begin
       //If substring and replacement string is only 1 char, then it's simpler:
@@ -154,7 +161,8 @@ begin
         end;
         Prev := Curr + HiSub;
       end;
-      MemMove(Self[Prev], Result[k], Hi-Prev+1);
+      if Prev <= Hi then
+        MemMove(Self[Prev], Result[k], Hi-Prev+1);
     end;
   False:
     begin
@@ -172,6 +180,7 @@ begin
     end;
   end;
 end;
+}
 
 (*
   Blow up the string at each delimiter into smaller strings
@@ -337,8 +346,11 @@ begin
     begin
       Tmp += Self[i];
       while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
-      if (i <= L) and (Self[i] = '.') then Tmp[c] += Self[i];
-      while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      if (i <= L) and (Self[i] = '.') then
+      begin
+        Tmp[c] += Self[i];
+        while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      end;
       if (i > L) then Break;
       Inc(c);
     end;
@@ -374,6 +386,7 @@ end;
 function AnsiString.FileExt(): String; constref;
 begin
   Result := ExtractFileExt(Self);
+  Delete(Result,1,1);
 end;
 
 function AnsiString.FileName(): String; constref;
