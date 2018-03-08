@@ -664,19 +664,20 @@ Example:
 procedure TMufasaBitmap.DrawClippedText(txt: string; pt: TPoint; font: string; shadow: boolean; color: TColor);
 var
   tpa, tpaShadow: TPointArray;
+  w,h: Int32;
 begin
-  tpa := TPAFromText(txt, font);
-  OffsetTPA(tpa, pt);
+  with client.GetMOCR() do TPA := TextToFontTPA(txt, font, w,h);
+  OffsetTPA(TPA, pt);
 
   if (shadow) then
   begin
     tpaShadow := CopyTPA(tpa);
     OffsetTPA(tpaShadow, point(1, 1));
-    filterPointsBox(tpaShadow, 0, 0, self.GetWidth() -1, self.GetHeight() -1);
+    FilterPointsBox(tpaShadow, 0, 0, self.GetWidth()-1, self.GetHeight()-1);
     self.DrawTPA(tpaShadow, __SHADOW_COLOR);
   end;
 
-  filterPointsBox(tpa, 0, 0, self.getWidth() -1, self.getHeight() -1);
+  FilterPointsBox(tpa, 0, 0, self.GetWidth()-1, self.GetHeight()-1);
   self.DrawTPA(tpa, color);
 end;
 
