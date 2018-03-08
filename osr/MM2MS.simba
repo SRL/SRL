@@ -104,7 +104,7 @@ end;
 
 
 // Takes array, returns projected array
-function TMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
+function TRSMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
 var
   i: Int32;
 begin
@@ -115,7 +115,7 @@ begin
   Result := MM2MS.Run(Arr, Roll);
 end;
 
-function TMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF): TPointArray; overload;
+function TRSMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF): TPointArray; overload;
 var
   VecArr: Vector3Array;
   i: Int32;
@@ -134,7 +134,7 @@ end;
 
 
 // Takes single point, returns single point
-function TMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF): TPoint;
+function TRSMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF): TPoint;
 begin
   if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
   Vec := Vec.RotateXY(PI*2 - Roll, MM2MS.MMCX, MM2MS.MMCY);
@@ -142,7 +142,7 @@ begin
   Result := MM2MS.Run([Vec], Roll)[0];
 end;
 
-function TMinimap.PointToMs(PT: TPoint; Roll:Single=$FFFF): TPoint;
+function TRSMinimap.PointToMs(PT: TPoint; Roll:Single=$FFFF): TPoint;
 begin
   if (Roll = $FFFF) then Roll := Self.GetCompassAngle(False);
   pt := pt.Rotate(PI*2 - Roll, Point(MM2MS.MMCX, MM2MS.MMCY));
@@ -152,7 +152,7 @@ end;
 
 
 // Takes single point, returns a rectangle
-function TMinimap.VecToMsRect(Vec: Vector3; Roll:Single=$FFFF): TRectangle;
+function TRSMinimap.VecToMsRect(Vec: Vector3; Roll:Single=$FFFF): TRectangle;
 var
   arr: TPointArray;
 begin
@@ -163,7 +163,7 @@ begin
   Result := [Arr[0], Arr[1], Arr[2], Arr[3]];
 end;
 
-function TMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF): TRectangle;
+function TRSMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF): TRectangle;
 var
   arr: TPointArray;
 begin
@@ -176,7 +176,7 @@ end;
 
 
 // Takes single point, returns a box
-function TMinimap.VecToMsBox(Vec: Vector3; Roll:Single=$FFFF): TBox;
+function TRSMinimap.VecToMsBox(Vec: Vector3; Roll:Single=$FFFF): TBox;
 var
   arr: TPointArray;
 begin
@@ -187,7 +187,7 @@ begin
   Result := GetTPABounds(arr);
 end;
 
-function TMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
+function TRSMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
 var
   arr: TPointArray;
 begin
@@ -201,7 +201,7 @@ end;
 
 // Takes static minimap coordinate, rotates it to compass angle,
 // and returns mainscreen rectangle
-function TMinimap.StaticToMsRect(StaticMMPoint: TPoint; Height:Int32=0): TRectangle;
+function TRSMinimap.StaticToMsRect(StaticMMPoint: TPoint; Height:Int32=0): TRectangle;
 var
   angle: Double;
 begin
@@ -212,7 +212,7 @@ end;
 
 // Takes static minimap coordinate, rotates it to compass angle,
 // and returns mainscreen point
-function TMinimap.StaticToMs(StaticMMPoint: TPoint; Height:Int32=0): TPoint;
+function TRSMinimap.StaticToMs(StaticMMPoint: TPoint; Height:Int32=0): TPoint;
 var
   angle: Double;
 begin

@@ -5,7 +5,7 @@ const
   DIR_WEST  = 270.0;
 
 type
-  EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun);
+  EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
   EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
 
 type
@@ -19,11 +19,11 @@ type
   TMMCompassInfo = record
     Middle: TPoint;
     Bounds: TBox;
-    Radius: Byte;
+    Radius: UInt8;
  end;
 
 type
-  TMinimap = record(TInterfaceBase)
+  TRSMinimap = record(TInterfaceBase)
     CompassInfo: TMMCompassInfo;
     OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
     MaskBMP: Int32;
@@ -32,14 +32,14 @@ type
  end;
 
 var
-  Minimap: TMinimap;
+  Minimap: TRSMinimap;
 
-procedure TMinimap.__Free();
+procedure TRSMinimap.__Free();
 begin
   FreeBitmap(Self.MaskBMP);
 end;
 
-procedure TMinimap.__Setup();
+procedure TRSMinimap.__Setup();
 begin
   with Self do
   begin
@@ -64,16 +64,23 @@ begin
 
     with OrbInfo[MMOrbPrayer] do
     begin
-      Middle := [557, 101];
-      Radius := 11;
-      TextBox := [521, 99, 540, 112];
+      Middle := [555, 91];
+      Radius := 13;
+      TextBox := [520, 89, 541, 102];
     end;
 
     with OrbInfo[MMOrbRun] do
     begin
-      Middle := [581, 136];
-      Radius := 11;
-      TextBox := [545, 135, 564, 148];
+      Middle := [566, 124];
+      Radius := 13;
+      TextBox := [530, 121, 551, 134];
+    end;
+
+    with OrbInfo[MMOrbSpecialAttack] do
+    begin
+      Middle := [587, 148];
+      Radius := 13;
+      TextBox := [552, 146, 573, 159];
     end;
 
     Self.MaskPoly := [
@@ -113,16 +120,16 @@ Minimap.GetMiddle
 ~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetMiddle: TPoint;
+    function TRSMinimap.GetMiddle: TPoint;
 
 Returns the center of the minimap
 *)
-function TMinimap.GetMiddle: TPoint; override;
+function TRSMinimap.GetMiddle: TPoint; override;
 begin
   Result := Self.Center;
 end;
 
-function TMinimap._GetOrbValue(const orb: EMinimapOrb): Integer;
+function TRSMinimap._GetOrbValue(const orb: EMinimapOrb): Int32;
 const
   IgnoreCols = [4938344, 0];
   Font = 'StatChars07';
@@ -151,11 +158,11 @@ Minimap.GetPrayerLevel
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetPrayerLevel(): Integer;
+    function TRSMinimap.GetPrayerLevel(): Int32;
 
 Returns your current prayer level
 *)
-function TMinimap.GetPrayerLevel(): Integer;
+function TRSMinimap.GetPrayerLevel: Int32;
 begin
   Result := Self._GetOrbValue(MMOrbPrayer);
 end;
@@ -165,11 +172,11 @@ Minimap.GetHPLevel
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetHPLevel(): Integer;
+    function TRSMinimap.GetHPLevel: Int32;
 
 Returns your current HP level
 *)
-function TMinimap.GetHPLevel(): Integer;
+function TRSMinimap.GetHPLevel: Int32;
 begin
   Result := Self._GetOrbValue(MMOrbHP);
 end;
@@ -179,11 +186,11 @@ Minimap.GetHPPercent
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetHPPercent(): Byte;
+    function TRSMinimap.GetHPPercent(): Int32;
 
 Returns your current HP level as a percentage `0..100`
 *)
-function TMinimap.GetHPPercent(): Byte;
+function TRSMinimap.GetHPPercent: Int32;
 var
   tb, b: TBox;
   TPA: TPointArray;
@@ -195,7 +202,30 @@ begin
   Result := 100 - Ceil((tb.y2 - tb.y1) / (b.y2 - b.y1) * 100);
 end;
 
-function TMinimap.IsPoisoned: Boolean;
+(*
+Minimap.GetSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSMinimap.GetSpecialAttack(): Int32;
+
+Returns your special attack.
+*)
+function TRSMinimap.GetSpecialAttack: Int32;
+begin
+  Result := Self._GetOrbValue(MMOrbSpecialAttack);
+end;
+
+(*
+Minimap.IsPoisoned
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSMinimap.IsPoisoned: Boolean;
+
+Returns true if you're poisoned by checking the minimap orb.
+*)
+function TRSMinimap.IsPoisoned: Boolean;
 var
   B: TBox;
 begin
@@ -205,9 +235,18 @@ begin
   Result := CountColorTolerance(101136, B, 85) > 0;
 end;
 
-procedure TMinimap.CurePoison;
+(*
+Minimap.CurePoison
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TRSMinimap.CurePoison;
+
+Clicks the hitpoints orb if currently poisoned.
+*)
+procedure TRSMinimap.CurePoison;
 begin
-  if (Self.IsPoisoned()) then
+  if Self.IsPoisoned() then
     with Minimap.OrbInfo[MMOrbHP] do
       Mouse.Click(Middle, Radius, mouse_Left);
 end;
@@ -217,11 +256,11 @@ Minimap.GetRunEnergy
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetRunEnergy(): Integer;
+    function TRSMinimap.GetRunEnergy(): Integer;
 
 Returns your current energy level 
 *)
-function TMinimap.GetRunEnergy(): Integer;
+function TRSMinimap.GetRunEnergy(): Integer;
 begin
   Result := Self._GetOrbValue(MMOrbRun);
 end;
@@ -231,11 +270,11 @@ Minimap.isPrayerEnabled
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+    function TRSMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
 
 Returns `True` if you have enabled it otherwise `False`.
 *)
-function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+function TRSMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
 var
   b: TBox;
 begin
@@ -253,17 +292,21 @@ Minimap.isRunEnabled
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
+    function TRSMinimap.isRunEnabled(WaitTime: Int32 = 0): Boolean;
 
 Returns `True` if you have enabled it otherwise `False`.
 *)
-function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
+function TRSMinimap.isRunEnabled(WaitTime: Int32 = 0): Boolean;
 var
-  b: TBox;
+  B: TBox;
 begin
-  with (Self.OrbInfo[MMOrbRun].Middle) do
-    b := [X - 8, Y - 8, X + 8, Y + 15];
-  Result := srl.WaitColorCount([101547, 40], b, @GreaterThan, 5, WaitTime);
+  with Self.OrbInfo[MMOrbRun] do
+  begin
+    B := [Middle.X, Middle.Y, Middle.X, Middle.Y];
+    B.Expand(Radius);
+  end;
+
+  Result := srl.WaitColorCount([101547, 40], B, @GreaterThan, 5, WaitTime);
 end;
 
 (*
@@ -271,11 +314,11 @@ Minimap.TogglePrayer
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+    function TRSMinimap.TogglePrayer(const Enable: Boolean): Boolean;
 
 A toggle to enable or disable prayer.
 *)
-function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+function TRSMinimap.TogglePrayer(const Enable: Boolean): Boolean;
 var t: TCountDown;
 begin
   if (Enable = Self.isPrayerEnabled()) then Exit(True);
@@ -294,11 +337,11 @@ Minimap.ToggleRun
 ~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+    function TRSMinimap.ToggleRun(const Enable: Boolean): Boolean;
 
 A toggle to enable or disable running.
 *)
-function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+function TRSMinimap.ToggleRun(const Enable: Boolean): Boolean;
 var t: TCountDown;
 begin
   if (Enable = Self.isRunEnabled()) then Exit(True);
@@ -317,11 +360,11 @@ Minimap.isPlayerMoving
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+    function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
 
 Returns `True` if your character is moving.
 *)
-function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
 begin
   with Self.Center do
     Result := srl.GetPixelShift([X - 35, Y - 35, X + 35, Y + 35], System.Random(300, 350)) >= MinShift;
@@ -332,11 +375,11 @@ Minimap.FindFlag
 ~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
+    function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
 
 Searches for the flag on a bitmap.
 *)
-function TMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
+function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
 const
   COL_DARK_POLE = 1127261;
   COL_LIGHT_POLE = 284358;
@@ -368,7 +411,7 @@ begin
   end;
 end;
 
-function TMinimap.FindFlag(out P: TPoint): Boolean; overload;
+function TRSMinimap.FindFlag(out P: TPoint): Boolean; overload;
 var
   B: TBox;
   BMP: Int32;
@@ -389,11 +432,11 @@ Minimap.isFlagPresent
 ~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
+    function TRSMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
 
 Returns True if the flag can be found on the minimap.. otherwise False.
 *)
-function TMinimap.isFlagPresent(WaitTime: Int32 = 0): Boolean;
+function TRSMinimap.isFlagPresent(WaitTime: Int32 = 0): Boolean;
 var
   T: UInt64;
   P: TPoint;
@@ -418,12 +461,12 @@ Minimap.WaitFlag
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
+    procedure TRSMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
 
 Waits while the flag distance is greater than `dist`. Timeout is ~20 seconds which
 is reset when flag distance has changed.
 *)
-procedure TMinimap.WaitFlag(Dist: Int32 = 0);
+procedure TRSMinimap.WaitFlag(Dist: Int32 = 0);
 var
   P: TPoint;
   TimeOut: TCountDown;
@@ -461,11 +504,11 @@ Minimap.WaitPlayerMoving
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+    procedure TRSMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
 
 Waits till your character is no longer moving.
 *)
-procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+procedure TRSMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
 var
   t: UInt64;
 begin
@@ -486,7 +529,7 @@ Minimap.WaitFlagEx
 
 .. code-block:: pascal
 
-    function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+    function TRSMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
 
 Extra WaitFlag method that Waits for the flag to disapear but will return if the
 position we walked to is where the flag was first clicked.
@@ -503,7 +546,7 @@ Example:
     else
       srl.Writeln('We have finished walking, but the flag moved alot so we didnt hit our target pos');
 *)
-function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+function TRSMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
 var
   OldPt, NewPt: TPoint;
   t: UInt64;
@@ -537,11 +580,11 @@ Minimap.GetCompassAngle
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+    function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 
 Returns the current compass angle, default as degrees.
 *)
-function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
 var
   north, south: TPoint;
   M: TPoint := Self.CompassInfo.Middle;
@@ -578,11 +621,11 @@ Minimap.MouseSetCompassAngle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
+    function TRSMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
 
 Some long code that does stuff.
 *)
-function TMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
+function TRSMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
 type
   EMoveDirection = (mdLeft, mdRight);
 const
@@ -679,7 +722,7 @@ begin
     end;
 end;
 
-procedure TMinimap.SetCompassAngle_Key(Degrees: Double);
+procedure TRSMinimap.SetCompassAngle_Key(Degrees: Double);
 var
   Keys: record Left, Right: Boolean; end;
 
@@ -733,7 +776,7 @@ begin
   end;
 end;
 
-procedure TMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
+procedure TRSMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
 begin
   case Mouse of
     True:
@@ -743,12 +786,12 @@ begin
   end;
 end;
 
-procedure TMinimap.ClickCompass;
+procedure TRSMinimap.ClickCompass;
 begin
   Mouse.Click(Self.CompassInfo.Middle, Self.CompassInfo.Radius, mouse_Left);
 end;
 
-function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+function TRSMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 const
   DOT_COLOR: array[EMinimapDotType] of Int32 = [$EEEEEE, $0000CC, $00CCCC];
   BORDER_COLOR = 65536;
@@ -787,17 +830,17 @@ begin
   FreeBitmap(BMP);
 end;
 
-function TMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+function TRSMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
 begin
   Result := Length(Self.GetDots(DotType, False)) >= MinCount;
 end;
 
-function TMinimap.isPointOn(P: TPoint): Boolean;
+function TRSMinimap.isPointOn(P: TPoint): Boolean;
 begin
   Result := srl.PointInPoly(P, Self.MaskPoly);
 end;
 
-procedure TMinimap.FilterPoints(var TPA: TPointArray);
+procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
 var
   i: Int32;
 begin
@@ -806,7 +849,7 @@ begin
       Delete(TPA, i, 1);
 end;
 
-function TMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
+function TRSMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
 var
   Total: Int32;
   TPA: TPointArray;
@@ -818,7 +861,7 @@ begin
   Result := Round((Length(TPA) / Total) * 100);
 end;
 
-procedure TMinimap.RandomCompass(Min, Max: Int32; Mouse: Boolean = True);
+procedure TRSMinimap.RandomCompass(Min, Max: Int32; Mouse: Boolean = True);
 var
   Degrees: Int32;
 begin
