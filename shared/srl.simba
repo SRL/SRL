@@ -91,6 +91,9 @@ end;
 
 procedure TSRL.Setup(AOptions: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
+  if (@Self.OnSetup <> nil) then
+    Self.OnSetup();
+
   Self.Options := AOptions;
   if (Self.StartTime = 0) then
     Self.StartTime := GetTickCount();
