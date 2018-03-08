@@ -682,5 +682,13 @@ begin
   if Random(2)=0 then Self.CheckSkill();
 end;
 
+function TAntiban.TimeUntilBreak(Break: TBreakTask; Format: TTimeFormat): String;
+begin
+  if (Break.NextAtTime - TimeRunning() <= 0) then
+    Result := 'Now'
+  else
+    Result := srl.MsToTime(Round(Break.NextAtTime - TimeRunning()), Format);
+end;
+
 
 
