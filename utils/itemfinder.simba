@@ -367,8 +367,8 @@ end;
 begin
   with ItemFinder do
   begin
-    Similarity := 0.95;
-    Hue := 6.5;
+    Similarity := 0.935;
+    Hue := 4.0;
     Sat := 1.0;
 
     AddOnTerminate(@Free);
