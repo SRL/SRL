@@ -1,3 +1,9 @@
+{$IFDEF SIMBAMAJOR980}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
+{$IFDEF SIMBAMAJOR1000}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
+{$IFDEF SIMBAMAJOR1100}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
+
+{$IFNDEF INCOMPATIBLE_VERSION}
+{$IFNDECL SRL}
 {$DEFINE OSR}
 {$IFNDEF SRL:DEBUG}
   {$IFDEF HINTS}{$DEFINE !HAD_HINTS}{$H-}{$ENDIF}
@@ -56,11 +62,20 @@ begin
   {$ENDIF}
 
   if (not Self.isClientReady(60000 * 3)) then
-    Self.Writeln('Client ready timed out. Make sure ORS is setup correctly', dtFatal)
+    Self.Writeln('Timed out waiting for client. Make sure OSRS is setup correctly', dtFatal)
   else
     Self.Writeln('Client ready!');
 end;
 
-{$IFDEF !HAD_HINTS}
-  {$H+}
+{$IFDEF !HAD_HINTS}{$H+}{$ENDIF}
+{$ENDIF}
+{$ELSE}
+begin
+  WriteLn('ERROR: Unable to include SRL, Incompatible Simba version detected.');
+  WriteLn('       SRL requires Simba 1.2 or newer.');
+  WriteLn('Recommended Simba 1.2 builds:');
+  WriteLn('  [main] https://github.com/slackydev/Simba/releases/tag/Simba-1.2.0-rc6_fixes');
+  WriteLn('  [alt]  http://nala.villavu.com/downloads/master/05a0dc6397ebfbf77d10eae153e58a5050678f87/Simba.i386-win32.exe');
+  TerminateScript;
+end;
 {$ENDIF}
