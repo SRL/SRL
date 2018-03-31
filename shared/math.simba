@@ -82,11 +82,12 @@ srl.DistToLine
 ~~~~~~~~~~~~~~
 .. code-block:: pascal
 
+    function TSRL.DistToLineEx(Pt, sA, sB: TPoint; out Nearest: TPoint): Double;
     function TSRL.DistToLine(Pt, sA, sB: TPoint): Double;
 
 Returns the distance to the nearest point on the line `sA`..`sB`
 *)
-function TSRL.DistToLine(Pt, sA, sB: TPoint): Double; static;
+function TSRL.DistToLineEx(Pt, sA, sB: TPoint; out Nearest: TPoint): Double; static;
 var
   dx,dy,d:Int32;
   f: Single;
@@ -99,10 +100,45 @@ begin
   f := ((pt.x - sA.x) * (dx) + (pt.y - sA.y) * (dy)) / d;
   if (f < 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
   if (f > 1) then Exit(Hypot(pt.x-sB.x, pt.y-sB.y));
-  qt.x := Round(sA.x + f * dx);
-  qt.y := Round(sA.y + f * dy);
-  Result := Hypot(pt.x-qt.x, pt.y-qt.y);
+  Nearest.x := Round(sA.x + f * dx);
+  Nearest.y := Round(sA.y + f * dy);
+  Result := Hypot(pt.x-Nearest.x, pt.y-Nearest.y);
 end;
+
+function TSRL.DistToLine(Pt, sA, sB: TPoint): Double; static;
+var qt:TPoint;
+begin
+  Result := DistToLineEx(Pt,sA,sB, qt);
+end;
+
+(*
+srl.LinesIntersect
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.LinesIntersect(p1,p2, q1,q2:TPoint; out i: TPoint): Boolean;
+*)
+function TSRL.LinesIntersect(p1,p2, q1,q2:TPoint; out i: TPoint): Boolean; static;
+var
+  s, t, det: Double;
+  s1, s2: TPoint;
+begin
+  s1 := p2-p1;
+  s2 := q2-q1;
+  det := (-s2.x * s1.y + s1.x * s2.y);
+  if det = 0 then Exit(False);
+
+  s := (-s1.y * (p1.x - q1.x) + s1.x * (p1.y - q1.y)) / det;
+  t := ( s2.x * (p1.y - q1.y) - s2.y * (p1.x - q1.x)) / det;
+  if (s >= 0) and (s <= 1) and (t >= 0) and (t <= 1) then
+  begin
+    i.x := Round(p1.x + (t * s1.x));
+    i.y := Round(p1.y + (t * s1.y));
+    Result := True;
+  end;
+end;
+
+
 
 {*
  Check if a point is inside a triangle.
@@ -136,10 +172,18 @@ Example:
 
     Writeln(srl.PointInRect(Point(100, 100), [0,0], [200,1], [201,201], [0,225]));
 *)
-function TSRL.PointInRect(const Pt: TPoint; const A, B, C, D: TPoint): Boolean; static;
+function TSRL.PointInRect(M: TPoint; A,B,C,D: TPoint): Boolean; static;
+//function Dot(U,V: TPoint): Int64; begin Result := U.x*V.x + U.y*V.y; end;
+//var
+//  AB,AM,AD: TPoint;
 begin
-  if srl.PointInTriangle(pt, A,C,B) then Exit(True);
-  if srl.PointInTriangle(pt, A,D,C) then Exit(True);
+  //AB := B-A;
+  //AM := M-A;
+  //AD := D-A;
+  //Result := (InRange(Dot(AM,AB), 0, Dot(AB,AB)) and
+  //           InRange(Dot(AM,AD), 0, Dot(AD,AD)));
+  if srl.PointInTriangle(M, A,C,B) then Exit(True);
+  if srl.PointInTriangle(M, A,D,C) then Exit(True);
 end;
 
 

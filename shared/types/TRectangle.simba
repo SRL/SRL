@@ -132,7 +132,7 @@ begin
   Dot := ((Self.Top.x-Pt.x) * Vec.x) + ((Self.Top.y-Pt.y) * Vec.y);
   if not((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
     Exit(False);
-  Vec := Point(Self.Top.x-Self.Btm.x, Self.Top.y-Self.Btm.y);
+  Vec := Point(Self.Top.x-Self.Left.x, Self.Top.y-Self.Left.y);
   Dot := ((Self.Top.x-Pt.x) * Vec.x) + ((Self.Top.y-Pt.y) * Vec.y);
   if not((0 <= Dot) and (Dot <= (Sqr(Vec.x) + Sqr(Vec.y)))) then
     Exit(False);
