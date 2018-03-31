@@ -240,3 +240,49 @@ procedure WaitEx(mean, dev:Double);
 begin
   Wait(Abs(Trunc(srl.GaussRand(mean, dev))));
 end;
+
+
+(*
+srl.rowp
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TSRL.rowp(From: TPoint; Rect: TRectangle; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint;
+  function TSRL.rowp(From: TPoint; Box: TBox; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint;
+
+rowp, short for `Random Olly Weighted Point`. Generates a random point based on
+a rough formula that Olly came up with for weighting points towards "From" point.
+Final implementation and math done by slacky.
+
+Force ranges from -1 (close to) to 1 (away from), where 0 is mean, but with a bit of a skewiness...
+*)
+function TSRL.rowp(From: TPoint; Rect: TRectangle; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint; static; overload;
+var
+  p,e: TPoint;
+  t, dist: Double;
+
+  function NearestEdgeTo(P: TPoint): TPoint;
+  var
+    best,dist: Double;
+    x: TPoint;
+  begin
+    best := srl.DistToLineEx(p, Rect.Top,  Rect.Left, Result);
+    if (dist := srl.DistToLineEx(p, Rect.Left, Rect.Btm,  x)) < best then begin Result := x; Best := dist; end;
+    if (dist := srl.DistToLineEx(p, Rect.Btm,  Rect.Right,x)) < best then begin Result := x; Best := dist; end
+    if (dist := srl.DistToLineEx(p, Rect.Right,Rect.Top,  x)) < best then begin Result := x; Best := dist; end;
+  end;
+begin
+  p := srl.RandomPoint(rect);
+  e := NearestEdgeTo(P);
+
+  dist := Hypot(p.X - e.X, p.Y - e.Y);
+  t := ArcTan2(p.Y-From.Y, p.X-From.X) + (Random()-0.5)*Smoothness;
+  Result.X := Round(p.x + Cos(t) * srl.SkewedRand(dist * force, 0, dist));
+  Result.Y := Round(p.y + Sin(t) * srl.SkewedRand(dist * force, 0, dist));
+end;
+
+function TSRL.rowp(From: TPoint; Box: TBox; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint; static; overload;
+begin
+  Result := TSRL.rowp(From, Box.ToRectangle(), Force, Smoothness);
+end;
+
