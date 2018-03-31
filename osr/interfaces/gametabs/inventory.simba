@@ -626,6 +626,25 @@ begin
     Result := ChooseOption.Select(['Use']);
 end;
 
+function TRSInventory.WaitCount(Amount: Int32; Time: Int32; Compare: TComparator = __EQ__): Boolean;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + Time;
+
+  while (T > GetTickCount()) do
+  begin
+    case Compare of
+      __LT__: if (Self.Count() < Amount) then Exit(True);
+      __GT__: if (Self.Count() > Amount) then Exit(True);
+      __EQ__: if (Self.Count() = Amount) then Exit(True);
+      __NE__: if (Self.Count() <> Amount) then Exit(True);
+    end;
+
+    Wait(Random(30, 60));
+  end;
+end;
+
 
 begin
   Inventory.__Setup();
