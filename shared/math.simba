@@ -93,13 +93,19 @@ var
   f: Single;
   qt:TPoint;
 begin
+  Nearest.x := sA.x;
+  Nearest.y := sA.y;
   dx := sB.x - sA.x;
   dy := sB.y - sA.y;
   d := dx*dx + dy*dy;
   if (d = 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
   f := ((pt.x - sA.x) * (dx) + (pt.y - sA.y) * (dy)) / d;
   if (f < 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
-  if (f > 1) then Exit(Hypot(pt.x-sB.x, pt.y-sB.y));
+  if (f > 1) then
+  begin
+    Nearest := sA;
+    Exit(Hypot(pt.x-sB.x, pt.y-sB.y));
+  end;
   Nearest.x := Round(sA.x + f * dx);
   Nearest.y := Round(sA.y + f * dy);
   Result := Hypot(pt.x-Nearest.x, pt.y-Nearest.y);
