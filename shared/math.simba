@@ -103,7 +103,7 @@ begin
   if (f < 0) then Exit(Hypot(pt.x-sA.x, pt.y-sA.y));
   if (f > 1) then
   begin
-    Nearest := sA;
+    Nearest := sB;
     Exit(Hypot(pt.x-sB.x, pt.y-sB.y));
   end;
   Nearest.x := Round(sA.x + f * dx);
