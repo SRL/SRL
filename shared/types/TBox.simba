@@ -203,6 +203,43 @@ begin
   Result[3] := [Self.X2 - Size, Result[0].Y2 + 1, Self.X2, Result[1].Y1 - 1];
 end;
 
+(*
+TBox.NearestEdge
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TBox.NearestEdge(P: TPoint): TPoint; constref;
+
+Returns the closest edge point to the TPoint `P`.
+
+.. note:: by slacky
+*)
+function TBox.NearestEdge(P: TPoint): TPoint; constref;
+begin
+  Result := P;
+
+  if Self.Contains(Result) then
+  begin
+    if Min(Abs(Self.Y1 - P.Y), Abs(P.Y - Self.Y2)) > Min(Abs(Self.X1 - P.X), Abs(P.X - Self.X2)) then
+    begin
+      Result.X := Self.X1;
+      if (P.X - Self.X1 > Self.X2 - P.X) then
+        Result.X := Self.X2;
+    end else
+     begin
+      Result.Y := Self.Y1;
+      if (P.Y - Self.Y1 > Self.Y2 - P.Y) then
+        Result.Y := Self.Y2;
+    end;
+  end else
+  begin
+    if (Result.X < Self.X1) then Result.X := Self.X1;
+    if (Result.X > Self.X2) then Result.X := Self.X2;
+    if (Result.Y < Self.Y1) then Result.Y := Self.Y1;
+    if (Result.Y > Self.Y2) then Result.Y := Self.Y2;
+  end;
+end;
+
 operator + (Left, Right: TBox): TBox;
 begin
   Result.X1 := Min(Min(Left.X1, Right.X2), Min(Right.X1, Left.X2));

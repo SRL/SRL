@@ -278,3 +278,26 @@ begin
   end;
   Result := TRectangle(TMP);
 end;
+
+
+(*
+TRectangle.NearestEdge
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.NearestEdge(P: TPoint): TPoint; constref;
+
+Returns the closest edge point (think Rect.ToTPA.Connect) to the TPoint `P`.
+
+.. note:: by slacky
+*)
+function TRectangle.NearestEdge(P: TPoint): TPoint; constref;
+var
+  Best, Dist: Double;
+  X: TPoint;
+begin
+  Best := srl.DistToLineEx(P, Self.Top,  Self.Left, Result);
+  if (dist := srl.DistToLineEx(P, Self.Left, Self.Btm,   X)) < Best then begin Result := X; Best := Dist; end;
+  if (dist := srl.DistToLineEx(P, Self.Btm,  Self.Right, X)) < Best then begin Result := X; Best := Dist; end
+  if (dist := srl.DistToLineEx(P, Self.Right,Self.Top,   X)) < Best then begin Result := X; Best := Dist; end;
+end;
