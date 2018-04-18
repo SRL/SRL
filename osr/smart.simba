@@ -13,13 +13,13 @@ begin
   if (Self.World <> 0) then
     Self.Parameters.Root := Format(RS_URL, [Self.World])
   else begin
-    s := Between('<span>(Old School', ')', GetPage('http://oldschool.runescape.com/slu'));
+    s := Between('>(Old School', ')', GetPage('http://oldschool.runescape.com/slu'));
     Self.World := StrToIntDef(ExtractFromStr(s, Numbers), -1);
 
     if (Self.World = -1) then
     begin
-      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2');
-      Self.World := 2;
+      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 1');
+      Self.World := 1;
     end;
 
     Self.Parameters.Root := Format(RS_URL, [Self.World]);
