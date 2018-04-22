@@ -334,6 +334,9 @@ Wraps Simba's GetTPABounds
 *)
 function TPointArray.Bounds(): TBox; constref;
 begin
+  if Length(Self) = 1 then
+    Exit(TBox([Self[0].x, Self[0].y, Self[0].x, Self[0].y]));
+
   Result := GetTPABounds(Self);
 end;
 
