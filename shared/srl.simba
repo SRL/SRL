@@ -103,7 +103,7 @@ begin
   srl.DebugLevel := 0;
   srl.StartTime := GetTickCount();
   srl.Options := SRL_DEFAULT_OPTIONS;
-  srl.GAUSS_CUTOFF := 4.5;
+  srl.GAUSS_CUTOFF := 4.0;
 end;
 
 

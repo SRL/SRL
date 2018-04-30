@@ -257,7 +257,7 @@ TPointArray.SortByRow
 
     procedure TPointArray.SortByRow(reverse:Boolean=False);
 
-The name tells the story
+Sorts a given TPointArray TPA row-by-row, starting from the smallest Y coordinate to the largest Y coordinate, and for every row from the smallest X coordinate to the largest X coordinate.
 *)
 procedure TPointArray.SortByRow(reverse:Boolean=False);
 var
@@ -268,7 +268,7 @@ begin
   Hi := High(self);
   if Hi <= 1 then Exit;
   area := GetTPABounds(self);
-  w := Area.X2-Area.X1+1;
+  w := Area.X2 - Area.X1 + 1;
   SetLength(weight, hi+1);
   for i:=0 to Hi do
     weight[i] := self[i].y * W + self[i].x;
@@ -278,12 +278,12 @@ end;
 
 (*
 TPointArray.SortByColumn
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     procedure TPointArray.SortByColumn(reverse:Boolean=False);
 
-The name tells the story
+much like SortByRow, but the order of the column comes first
 *)
 procedure TPointArray.SortByColumn(reverse:Boolean=False);
 var
@@ -294,7 +294,7 @@ begin
   Hi := High(self);
   if Hi <= 1 then Exit;
   Area := GetTPABounds(self);
-  H := Area.Y2-Area.Y1+1;
+  H := Area.Y2 - Area.Y1 + 1;
   SetLength(Weight, Hi+1);
   for i := 0 to Hi do
     Weight[i] := self[i].x * H + self[i].y;

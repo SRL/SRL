@@ -33,12 +33,12 @@ srl.TruncatedGauss
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.TruncatedGauss(left:Double=0; right:Double=1): Double;
+  function TSRL.TruncatedGauss(Left:Double=0; Right:Double=1): Double;
 
 Generates a random gaussian/normal number which is truncated and mapped within then 
 given range ``[left..right]`` weighted towards ``left``
 *)
-function TSRL.TruncatedGauss(left:Double=0; right:Double=1; CUTOFF:Single=0): Double; static;
+function TSRL.TruncatedGauss(Left:Double=0; Right:Double=1; CUTOFF:Single=0): Double; static;
 begin
   if CUTOFF <= 0 then CUTOFF := srl.GAUSS_CUTOFF;
 
@@ -78,14 +78,13 @@ srl.NormalRange
 ~~~~~
 .. code-block:: pascal
 
-  function TSRL.NormalRange(min, max: Integer): Integer;
+  function TSRL.NormalRange(min, max: Int64): Int64;
 
 Generates a random integer in the given range, weighted towards the mean.
 *)
-function TSRL.NormalRange(min, max:Int32; CUTOFF:Single=0): Integer; constref;
+function TSRL.NormalRange(min, max: Int64; CUTOFF:Single=0): Int64; constref;
 begin
   if CUTOFF <= 0 then CUTOFF := srl.GAUSS_CUTOFF;
-
   case Random(0,1) of
     0: Result := Round((max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF));
     1: Result := Round((max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF));
@@ -105,7 +104,6 @@ Generates a random float in the given range, weighted towards the mean.
 function TSRL.NormalRange(min, max: Double; CUTOFF:Single=0): Double; constref; overload;
 begin
   if CUTOFF <= 0 then CUTOFF := srl.GAUSS_CUTOFF;
-
   case Random(0,1) of
     0: Result := (max+min)/2.0 + TruncatedGauss(0, (max-min)/2, CUTOFF);
     1: Result := (max+min)/2.0 - TruncatedGauss(0, (max-min)/2, CUTOFF);
@@ -123,7 +121,7 @@ srl.RandomPoint
 Generates a random TPoint which weights around ``mean``, with a max distance 
 from mean defined by ``maxRad``.
 *)
-function TSRL.RandomPoint(mean: TPoint; maxRad:Int32): TPoint; constref;
+function TSRL.RandomPoint(mean: TPoint; maxRad: Int32): TPoint; constref;
 begin
   Result.X := NormalRange(mean.x-maxRad, mean.x+maxRad);
   Result.Y := NormalRange(mean.y-maxRad, mean.y+maxRad);
