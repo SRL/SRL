@@ -302,13 +302,20 @@ end;
 {$IFDEF WINDOWS}
 function PerformanceTimer(): Double;
 var
-  frequency,count: UInt64;
-  function QPF(out F: UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
-  function QPC(out C: UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  frequency,counter: ^UInt64;
+  function QPF(F: ^UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  function QPC(C: ^UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
 begin
-  if not QPF(frequency) then Exit(GetTickCount);
-  if not QPC(count) then Exit(GetTickCount);
-  Result := count / frequency * 1000;        
+  frequency := GetMem(SizeOf(UInt64)); // at least qword aligned
+  counter   := GetMem(SizeOf(UInt64)); // ...
+
+  if QPF(frequency) and QPC(counter) then
+    Result := counter^ / frequency^ * 1000
+  else
+    Result := GetTickCount();
+
+  FreeMem(frequency);
+  FreeMem(counter);
 end;
 {$ELSE}
 function PerformanceTimer(): Double;
