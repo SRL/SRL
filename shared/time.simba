@@ -306,8 +306,8 @@ var
   function QPF(out F: UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
   function QPC(out C: UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
 begin
-  if QPF(frequency) = 0 then Exit(GetTickCount);
-  if QPC(count) = 0 then Exit(GetTickCount);
+  if not QPF(frequency) then Exit(GetTickCount);
+  if not QPC(count) then Exit(GetTickCount);
   Result := count / frequency * 1000;        
 end;
 {$ELSE}
