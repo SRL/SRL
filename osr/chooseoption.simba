@@ -353,7 +353,7 @@ var
   i,j,l: Int32;
   choices: TOptionArray;
 begin
-  while (Random(100) < ChanceOfMiss) then
+  while (Random(100) < ChanceOfMiss) do
   begin
     Self.Select([MissOpt]);
     Wait(35,800, wdLeft);
