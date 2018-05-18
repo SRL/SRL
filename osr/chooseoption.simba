@@ -1,8 +1,8 @@
 (*
 ChooseOption
-=======
-The ChooseOption file holds functions and procedures that are related 
-to the runescape ChooseOption-menu
+============
+The ChooseOption file holds functions and procedures that are related to the
+ingame context menu.
 *)
 
 type
@@ -10,12 +10,12 @@ type
     Str: String;
     Bounds: TBox;
   end;
-  TOptionArray = Array of TOption;
+  TOptionArray = array of TOption;
 
 (*
 type TRSChooseOption
-~~~~~~~~~~~~~~~
-The type that holds functions and properties of the Runescape ChooseOption-menu.
+~~~~~~~~~~~~~~~~~~~~
+The type that holds functions and properties of the context menu.
 *)
 type
   TRSChooseOption = record
@@ -29,9 +29,9 @@ type
   end;
 
 (*
-var inventory
-~~~~~~~~~~~
-Variable that stores functions and properties of the Runescape ChooseOption-menu.
+var ChooseOption
+~~~~~~~~~~~~~~~~
+Variable that stores functions and properties of the context menu.
 *)
 var
   ChooseOption: TRSChooseOption;
@@ -335,6 +335,38 @@ function TRSChooseOption.Select(Option: String; mouseAction:Int32=mouse_left; AC
 begin
   Result := Self.Select([Option], mouseAction, AClose, CaseSensitive);
 end;
+
+
+(*
+ChooseOption.MissSelect
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss: Int32=5): Boolean;
+  function TRSChooseOption.MissSelect(Option, MissOpt: String; ChanceOfMiss: Int32=5): Boolean;
+
+For example, click Inspect when you meant to click Drop. By default there's a 5% chance of misclick,
+it will automatically click the right one after a missclick.
+*)
+function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss: Int32=5): Boolean;
+var
+  i,j,l: Int32;
+  choices: TOptionArray;
+begin
+  while (Random(100) < ChanceOfMiss) then
+  begin
+    Self.Select([MissOpt]);
+    Wait(35,800, wdLeft);
+  end;
+
+  Result := Self.Select([Option]);
+end;
+
+function TRSChooseOption.MissSelect(Option, MissOpt: String; ChanceOfMiss: Int32=5): Boolean; overload;
+begin
+  Result := Self.MissSelect([Option], [MissOpt], ChanceOfMiss);
+end;
+
 
 (*
 ChooseOption.Close
