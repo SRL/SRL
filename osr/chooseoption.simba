@@ -310,7 +310,7 @@ ChooseOption.Select
   
 Same as SelectID, except that this will look for the option by it's text, rather than by id.
 *)
-function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; CloseIt:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; CloseIt:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
 var
   i,j,l: Int32;
   choices: TOptionArray;
@@ -336,7 +336,6 @@ begin
   Result := Self.Select([Option], mouseAction, AClose, CaseSensitive);
 end;
 
-
 (*
 ChooseOption.MissSelect
 ~~~~~~~~~~~~~~~~~~~~
@@ -355,11 +354,11 @@ var
 begin
   while (Random(100) < ChanceOfMiss) do
   begin
-    Self.Select([MissOpt]);
+    Self.Select(MissOpt);
     Wait(35,800, wdLeft);
   end;
 
-  Result := Self.Select([Option]);
+  Result := Self.Select(Option);
 end;
 
 function TRSChooseOption.MissSelect(Option, MissOpt: String; ChanceOfMiss: Int32=5): Boolean; overload;
