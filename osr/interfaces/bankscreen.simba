@@ -69,17 +69,6 @@ begin
     end;
   end;
 end;
-
-procedure TRSPinScreen.__Setup();
-begin
-  with Self do
-  begin
-    FSlots := Box(37, 107, 318, 320).Partition(3,3);
-    FSlots.ModifySide('x2',-30);
-    FSlots.ModifySide('y2',-6);
-    FSlots.Append(Box(309, 107, 372, 170));
-  end;
-end;
 {$ENDIF}
 
 
@@ -94,6 +83,7 @@ begin
     else
       Wait(20);
 end;
+
 
 function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
 var
@@ -185,6 +175,15 @@ begin
   until (GetTickCount() >= t);
 end;
 
+(*
+BankScreen.OpenAt
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSBankScreen.OpenAt(P: TPoint): Boolean;
+
+returns True if the bankscreen could be open'd at given location `P`
+*)
 function TRSBankScreen.OpenAt(P: TPoint): Boolean;
 begin
   Mouse.Move(P);
@@ -715,6 +714,34 @@ begin
 end;
 
 
+(*
+PinScreen
+==========
+This file also stores all methods that are used in the pinscreen-iterface.
+
+Technically, I think you can call `PinScreen.EnterPin` to determine if the 
+bankscreen interface is open, by doing so it would enter the pin if there is one. 
+
+I think at some point this should probably be handled automatically by bankscreen
+looking at the code this will be a bit troublesome now? - slacky
+
+.. code-block:: pascal
+
+    WriteLn(PinScreen.EnterPin()); // returns True if we got to the bank
+*)
+{$IFNDEF CodeInsight}
+procedure TRSPinScreen.__Setup();
+begin
+  with Self do
+  begin
+    FSlots := Box(37, 107, 318, 320).Partition(3,3); // unused, solved dynamically now
+    FSlots.ModifySide('x2',-30);
+    FSlots.ModifySide('y2',-6);
+    FSlots.Append(Box(309, 107, 372, 170));
+  end;
+end;
+{$ENDIF}
+
 function TRSPinScreen._Find(): Boolean;
 var
   P: TPoint;
@@ -737,85 +764,194 @@ begin
   until (GetTickCount() >= t);
 end;
 
-function TRSPinScreen.EnterPin(): Boolean;
+
+// ----------------------------------------------------------------------------
+// Searches for the number boxes for some amount of time
+function TRSPinScreen.FindButtons(out Buttons: TBoxArray; SearchTime: Int32): Boolean;
 var
-  I, J, F, Start: Int32;
-  TSA: TStringArray = ['First', 'Now', 'Time', 'Finally'];
-  t: UInt64;
-  P: TPoint;
-
-  function __EnterPin(): Boolean;
-  begin
-    T := GetTickCount() + RandomRange(4000, 8000);
-    while (CountColor(32767, 37, 107, 372, 318) <> 322) do//waiting for the numbers to load
-    begin
-      Wait(RandomRange(100, 400));
-      if (GetTickCount() > T) then
-        Exit(False);
-    end;
-    
-    for Start := 1 to 4 do
-    begin
-      if srl.FindText(p, TSA[Start - 1], 'UpChars07_s', Box(160, 80, 350, 100)) then
-        Break;
-    end;
-    
-    for J := Start to 4 do
-    begin
-      p := [0, 0];
-      if srl.FindText(p, Players.GetCurrent()^.BankPin[J], 'UpChars07_s', Box(37, 107, 372, 318)) then
-      begin
-        for I := Low(FSlots) to High(FSlots) do
-        begin
-          if PointInBox(p, FSlots[I]) then
-          begin
-            Mouse.Click(FSlots[I], mouse_Left);
-            Break;
-          end;
-        end;
-      end else
-      begin
-        GetMousePos(p.X, p.Y);
-        for I := Low(FSlots) to High(FSlots) do
-        begin
-          if PointInBox(p, FSlots[I]) then
-          begin
-            Mouse.Click(FSlots[I], mouse_Left);
-            Break;
-          end;
-        end;
-      end;
-      
-      T := GetTickCount() + RandomRange(4000, 8000);
-      while srl.FindText(p, TSA[J - 1], 'UpChars07_s', Box(160, 80, 350, 100)) and (CountColor(32767, 37, 107, 372, 318) <> 332) do
-      begin
-        Wait(RandomRange(300, 600));
-        if (GetTickCount > T) then
-          Exit(False);
-      end;
-      Wait(RandomRange(600, 1200));
-    end;
-  end;
-
+  i: Int32;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  t: TCountDown;
 begin
-  if not __EnterPin() then
+  Buttons := [];
+  t.Init(SearchTime);
+  repeat
+    if srl.FindColors(TPA, CTS2(988769, 10, 0.06, 1.28), MainScreen.GetBounds) then
+    begin
+      ATPA := TPA.Cluster(4);
+      ATPA.FilterDimensions(45,45, 70,70);
+
+      for i:=0 to High(ATPA) do
+        Buttons += ATPA[i].Bounds();
+
+      if (Length(Buttons) >= 10) then
+        Exit(True);
+    end;
+  until t.IsFinished();
+end;
+
+// ----------------------------------------------------------------------------
+// Sorts the boxes, so that box[0] contains the number 0, and so on
+// will wait for 4 seconds, or until the text appears
+function TRSPinScreen.SortButtons(var Buttons: TBoxArray; SearchTime: Int32): Boolean;
+var
+  i,j,count: Int32;
+  p: TPoint;
+  TBA: TBoxArray;
+  _: TPointArray;
+  t: TCountDown;
+begin
+  TBA := Copy(Buttons);
+  Buttons := [];
+
+  // wait for key-number to appear in the boxes
+  t.Init(SearchTime);
+  repeat
+    count := 0;
+    for i:=0 to High(TBA) do
+      if (srl.FindColors(_, CTS1(32767,16), TBA[i]) > 0) then
+        Inc(count);
+    Wait(100,150);
+  until t.IsFinished() or (count >= 9);
+
+  // ensure that all the 10 digits was drawn, dont want no bullshit!
+  if (count < 9) then
     Exit(False);
 
-  t := GetTickCount() + RandomRange(15000, 20000);
+  // now sort the boxes so that Buttons[4] is the button for the number 4, and so on.
+  SetLength(Buttons, 10);
+  count := 0;
+  for i:=0 to 9 do
+    for j:=0 to High(TBA) do
+      if srl.FindText(p, ToStr(i), 'UpChars07_s', 32767, 16, TBA[j].ExpandFunc(4)) then
+      begin
+        Buttons[i] := TBA[j];
+        TBA.Del(j);
+        Inc(count);
+        Break;
+      end;
+
+  // if the mouse is over a number, it will disappear, this trick solves that
+  for i:=0 to 9 do
+    if (TBA <> []) and (Buttons[i] = []) then
+    begin
+      Buttons[i] := TBA[0];
+      Inc(count);
+      Break;
+    end;
+
+  // only return true if 10 numbers was added
+  Result := (count = 10);
+end;
+
+// ----------------------------------------------------------------------------
+// Debugging is always nice to have, and exists within the various interfaces
+procedure TRSPinScreen.Debug();
+var
+  i: Int32;
+  buttons: TBoxArray;
+  muf: TMufasaBitmap;
+begin
+  muf := GetMufasaBitmap(BitmapFromClient(srl.DefaultClientBounds));
+
+  FindButtons(buttons, Random(3000,4500));
+  SortButtons(buttons, Random(4000,6500));
+  for i:=0 to High(buttons) do
+  begin
+    muf.DrawBox(buttons[i], False, $00FF00);
+    muf.DrawText(ToStr(i), Point(buttons[i].X1+5, buttons[i].Y1+5), $00FF00);
+  end;
+
+  muf.Debug();
+end;
+
+// ----------------------------------------------------------------------------
+// Select that one key
+function TRSPinScreen.SelectKey(x: Int32): Boolean;
+var
+  i: Int32;
+  buttons: TBoxArray;
+begin
+  if (not FindButtons(buttons, Random(3000,4500))) then
+    Exit(srl.WriteLn('Pinscreen.FindButtons Failed', False));
+
+  if (not SortButtons(buttons, Random(4000,6500))) then
+    Exit(srl.WriteLn('Pinscreen.SortButtons Failed', False));
+
+  Mouse.Move(buttons[x]);
+  Wait(90, 1000, wdLeft);
+  Mouse.Click(buttons[x], MOUSE_LEFT);
+
+  //if Random(4) = 0 then
+  //begin
+  //  Wait(50,120);
+  //  Mouse.Move(buttons[Random(10)]);
+  //  Wait(460, 1400, wdLeft);
+  //end;
+
+  Result := True;
+end;
+
+// ----------------------------------------------------------------------------
+// Input the pin
+function TRSPinScreen.EnterPin(): Boolean;
+  function __EnterPin(Pin: String): Boolean;
+  var
+    i: Int32;
+    p: TPoint;
+    t: TCountDown;
+    atStage: Boolean;
+    stages: TStringArray = ['First', 'Now', 'Time', 'Finally'];
+  begin
+    for i:=0 to High(stages) do
+    begin
+      // wait for the current stage to show up (FIRST, SECOND, THIRD, FOURTH)
+      atStage := False;
+      t.Init(Random(3500, 5000));
+      while(not t.IsFinished()) do
+        if (atStage := srl.FindText(p, stages[i], 'UpChars07_s', Box(100, 80, 380, 100))) then
+          Break;
+
+      // try to click the key
+      if (not atStage) or (not SelectKey(StrToInt(pin[i+1]))) then
+        Exit(False);
+
+      Wait(90,1000, wdLeft);
+    end;
+
+    Result := True;
+  end;
+var
+  F,t: UInt64;
+begin
+  if (Players.GetCurrent()^.BankPin = '') or                // if no pin is defined
+     (not PinScreen.IsOpen()) or                            // if pinscreen isn't open
+     (not __EnterPin(Players.GetCurrent()^.BankPin)) then   // if it failed to enter the pin
+  begin
+    Exit(BankScreen.IsOpen());                              // then just exit-check if we are in the bank already
+  end;
+  
+  // otherwise, we have a pin, pinscreen is open, and we didn't fail to enter the pin
+  // so now we just wait for the bankscreen to show up, and maybe retry if needed.
+  t := GetTickCount() + Random(25000, 30000);
   while not BankScreen.IsOpen() do
   begin
-    if ChatBox.ClickContinue() then
+    if Chatbox.ClickContinue() then // error message, something something wrong pin I assume, retry
     begin
       Inc(F);
-      if (F > 2) then
+      if (F = 3) then
         srl.WriteLn('Your pin is wrong!', dtFatal);
-      __EnterPin();
+
+      __EnterPin(Players.GetCurrent()^.BankPin);
     end;
-    Wait(RandomRange(40, 200));
+
+    Wait(60, 200);
     if (GetTickCount() > t) then
       Exit(False);
   end;
-  Result := BankScreen.IsOpen(RandomRange(2000, 6000));
+  
+  Result := BankScreen.IsOpen();
 end;
 
 begin
