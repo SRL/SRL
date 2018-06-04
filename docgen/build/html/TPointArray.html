@@ -1,0 +1,388 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TPointArray.Mean &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="TRectangle.ToTPA" href="TRectangle.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="TPoint.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="TRectangle.html" title="TRectangle.ToTPA"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TPoint.html" title="&lt;no title&gt;"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tpointarray-mean">
+<h1>TPointArray.Mean<a class="headerlink" href="#tpointarray-mean" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Mean</span><span class="p">()</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s TPAMiddle</p>
+</div>
+<div class="section" id="tpointarray-meanex">
+<h1>TPointArray.MeanEx<a class="headerlink" href="#tpointarray-meanex" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">MeanEx</span><span class="p">()</span><span class="o">:</span> <span class="n">Vector2</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Middle as a Vector.</p>
+</div>
+<div class="section" id="tpointarray-sort">
+<h1>TPointArray.Sort<a class="headerlink" href="#tpointarray-sort" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Sort</span><span class="p">(</span><span class="n">From</span><span class="o">:</span><span class="n">TPoint</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span><span class="p">])</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>SortTPAFrom</cite></p>
+</div>
+<div class="section" id="tpointarray-sorted">
+<h1>TPointArray.Sorted<a class="headerlink" href="#tpointarray-sorted" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Sorted</span><span class="p">(</span><span class="n">From</span><span class="o">:</span><span class="n">TPoint</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span><span class="p">])</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>SortTPAFrom</cite>, produces a sorted copy.</p>
+</div>
+<div class="section" id="tpointarray-sortbyx">
+<h1>TPointArray.SortByX<a class="headerlink" href="#tpointarray-sortbyx" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SortByX</span><span class="p">(</span><span class="n">LowToHi</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>SortTPAByX</cite></p>
+</div>
+<div class="section" id="tpointarray-sortbyy">
+<h1>TPointArray.SortByY<a class="headerlink" href="#tpointarray-sortbyy" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SortByY</span><span class="p">(</span><span class="n">LowToHi</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>SortTPAByY</cite></p>
+</div>
+<div class="section" id="tpointarray-sortbyrow">
+<h1>TPointArray.SortByRow<a class="headerlink" href="#tpointarray-sortbyrow" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SortByRow</span><span class="p">(</span><span class="n">reverse</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">False</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sorts a given TPointArray TPA row-by-row, starting from the smallest Y coordinate to the largest Y coordinate, and for every row from the smallest X coordinate to the largest X coordinate.</p>
+</div>
+<div class="section" id="tpointarray-sortbycolumn">
+<h1>TPointArray.SortByColumn<a class="headerlink" href="#tpointarray-sortbycolumn" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SortByColumn</span><span class="p">(</span><span class="n">reverse</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">False</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>much like SortByRow, but the order of the column comes first</p>
+</div>
+<div class="section" id="tpointarray-sortfromline">
+<h1>TPointArray.SortFromLine<a class="headerlink" href="#tpointarray-sortfromline" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SortFromLine</span><span class="p">(</span><span class="n">p</span><span class="o">,</span><span class="n">q</span><span class="o">:</span><span class="n">TPoint</span><span class="o">;</span> <span class="n">reverse</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">False</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The name tells the story</p>
+</div>
+<div class="section" id="tpointarray-bounds">
+<h1>TPointArray.Bounds<a class="headerlink" href="#tpointarray-bounds" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Bounds</span><span class="p">()</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s GetTPABounds</p>
+</div>
+<div class="section" id="tpointarray-density">
+<h1>TPointArray.Density<a class="headerlink" href="#tpointarray-density" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Density</span><span class="p">()</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the TPA’s density (Length(TPA)/(width*height))</p>
+</div>
+<div class="section" id="tpointarray-edges">
+<h1>TPointArray.Edges<a class="headerlink" href="#tpointarray-edges" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Edges</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Filters all points out of the given TPointArray which aren’t edge-points.
+Edge-points are points that are on the edge of the TPA, not completely surrounded by other points.
+Same as Simba’s <cite>FindTPAEdges</cite></p>
+</div>
+<div class="section" id="tpointarray-cluster">
+<h1>TPointArray.Cluster<a class="headerlink" href="#tpointarray-cluster" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Cluster</span><span class="p">(</span><span class="n">dist</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Cluster</span><span class="p">(</span><span class="n">distX</span><span class="o">,</span><span class="n">distY</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Smart wrapper of Simba’s <cite>ClusterTPA</cite> and <cite>ClusterTPAEx</cite> (fall backs to <cite>SplitTPA</cite> when it’s better suited)</p>
+</div>
+<div class="section" id="tpointarray-split">
+<h1>TPointArray.Split<a class="headerlink" href="#tpointarray-split" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Split</span><span class="p">(</span><span class="n">dist</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Split</span><span class="p">(</span><span class="n">distX</span><span class="o">,</span><span class="n">distY</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>SplitTPA</cite> and <cite>SplitTPAEx</cite></p>
+</div>
+<div class="section" id="tpointarray-toatpa">
+<h1>TPointArray.ToATPA<a class="headerlink" href="#tpointarray-toatpa" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">ToATPA</span><span class="p">(</span><span class="n">WH</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">ToATPA</span><span class="p">(</span><span class="n">W</span><span class="o">,</span><span class="n">H</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>TPAToATPA</cite> and <cite>TPAToATPAEx</cite></p>
+</div>
+<div class="section" id="tpointarray-offset">
+<h1>TPointArray.Offset<a class="headerlink" href="#tpointarray-offset" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Offset</span><span class="p">(</span><span class="n">off</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>OffsetTPA</cite></p>
+</div>
+<div class="section" id="tpointarray-offsetfunc">
+<h1>TPointArray.OffsetFunc<a class="headerlink" href="#tpointarray-offsetfunc" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">OffsetFunc</span><span class="p">(</span><span class="n">off</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wraps Simba’s <cite>OffsetTPA</cite>, but offsets a copy, and returns it.</p>
+</div>
+<div class="section" id="tpointarray-invert">
+<h1>TPointArray.Invert<a class="headerlink" href="#tpointarray-invert" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Invert</span><span class="p">(</span><span class="n">Area</span><span class="o">:</span><span class="n">TBox</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span><span class="o">,-</span><span class="mi">1</span><span class="o">,-</span><span class="mi">1</span><span class="p">])</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Inverts the shape based on the area covered, alternatively the given area.
+Same as <cite>ReturnPointsNotInTPA</cite> in Simba.</p>
+</div>
+<div class="section" id="tpointarray-filterbox">
+<h1>TPointArray.FilterBox<a class="headerlink" href="#tpointarray-filterbox" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">FilterBox</span><span class="p">(</span><span class="n">Box</span><span class="o">:</span> <span class="n">TBox</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a filtered version of the TPA.
+Same as Simba’s <cite>FilterPointsBox</cite></p>
+</div>
+<div class="section" id="id1">
+<h1>TPointArray.FilterBox<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">FilterDist</span><span class="p">(</span><span class="n">MinDist</span><span class="o">,</span><span class="n">MaxDist</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">Mx</span><span class="o">,</span><span class="n">My</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a filtered version of the TPA.
+Same as Simba’s <cite>FilterPointsDist</cite></p>
+</div>
+<div class="section" id="tpointarray-filterduplicates">
+<h1>TPointArray.FilterDuplicates<a class="headerlink" href="#tpointarray-filterduplicates" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">FilterDuplicates</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a copy where all duplicate points are removed.</p>
+</div>
+<div class="section" id="tpointarray-clearduplicates">
+<h1>TPointArray.ClearDuplicates<a class="headerlink" href="#tpointarray-clearduplicates" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">ClearDuplicates</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Removes all the duplicate points from self.</p>
+</div>
+<div class="section" id="tpointarray-rotate">
+<h1>TPointArray.Rotate<a class="headerlink" href="#tpointarray-rotate" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Rotate</span><span class="p">(</span><span class="n">AngleRad</span><span class="o">,</span> <span class="n">MidX</span><span class="o">,</span> <span class="n">MidY</span><span class="o">:</span> <span class="kt">Double</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a copy where all points are rotated around MidX, MidY.
+Same as Simba’s <cite>RotatePoints</cite>.</p>
+</div>
+<div class="section" id="tpointarray-splitrows">
+<h1>TPointArray.SplitRows<a class="headerlink" href="#tpointarray-splitrows" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">SplitRows</span><span class="p">(</span><span class="n">dist</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Splits a TPA <cite>Arr</cite> into TPAs of each row, it then proceeds to further split the rows
+in to separate TPAs when the given distance <code class="docutils literal notranslate"><span class="pre">dist</span></code> is less than the distance between the points
+Same output as <cite>SplitTPAEx(TPA,dist,0)</cite>, but generally faster.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">ATPA</span> <span class="o">:=</span> <span class="n">TPA</span><span class="o">.</span><span class="n">SplitRows</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tpointarray-connect">
+<h1>TPointArray.Connect<a class="headerlink" href="#tpointarray-connect" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">Connect</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Fills a line between all the points (by their order), can be used to get the edges
+around a polygon</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">edges</span> <span class="o">:=</span> <span class="n">TPA</span><span class="o">.</span><span class="n">ConvexHull</span><span class="p">()</span><span class="o">.</span><span class="n">Connect</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tpointarray-convexhull">
+<h1>TPointArray.ConvexHull<a class="headerlink" href="#tpointarray-convexhull" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">ConvexHull</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Computes the convex hull around the given TPA. Imagine placing a rubber band around the
+points, the points which strech the band are the points returned by this function.</p>
+<p>See: <a class="reference external" href="http://en.wikipedia.org/wiki/Convex_hull">http://en.wikipedia.org/wiki/Convex_hull</a> for more information.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Smart</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">DrawTPA</span><span class="p">(</span><span class="n">TPA</span><span class="o">.</span><span class="n">ConvexHull</span><span class="p">())</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tpointarray-minarearect">
+<h1>TPointArray.MinAreaRect<a class="headerlink" href="#tpointarray-minarearect" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">MinAreaRect</span><span class="p">()</span><span class="o">:</span> <span class="n">TRectangle</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Computes the minimum bounding box (defined by area) around the given shape.
+Four points (which are in order) are always returned.</p>
+<p>See: <a class="reference external" href="http://en.wikipedia.org/wiki/Minimum_bounding_box">http://en.wikipedia.org/wiki/Minimum_bounding_box</a> for more information.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="nb">WriteLn</span><span class="p">(</span><span class="s">&#39;The four box corners are: &#39;</span><span class="o">,</span> <span class="n">TPA</span><span class="o">.</span><span class="n">MinAreaRect</span><span class="p">())</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tpointarray-minareacircle">
+<h1>TPointArray.MinAreaCircle<a class="headerlink" href="#tpointarray-minareacircle" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPointArray</span><span class="o">.</span><span class="nf">MinAreaCircle</span><span class="p">()</span><span class="o">:</span> <span class="n">TCircle</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Computes the minimum bounding circle around the given shape.</p>
+<p>See: <a class="reference external" href="https://en.wikipedia.org/wiki/Smallest-circle_problem">https://en.wikipedia.org/wiki/Smallest-circle_problem</a> for more information.</p>
+<p>Implementation is a mixture of a few implementations I’ve seen.</p>
+</div>
+<div class="section" id="expandpolygon">
+<h1>ExpandPolygon<a class="headerlink" href="#expandpolygon" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nf">ExpandPolygon</span><span class="p">(</span><span class="nb">Poly</span><span class="o">:</span><span class="n">TPointArray</span><span class="o">;</span> <span class="nb">inc</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>A method for increasing the size of any convex polygon.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TPointArray.Mean</a></li>
+<li><a class="reference internal" href="#tpointarray-meanex">TPointArray.MeanEx</a></li>
+<li><a class="reference internal" href="#tpointarray-sort">TPointArray.Sort</a></li>
+<li><a class="reference internal" href="#tpointarray-sorted">TPointArray.Sorted</a></li>
+<li><a class="reference internal" href="#tpointarray-sortbyx">TPointArray.SortByX</a></li>
+<li><a class="reference internal" href="#tpointarray-sortbyy">TPointArray.SortByY</a></li>
+<li><a class="reference internal" href="#tpointarray-sortbyrow">TPointArray.SortByRow</a></li>
+<li><a class="reference internal" href="#tpointarray-sortbycolumn">TPointArray.SortByColumn</a></li>
+<li><a class="reference internal" href="#tpointarray-sortfromline">TPointArray.SortFromLine</a></li>
+<li><a class="reference internal" href="#tpointarray-bounds">TPointArray.Bounds</a></li>
+<li><a class="reference internal" href="#tpointarray-density">TPointArray.Density</a></li>
+<li><a class="reference internal" href="#tpointarray-edges">TPointArray.Edges</a></li>
+<li><a class="reference internal" href="#tpointarray-cluster">TPointArray.Cluster</a></li>
+<li><a class="reference internal" href="#tpointarray-split">TPointArray.Split</a></li>
+<li><a class="reference internal" href="#tpointarray-toatpa">TPointArray.ToATPA</a></li>
+<li><a class="reference internal" href="#tpointarray-offset">TPointArray.Offset</a></li>
+<li><a class="reference internal" href="#tpointarray-offsetfunc">TPointArray.OffsetFunc</a></li>
+<li><a class="reference internal" href="#tpointarray-invert">TPointArray.Invert</a></li>
+<li><a class="reference internal" href="#tpointarray-filterbox">TPointArray.FilterBox</a></li>
+<li><a class="reference internal" href="#id1">TPointArray.FilterBox</a></li>
+<li><a class="reference internal" href="#tpointarray-filterduplicates">TPointArray.FilterDuplicates</a></li>
+<li><a class="reference internal" href="#tpointarray-clearduplicates">TPointArray.ClearDuplicates</a></li>
+<li><a class="reference internal" href="#tpointarray-rotate">TPointArray.Rotate</a></li>
+<li><a class="reference internal" href="#tpointarray-splitrows">TPointArray.SplitRows</a></li>
+<li><a class="reference internal" href="#tpointarray-connect">TPointArray.Connect</a></li>
+<li><a class="reference internal" href="#tpointarray-convexhull">TPointArray.ConvexHull</a></li>
+<li><a class="reference internal" href="#tpointarray-minarearect">TPointArray.MinAreaRect</a></li>
+<li><a class="reference internal" href="#tpointarray-minareacircle">TPointArray.MinAreaCircle</a></li>
+<li><a class="reference internal" href="#expandpolygon">ExpandPolygon</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="TPoint.html"
+                        title="previous chapter">&lt;no title&gt;</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="TRectangle.html"
+                        title="next chapter">TRectangle.ToTPA</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TPointArray.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="TRectangle.html" title="TRectangle.ToTPA"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TPoint.html" title="&lt;no title&gt;"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

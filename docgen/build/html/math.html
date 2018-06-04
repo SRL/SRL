@@ -1,0 +1,175 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>srl.Modulo &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Mouse" href="mouse.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="keyboard.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="mouse.html" title="Mouse"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="keyboard.html" title="&lt;no title&gt;"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="srl-modulo">
+<h1>srl.Modulo<a class="headerlink" href="#srl-modulo" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">Modulo</span><span class="p">(</span><span class="n">X</span><span class="o">,</span> <span class="n">Y</span><span class="o">:</span> <span class="kt">Double</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>This function returns the remainder from the division of the first argument by the second.
+It will always returns a result with the same sign as its second operand (or zero).</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="nb">Writeln</span><span class="p">(</span><span class="n">srl</span><span class="o">.</span><span class="n">Modulo</span><span class="p">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="p">))</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="srl-modulo-overload">
+<h1>srl.Modulo; overload<a class="headerlink" href="#srl-modulo-overload" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">Modulo</span><span class="p">(</span><span class="n">X</span><span class="o">,</span> <span class="n">Y</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Integer overload for Modulo.</p>
+</div>
+<div class="section" id="srl-crossproduct">
+<h1>srl.CrossProduct<a class="headerlink" href="#srl-crossproduct" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">CrossProduct</span><span class="p">(</span><span class="n">ry</span><span class="o">,</span><span class="n">ry</span><span class="o">,</span> <span class="n">px</span><span class="o">,</span><span class="n">py</span><span class="o">,</span> <span class="n">qx</span><span class="o">,</span><span class="n">qy</span><span class="o">:</span> <span class="kt">Double</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Cross-product of rp and rq vectors.</p>
+</div>
+<div class="section" id="srl-crossproduct-overload">
+<h1>srl.CrossProduct; overload;<a class="headerlink" href="#srl-crossproduct-overload" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">CrossProduct</span><span class="p">(</span><span class="n">r</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">q</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Int64</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Cross-product of rp and rq vectors.</p>
+</div>
+<div class="section" id="srl-deltaangle">
+<h1>srl.DeltaAngle<a class="headerlink" href="#srl-deltaangle" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">DeltaAngle</span><span class="p">(</span><span class="n">DegA</span><span class="o">,</span> <span class="n">DegB</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">R</span><span class="o">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="mi">360</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the shortest difference between two given angles.</p>
+</div>
+<div class="section" id="srl-disttoline">
+<h1>srl.DistToLine<a class="headerlink" href="#srl-disttoline" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">DistToLineEx</span><span class="p">(</span><span class="n">Pt</span><span class="o">,</span> <span class="n">sA</span><span class="o">,</span> <span class="n">sB</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="n">out</span> <span class="n">Nearest</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">DistToLine</span><span class="p">(</span><span class="n">Pt</span><span class="o">,</span> <span class="n">sA</span><span class="o">,</span> <span class="n">sB</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the distance to the nearest point on the line <cite>sA</cite>..`sB`</p>
+</div>
+<div class="section" id="srl-linesintersect">
+<h1>srl.LinesIntersect<a class="headerlink" href="#srl-linesintersect" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">LinesIntersect</span><span class="p">(</span><span class="n">p1</span><span class="o">,</span><span class="n">p2</span><span class="o">,</span> <span class="n">q1</span><span class="o">,</span><span class="n">q2</span><span class="o">:</span><span class="n">TPoint</span><span class="o">;</span> <span class="n">out</span> <span class="n">i</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="srl-pointinrect">
+<h1>srl.PointInRect<a class="headerlink" href="#srl-pointinrect" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TSRL</span><span class="o">.</span><span class="nf">PointInRect</span><span class="p">(</span><span class="k">const</span> <span class="n">Pt</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="k">const</span> <span class="n">A</span><span class="o">,</span> <span class="n">B</span><span class="o">,</span> <span class="n">C</span><span class="o">,</span> <span class="n">D</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if the TPoint ‘Pt’ is in a rect (defined by four points).</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="nb">Writeln</span><span class="p">(</span><span class="n">srl</span><span class="o">.</span><span class="n">PointInRect</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">100</span><span class="o">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">,</span> <span class="p">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">0</span><span class="p">]</span><span class="o">,</span> <span class="p">[</span><span class="mi">200</span><span class="o">,</span><span class="mi">1</span><span class="p">]</span><span class="o">,</span> <span class="p">[</span><span class="mi">201</span><span class="o">,</span><span class="mi">201</span><span class="p">]</span><span class="o">,</span> <span class="p">[</span><span class="mi">0</span><span class="o">,</span><span class="mi">225</span><span class="p">]))</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">srl.Modulo</a></li>
+<li><a class="reference internal" href="#srl-modulo-overload">srl.Modulo; overload</a></li>
+<li><a class="reference internal" href="#srl-crossproduct">srl.CrossProduct</a></li>
+<li><a class="reference internal" href="#srl-crossproduct-overload">srl.CrossProduct; overload;</a></li>
+<li><a class="reference internal" href="#srl-deltaangle">srl.DeltaAngle</a></li>
+<li><a class="reference internal" href="#srl-disttoline">srl.DistToLine</a></li>
+<li><a class="reference internal" href="#srl-linesintersect">srl.LinesIntersect</a></li>
+<li><a class="reference internal" href="#srl-pointinrect">srl.PointInRect</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="keyboard.html"
+                        title="previous chapter">&lt;no title&gt;</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mouse.html"
+                        title="next chapter">Mouse</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/math.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="mouse.html" title="Mouse"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="keyboard.html" title="&lt;no title&gt;"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

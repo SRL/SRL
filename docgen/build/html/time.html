@@ -1,0 +1,222 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Time &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="Other.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="srl.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Other.html" title="&lt;no title&gt;"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="srl.html" title="&lt;no title&gt;"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="time">
+<h1>Time<a class="headerlink" href="#time" title="Permalink to this headline">¶</a></h1>
+<p>Time related methods</p>
+<div class="section" id="ttimemarker">
+<h2>TTimeMarker<a class="headerlink" href="#ttimemarker" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="n">TTimeMarker</span> <span class="o">=</span> <span class="k">record</span>
+    <span class="nb">time</span><span class="o">,</span> <span class="n">startTime</span><span class="o">:</span> <span class="kt">LongWord</span><span class="o">;</span>
+    <span class="n">paused</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Timer type which is useful for loops, timing and writing progress reports.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+</div>
+<div class="section" id="ttimemarker-start">
+<h2>TTimeMarker.Start<a class="headerlink" href="#ttimemarker-start" title="Permalink to this headline">¶</a></h2>
+<p>Starts the timer. Can also be used when paused to continue where it left.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">myTimer</span><span class="o">.</span><span class="n">Start</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ttimemarker-reset">
+<h2>TTimeMarker.Reset<a class="headerlink" href="#ttimemarker-reset" title="Permalink to this headline">¶</a></h2>
+<p>Stops the timer and resets it to zero.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">myTimer</span><span class="o">.</span><span class="n">Reset</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ttimemarker-pause">
+<h2>TTimeMarker.Pause<a class="headerlink" href="#ttimemarker-pause" title="Permalink to this headline">¶</a></h2>
+<p>Pauses the timer. It can be continued with start().</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">myTimer</span><span class="o">.</span><span class="n">Pause</span><span class="p">()</span><span class="o">;</span>
+<span class="n">TakeABreak</span><span class="p">(</span><span class="mi">90000</span><span class="p">)</span><span class="o">;</span>
+<span class="n">myTimer</span><span class="o">.</span><span class="n">Start</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ttimemarker-gettime">
+<h2>TTimeMarker.GetTime<a class="headerlink" href="#ttimemarker-gettime" title="Permalink to this headline">¶</a></h2>
+<p>Gets the time from the timer. Returns zero if the timer was not set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">myTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span><span class="o">;</span>
+<span class="k">repeat</span>
+  <span class="n">DoStuff</span><span class="o">;</span>
+<span class="k">until</span><span class="p">(</span><span class="n">myTimer</span><span class="o">.</span><span class="n">GetTime</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">60000</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ttimemarker-gettotaltime">
+<h2>TTimeMarker.GetTotalTime<a class="headerlink" href="#ttimemarker-gettotaltime" title="Permalink to this headline">¶</a></h2>
+<p>Gets the time from the timer including the time it was paused. Returns zero if
+the timer was not set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>by Bart de Boer</li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">BreakTime</span> <span class="o">:=</span> <span class="n">MyTimer</span><span class="o">.</span><span class="n">GetTotalTime</span><span class="p">()</span> <span class="o">-</span> <span class="n">MyTimer</span><span class="o">.</span><span class="n">GetTime</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tcountdown">
+<h2>TCountDown<a class="headerlink" href="#tcountdown" title="Permalink to this headline">¶</a></h2>
+<p>A neat and simple timer type.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">myTimer</span><span class="o">.</span><span class="n">Init</span><span class="p">(</span><span class="mi">3000</span><span class="p">)</span><span class="o">;</span> <span class="c1">//3000ms</span>
+<span class="k">while</span> <span class="k">not</span> <span class="n">myTimer</span><span class="o">.</span><span class="n">IsFinished</span><span class="p">()</span> <span class="k">do</span>
+  <span class="cm">{do something}</span><span class="o">;</span>
+
+<span class="n">myTimer</span><span class="o">.</span><span class="n">Restart</span><span class="p">(</span><span class="nb">Random</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="o">,</span><span class="mi">200</span><span class="p">))</span><span class="o">;</span> <span class="c1">//3000 +/- 200ms</span>
+<span class="k">while</span> <span class="k">not</span> <span class="n">myTimer</span><span class="o">.</span><span class="n">IsFinished</span><span class="p">()</span> <span class="k">do</span>
+  <span class="cm">{do something}</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Time</a><ul>
+<li><a class="reference internal" href="#ttimemarker">TTimeMarker</a></li>
+<li><a class="reference internal" href="#ttimemarker-start">TTimeMarker.Start</a></li>
+<li><a class="reference internal" href="#ttimemarker-reset">TTimeMarker.Reset</a></li>
+<li><a class="reference internal" href="#ttimemarker-pause">TTimeMarker.Pause</a></li>
+<li><a class="reference internal" href="#ttimemarker-gettime">TTimeMarker.GetTime</a></li>
+<li><a class="reference internal" href="#ttimemarker-gettotaltime">TTimeMarker.GetTotalTime</a></li>
+<li><a class="reference internal" href="#tcountdown">TCountDown</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="srl.html"
+                        title="previous chapter">&lt;no title&gt;</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Other.html"
+                        title="next chapter">&lt;no title&gt;</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/time.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Other.html" title="&lt;no title&gt;"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="srl.html" title="&lt;no title&gt;"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

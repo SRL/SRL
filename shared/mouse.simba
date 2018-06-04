@@ -1,6 +1,12 @@
 (*
-  Moving the mouse
-  ~~~~~~~~~~~~~~~~
+Mouse
+=======
+The Mouse file holds functions and procedures that are related to mouse-stuffz.
+*)
+
+(*
+Moving the mouse
+~~~~~~~~~~~~~~~~
 
   Move the mouse to a x, y coord.
    - Mouse.Move(100, 100);
@@ -14,8 +20,9 @@
   Move the mouse to a random (gauss) point in a circle.
   - Mouse.Move(Point(100, 100), 50);
 
-  Clicking the mouse
-  ~~~~~~~~~~~~~~~~~~
+
+Clicking the mouse
+~~~~~~~~~~~~~~~~~~
 
   Vaild click types: mouse_Left, mouse_Right, mouse_Middle.
 

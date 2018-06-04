@@ -1,3 +1,8 @@
+(*
+Time
+=======
+Time related methods
+*)
 type
   TTimeFormat = (Time_Formal, Time_Short, Time_Abbrev, Time_Bare, Time_FStop, Time_Formal_Long);
 
@@ -258,6 +263,7 @@ TCountDown
 A neat and simple timer type.
 
 Example:
+
 .. code-block:: pascal
 
   myTimer.Init(3000); //3000ms

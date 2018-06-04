@@ -232,7 +232,24 @@ begin
     Result[i] := MiddleTPA(Self[i]);
 end;
 
-function T2DPointArray.Biggest: TPointArray; constref;
+function T2DPointArray.ToTBA(): TBoxArray; constref;
+var i:Int32;
+begin
+  SetLength(Result, Length(self));
+  for i:=0 to High(Self) do
+    Result[i] := GetTPABounds(Self[i]);
+end;
+
+function T2DPointArray.Smallest(): TPointArray; constref;
+var
+  TPA: TPointArray;
+begin
+  for TPA in Self do
+    if (Length(TPA) < Length(Result)) then
+      Result := TPA;
+end;
+
+function T2DPointArray.Biggest(): TPointArray; constref;
 var
   TPA: TPointArray;
 begin

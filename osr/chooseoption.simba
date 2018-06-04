@@ -75,7 +75,7 @@ end;
 
 (*
 ChooseOption.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Open(): Boolean;
@@ -93,7 +93,7 @@ end;
 
 (*
 ChooseOption.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Open(Box:TBox): Boolean; overload;
@@ -111,7 +111,7 @@ end;
 
 (*
 ChooseOption.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.IsOpen(): Boolean;
@@ -128,7 +128,7 @@ end;
 
 (*
 ChooseOption.IsClosed
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.IsClosed(): Boolean;
@@ -150,7 +150,7 @@ end;
 
 (*
 ChooseOption.Find
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Find(): Boolean;
@@ -338,7 +338,7 @@ end;
 
 (*
 ChooseOption.MissSelect
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss: Int32=5): Boolean;
@@ -369,7 +369,7 @@ end;
 
 (*
 ChooseOption.Close
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;

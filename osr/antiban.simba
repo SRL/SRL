@@ -1,54 +1,65 @@
 (*
- Experimental Antiban, Breaksystem, and fatigue/energy system.
- Could contain some issues, and for that reason breaking changes may happen.
+Antiban
+=======
+Experimental Antiban, Breaksystem, and fatigue/energy system.
+Could contain some issues, and for that reason breaking changes may happen.
 
- Other methods worth mentioning in this file:
-    procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; WaitMean:Double=3500);
-    procedure TSRL.MouseOffClient(Direction: Byte);
-    procedure TSRL.MouseOffClient(); overload;
-    function  TSRL.DismissRandom(): Boolean;
+Other methods worth mentioning in this file:
 
+.. code-block:: pascal
 
- Functions of TAntiban:
-    function  TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
-    function  TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
-    function  TAntiban.Copy(): TAntiban; constref;
-
-    procedure TAntiban.SetupBiometrics();
-    function  TAntiban.TimeRunning(): Int64; constref;
-    function  TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
-    procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
-
-    function  TAntiban.AddTask(Task: TAntibanTask): Boolean;
-    function  TAntiban.AddBreak(Task: TBreakTask): Boolean;
-    function  TAntiban.RestartAntiban(): Boolean;
-
-    function  TAntiban.DoBreak(out BreakID: Int32): Boolean;
-    function  TAntiban.DoBreak(): Boolean; overload;
-    function  TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
-
-    function  TAntiban.HasSleep(): Boolean;
-    function  TAntiban.GetSleepId(): Int32;
-    function  TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
-    function  TAntiban.BreaksPast(Timespan: Double): Int64;
-    function  TAntiban.EnergyLevel(): Double;
-    procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.667);
+  procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; WaitMean:Double=3500);
+  procedure TSRL.MouseOffClient(Direction: Byte);
+  procedure TSRL.MouseOffClient(); overload;
+  function  TSRL.DismissRandom(): Boolean;
 
 
- Builtin antiban tasks that can be used directly with TAntiban:
-    procedure TAntiban.LoseFocus();
-    procedure TAntiban.HoverPlayers();
-    procedure TAntiban.CheckSkill();
-    procedure TAntiban.RandomCompass();
-    procedure TAntiban.RandomCompassNESW();
-    procedure TAntiban.CheckStats();
-    procedure TAntiban.OpenRandomTab();
-    procedure TAntiban.VeryShortBreak();
-    procedure TAntiban.FiveMinBreak();
-    procedure TAntiban.DoMiscStuff();
+Functions of TAntiban:
 
- You can easily create your own tasks like the above in your script that does
- whatever. For a deeper look skip to the last lines of this file.
+.. code-block:: pascal
+
+  function  TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
+  function  TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
+  function  TAntiban.Copy(): TAntiban; constref;
+
+  procedure TAntiban.SetupBiometrics();
+  function  TAntiban.TimeRunning(): Int64; constref;
+  function  TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
+  procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
+
+  function  TAntiban.AddTask(Task: TAntibanTask): Boolean;
+  function  TAntiban.AddBreak(Task: TBreakTask): Boolean;
+  function  TAntiban.RestartAntiban(): Boolean;
+
+  function  TAntiban.DoBreak(out BreakID: Int32): Boolean;
+  function  TAntiban.DoBreak(): Boolean; overload;
+  function  TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
+
+  function  TAntiban.HasSleep(): Boolean;
+  function  TAntiban.GetSleepId(): Int32;
+  function  TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
+  function  TAntiban.BreaksPast(Timespan: Double): Int64;
+  function  TAntiban.EnergyLevel(): Double;
+  procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.667);
+
+
+Builtin antiban tasks that can be used directly with TAntiban:
+
+.. code-block:: pascal
+
+  procedure TAntiban.LoseFocus();
+  procedure TAntiban.HoverPlayers();
+  procedure TAntiban.CheckSkill();
+  procedure TAntiban.RandomCompass();
+  procedure TAntiban.RandomCompassNESW();
+  procedure TAntiban.CheckStats();
+  procedure TAntiban.OpenRandomTab();
+  procedure TAntiban.VeryShortBreak();
+  procedure TAntiban.FiveMinBreak();
+  procedure TAntiban.DoMiscStuff();
+
+You can easily create your own tasks like the above in your script that does
+whatever. For a deeper look skip to the last lines of this file.
 *)
 
 type
@@ -216,10 +227,10 @@ end;
 // -----------------------------------------------------------------------------
 // TAntiban setup and such
 
-(*
+{
   Basic setup procedures
   What skills do we care about, and alterantively how long should the log be (mainly for debugging)
-*)
+}
 function TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
 var i: Int32;
 begin
@@ -235,9 +246,9 @@ begin
   Self.Init([Skill], LogSize);
 end;
 
-(*
+{
   Deep copy of the antiban structure
-*)
+}
 function TAntiban.Copy(): TAntiban; constref;
 begin
   Result := Self;
@@ -247,7 +258,7 @@ begin
   Result.TasksDone    := System.Copy(Self.TasksDone);
 end;
 
-(*
+{
   Sets up two variables Patience and an Endurance, based on your characters
   nickname. These two factors are used within Energy calculation to make it
   unique to you.
@@ -262,7 +273,7 @@ end;
           the bot can run for a full 24 hours before energy is depleted.
     Low:  You generally drop off faster. Min endurance means the bot can
           only run for 16 hours before energy is depleted.
-*)
+}
 procedure TAntiban.SetupBiometrics();
 var
   h,i:UInt32;
@@ -281,17 +292,17 @@ begin
   Self.Patience  := (1+Sin(h)) / 2;
 end;
 
-(*
+{
   A 64bit timer for runtime, so that we can do long proggies without hickups
-*)
+}
 function TAntiban.TimeRunning(): Int64; constref;
 begin
   Result := GetTickCount() - SRL.StartTime;
 end;
 
-(*
+{
   Returns the time running at the given time of day.
-*)
+}
 function TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
 var
   stv, res: TDateTime;
@@ -304,9 +315,9 @@ begin
 end;
 
 
-(*
+{
   Debugs the latest antiban task done, and stores it in the logg.
-*)
+}
 procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
 var
   text: String;
@@ -324,12 +335,12 @@ begin
 end;
 
 
-(*
+{
   Used to add an antiban task.
 
                             The task            How often     Variation (0..1)
   Example: Antiban.AddTask([@Antiban.LoseFocus, FIVE_MINUTES, 0.25]);
-*)
+}
 function TAntiban.AddTask(Task: TAntibanTask): Boolean;
 begin
   with Task do
@@ -340,7 +351,7 @@ begin
   Self.Tasks += Task;
 end;
 
-(*
+{
   Used to add an antiban break.
 
   Example:             Run every   Lasts for?     Logout chance   Variation (0..1)
@@ -349,7 +360,7 @@ end;
   Note:
     Breaks should always be added in the order most often to least often, but
     where a sleep kind of break is always the last addition.
-*)
+}
 function TAntiban.AddBreak(Task: TBreakTask): Boolean;
 begin
   with Task do
@@ -360,10 +371,10 @@ begin
   Self.Breaks += Task;
 end;
 
-(*
+{
   Internally used to reset all antiban timers to a random start
   time after a break
-*)
+}
 function TAntiban.RestartAntiban(): Boolean;
 var i: Int32;
 begin
@@ -372,12 +383,12 @@ begin
       NextAtTime := Self.TimeRunning() + Random() * Interval;
 end;
 
-(*
+{
   Call this method to do a break. If one of those has pased it's time,
   then it will be executed, and the method will return `True`.
 
   Returns the id of the break executed.
-*)
+}
 function TAntiban.DoBreak(out BreakID: Int32): Boolean;
 var
   i, j, PauseStart: Int32;
@@ -411,11 +422,11 @@ begin
   Result := Self.DoBreak(_);
 end;
 
-(*
+{
   Call this method to do an antiban (or a break if `CheckBreaks` is set).
   If one of those has pased it's time, then it will be executed, and the
   method will return `True`
-*)
+}
 function TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
 var i: Int32;
 begin
@@ -436,10 +447,10 @@ begin
 end;
 
 
-(*
+{
   Check if the antiban has a `sleep` break added.
   Note: Sleep is defined by being 5+ hours, and is the the last added break.
-*)
+}
 function TAntiban.HasSleep(): Boolean;
 var zZz: Int32;
 begin
@@ -447,10 +458,10 @@ begin
   Result := (zZz >= 0) and ((Self.Breaks[zZz].Length) > 5*ONE_HOUR);
 end;
 
-(*
+{
   Returns the ID of the sleep break, if there is one, otherwise -1.
   Note: Sleep is defined by being 5+ hours, and is the the last added break.
-*)
+}
 function TAntiban.GetSleepId(): Int32;
 var zZz: Int32;
 begin
@@ -460,10 +471,10 @@ begin
     Result := zZz;
 end;
 
-(*
+{
   Internally used to compute Energy
   - It checks how long it was since last break, returns the value in milliseconds
-*)
+}
 function TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
 var i: Int32;
 begin
@@ -474,12 +485,12 @@ begin
 end;
 
 
-(*
+{
   Internally used to compute Energy
   - The method gathers the sum/length of pauses the past `Timespan`.
   It only counts one of each type of pauses, so if you have a 5 min break that
   runs every 10 minutes, it will only count the last executed one no matter timespan.
-*)
+}
 function TAntiban.BreaksPast(Timespan: Double): Int64;
 var
   XHoursAgo: Double := Self.TimeRunning() - Timespan;
@@ -499,13 +510,13 @@ begin
   Result := Round(Min(Timespan, Timespan - Active));
 end;
 
-(*
+{
   Returns the current energy of your character, based on recent breaks, and runtime.
   You should start with near 100% energy, can be a little less.
 
   This method does expect your bot to have a sleep break (5+ hours), otherwise it
   wont be worth a lot.
-*)
+}
 function TAntiban.EnergyLevel(): Double;
 var
   zz: Int32;
@@ -653,12 +664,12 @@ begin
 end;
 
 
-(*
+{
   Internally used to take a break:
   - It pauses for the time specified in the Task +/- Task.StdVar
   - Can log out if LogoutChance is hit (0..1), and if rsclient is used an equal
     test will be computed for it with the same chance as `LogoutChance` for losing focus.
-*)
+}
 procedure TAntiban.TakeBreak(Task: TBreakTask);
 var
   len: Int64;

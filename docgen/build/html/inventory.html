@@ -1,0 +1,334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Inventory &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Logout" href="logout.html" />
+    <link rel="prev" title="Equipment" href="equipment.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="logout.html" title="Logout"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="equipment.html" title="Equipment"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="inventory">
+<h1>Inventory<a class="headerlink" href="#inventory" title="Permalink to this headline">¶</a></h1>
+<p>The inventory file holds functions and procedures that are related
+to the runescape inventory</p>
+<div class="section" id="type-trsinventory">
+<h2>type TRSInventory<a class="headerlink" href="#type-trsinventory" title="Permalink to this headline">¶</a></h2>
+<p>The type that holds functions and properties of the Runescape inventory gametab.</p>
+</div>
+<div class="section" id="var-inventory">
+<h2>var inventory<a class="headerlink" href="#var-inventory" title="Permalink to this headline">¶</a></h2>
+<p>Variable that stores functions and properties of the Runescape inventory gametab.</p>
+</div>
+<div class="section" id="inventory-open">
+<h2>Inventory.Open<a class="headerlink" href="#inventory-open" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Open</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the interface</p>
+</div>
+<div class="section" id="inventory-isopen">
+<h2>Inventory.IsOpen<a class="headerlink" href="#inventory-isopen" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">IsOpen</span><span class="p">(</span><span class="n">maxWait</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Checks if the interface is already open.</p>
+</div>
+<div class="section" id="inventory-isslotvalid">
+<h2>Inventory.IsSlotValid<a class="headerlink" href="#inventory-isslotvalid" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">IsSlotValid</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if the given slot is within a valid range.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-pointtoslot">
+<h2>Inventory.PointToSlot<a class="headerlink" href="#inventory-pointtoslot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">PointToSlot</span><span class="p">(</span><span class="n">pt</span><span class="o">:</span><span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the slot-index under the given TPoint.
+If it’s not over a slot then -1 is returned</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-mouseslot">
+<h2>Inventory.MouseSlot<a class="headerlink" href="#inventory-mouseslot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">MouseSlot</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">btn</span><span class="o">:</span> <span class="kt">Integer</span> <span class="o">=</span> <span class="n">mouse_Move</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Moves the moise over the given slot-index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-isfull">
+<h2>Inventory.IsFull<a class="headerlink" href="#inventory-isfull" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">IsFull</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns True if the inventory can’t hold anymore items</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-getslotbox">
+<h2>Inventory.GetSlotBox<a class="headerlink" href="#inventory-getslotbox" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">GetSlotBox</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the bounding box covering the given slot-index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-isslotused">
+<h2>Inventory.IsSlotUsed<a class="headerlink" href="#inventory-isslotused" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">IsSlotUsed</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if the given slot is occupied.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-getusedslots">
+<h2>Inventory.GetUsedSlots<a class="headerlink" href="#inventory-getusedslots" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">GetUsedSlots</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns all the occupied slot-indices.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-count">
+<h2>Inventory.Count<a class="headerlink" href="#inventory-count" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Count</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the number of used slots</p>
+</div>
+<div class="section" id="inventory-dropitems">
+<h2>Inventory.DropItems<a class="headerlink" href="#inventory-dropitems" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">DropItems</span><span class="p">(</span><span class="n">Slots</span><span class="o">:</span><span class="n">TIntegerArray</span> <span class="o">=</span> <span class="n">DROP_PATTERN_REGULAR</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Drops the given items. It’s order-sensitive which means unless you want it to
+jump randomly all over the inventory dropping items, you give it a ordered drop-pattern.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Examples:
+.. code-block:: pascal</p>
+<blockquote>
+<div>// drops all items in a “snake order” / “Z”-order
+Inventory.DropItems(DROP_PATTERN_SNAKE);</div></blockquote>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Inventory</span><span class="o">.</span><span class="n">DropItems</span><span class="p">([</span><span class="mi">0</span><span class="o">..</span><span class="mi">3</span><span class="p">])</span><span class="o">;</span> <span class="c1">// drops the four first items</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inventory-dropitemsexcept">
+<h2>Inventory.DropItemsExcept<a class="headerlink" href="#inventory-dropitemsexcept" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">DropItemsExcept</span><span class="p">(</span><span class="n">ignoreSlots</span><span class="o">:</span><span class="n">TIntegerArray</span><span class="o">;</span> <span class="n">Slots</span><span class="o">:</span><span class="n">TIntegerArray</span> <span class="o">=</span> <span class="n">DROP_PATTERN_REGULAR</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Drops all the given items <code class="docutils literal notranslate"><span class="pre">Slots</span></code> except for the items in <code class="docutils literal notranslate"><span class="pre">IgnoreSolots</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="inventory-finditem">
+<h2>Inventory.FindItem<a class="headerlink" href="#inventory-finditem" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">FindItem</span><span class="p">(</span><span class="n">Mask</span><span class="o">:</span> <span class="n">TMask</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">:</span><span class="n">Int32</span> <span class="o">=</span> <span class="mi">30</span><span class="o">;</span> <span class="n">ContourTolerance</span><span class="o">:</span><span class="n">Int32</span> <span class="o">=</span> <span class="mi">30</span><span class="o">;</span> <span class="n">MaxToFind</span><span class="o">:</span><span class="kt">Byte</span> <span class="o">=</span> <span class="mi">28</span><span class="p">)</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">FindItem</span><span class="p">(</span><span class="n">DTM</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span> <span class="n">MaxToFind</span><span class="o">:</span><span class="kt">Byte</span> <span class="o">=</span> <span class="mi">28</span><span class="p">)</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">FindItem</span><span class="p">(</span><span class="n">BMP</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">MaxToFind</span><span class="o">:</span><span class="kt">Byte</span><span class="p">)</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Find the slots of the given item defined by a <cite>TMask</cite>, <cite>DTM</cite>, or <cite>BMP</cite>.</p>
+<p>_Note: Last parameter is not defaulted in the last overload <cite>FindItem(BMP..)</cite> for technical reasons._</p>
+<p>Example:
+.. code-block:: pascal</p>
+<blockquote>
+<div><p>itemArr := Inventory.FindItem(myMask);
+if itemArr = [] then</p>
+<blockquote>
+<div>WriteLn(‘Not found’);</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="id1">
+<h2>Inventory.Count<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Count</span><span class="p">(</span><span class="n">Mask</span><span class="o">:</span> <span class="n">TMask</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">,</span> <span class="n">ContourTolerance</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Count</span><span class="p">(</span><span class="n">DTM</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Count</span><span class="p">(</span><span class="n">BMP</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Counts the number of slots containing this item</p>
+</div>
+<div class="section" id="inventory-contains">
+<h2>Inventory.Contains<a class="headerlink" href="#inventory-contains" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">Mask</span><span class="o">:</span> <span class="n">TMask</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">,</span> <span class="n">ContourTolerance</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">DTM</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">BMP</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">:</span><span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if the inventory contains the given item</p>
+</div>
+<div class="section" id="inventory-getactiveslot">
+<h2>Inventory.GetActiveSlot<a class="headerlink" href="#inventory-getactiveslot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">GetActiveSlot</span><span class="p">()</span><span class="o">:</span> <span class="n">Int8</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the index to the current active slot, returns <cite>-1</cite> if none.</p>
+</div>
+<div class="section" id="inventory-use">
+<h2>Inventory.Use<a class="headerlink" href="#inventory-use" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">Use</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>RS correct alias for Inventory.ActivateSlot.</p>
+</div>
+<div class="section" id="inventory-activateslot">
+<h2>Inventory.ActivateSlot<a class="headerlink" href="#inventory-activateslot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">ActivateSlot</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Activates (Presses) the given slot, however if <cite>Slot</cite> is <cite>-1</cite> then it will disable the current active slot.</p>
+</div>
+<div class="section" id="inventory-waitcount">
+<h2>Inventory.WaitCount<a class="headerlink" href="#inventory-waitcount" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSInventory</span><span class="o">.</span><span class="nf">WaitCount</span><span class="p">(</span><span class="n">Amount</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="nb">Time</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">Compare</span><span class="o">:</span> <span class="n">TComparator</span> <span class="o">=</span> <span class="n">__EQ__</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Waits for intentory amount to meet expected size. By default it waits till it’s equal
+to given Amount, but can wait till it’s not equal, less than or greater than.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Inventory</a><ul>
+<li><a class="reference internal" href="#type-trsinventory">type TRSInventory</a></li>
+<li><a class="reference internal" href="#var-inventory">var inventory</a></li>
+<li><a class="reference internal" href="#inventory-open">Inventory.Open</a></li>
+<li><a class="reference internal" href="#inventory-isopen">Inventory.IsOpen</a></li>
+<li><a class="reference internal" href="#inventory-isslotvalid">Inventory.IsSlotValid</a></li>
+<li><a class="reference internal" href="#inventory-pointtoslot">Inventory.PointToSlot</a></li>
+<li><a class="reference internal" href="#inventory-mouseslot">Inventory.MouseSlot</a></li>
+<li><a class="reference internal" href="#inventory-isfull">Inventory.IsFull</a></li>
+<li><a class="reference internal" href="#inventory-getslotbox">Inventory.GetSlotBox</a></li>
+<li><a class="reference internal" href="#inventory-isslotused">Inventory.IsSlotUsed</a></li>
+<li><a class="reference internal" href="#inventory-getusedslots">Inventory.GetUsedSlots</a></li>
+<li><a class="reference internal" href="#inventory-count">Inventory.Count</a></li>
+<li><a class="reference internal" href="#inventory-dropitems">Inventory.DropItems</a></li>
+<li><a class="reference internal" href="#inventory-dropitemsexcept">Inventory.DropItemsExcept</a></li>
+<li><a class="reference internal" href="#inventory-finditem">Inventory.FindItem</a></li>
+<li><a class="reference internal" href="#id1">Inventory.Count</a></li>
+<li><a class="reference internal" href="#inventory-contains">Inventory.Contains</a></li>
+<li><a class="reference internal" href="#inventory-getactiveslot">Inventory.GetActiveSlot</a></li>
+<li><a class="reference internal" href="#inventory-use">Inventory.Use</a></li>
+<li><a class="reference internal" href="#inventory-activateslot">Inventory.ActivateSlot</a></li>
+<li><a class="reference internal" href="#inventory-waitcount">Inventory.WaitCount</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="equipment.html"
+                        title="previous chapter">Equipment</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="logout.html"
+                        title="next chapter">Logout</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/inventory.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="logout.html" title="Logout"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="equipment.html" title="Equipment"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

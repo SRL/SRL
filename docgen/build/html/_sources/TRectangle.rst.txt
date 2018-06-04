@@ -1,0 +1,117 @@
+
+TRectangle.ToTPA
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.ToTPA(): TPointArray; constref;
+
+TPA from the rectangle.
+
+TRectangle.Bounds
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Bounds(): TBox; constref;
+
+Returns the minimum bounding box covering the rectangle
+
+TRectangle.Radius
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Radius(): Double; constref;
+
+Returns the radius of the shortest side, for the maximum see MaxRadius
+
+TRectangle.MaxRadius
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.MaxRadius(): Double; constref;
+
+Returns the radius of the longest side, for minimum see Radius
+
+TRectangle.Mean
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Mean(): TPoint; constref;
+
+Middle of the rectangle
+
+.. note:: by slacky
+
+TRectangle.Rotate
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Rotate(Angle: Double): TRectangle; constref;
+    
+Returns a rotated copy of the rectangle
+
+TRectangle.Contains
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Contains(Pt: TPoint): Boolean; constref;
+  
+Returns true if the point `Pt` is inside the rectangle.
+.. note:: by slacky
+
+TRectangle.DirByLen
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.DirByLen(Longest: Boolean=True): ESplitDirection; constref;
+  
+Returns the direction which is the longest or shortest.
+
+.. note:: by slacky
+
+TRectangle.Partition
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Partition(m,n:Int32; dir:ESplitDirection=rpTopLeft): TRectArray; constref;
+    
+Break the rectangle into smaller rectangles. Goes well along with `DirByLen`
+
+.. note:: by slacky
+
+TRectangle.OffsetFunc
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.OffsetFunc(pt: TPoint): TRectangle; constref;
+
+Offset the rectangle
+
+TRectangle.Filter
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Filter(TestSet: TPointArray): TPointArray; constref;
+    
+Extract all the points from `TestSet` that fits within this rectangle.
+
+.. note:: by slacky
+
+TRectangle.Expand
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.Expand(Inc: Int32): TRectangle; constref;
+  
+Increase or decrease the dimensions of the rectangle.
+
+.. note:: by slacky
+
+TRectangle.NearestEdge
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRectangle.NearestEdge(P: TPoint): TPoint; constref;
+
+Returns the closest edge point (think Rect.ToTPA.Connect) to the TPoint `P`.
+
+.. note:: by slacky

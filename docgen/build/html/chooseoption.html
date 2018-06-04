@@ -1,0 +1,239 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ChooseOption &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="client.html" />
+    <link rel="prev" title="Antiban" href="antiban.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="client.html" title="&lt;no title&gt;"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="antiban.html" title="Antiban"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="chooseoption">
+<h1>ChooseOption<a class="headerlink" href="#chooseoption" title="Permalink to this headline">¶</a></h1>
+<p>The ChooseOption file holds functions and procedures that are related to the
+ingame context menu.</p>
+<div class="section" id="type-trschooseoption">
+<h2>type TRSChooseOption<a class="headerlink" href="#type-trschooseoption" title="Permalink to this headline">¶</a></h2>
+<p>The type that holds functions and properties of the context menu.</p>
+</div>
+<div class="section" id="var-chooseoption">
+<h2>var ChooseOption<a class="headerlink" href="#var-chooseoption" title="Permalink to this headline">¶</a></h2>
+<p>Variable that stores functions and properties of the context menu.</p>
+</div>
+<div class="section" id="chooseoption-open">
+<h2>ChooseOption.Open<a class="headerlink" href="#chooseoption-open" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Open</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the optionbox, returns true if it worked.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>ChooseOption.Open<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Open</span><span class="p">(</span><span class="n">Box</span><span class="o">:</span><span class="n">TBox</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the menu and stores it’s bounds, returns true if it worked.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-isopen">
+<h2>ChooseOption.IsOpen<a class="headerlink" href="#chooseoption-isopen" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">IsOpen</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Checks if the menu is open, it repeats the check for a +/-2 sec if it’s <code class="docutils literal notranslate"><span class="pre">False</span></code> (expecting it to open).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-isclosed">
+<h2>ChooseOption.IsClosed<a class="headerlink" href="#chooseoption-isclosed" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">IsClosed</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Checks if the menu is closed, it repeats the check for a +/-650ms if it’s <code class="docutils literal notranslate"><span class="pre">True</span></code> (expecting it to close).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-find">
+<h2>ChooseOption.Find<a class="headerlink" href="#chooseoption-find" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Find</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Is used internally to find the option-menu, and store the coordinates in the instance.
+Returns True if it’s found.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-getoptions">
+<h2>ChooseOption.GetOptions<a class="headerlink" href="#chooseoption-getoptions" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">GetOptions</span><span class="p">()</span><span class="o">:</span> <span class="n">TOptionArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns each option in the menu.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-selectid">
+<h2>ChooseOption.SelectID<a class="headerlink" href="#chooseoption-selectid" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">SelectID</span><span class="p">(</span><span class="n">ID</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">MouseAction</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="n">mouse_left</span><span class="o">;</span> <span class="n">CloseIt</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>By default it will click the given option <cite>ID</cite>, if it’s not there the menu will be closed.
+Returns True if the select-action was performed.</p>
+<p>Slows down the mouse movement for more realistic sliding through the lines of text.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chooseoption-select">
+<h2>ChooseOption.Select<a class="headerlink" href="#chooseoption-select" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Select</span><span class="p">(</span><span class="n">SubStrings</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">MouseAction</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="n">mouse_left</span><span class="o">;</span> <span class="n">AClose</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="o">;</span> <span class="n">CaseSensitive</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Select</span><span class="p">(</span><span class="n">Option</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">MouseAction</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="n">mouse_left</span><span class="o">;</span> <span class="n">AClose</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="o">;</span> <span class="n">CaseSensitive</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Same as SelectID, except that this will look for the option by it’s text, rather than by id.</p>
+</div>
+<div class="section" id="chooseoption-missselect">
+<h2>ChooseOption.MissSelect<a class="headerlink" href="#chooseoption-missselect" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">MissSelect</span><span class="p">(</span><span class="n">Option</span><span class="o">,</span> <span class="n">MissOpt</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">ChanceOfMiss</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">MissSelect</span><span class="p">(</span><span class="n">Option</span><span class="o">,</span> <span class="n">MissOpt</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">ChanceOfMiss</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>For example, click Inspect when you meant to click Drop. By default there’s a 5% chance of misclick,
+it will automatically click the right one after a missclick.</p>
+</div>
+<div class="section" id="chooseoption-close">
+<h2>ChooseOption.Close<a class="headerlink" href="#chooseoption-close" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChooseOption</span><span class="o">.</span><span class="nf">Close</span><span class="p">(</span><span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Closes the option menu by dragging the mouse away from it, if that
+failed it clicks the “Close”-option.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ChooseOption</a><ul>
+<li><a class="reference internal" href="#type-trschooseoption">type TRSChooseOption</a></li>
+<li><a class="reference internal" href="#var-chooseoption">var ChooseOption</a></li>
+<li><a class="reference internal" href="#chooseoption-open">ChooseOption.Open</a></li>
+<li><a class="reference internal" href="#id1">ChooseOption.Open</a></li>
+<li><a class="reference internal" href="#chooseoption-isopen">ChooseOption.IsOpen</a></li>
+<li><a class="reference internal" href="#chooseoption-isclosed">ChooseOption.IsClosed</a></li>
+<li><a class="reference internal" href="#chooseoption-find">ChooseOption.Find</a></li>
+<li><a class="reference internal" href="#chooseoption-getoptions">ChooseOption.GetOptions</a></li>
+<li><a class="reference internal" href="#chooseoption-selectid">ChooseOption.SelectID</a></li>
+<li><a class="reference internal" href="#chooseoption-select">ChooseOption.Select</a></li>
+<li><a class="reference internal" href="#chooseoption-missselect">ChooseOption.MissSelect</a></li>
+<li><a class="reference internal" href="#chooseoption-close">ChooseOption.Close</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="antiban.html"
+                        title="previous chapter">Antiban</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="client.html"
+                        title="next chapter">&lt;no title&gt;</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/chooseoption.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="client.html" title="&lt;no title&gt;"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="antiban.html" title="Antiban"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

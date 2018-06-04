@@ -1,3 +1,7 @@
+(*
+BankScreen
+==========
+*)
 const
   DIR_NORTH = 0.00;
   DIR_EAST  = 90.0;

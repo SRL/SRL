@@ -554,7 +554,7 @@ end;
 
 (*
 Chatbox.GetButtonQuery
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.GetButtonQuery(): String;
@@ -579,7 +579,7 @@ end;
 
 (*
 Chatbox.WaitButtonQuery
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.WaitButtonQuery(Query: String; WaitTime: Int32): Boolean;
@@ -602,7 +602,7 @@ end;
 
 (*
 Chatbox.ClickButtonId
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.ClickButtonId(Query: String; Id:Int32; UpText:String; WaitTime: Int32): Boolean;
@@ -648,7 +648,7 @@ end;
 
 (*
 Chatbox.ClickButtonColor
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;
@@ -726,7 +726,7 @@ end;
 
 (*
 Chatbox.GetNotification
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TRSChatBox.GetNotification: String;

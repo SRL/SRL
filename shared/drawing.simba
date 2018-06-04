@@ -7,8 +7,6 @@ The drawing file holds TMufasaBitmap drawing functions to aid drawing onto bitma
 The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/master/lib/utilities/drawing.simba>`_.
 *)
 
-{$f-}
-
 type
   TColorArray = array of TColor;
 
@@ -412,8 +410,12 @@ TMufasaBitmap.DrawRect
 Draws a TRectangle onto the TMufasaBitmap
 *)
 procedure TMufasaBitmap.DrawRect(Rect: TRectangle; color: TColor);
+var
+  TPA: TPointArray;
 begin
-  Self.DrawTPA(Rect.ToTPA().Connect(), color);
+  TPA := Rect.ToTPA().Connect();
+  FilterPointsBox(TPA, 0,0,Self.GetWidth()-1,Self.GetHeight()-1);
+  Self.DrawTPA(TPA, color);
 end;
 
 (*
@@ -809,7 +811,7 @@ begin
   end;
 
   ClearDebugImg();
-  DisplayDebugImgWindow(self.GetWidth(), self.GetHeight());
+  DisplayDebugImgWindow(Max(100,self.GetWidth()), Max(100,self.GetHeight()));
   DrawBitmapDebugImg(self.GetIndex());
 end;
 
