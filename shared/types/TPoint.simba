@@ -1,3 +1,8 @@
+(*
+TPoint
+=============
+TPoint related methods
+*)
 function TPoint.InRect(Rect: TRectangle): Boolean; constref;
 begin
   if srl.PointInTriangle(Self, Rect.Top,Rect.Btm,Rect.Right) then Exit(True);

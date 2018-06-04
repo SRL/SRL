@@ -1,4 +1,8 @@
 
+Color
+======
+Color finding related methods
+
 srl.WaitColorCount
 ~~~~~~~~~~~~~~~~~~
 

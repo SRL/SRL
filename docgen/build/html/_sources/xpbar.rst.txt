@@ -1,4 +1,8 @@
 
+XPBar
+======
+XPBar related methods
+
 XPBar.Read
 ~~~~~~~~~~
 .. code-block:: pascal

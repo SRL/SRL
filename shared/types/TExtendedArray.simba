@@ -1,3 +1,9 @@
+(*
+TExtendedArray
+==============
+TExtendedArray related methods
+*)
+
 procedure TExtendedArray.Append(const Value: Extended);
 var top:Int32;
 begin

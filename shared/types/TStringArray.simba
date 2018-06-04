@@ -1,3 +1,9 @@
+(*
+TStringArray
+=============
+TStringArray related methods
+*)
+
 procedure TStringArray.Append(const Value: String);
 var top:Int32;
 begin

@@ -1,4 +1,10 @@
 
+TCircle
+=======
+TCircle related methods
+
+type definition is found in shared/globals.simba
+
 TCircle.ToTPA
 ~~~~~~~~~~~~~~
 .. code-block:: pascal

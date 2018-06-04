@@ -1,4 +1,8 @@
 
+WorldSwitcher
+=============
+Methods that relates to swithing world.
+
 WorldSwitcher.GetWorld
 ~~~~~~~~~~~~~~~~~~~~~~
 

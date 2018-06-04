@@ -1,3 +1,9 @@
+(*
+Loginscreen
+===========
+Loginscreen related methods
+*)
+
 {$IFNDEF CODEINSIGHT}
 const
   COL_LOGIN_YELLOW = 65535;

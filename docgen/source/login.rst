@@ -1,4 +1,8 @@
 
+Loginscreen
+===========
+Loginscreen related methods
+
 TRSLoginScreen.OpenWorldSwitcher
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

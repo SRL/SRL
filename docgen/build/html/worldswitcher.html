@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>WorldSwitcher.GetWorld &#8212; SRL  documentation</title>
+    <title>WorldSwitcher &#8212; SRL  documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="XPBar.Read" href="xpbar.html" />
+    <link rel="next" title="XPBar" href="xpbar.html" />
     <link rel="prev" title="Text" href="text.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -25,7 +25,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="xpbar.html" title="XPBar.Read"
+          <a href="xpbar.html" title="XPBar"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="text.html" title="Text"
@@ -39,8 +39,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="worldswitcher-getworld">
-<h1>WorldSwitcher.GetWorld<a class="headerlink" href="#worldswitcher-getworld" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="worldswitcher">
+<h1>WorldSwitcher<a class="headerlink" href="#worldswitcher" title="Permalink to this headline">¶</a></h1>
+<p>Methods that relates to swithing world.</p>
+<div class="section" id="worldswitcher-getworld">
+<h2>WorldSwitcher.GetWorld<a class="headerlink" href="#worldswitcher-getworld" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div>function TRSWorldSwitcher.GetWorld(Filter: TRSWorldFilter): Int32; overload;</div></blockquote>
 <p>Selects a random world which isn’t a filter world and has no filter properties.</p>
@@ -50,6 +53,7 @@
 <div>// Returns a random world that isn’t world 302 and isn’t a free world.
 World := WorldSwitcher.GetWorld([[WORLD_FREE], [302]]);</div></blockquote>
 </div>
+</div>
 
 
           </div>
@@ -57,12 +61,20 @@ World := WorldSwitcher.GetWorld([[WORLD_FREE], [302]]);</div></blockquote>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">WorldSwitcher</a><ul>
+<li><a class="reference internal" href="#worldswitcher-getworld">WorldSwitcher.GetWorld</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="text.html"
                         title="previous chapter">Text</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="xpbar.html"
-                        title="next chapter">XPBar.Read</a></p>
+                        title="next chapter">XPBar</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -93,7 +105,7 @@ World := WorldSwitcher.GetWorld([[WORLD_FREE], [302]]);</div></blockquote>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="xpbar.html" title="XPBar.Read"
+          <a href="xpbar.html" title="XPBar"
              >next</a> |</li>
         <li class="right" >
           <a href="text.html" title="Text"

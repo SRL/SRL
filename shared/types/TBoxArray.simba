@@ -1,3 +1,9 @@
+(*
+TBoxArray
+=========
+TBoxArray related methods
+*)
+
 procedure TBoxArray.Append(const Value: TBox);
 var top:Int32;
 begin

@@ -1,3 +1,8 @@
+(*
+Color
+======
+Color finding related methods
+*)
 type
   TCTSColor = record
     Color: Integer;

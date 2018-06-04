@@ -1,3 +1,8 @@
+(*
+WorldSwitcher
+=============
+Methods that relates to swithing world.
+*)
 type
   ERSWorldProperty = (WORLD_FREE, WORLD_MEMBERS,
                       WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT,

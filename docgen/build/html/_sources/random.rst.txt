@@ -1,6 +1,10 @@
 
+Random
+=======
+Random related methods
+
 srl.GaussRand
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.GaussRand(mean, dev: Double): Double;
@@ -8,7 +12,7 @@ srl.GaussRand
 Generates a random gaussian/normal number.
 
 srl.TruncatedGauss
-~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.TruncatedGauss(Left:Double=0; Right:Double=1): Double;
@@ -17,7 +21,7 @@ Generates a random gaussian/normal number which is truncated and mapped within t
 given range ``[left..right]`` weighted towards ``left``
 
 srl.SkewedRand
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.SkewedRand(Mode, Lo, Hi: Double): Double; static;
@@ -26,7 +30,7 @@ Random skewed distribution generation. `Mode` is a number between `Lo` and `Hi` 
 where the most of the generated numbers will land.
 
 srl.NormalRange
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.NormalRange(min, max: Int64): Int64;
@@ -34,7 +38,7 @@ srl.NormalRange
 Generates a random integer in the given range, weighted towards the mean.
 
 srl.NormalRange
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.NormalRange(min, max: Double): Double;
@@ -69,7 +73,7 @@ Generates a random TPoint in the given rectangle `rect`,
 The point weights towards the middle of the rectangle.
 
 srl.RandonPointEx
-~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.RandonPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
@@ -82,7 +86,7 @@ The last parameter `Force` defines how much the generated point is to be skewed 
   Force = 2: Result weighs heavily towrads the edge furthest away from `From`
 
 Wait (overload)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   procedure Wait(min, max:Double; weight:EWaitDir=wdMean); overload;
@@ -90,7 +94,7 @@ Wait (overload)
 Waits ... Weighted towards the mean of `min` and `max`
 
 WaitEx
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
 .. code-block:: pascal
 
   procedure WaitEx(mean, dev:Double);
@@ -98,7 +102,7 @@ WaitEx
 Waits ... Regular gauss random
 
 srl.rowp
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.rowp(From: TPoint; Rect: TRectangle; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint;

@@ -1,4 +1,10 @@
 
+TRectangle
+=============
+TRectangle related methods
+
+Type definition is found in shared/globals.simba
+
 TRectangle.ToTPA
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal

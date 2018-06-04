@@ -1,3 +1,9 @@
+(*
+String
+======
+String related methods
+*)
+
 (* 
  `AnsiString` is used instead of `string`, because 
   code completion doesn't support `string`

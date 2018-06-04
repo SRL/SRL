@@ -1,4 +1,8 @@
 
+TPointArray
+=============
+TPointArray related methods
+
 TPointArray.Mean
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal

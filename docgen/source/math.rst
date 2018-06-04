@@ -1,4 +1,8 @@
 
+Math
+=======
+Math related methods
+
 srl.Modulo
 ~~~~~~~~~~
 .. code-block:: pascal

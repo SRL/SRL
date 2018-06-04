@@ -1,3 +1,9 @@
+(*
+TIntegerArray
+=============
+TIntegerArray related methods
+*)
+
 procedure TIntegerArray.Append(const Value: Integer);
 var top:Int32;
 begin

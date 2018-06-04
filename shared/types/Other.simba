@@ -1,3 +1,9 @@
+(*
+Other datatypes
+===============
+Defines methods for some other datatypes
+*)
+
 type
   TMatrix4 = packed record
     M11,M12,M13,M14,

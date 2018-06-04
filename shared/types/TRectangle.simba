@@ -1,5 +1,10 @@
-// type definition is found in shared/globals.simba
+(*
+TRectangle
+=============
+TRectangle related methods
 
+Type definition is found in shared/globals.simba
+*)
 type
   ESplitDirection = (rpTopLeft, rpBtmRight);
 

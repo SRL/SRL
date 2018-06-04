@@ -1,3 +1,9 @@
+(*
+TPointArray
+=============
+TPointArray related methods
+*)
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure TPointArray.Append(const Value: TPoint);

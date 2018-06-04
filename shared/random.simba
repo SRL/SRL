@@ -1,3 +1,8 @@
+(*
+Random
+=======
+Random related methods
+*)
 type
   EWaitDir = (wdLeft,wdMean,wdRight);
 
@@ -12,7 +17,7 @@ end;
 
 (*
 srl.GaussRand
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.GaussRand(mean, dev: Double): Double;
@@ -30,7 +35,7 @@ end;
 
 (*
 srl.TruncatedGauss
-~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.TruncatedGauss(Left:Double=0; Right:Double=1): Double;
@@ -51,7 +56,7 @@ end;
 
 (*
 srl.SkewedRand
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.SkewedRand(Mode, Lo, Hi: Double): Double; static;
@@ -75,7 +80,7 @@ end;
 
 (*
 srl.NormalRange
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.NormalRange(min, max: Int64): Int64;
@@ -94,7 +99,7 @@ end;
 
 (*
 srl.NormalRange
-~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.NormalRange(min, max: Double): Double;
@@ -177,7 +182,7 @@ end;
 
 (*
 srl.RandonPointEx
-~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.RandonPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
@@ -209,7 +214,7 @@ end;
 
 (*
 Wait (overload)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   procedure Wait(min, max:Double; weight:EWaitDir=wdMean); overload;
@@ -227,7 +232,7 @@ end;
 
 (*
 WaitEx
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
 .. code-block:: pascal
 
   procedure WaitEx(mean, dev:Double);
@@ -242,7 +247,7 @@ end;
 
 (*
 srl.rowp
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
 .. code-block:: pascal
 
   function TSRL.rowp(From: TPoint; Rect: TRectangle; Force: Double=-0.9; Smoothness: Double=PI/12): TPoint;

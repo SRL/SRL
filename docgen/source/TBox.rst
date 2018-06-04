@@ -1,4 +1,8 @@
 
+TBox
+=========
+TBox related methods
+
 TBox.NearestEdge
 ~~~~~~~~~~~~~~~~
 .. code-block:: pascal

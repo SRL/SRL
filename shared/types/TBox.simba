@@ -1,3 +1,9 @@
+(*
+TBox
+=========
+TBox related methods
+*)
+
 function Box(X1,Y1,X2,Y2: Int32): TBox;
 begin
   Result := [X1, Y1, X2, Y2];

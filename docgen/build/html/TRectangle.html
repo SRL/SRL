@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>TRectangle.ToTPA &#8212; SRL  documentation</title>
+    <title>TRectangle &#8212; SRL  documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,8 +15,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="TStringArray.html" />
-    <link rel="prev" title="TPointArray.Mean" href="TPointArray.html" /> 
+    <link rel="next" title="TStringArray" href="TStringArray.html" />
+    <link rel="prev" title="TPointArray" href="TPointArray.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -25,10 +25,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="TStringArray.html" title="&lt;no title&gt;"
+          <a href="TStringArray.html" title="TStringArray"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="TPointArray.html" title="TPointArray.Mean"
+          <a href="TPointArray.html" title="TPointArray"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
       </ul>
@@ -39,36 +39,40 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="trectangle-totpa">
-<h1>TRectangle.ToTPA<a class="headerlink" href="#trectangle-totpa" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="trectangle">
+<h1>TRectangle<a class="headerlink" href="#trectangle" title="Permalink to this headline">¶</a></h1>
+<p>TRectangle related methods</p>
+<p>Type definition is found in shared/globals.simba</p>
+<div class="section" id="trectangle-totpa">
+<h2>TRectangle.ToTPA<a class="headerlink" href="#trectangle-totpa" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">ToTPA</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>TPA from the rectangle.</p>
 </div>
 <div class="section" id="trectangle-bounds">
-<h1>TRectangle.Bounds<a class="headerlink" href="#trectangle-bounds" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Bounds<a class="headerlink" href="#trectangle-bounds" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Bounds</span><span class="p">()</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>Returns the minimum bounding box covering the rectangle</p>
 </div>
 <div class="section" id="trectangle-radius">
-<h1>TRectangle.Radius<a class="headerlink" href="#trectangle-radius" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Radius<a class="headerlink" href="#trectangle-radius" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Radius</span><span class="p">()</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>Returns the radius of the shortest side, for the maximum see MaxRadius</p>
 </div>
 <div class="section" id="trectangle-maxradius">
-<h1>TRectangle.MaxRadius<a class="headerlink" href="#trectangle-maxradius" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.MaxRadius<a class="headerlink" href="#trectangle-maxradius" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">MaxRadius</span><span class="p">()</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>Returns the radius of the longest side, for minimum see Radius</p>
 </div>
 <div class="section" id="trectangle-mean">
-<h1>TRectangle.Mean<a class="headerlink" href="#trectangle-mean" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Mean<a class="headerlink" href="#trectangle-mean" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Mean</span><span class="p">()</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -79,14 +83,14 @@
 </div>
 </div>
 <div class="section" id="trectangle-rotate">
-<h1>TRectangle.Rotate<a class="headerlink" href="#trectangle-rotate" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Rotate<a class="headerlink" href="#trectangle-rotate" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Rotate</span><span class="p">(</span><span class="n">Angle</span><span class="o">:</span> <span class="kt">Double</span><span class="p">)</span><span class="o">:</span> <span class="n">TRectangle</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>Returns a rotated copy of the rectangle</p>
 </div>
 <div class="section" id="trectangle-contains">
-<h1>TRectangle.Contains<a class="headerlink" href="#trectangle-contains" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Contains<a class="headerlink" href="#trectangle-contains" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">Pt</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -94,7 +98,7 @@
 .. note:: by slacky</p>
 </div>
 <div class="section" id="trectangle-dirbylen">
-<h1>TRectangle.DirByLen<a class="headerlink" href="#trectangle-dirbylen" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.DirByLen<a class="headerlink" href="#trectangle-dirbylen" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">DirByLen</span><span class="p">(</span><span class="n">Longest</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="n">ESplitDirection</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -105,7 +109,7 @@
 </div>
 </div>
 <div class="section" id="trectangle-partition">
-<h1>TRectangle.Partition<a class="headerlink" href="#trectangle-partition" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Partition<a class="headerlink" href="#trectangle-partition" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Partition</span><span class="p">(</span><span class="n">m</span><span class="o">,</span><span class="n">n</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">dir</span><span class="o">:</span><span class="n">ESplitDirection</span><span class="o">=</span><span class="n">rpTopLeft</span><span class="p">)</span><span class="o">:</span> <span class="n">TRectArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -116,14 +120,14 @@
 </div>
 </div>
 <div class="section" id="trectangle-offsetfunc">
-<h1>TRectangle.OffsetFunc<a class="headerlink" href="#trectangle-offsetfunc" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.OffsetFunc<a class="headerlink" href="#trectangle-offsetfunc" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">OffsetFunc</span><span class="p">(</span><span class="n">pt</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="n">TRectangle</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
 <p>Offset the rectangle</p>
 </div>
 <div class="section" id="trectangle-filter">
-<h1>TRectangle.Filter<a class="headerlink" href="#trectangle-filter" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Filter<a class="headerlink" href="#trectangle-filter" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Filter</span><span class="p">(</span><span class="n">TestSet</span><span class="o">:</span> <span class="n">TPointArray</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -134,7 +138,7 @@
 </div>
 </div>
 <div class="section" id="trectangle-expand">
-<h1>TRectangle.Expand<a class="headerlink" href="#trectangle-expand" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.Expand<a class="headerlink" href="#trectangle-expand" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">Expand</span><span class="p">(</span><span class="nb">Inc</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TRectangle</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -145,7 +149,7 @@
 </div>
 </div>
 <div class="section" id="trectangle-nearestedge">
-<h1>TRectangle.NearestEdge<a class="headerlink" href="#trectangle-nearestedge" title="Permalink to this headline">¶</a></h1>
+<h2>TRectangle.NearestEdge<a class="headerlink" href="#trectangle-nearestedge" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRectangle</span><span class="o">.</span><span class="nf">NearestEdge</span><span class="p">(</span><span class="n">P</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
 </pre></div>
 </div>
@@ -153,6 +157,7 @@
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">by slacky</p>
+</div>
 </div>
 </div>
 
@@ -164,7 +169,8 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">TRectangle.ToTPA</a></li>
+<li><a class="reference internal" href="#">TRectangle</a><ul>
+<li><a class="reference internal" href="#trectangle-totpa">TRectangle.ToTPA</a></li>
 <li><a class="reference internal" href="#trectangle-bounds">TRectangle.Bounds</a></li>
 <li><a class="reference internal" href="#trectangle-radius">TRectangle.Radius</a></li>
 <li><a class="reference internal" href="#trectangle-maxradius">TRectangle.MaxRadius</a></li>
@@ -178,13 +184,15 @@
 <li><a class="reference internal" href="#trectangle-expand">TRectangle.Expand</a></li>
 <li><a class="reference internal" href="#trectangle-nearestedge">TRectangle.NearestEdge</a></li>
 </ul>
+</li>
+</ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="TPointArray.html"
-                        title="previous chapter">TPointArray.Mean</a></p>
+                        title="previous chapter">TPointArray</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="TStringArray.html"
-                        title="next chapter">&lt;no title&gt;</a></p>
+                        title="next chapter">TStringArray</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -215,10 +223,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="TStringArray.html" title="&lt;no title&gt;"
+          <a href="TStringArray.html" title="TStringArray"
              >next</a> |</li>
         <li class="right" >
-          <a href="TPointArray.html" title="TPointArray.Mean"
+          <a href="TPointArray.html" title="TPointArray"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
       </ul>

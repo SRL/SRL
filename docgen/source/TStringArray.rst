@@ -1,0 +1,4 @@
+
+TStringArray
+=============
+TStringArray related methods
