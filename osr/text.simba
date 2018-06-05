@@ -1,3 +1,9 @@
+(*
+Text
+=============
+Text related methods aimed towards OSRS
+*)
+
 {$loadlib SimpleOCR}
 var 
   OCR: TSimpleOCR;
