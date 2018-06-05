@@ -1,13 +1,12 @@
 (*
 Inventory
-=======
-The inventory file holds functions and procedures that are related 
-to the runescape inventory
+=========
+The inventory file holds functions and procedures that are related to the runescape inventory
 *)
 
 (*
 type TRSInventory
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 The type that holds functions and properties of the Runescape inventory gametab.
 *)
 type 
@@ -38,19 +37,37 @@ type
 }
 
 (*
-var inventory
-~~~~~~~~~~~
+var Inventory
+~~~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape inventory gametab.
 *)
 var 
   Inventory: TRSInventory;
 
+  
+(*
+Drop patterns
+~~~~~~~~~~~~~
+Column wise  and "reversed" column wise (S-style):
+
+``DROP_PATTERN_REGULAR``, ``DROP_PATTERN_REGULAR_R``
+
+
+Column wise snake-style patterns and "reversed" version:
+
+``DROP_PATTERN_SNAKE``, ``DROP_PATTERN_SNAKE_R``
+
+
+By row, from to-left, down to bottom right, it's reverse starts in top-right down to bottom right.
+
+``DROP_PATTERN_TOPDOWN``, ``DROP_PATTERN_TOPDOWN_R``
+*)
 const
-    //Column wise (Z-style) and "reversed" column wise (S-style)
+    //Column wise and "reversed" column wise - normal pattern
     DROP_PATTERN_REGULAR   = [0..27];
     DROP_PATTERN_REGULAR_R = [3,2,1,0, 7,6,5,4, 11,10,9,8, 15,14,13,12, 19,18,17,16, 23,22,21,20, 27,26,25,24];
 
-    //Column wise (zigzag-style) and "reversed" version
+    //Column wise snake and "reversed" version
     DROP_PATTERN_SNAKE   = [0,1,2,3, 7,6,5,4, 8,9,10,11, 15,14,13,12, 16,17,18,19, 23,22,21,20, 24,25,26,27];
     DROP_PATTERN_SNAKE_R = [3,2,1,0, 4,5,6,7, 11,10,9,8, 12,13,14,15, 19,18,17,16, 20,21,22,23, 27,26,25,24];
 
@@ -95,8 +112,21 @@ begin
 end;
 {$ENDIF}
 
+(*
+Inventory.ErrorPattern
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-//given a pattern an a upper limit of errors, it will swap around some values and return a "errorized" drop-pattern
+  function TRSInventory.ErrorPattern(Pattern: TIntArray=DROP_PATTERN_REGULAR; ErrorChance:Int32=5): TIntegerArray;
+
+Given a pattern and an upper limit of errors in percent, it will swap around some values and return a "errorized" drop-pattern
+
+**Example:**
+
+.. code-block:: pascal
+
+   Inventory.DropItems(Inventory.ErrorPattern(DROP_PATTERN_REGULAR, 10));
+*)
 function TRSInventory.ErrorPattern(Pattern: TIntArray=DROP_PATTERN_REGULAR; ErrorChance:Int32=5): TIntegerArray;
 var i,j,h,k,tmp: Int32;
 begin
@@ -130,7 +160,7 @@ end;
 
 (*
 Inventory.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.Open(): Boolean;
@@ -229,7 +259,7 @@ Inventory.IsFull
 
   function TRSInventory.IsFull(): Boolean;
 
-Returns True if the inventory can't hold anymore items
+Returns ``True`` if the inventory can't hold anymore items
 
 .. note:: by slacky
 *)
@@ -341,7 +371,8 @@ jump randomly all over the inventory dropping items, you give it a ordered drop-
 
 .. note:: by slacky
 
-Examples:
+**Examples:**
+
 .. code-block:: pascal
 
     // drops all items in a "snake order" / "Z"-order
@@ -440,14 +471,15 @@ Inventory.FindItem
 
 Find the slots of the given item defined by a `TMask`, `DTM`, or `BMP`.
 
-_Note: Last parameter is not defaulted in the last overload `FindItem(BMP..)` for technical reasons._
+.. note:: Last parameter is not defaulted in the last overload `FindItem(BMP..)` for technical reasons._
 
-Example:
+**Example:**
+
 .. code-block:: pascal
 
-    itemArr := Inventory.FindItem(myMask);
-    if itemArr = [] then
-      WriteLn('Not found');
+   itemArr := Inventory.FindItem(myMask);
+   if itemArr = [] then
+     WriteLn('Not found');
 *)
 function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
 var
@@ -563,7 +595,7 @@ Inventory.GetActiveSlot
 
   function TRSInventory.GetActiveSlot(): Int8;
 
-Returns the index to the current active slot, returns `-1` if none.
+Returns the index to the current active slot, returns ``-1`` if none.
 *)
 function TRSInventory.GetActiveSlot(): Int8;
 var
@@ -589,7 +621,7 @@ Inventory.Use
 
   function TRSInventory.Use(Slot: Int32): Boolean;
 
-RS correct alias for Inventory.ActivateSlot.
+RS correct alias for ``Inventory.ActivateSlot``.
 *)
 function TRSInventory.Use(Slot: Int32): Boolean;
 begin
@@ -603,7 +635,7 @@ Inventory.ActivateSlot
 
   function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 
-Activates (Presses) the given slot, however if `Slot` is `-1` then it will disable the current active slot.
+Activates (Presses) the given slot, however if ``Slot`` is ``-1`` then it will disable the current active slot.
 *)
 function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 var

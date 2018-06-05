@@ -190,9 +190,9 @@ srl.RandonPointEx
 Generates a random point within the bounds of the given box `B`, the point generated is skewed towards towards the `From`-point.
 The last parameter `Force` defines how much the generated point is to be skewed towards or away from `From` - Expects value in the range 0..2
 
-  Force = 0: Result weighs heavily towrads the edge closest to `From`
-  Force = 1: Result in the middle of box is most common
-  Force = 2: Result weighs heavily towrads the edge furthest away from `From`
+* Force = 0: Result weighs heavily towrads the edge closest to `From`
+* Force = 1: Result in the middle of box is most common
+* Force = 2: Result weighs heavily towrads the edge furthest away from `From`
 *)
 function TSRL.RandomPointEx(From:TPoint; B: TBox; Force:Double=0.35): TPoint; constref;
 var

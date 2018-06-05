@@ -23,6 +23,8 @@ type
 var Prayer
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape prayer gametab.
+
+Prayers follow the same name as ingame,`only prefixed with ``PRAY_`` so for example: ``PRAY_THICK_SKIN`` or ``PRAY_ULTIMATE_STRENGTH``
 *)
 var 
   Prayer: TRSPrayer;
@@ -133,8 +135,6 @@ Prayer.GetPrayerBox
   function TRSPrayer.GetPrayerBox(Prayer: EPrayerType): TBox;
 
 Returns the bounding box covering the given prayer.
-
-.. note:: by slacky
 *)
 function TRSPrayer.GetPrayerBox(Prayer: EPrayerType): TBox;
 begin
@@ -149,8 +149,6 @@ Prayer.CanActivate
   function TRSPrayer.CanActivate(Prayer: EPrayerType): Boolean;
 
 Returns True if you can activete the prayer..
-
-.. note:: by slacky
 *)
 function TRSPrayer.CanActivate(Prayer: EPrayerType): Boolean;
 var 
@@ -170,8 +168,6 @@ Prayer.IsActivated
   function TRSPrayer.IsActivated(Prayer: EPrayerType): Boolean;
 
 Returns True if the spell is activated
-
-.. note:: by slacky
 *)
 function TRSPrayer.IsActivated(Prayer: EPrayerType): Boolean;
 begin
@@ -188,8 +184,6 @@ Prayer.MouseOver
   function TRSPrayer.MouseOver(Prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Moves the mouse over the given prayer.
-
-.. note:: by slacky
 *)
 function TRSPrayer.MouseOver(Prayer: EPrayerType; Rng: ERandomStyle=rndGauss): Boolean;
 begin
@@ -208,8 +202,6 @@ Prayer.Toggle
   function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Click's it if it can be activated.
-
-.. note:: by slacky
 *)
 function TRSPrayer.Toggle(Prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 begin

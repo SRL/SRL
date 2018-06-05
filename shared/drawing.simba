@@ -10,19 +10,19 @@ The source for this file can be found `here <https://github.com/SRL/SRL-6/blob/m
 type
   TColorArray = array of TColor;
 
-{*
+(*
 const __SHADOW_COLOR
 ~~~~~~~~~~~~~~~~~~~~
 
 Integer constant that stores the shadow color for adding a shadow for text drawing.
-*}
+*)
 const
   __SHADOW_COLOR = 65536;
 
   
 (*
 TMufasaBitmap.FromClient
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     procedure TMufasaBitmap.FromClient(Area: TBox);

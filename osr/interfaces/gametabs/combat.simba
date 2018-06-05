@@ -33,7 +33,7 @@ var
 
 (*
 type ECombatStyle
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   ECombatStyle = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
@@ -176,12 +176,21 @@ begin
     Result := ocr.Recognize(TBox([x1,212,x2,230]), TCompareRules([2070783]), 70);
 end;
 
-function TRSCombat.GetSpecialAttack(): Integer;
+(*
+Combat.GetSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.GetSpecialAttack(): Int32;
+
+Returns the specual attack level
+*)
+function TRSCombat.GetSpecialAttack(): Int32;
 var
   Text: String;
   TPA: TPointArray;
   b: TBox;
-  color: Integer;
+  color: Int32;
 begin
   if (not Self.Open()) then
     Exit(-1);
@@ -196,21 +205,44 @@ begin
     end;
 end;
 
+(*
+Combat.SpecialAttackEnabled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.SpecialAttackEnabled(): Boolean;
+
+Returns ``True`` if special attack has been activated
+*)
 function TRSCombat.SpecialAttackEnabled(): Boolean;
 var
-  x, y: Integer;
+  x, y: Int32;
 begin
   if (not Self.Open()) then
     Exit(False);
   Result := FindColor(x, y, 65535, Self.FButtons[cbtSpecialAttack]);
 end;
 
-function TRSCombat.UseSpecialAttack(): Integer;
+(*
+Combat.UseSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.UseSpecialAttack(): Boolean;
+
+Attempts to enabled special attack, returns ``True`` if it managed to, or if it was already enabled.
+*)
+function TRSCombat.UseSpecialAttack(): Boolean;
 begin
   if (not Self.Open()) then
-    Exit(-1);
-  if (not Self.SpecialAttackEnabled()) then
+    Exit(False);
+  
+  Result := Self.SpecialAttackEnabled();
+  if (not Result) then
+  begin
     Mouse.Click(Self.FButtons[cbtSpecialAttack], mouse_Left);
+    Result := True;
+  end;
 end;
 
 begin

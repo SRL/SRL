@@ -6,7 +6,7 @@ The file holds functions and procedures that are used for controlling equipment.
 
 (*
 type TRSEquipment
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 The type that holds functions and properties of the Runescape equipment interface.
 *)  
 type 
@@ -22,7 +22,7 @@ type
 
 (*
 var Equipment
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape equipment interface.
 *)
 var 
@@ -67,7 +67,7 @@ end;
 
 (*
 Equipment.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.Open(): Boolean;
@@ -81,7 +81,7 @@ end;
 
 (*
 Equipment.IsSlotUsed
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
@@ -96,7 +96,7 @@ end;
 
 (*
 Equipment.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.IsOpen(): Boolean;
@@ -146,7 +146,7 @@ end;
 
 (*
 Equipment.Remove
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.Remove(): Boolean;

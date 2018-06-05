@@ -2,6 +2,9 @@
 Options
 =======
 The options file holds functions and procedures that are used for configuring runescape.
+
+Keep in mind that the option-tab changes qute frequently in OSRS, so over time it's more likely
+to get outdated.
 *)
 
 (*
@@ -44,7 +47,7 @@ var
 
 (*
 type EOptionsTab
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 A type that covers the internal tabs in TRSOptions: ``EOptionsTab = (optDisplay, optAudio, optChat, optControls)``
 *)
 type
@@ -73,10 +76,8 @@ end;
 
 (*
 Options.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.Open(): Boolean;
+~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.Open(): Boolean;
 
 Opens the interface
 *)
@@ -87,10 +88,8 @@ end;
 
 (*
 Options.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.IsOpen(maxWait:Int32=0): Boolean;
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.IsOpen(maxWait:Int32=0): Boolean;
 
 Checks if the interface is already open.
 *)
@@ -115,10 +114,8 @@ end;
 
 (*
 Options.GetCurrentTab
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.GetCurrentTab(): EOptionsTab;
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.GetCurrentTab(): EOptionsTab;
 
 Returns which tab is currently active.
 *)
@@ -135,10 +132,8 @@ end;
 
 (*
 Options.SetCurrentTab
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.SetCurrentTab(Tab: EOptionsTab; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.SetCurrentTab(Tab: EOptionsTab; tryTime:Int32=2000): Boolean;
 
 Sets the current tab to the given ``Tab``
 *)
@@ -167,10 +162,8 @@ end;
 
 (*
 Options.GetBrightness
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.GetBrightness(): Int32;
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.GetBrightness(): Int32;
 
 Returns the mainscreen brightness
 *)
@@ -189,10 +182,8 @@ end;
 
 (*
 Options.SetBrightness
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.SetBrightness(level: Int32; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.SetBrightness(level: Int32; tryTime:Int32=2000): Boolean;
 
 Sets the mainscreen brightness
 *)
@@ -222,10 +213,8 @@ end;
 
 (*
 Options.GetZoom
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.GetZoom(): Int32;
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.GetZoom(): Int32;
 
 Returns the mainscreen zoom
 *)
@@ -245,10 +234,8 @@ end;
 
 (*
 Options.SetZoom
-~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.SetZoom(APosition: Byte): Boolean;
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.SetZoom(APosition: Byte): Boolean;
 
 Sets the zoom of the mainscreen. 0 = Zoomed out, 100 = Zoomed in.
 *)
@@ -286,9 +273,7 @@ end;
 (*
 Options.ToggleAcceptAid
 ~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleAcceptAid(enable:Boolean; tryTime:Int32=2000): Boolean;
+.. pascal:: function TRSOptions.ToggleAcceptAid(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button to the given state.
 *)
@@ -306,10 +291,8 @@ end;
 
 (*
 Options.ToggleRun
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleRun(enable:Boolean; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.ToggleRun(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button to the given state.
 *)
@@ -328,10 +311,8 @@ end;
 
 (*
 Options.ToggleChatEffects
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.ToggleChatEffects(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button to the given state.
 *)
@@ -342,10 +323,8 @@ end;
 
 (*
 Options.ToggleSplitPrivChat
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.ToggleSplitPrivChat(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button to the given state.
 *)
@@ -357,10 +336,8 @@ end;
 
 (*
 Options.ToggleProfanityFilter
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.ToggleProfanityFilter(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button to the given state.
 *)
@@ -371,10 +348,8 @@ end;
 
 (*
 Options.ToggleTimeoutNotice
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.ToggleTimeoutNotice(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button for "Login/Logout notification timeout" to the given state.
 *)
@@ -386,9 +361,7 @@ end;
 (*
 Options.ToggleShiftDrop
 ~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSOptions.ToggleShiftDrop(enable:Boolean; tryTime:Int32=2000): Boolean;
+.. pascal:: function TRSOptions.ToggleShiftDrop(enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the button for "Shift Drop" to the given state.
 *)

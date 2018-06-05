@@ -3,8 +3,9 @@ from sys import argv
 import os
 import sys
 
-IGNORE_FOLDERS = ['git']
+IGNORE_FOLDERS  = ['git']
 FILE_EXTENSIONS = ['.pas','.inc','.simba'] 
+SHORT_RST       = [('.. code-block:: pascal\n\n', '.. pascal::')]
 
 rootdir = sys.argv[1]
 commentregex = re.compile('\(\*.+?\*\)', re.DOTALL)
@@ -38,11 +39,16 @@ for filename in paths:
     with open(filename, 'r') as f:
       contents = f.read()
     
-    o = open('source/%s.rst' % name, 'w+')
+    out = open('source/%s.rst' % name, 'w+')
     res = commentregex.findall(contents)
-    for y in res:
-        o.write(y[2:][:-2])
-    o.close()
+    for doc in res:
+      doc = doc[2:][:-2];
+      for ptrn in SHORT_RST:
+        doc = doc.replace(ptrn[1], ptrn[0])
+      
+      out.write(doc)
+      out.write('\n\n')
+    out.close()
 
 
 index = '''

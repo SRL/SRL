@@ -26,8 +26,8 @@ begin
 end;
 
 (*
-srl.Modulo; overload
-~~~~~~~~~~~~~~~~~~~~
+srl.Modulo (overload)
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TSRL.Modulo(X, Y: Int32): Int32; overload;
@@ -45,7 +45,7 @@ srl.CrossProduct
 .. code-block:: pascal
 
     function TSRL.CrossProduct(ry,ry, px,py, qx,qy: Double): Double;
-    
+
 Cross-product of rp and rq vectors.
 *)
 function TSRL.CrossProduct(rx,ry, px,py, qx,qy: Double): Double; static;
@@ -54,8 +54,8 @@ begin
 end;
 
 (*
-srl.CrossProduct; overload;
-~~~~~~~~~~~~~~~~~~~~
+srl.CrossProduct (overload)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TSRL.CrossProduct(r, p, q: TPoint): Int64; overload;
@@ -152,10 +152,16 @@ end;
 
 
 
-{*
- Check if a point is inside a triangle.
-*}
-function TSRL.PointInTriangle(PT, p1,p2,p3:TPoint): Boolean;
+(*
+srl.PointInTriangle
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.PointInTriangle(PT, p1,p2,p3: TPoint): Boolean;
+
+Returns True if the TPoint 'Pt' is inside the triangle
+*)
+function TSRL.PointInTriangle(PT, p1,p2,p3: TPoint): Boolean;
 var
   b1,b2,b3: Boolean;
 begin
@@ -199,18 +205,30 @@ begin
 end;
 
 
-{*
- Check if a point is within a circle.
-*}
+(*
+srl.PointInCircle
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.PointInCircle(PT, Center: TPoint; Radius: Double): Boolean;
+
+Returns True if the TPoint 'Pt' is inside the circle
+*)
 function TSRL.PointInCircle(PT, Center: TPoint; Radius: Double): Boolean; static;
 begin
   Result := Sqr(PT.X - Center.X) + Sqr(PT.Y - Center.Y) <= Sqr(Radius);
 end;
 
   
-{*
- Check if a point is within a ellipse.
-*}
+(*
+srl.PointInEllipse
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.PointInEllipse(PT, Center:TPoint; YRad, XRad: Double): Boolean;
+    
+Returns True if the TPoint 'Pt' is inside the ellipse
+*)
 function TSRL.PointInEllipse(PT, Center:TPoint; YRad, XRad: Double): Boolean; static;
 var
   X, Y: Integer;
@@ -220,13 +238,19 @@ begin
   Result := (Sqr(X)*Sqr(YRad))+(Sqr(Y)*Sqr(XRad)) <= (Sqr(YRad)*Sqr(XRad));
 end;
 
-{* 
- Check if a point is within a polygon/shape by the given outline points (poly)
- The points must be in order, as if you would draw a line trough each point.
- 
- Winding number algorithm
-*}
-function TSRL.PointInPoly(pt:TPoint; Poly:TPointArray): Boolean; static; 
+(*
+srl.PointInPoly
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.PointInPoly(pt: TPoint; Poly: TPointArray): Boolean;
+    
+Check if a point is within a polygon/shape by the given outline points (poly)
+The points must be in order, as if you would draw a line trough each point.
+
+Note: Uses winding number algorithm
+*)
+function TSRL.PointInPoly(pt: TPoint; Poly: TPointArray): Boolean; static; 
 var
   wn,H,i,j:Int32;
 begin
@@ -249,9 +273,15 @@ begin
   Result := (wn <> 0);
 end;
 
-{*
- Check if a point is within a cuboid defined by top and bottom rectangle.
-*}
+(*
+srl.PointInCuboid
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.PointInCuboid(pt: TPoint; Top, Btm: TRectangle): Boolean;
+
+Check if a point is within a cuboid defined by top and bottom rectangle.
+*)
 function TSRL.PointInCuboid(pt: TPoint; Top, Btm: TRectangle): Boolean;
 begin
   if pt.InRect(Top) then Exit(True);   //we could instead create a poly.. hum..

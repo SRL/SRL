@@ -1,6 +1,33 @@
 (*
 Gametabs
 ==========
+Gametabs is the core of every tab, like inventory, stats, and so on.
+This is also the file that includes every tab's code.
+
+.. code-block:: pascal
+
+   type EGametab = (
+     tabCombat,
+     tabStats,
+     tabQuests,
+     tabInventory,
+     tabEquipment,
+     tabPrayer,
+     tabMagic,
+     tabClan,
+     tabFriends,
+     tabIgnores,
+     tabLogout,
+     tabOptions,
+     tabEmotes,
+     tabMusic
+   );
+   
+   type TRSGametab = record
+     Tabs: TBoxArray;
+     Keybindings: TIntegerArray;
+     FKeysEnabled: Boolean;
+   end;
 *)
 type
   EGametab = (
@@ -33,6 +60,11 @@ type
     Bounds: TBox;
   end;
 
+(*
+var Gametabs
+~~~~~~~~~~~~
+Variable that stores functions and properties relating to gametabs.
+*)
 var
   Gametabs: TRSGametab;
 
@@ -53,16 +85,45 @@ begin
   end;
 end;
 
-procedure TRSGametab.ToggleFKeys(const Enable:Boolean);
+(*
+Gametab.ToggleFKeys
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  procedure TRSGametab.ToggleFKeys(const Enable: Boolean);
+
+Enables support for FKeys to open tabs.
+*)
+procedure TRSGametab.ToggleFKeys(const Enable: Boolean);
 begin
   Self.FKeysEnabled := Enable;
 end;
 
-function TRSGametab.GetBounds(Tab:EGametab): TBox;
+(*
+Gametab.GetBounds
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSGametab.GetBounds(Tab: EGametab): TBox;
+
+Returns the bounds of the tab-button
+*)
+function TRSGametab.GetBounds(Tab: EGametab): TBox;
 begin
   Result := Self.Tabs[Ord(Tab)];
 end;
 
+(*
+Gametab.PointToSlot
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSGametab.PointToSlot(pt: TPoint): Int32;
+
+Returns the tab-id under the location ``pt``, value is returned as
+an integer, as it will return ``-1`` if it fails. To convert it to a 
+gametab is just a matter of casting it like ``EGameTab(theValue)``
+*)
 function TRSGametab.PointToSlot(pt: TPoint): Int32;
 begin
   for Result:=0 to High(Self.Tabs) do
@@ -71,6 +132,15 @@ begin
   Result := -1;
 end;
 
+(*
+Gametab.IsOpen
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;
+
+Checks if the given tab is open or now. By default it wont wait (expecting it to open).
+*)
 function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;
 var
   FoundTab:Boolean;
@@ -96,7 +166,16 @@ begin
   until GetTickCount64() > t;
 end;
 
-function TRSGametab.Open(Tab:EGametab; tries:Int32=2): Boolean;
+(*
+Gametab.Open
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSGametab.Open(Tab: EGametab; tries: Int32=2): Boolean;
+
+Opens the given gametab, by default it retries twice.
+*)
+function TRSGametab.Open(Tab: EGametab; tries: Int32=2): Boolean;
 var
   i:Int32;
   B:TBox;
@@ -121,14 +200,30 @@ begin
   end;
 end;
 
+(*
+Gametab.Open
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+  procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+
+Only moves the mouse over the given tab.
+*)
+procedure TRSGametab.Hover(Tab: EGametab; Condition: Boolean=True);
 begin
   if Condition then
     Mouse.Move(self.GetBounds(Tab));
 end;
 
+(*
+Gametab.GetCurrent
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
+  function TRSGametab.GetCurrent(): EGametab;
+
+Returns the current open tab.
+*)
 function TRSGametab.GetCurrent(): EGametab;
 var i:Int32;
 begin
