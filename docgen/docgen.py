@@ -3,7 +3,7 @@ from sys import argv
 import os
 import sys
 
-IGNORE_FOLDERS  = ['git']
+IGNORE_FOLDERS  = ['.git']
 FILE_EXTENSIONS = ['.pas','.inc','.simba'] 
 SHORT_RST       = [('.. code-block:: pascal\n\n', '.. pascal::')]
 
