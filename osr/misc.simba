@@ -1,6 +1,26 @@
+(*
+Misc
+=====
+The ``osr/misc.simba`` file contains various RS related funcions that doesn't fit elsewhere
+*)
+
+(*
+type ERSClickType
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: type ERSClickType = (ctNone, ctRed, ctYellow);
+*)
 type
   ERSClickType = (ctNone, ctRed, ctYellow);
 
+  
+(*
+Mouse.Click
+~~~~~~~~~~~~
+.. pascal:: function TMouse.Click(ClickType: ERSClickType): Boolean; overload;
+
+Leftclicks the mouse returns ``True`` if the click passed through as expected.
+Useful when expecting a red or yellow X after a click.
+*)
 function TMouse.Click(ClickType: ERSClickType): Boolean; overload;
 
   function FindColorEx(Color, Tolerance: Int32; Area: TBox): TPointArray;
@@ -46,6 +66,13 @@ begin
   end;
 end;
 
+(*
+SRL.GetXPAtLevel
+~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetXPAtLevel(level:Int32): Int32;
+
+Given a level it returns the minimum XP needed for it.
+*)
 function TSRL.GetXPAtLevel(level:Int32): Int32;
 var
   total:Double;
@@ -56,6 +83,13 @@ begin
   Result := Floor(total / 4);
 end;
 
+(*
+SRL.GetLevelAtXP
+~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetLevelAtXP(XP:UInt32): Int32;
+
+Given some XP, it returns what level that is.
+*)
 function TSRL.GetLevelAtXP(XP:UInt32): Int32;
 var 
   total:Double;
@@ -67,6 +101,14 @@ begin
   end;
 end;
 
+(*
+SRL.GetItemAmount
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetItemAmount(Area: TBox): Int32;
+
+For use with items in like bankscreen, inventory, shops and so on to
+get the number of stacked items there are.
+*)
 function TSRL.GetItemAmount(Area: TBox): Int32;
 const
   TEXT_COLORS: TIntegerArray = [65535, 65278, 16777215, 8453888]; // Million = white | Billion = green etc.
@@ -95,6 +137,14 @@ begin
     end;
 end;
 
+(*
+SRL.AvgBrightness
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.AvgBrightness(B: TBox): Int32;
+
+Returns the average brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+*)
 function TSRL.AvgBrightness(B: TBox): Int32;
 var
   BMP: TMufasaBitmap;
@@ -104,6 +154,14 @@ begin
   BMP.Free();
 end;
 
+(*
+SRL.PeakBrightness
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.PeakBrightness(B: TBox): Int32;
+
+Returns the peak brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+*)
 function TSRL.PeakBrightness(B: TBox): Int32;
 var
   BMP: TMufasaBitmap;
