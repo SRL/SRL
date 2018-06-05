@@ -48,6 +48,7 @@ for filename in paths:
       
       out.write(doc)
       out.write('\n\n')
+      out.write('------------\n')
     out.close()
 
 
