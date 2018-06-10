@@ -20,7 +20,7 @@
 {$ENDIF}
 
 var
-  RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLoader', 'SMART'];
+  RS_CLIENT_TITLES: TStringArray = ['RuneScape', 'OSBuddy Pro', 'OSBuddy Guest', 'OSBuddy Free', 'RuneLite', 'SMART'];
   RS_CLIENT_LOSE_FOCUS_WINDOWS: TStringArray = ['Simba - '];
   RS_CLIENT_CANVAS_CLASS: String = 'SunAwtCanvas';
 
