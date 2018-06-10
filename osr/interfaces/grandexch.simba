@@ -150,12 +150,14 @@ var
   GrandExchange: TRSGrandExch;
 
 
+//----------------------------------------------------------------------------
+
 (*
-Methods
--------
+GrandExchange Stub
+------------------
+These methods are available through both `GrandExchange` and `GrandExchange.Offer`.
 *)
-  
-//====| The base of GE interfaces |===========================================\\
+
 procedure TGrandExchStub.__Setup();
 begin
   self.FBounds := [23,24,496,317];
@@ -295,7 +297,7 @@ Clicks one of the many exchange buttons.
 
 .. pascal:: 
   GrandExchange.Offer.Click(ebAbort); // abort the offer
-  GrandExchange.Click(ebCollect);
+  GrandExchange.Click(ebCollect);     // collect items / money
 *)
 procedure TGrandExchStub.Click(Button: EExchButton);
 begin
@@ -322,7 +324,13 @@ end;
 
 
 
-//====| GE Offer Interface (Sell & Buy) |=====================================\\
+//----------------------------------------------------------------------------
+
+(*
+GrandExchange Offer
+-------------------
+These are the methods for GE Offer Interface (Sell & Buy)
+*)
 procedure TGrandExchOffer.__Setup(); override;
 begin
   inherited;
@@ -402,8 +410,9 @@ GrandExchange.Offer.Click
 Click one of the adjustment buttons see [type-EAdjustButton]_
 
 **Example**
+
 .. pascal:: 
-  GrandExchange.Offer.Click(abIncPrice5Prc, 2); //click `+5%`, 2 times.
+   GrandExchange.Offer.Click(abIncPrice5Prc, 2); //click `+5%`, 2 times.
 *)
 procedure TGrandExchOffer.Click(Button: EAdjustButton; Times: Int32=1); overload;
 var i:Int32;
@@ -436,6 +445,7 @@ GrandExchange.Offer.SelectItem
 Once you have searched for an item, this function is used to select it.
 
 **Example**
+
 .. pascal::
   GrandExchange.PlaceOffer(0, etBuy);              // slot = 0, buy it
   GrandExchange.Offer.SearchFor('Rune scimitar');  // search for
@@ -762,8 +772,15 @@ begin
 end;
 
 
+//----------------------------------------------------------------------------
 
-//====| GrandExchange Interface |=============================================\\
+
+(*
+GrandExchange
+-------------
+These are the methods for the main GE interface.
+*)
+
 procedure TRSGrandExch.__Setup(); override;
 var
   i:Int32;
