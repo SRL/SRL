@@ -211,33 +211,13 @@ DepositBox.Close
 ~~~~~~~~~~~~~~~~
 .. pascal:: function TRSDepositBox.Close(): Boolean;
 
-Closes the depositbox intreface.
+Closes the interface.
 *)
-function TRSDepositBox.Close(): Boolean;
-var
-  t: Int64;
+function TRSDepositBox.Close(): Boolean; override;
 begin
-  if (not Self.IsOpen()) then
-    Exit(True);
-
-  if (srl.CloseInterfacesWithEscape) then
-  begin
-    Keyboard.PressKey(VK_ESCAPE);
-    t := GetTickCount() + Random(4000, 5000);
-    while (t > GetTickCount()) do
-    begin
-      if (not Self.IsOpen()) then
-        Exit(True);
-    end;
-    srl.ToggleCloseInterfacesWithEscape(False);
-  end;
-
-  Self.ClickButton(dbClose);
-  t := GetTickCount() + Random(4000, 5000);
-  while (t > GetTickCount()) do
-    if (not Self.IsOpen()) then
-      Exit(True);
+  Result := inherited;
 end;
+
 
 begin
   DepositBox.__Setup();

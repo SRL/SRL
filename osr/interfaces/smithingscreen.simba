@@ -43,11 +43,11 @@ begin
 end;
 
 (*
-DepositBox.__Prepare
+SmithingScreen.__Prepare
 ~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSDepositBox.__Prepare(): Boolean;
+.. pascal:: function TRSSmithingScreen.__Prepare(): Boolean;
 
-Internal method that's used to generate the boundaries of the depositbox - automatically.
+Internal method that's used to generate the boundaries of the interface - automatically.
 *)
 function TRSSmithingScreen.__Prepare(): Boolean;
 var
@@ -127,6 +127,42 @@ begin
 end;
 
 (*
+SmithingScreen.FindItem
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.FindItem(DTM: Integer): Int32;
+
+Returns the slot index for the given item, if it's found, otherwise ``-1``
+*)
+function TRSSmithingScreen.FindItem(DTM: Integer): Int32;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  if not(self.IsOpen()) then Exit(-1);
+
+  for i:=0 to High(Self.ItemBoxesIcon) do
+    if FindDTM(DTM, pt.x, pt.y, Self.ItemBoxesIcon[i]) then
+      Exit(i);
+  Result := -1;
+end;
+
+(*
+SmithingScreen.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
+
+Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
+*)
+function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  Result := True;
+  Mouse.Move(Self.ItemBoxesIcon[Slot]);
+end;
+
+(*
 SmithingScreen.ItemName
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSSmithingScreen.ItemName(Slot: Int32): String;
@@ -161,7 +197,7 @@ begin
   if TmpRes = '' then
    TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, 2070783,0, StatChars07);
 
-  Result := StrToInt64Def(ExtractFromStr(TmpRes, Numbers), -1);
+  Result := StrToIntDef(ExtractFromStr(TmpRes, Numbers), -1);
 end;
 
 (*
@@ -249,6 +285,20 @@ begin
       Result := Chatbox.AnswerQuery('Enter amount', ToString(amount), 6000);
   end;
 end;
+
+(*
+SmithingScreen.Close
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.Close(): Boolean;
+
+Closes the interface.
+*)
+function TRSSmithingScreen.Close(): Boolean; override;
+begin
+  Result := inherited;
+end;
+
+
 
 
 begin

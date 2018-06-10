@@ -1,0 +1,303 @@
+(*
+Shop Interface
+==============
+For interacting with various shop interfaces.
+All may not work, but I think most should work. There's a good chance the only
+thing lacking is that title of your shop interface, so if it doesn't work add
+the shops title - or a subset of it by doing
+
+.. pascal:: ShopScreen.AppendTitle('Wallmart');
+
+PS: You are expected to find and open the interface yourself.
+*)
+type
+  TRSShopScreen = record(TRSInterfaceBase)
+    ItemBoxes: TBoxArray;
+  end;
+
+(*
+.. pascal:: var ShopScreen: TRSShopScreen;
+*)
+var
+  ShopScreen: TRSShopScreen;
+
+
+(*
+ShopScreen.__Setup
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSShopScreen.__Setup();
+
+Every interface needs some internal setup procedure..
+*)
+procedure TRSShopScreen.__Setup();
+begin
+  Self.FBounds := Mainscreen.GetBounds;
+  Self.FName   := 'StoreScreen';
+  Self.FStatic := True;
+  Self.FTitles := [
+    'Store', 'Business', 'Fish', 'Shop', 'Supplies', 'Tackle', 'Market',
+    'Centre', 'Emporium'
+  ];
+  Self.FCaseInsensitive := True;
+end;
+
+(*
+ShopScreen.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the interface - automatically.
+*)
+function TRSShopScreen.__Prepare(): Boolean;
+var
+  Body: TBox;
+  i: Int32;
+begin
+  if not Self.__Find() then
+    Exit(False);
+
+  if Self.ItemBoxes <> [] then // we already have the bounds
+    Exit(True);
+
+  with Self.ItemBounds do Body := [X1+49, Y1-2, X2-52, Y2-28];
+  Self.ItemBoxes := Body.PartitionEx(5,8, -7,-7);
+
+  Result := True;
+end;
+
+(*
+ShopScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+*)
+function TRSShopScreen.IsOpen(): Boolean;
+begin
+  Result := Self.__Prepare();
+end;
+
+(*
+ShopScreen.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed.
+*)
+function TRSShopScreen.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+var
+  i, c: Integer;
+begin
+  if not Self.__Prepare() then Exit();
+
+  Result := Inherited(True);
+  for i:=0 to High(Self.ItemBoxes) do
+    Result.DrawBox(Self.ItemBoxes[i],      False, $0000FF);
+
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
+end;
+
+(*
+ShopScreen.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.ItemName(Slot: Int32): Boolean;
+
+Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
+*)
+function TRSShopScreen.MouseOver(Slot: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  Result := True;
+  Mouse.Move(Self.ItemBoxes[Slot]);
+end;
+
+(*
+ShopScreen.IsEmpty
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.IsEmpty(Slot: Int32): Boolean;
+
+Returns ``True`` if the slot is empty
+*)
+function TRSShopScreen.IsEmpty(Slot: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  Result := CountColor($010000, Self.ItemBoxes[Slot]) = 0;
+end;
+
+(*
+ShopScreen.FindItem
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.FindItem(DTM: Integer): Int32;
+
+Returns the slot index for the given item, if it's found, otherwise ``-1``
+*)
+function TRSShopScreen.FindItem(DTM: Integer): Int32;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  if not(self.IsOpen()) then Exit(-1);
+
+  for i:=0 to High(Self.ItemBoxes) do
+    if FindDTM(DTM, pt.x, pt.y, Self.ItemBoxes[i]) then
+      Exit(i);
+  Result := -1;
+end;
+
+(*
+ShopScreen.GetStackAmount
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.GetStackAmount(Slot: Int32): Int32;
+
+Returns the number of items stacked in the given slot. ``-1`` if failed.
+*)
+function TRSShopScreen.GetStackAmount(Slot: Int32): Int32;
+begin
+  if (not Self.IsOpen()) then
+    Exit(-1);
+
+  Result := srl.GetItemAmount(Self.ItemBoxes[Slot]);
+end;
+
+(*
+ShopScreen.ItemPrice
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.ItemPrice(Slot: Int32): Int32;
+
+Returns the price of the given item by id in the shop.
+*)
+function TRSShopScreen.ItemPrice(Slot: Int32): Int32;
+var
+  i: Int32;
+  oldMsg, thisMsg: String;
+  t: TCountDown;
+begin
+  if (not Self.IsOpen()) or Self.IsEmpty(Slot) then
+    Exit(-1);
+
+  oldMsg := Chatbox.GetTextOnLine(7);
+  Self.MouseOver(Slot);
+  ChooseOption.Select('Value ');
+
+  Result := -1;
+  t.Init(Random(1500,2000));
+  while (not t.IsFinished) and (Result = -1) do
+  begin
+    thisMsg := Chatbox.GetTextOnLine(7);
+    if (thisMsg = oldMsg) then continue;
+    if 'currently costs ' in thisMsg then
+      Result := StrToIntDef(ExtractFromStr(thisMsg, NUMBERS), -1);
+    Wait(30);
+  end;
+
+  if Result = -1 then
+    for i:=7 downto 0 do
+    begin
+      thisMsg := Chatbox.GetTextOnLine(i);
+      if 'currently costs ' in thisMsg then
+        Result := StrToIntDef(ExtractFromStr(thisMsg, NUMBERS), -1);
+    end;
+end;
+
+(*
+ShopScreen.SellValue
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.SellValue(InventorySlot: Int32): Int32;
+
+Returns the value of the item in your inventory.
+*)
+function TRSShopScreen.SellValue(Slot: Int32): Int32;
+var
+  i: Int32;
+  oldMsg, thisMsg: String;
+  t: TCountDown;
+begin
+  if (not Self.IsOpen()) or (not Inventory.IsSlotUsed(Slot, False)) then
+    Exit(-1);
+
+  oldMsg := Chatbox.GetTextOnLine(7);
+  Inventory.MouseSlot(Slot);
+  ChooseOption.Select('Value ');
+
+  Result := -1;
+  t.Init(Random(1500,2000));
+  while (not t.IsFinished) and (Result = -1) do
+  begin
+    thisMsg := Chatbox.GetTextOnLine(7);
+    if (thisMsg = oldMsg) then continue;
+    if 'will buy for ' in thisMsg then
+      Result := StrToIntDef(ExtractFromStr(thisMsg, NUMBERS), -1);
+    Wait(30);
+  end;
+
+  if Result = -1 then
+    for i:=7 downto 0 do
+    begin
+      thisMsg := Chatbox.GetTextOnLine(i);
+      if 'will buy for ' in thisMsg then
+        Result := StrToIntDef(ExtractFromStr(thisMsg, NUMBERS), -1);
+    end;
+end;
+
+(*
+ShopScreen.BuyItem
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.BuyItem(Slot, Amount: Int32): Boolean;
+
+Buy the item in the given shop slot.
+*)
+function TRSShopScreen.BuyItem(Slot, Amount: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) or Self.IsEmpty(Slot) then
+    Exit(False);
+
+  Self.MouseOver(Slot);
+  Wait(40,450, wdLeft);
+  ChooseOption.Open();
+  Wait(0,170, wdLeft);
+  Result := ChooseOption.Select(['Buy '+ToString(Amount)+' '],,False);
+end;
+
+(*
+ShopScreen.SellItem
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.SellItem(InvSlot, Amount: Int32): Boolean;
+
+Sell the item in the given invetory slot.
+*)
+function TRSShopScreen.SellItem(Slot, Amount: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) or (not Inventory.IsSlotUsed(Slot, False)) then
+    Exit(False);
+
+  Inventory.MouseSlot(Slot);
+  Wait(40,450, wdLeft);
+  ChooseOption.Open();
+  Wait(0,170, wdLeft);
+  Result := ChooseOption.Select(['Sell '+ToString(Amount)+' '],,False);
+end;
+
+(*
+ShopScreen.Close
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.Close(): Boolean;
+
+Closes the interface.
+*)
+function TRSShopScreen.Close(): Boolean; override;
+begin
+  Result := inherited;
+end;
+
+
+begin
+  ShopScreen.__Setup();
+end;

@@ -7,10 +7,35 @@ Used to find interfaces on the go, versus the static coordinates based ones.
 type
   TRSInterfaceBase = record(TInterfaceBase)
     FTitles: TStringArray;
+    FCaseInsensitive: Boolean;
     TitleBounds: TBox;
     ItemBounds: TBox;
     CloseButton: TBox;
   end;
+
+(*
+TRSInterfaceBase.AppendTitle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSInterfaceBase.AppendTitle(Title: String);
+
+Adds another alternative title to search for in the interface.
+*)
+procedure TRSInterfaceBase.AppendTitle(Title: String);
+begin
+  Self.FTitles += Title;
+end;
+
+(*
+TRSInterfaceBase.CaseInsensitive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSInterfaceBase.CaseInsensitive(CS: Boolean);
+
+Sets if the Title search should be case sensitive or not.
+*)
+procedure TRSInterfaceBase.CaseInsensitive(CS: Boolean);
+begin
+  Self.FCaseInsensitive := CS;
+end;
 
 (*
 TRSInterfaceBase.__Find
@@ -27,7 +52,9 @@ var
   i: Int32;
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  B: TBox;
+  ifaceTitle: String;
+  Bounds: TBox;
+  OCR_TITLE:  TCompareRules = [2070783,1,True,65];
 begin
   srl.FindColors(TPA, CTS2(3424329,10), Self.FBounds);
   ATPA := TPA.Cluster(1,3);
@@ -44,12 +71,21 @@ begin
     with Self.FBounds do
       Self.CloseButton := Box(X2-27, Y1+7, X2-7, Y1+27);
     
-    B := Self.TitleBounds;
-    B.y1 += 4; //SimpleOCR is highly sensitive
+    Bounds := Self.TitleBounds;
+    Bounds.y1 += 4; // SimpleOCR is highly sensitive
+
+    ifaceTitle := OCR.Recognize(Bounds, OCR_TITLE, UpFont, Self.TitleBounds.Width div 2);
     for i:=0 to High(Self.FTitles) do
     begin
-      Result := Self.FTitles[i] in OCR.Recognize(B, FontSettingShd(2070783,1,65), UpFont, Self.TitleBounds.Width div 2);
-      if Result then Exit(True);
+      if Self.FCaseInsensitive then
+      begin
+        Result := Lowercase(Self.FTitles[i]) in Lowercase(ifaceTitle);
+        if Result then Exit(True);
+      end else
+      begin
+        Result := Self.FTitles[i] in ifaceTitle;
+        if Result then Exit(True);
+      end;
     end;
   end;
 end;
@@ -144,4 +180,38 @@ begin
   Result.Debug();
   Result.Free();
   Result := nil;
+end;
+
+(*
+TRSInterfaceBase.Close
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.Close(): Boolean;
+
+Closes the interface, returns ``True`` on success
+*)
+function TRSInterfaceBase.Close(): Boolean;
+var
+  t: UInt64;
+begin
+  if (not Self.__Find()) then
+    Exit(True);
+
+  if (srl.CloseInterfacesWithEscape) then
+  begin
+    Keyboard.PressKey(VK_ESCAPE);
+    t := GetTickCount() + Random(4000, 5000);
+    while (t > GetTickCount()) do
+    begin
+      if (not Self.__Find()) then
+        Exit(True);
+      Wait(60);
+    end;
+    srl.ToggleCloseInterfacesWithEscape(False);
+  end;
+
+  Mouse.Click(Self.CloseButton, mouse_left);
+  t := GetTickCount() + Random(4000, 5000);
+  while (t > GetTickCount()) do
+    if (not Self.__Find()) then
+      Exit(True);
 end;
