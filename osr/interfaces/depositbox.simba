@@ -41,6 +41,7 @@ begin
   Self.FBounds := Mainscreen.GetBounds;
   Self.FName   := 'Deposit Box';
   Self.FStatic := True;
+  Self.FTitles := ['Deposit Box'];
 end;
 
 (*
@@ -54,8 +55,11 @@ function TRSDepositBox.__Prepare(): Boolean;
 var
   Body: TBox;
 begin
-  if not Self.Find() then
+  if not Self.__Find() then
     Exit(False);
+
+  if Self.ItemBoxes <> [] then // we already have the bounds
+    Exit(True);
 
   with Self.ItemBounds do Body := [X1+28, Y1-1, X2-32, Y2-42];
   Self.ItemBoxes := Body.PartitionEx(4,7, -5,-4);
@@ -69,30 +73,27 @@ end;
 (*
 DepositBox.Debug
 ~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: procedure TRSDepositBox.Debug(); override;
+.. pascal:: function TRSDepositBox.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 
 Debugs the bounds of the depositbox, mainly used when maintenance is needed.
 *)
-procedure TRSDepositBox.Debug(); override;
+function TRSDepositBox.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 var
   BMP, i, c: Integer;
 begin
   if not Self.__Prepare() then Exit();
-  BMP := BitmapFromClient(GetClientBounds());
 
-  DrawTPABitmap(BMP, EdgeFromBox(Self.FBounds), $FFFFFF);
-  DrawTPABitmap(BMP, EdgeFromBox(Self.ItemBounds), $00FFFF);
-  DrawTPABitmap(BMP, EdgeFromBox(Self.TitleBounds), $00FFFF);
-  DrawTPABitmap(BMP, EdgeFromBox(Self.CloseButton), $00FFFF);
-
+  Result := Inherited(True);
   for i:=0 to High(Self.ItemBoxes) do
-    DrawTPABitmap(BMP, EdgeFromBox(Self.ItemBoxes[i]), $0000FF);
+    Result.DrawBox(Self.ItemBoxes[i], False, $0000FF);
 
   for i:=0 to High(Self.Buttons) do
-    DrawTPABitmap(BMP, EdgeFromBox(Self.Buttons[i]), $FF0000);
+    Result.DrawBox(Self.Buttons[i], False, $FF0000);
 
-  ShowBitmap(BMP);
-  FreeBitmap(BMP);
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
 end;
 
 

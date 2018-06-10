@@ -1,11 +1,8 @@
 (*
 MakeScreen
 ==============
-This file stores all methods that are used for simpler interfaces like SmithingScreen.
 
-.. code-block:: pascal
-
-    Writeln(SmithingScreen.IsOpen());
+THIS FILE IS NO LONGER IN USED, AND WILL SOON BE REMOVED
 *)
 type
   TRSMakeScreen = record (TInterfaceBase)
@@ -235,5 +232,5 @@ begin
 end;
 
 
-var
-  SmithingScreen: TRSMakeScreen := MakeScreen(6,5,[4,0,-5,-4], 'StatChars07', [$FFFFFF,0]);
+//var
+//  SmithingScreen: TRSMakeScreen := MakeScreen(6,5,[4,0,-5,-4], 'StatChars07', [$FFFFFF,0]);

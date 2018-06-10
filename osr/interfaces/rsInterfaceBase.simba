@@ -1,0 +1,147 @@
+(*
+RSInterfaceBase
+================
+Specializes the generic TInterfaceBase towards Oldschool runescape.
+Used to find interfaces on the go, versus the static coordinates based ones.
+*)
+type
+  TRSInterfaceBase = record(TInterfaceBase)
+    FTitles: TStringArray;
+    TitleBounds: TBox;
+    ItemBounds: TBox;
+    CloseButton: TBox;
+  end;
+
+(*
+TRSInterfaceBase.__Find
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.__Find(): Boolean;
+
+Used to locate the bounds of the interface, and finally verifies it by
+checking if the title matches.
+
+Note: This method should not be called in scripts as it may be subject to change.
+*)
+function TRSInterfaceBase.__Find(): Boolean;
+var
+  i: Int32;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  B: TBox;
+begin
+  srl.FindColors(TPA, CTS2(3424329,10), Self.FBounds);
+  ATPA := TPA.Cluster(1,3);
+  SortATPAFromSize(ATPA, 0, False);
+
+  if (Length(ATPA) >= 2) then
+  begin
+    Self.TitleBounds := ATPA[1].Bounds();
+    Self.ItemBounds  := ATPA[0].Bounds();
+
+    Self.FBounds := Self.ItemBounds.Combine(Self.TitleBounds);
+    Self.FBounds.Expand(6);
+
+    with Self.FBounds do
+      Self.CloseButton := Box(X2-27, Y1+7, X2-7, Y1+27);
+    
+    B := Self.TitleBounds;
+    B.y1 += 4; //SimpleOCR is highly sensitive
+    for i:=0 to High(Self.FTitles) do
+    begin
+      Result := Self.FTitles[i] in OCR.Recognize(B, FontSettingShd(2070783,1,65), UpFont, Self.TitleBounds.Width div 2);
+      if Result then Exit(True);
+    end;
+  end;
+end;
+
+(*
+TRSInterfaceBase.IsUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSInterfaceBase.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+   function TRSInterfaceBase.IsUpText(Text: String; WaitTime: UInt32 = 350): Boolean; overload;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.IsUptext
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (IsArrInStr(SubStrs, Self.GetUpText())) then
+      Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
+function TRSInterfaceBase.IsUpText(Text: String; WaitTime: UInt32 = 350): Boolean; overload;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (Text in Self.GetUpText()) then
+      Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
+(*
+TRSInterfaceBase.GetUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.GetUpText(): String;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.GetUpText
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.GetUpText(): String;
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 85];
+var
+  client:T2DIntArray;
+  bmp:Int32;
+begin
+  bmp := BitmapFromClient(mainscreen.UpTextArea);
+  FastReplaceColor(bmp, 2070783, 3424329);
+  client := BitmapToMatrix(bmp);
+  Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT, UpFont);
+  FreeBitmap(bmp);
+end;
+
+
+(*
+TRSInterfaceBase.GetUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed.
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
+begin
+  Result.FromClient();
+  Result.DrawBox(Self.FBounds,     False, $FFFFFF);
+  Result.DrawBox(Self.ItemBounds,  False, $00FFFF);
+  Result.DrawBox(Self.TitleBounds, False, $00FFFF);
+  Result.DrawBox(Self.CloseButton, False, $00FFFF);
+
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
+end;

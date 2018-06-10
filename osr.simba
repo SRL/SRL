@@ -22,7 +22,6 @@ end;
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
-{$include_once osr/rsInterfaceBase.simba}
 {$include_once osr/misc.simba}
 {$include_once osr/lobby.simba}
 {$include_once osr/worldswitcher.simba}
@@ -36,9 +35,11 @@ end;
 {$include_once osr/interfaces/gametabs.simba}
 {$include_once osr/player.simba}
 {$include_once osr/players.simba}
+{$include_once osr/interfaces/rsInterfaceBase.simba}
 {$include_once osr/interfaces/bankscreen.simba}
 {$include_once osr/interfaces/depositbox.simba}
-{$include_once osr/interfaces/makescreen.simba}
+{.$include_once osr/interfaces/makescreen.simba}
+{$include_once osr/interfaces/smithingscreen.simba}
 {$include_once osr/interfaces/grandexch.simba}
 {$include_once osr/MM2MS.simba}
 {$include_once osr/antiban.simba}
