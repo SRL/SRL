@@ -1,0 +1,243 @@
+(*
+DepositBox
+==========
+For interacting with the depositbox.
+
+PS: You are expected to find and open the depositbox yourself.
+*)
+
+type
+  TRSDepositBox = record(TRSInterfaceBase)
+    ItemBoxes: TBoxArray;
+    Buttons: TBoxArray;
+  end;
+
+(*
+.. pascal:: var DepositBox: TRSDepositBox;
+
+.. pascal:: EDepositButton = (dbDepositInv, dbDepositWarnItems, dbDepositLoot, dbClose);
+
+.. pascal:: const DEPOSIT_ALL = -1;
+*)
+var
+  DepositBox: TRSDepositBox;
+
+type
+  EDepositButton = (dbDepositInv, dbDepositWarnItems, dbDepositLoot, dbClose);
+
+const
+  DEPOSIT_ALL = -1;
+
+
+(*
+DepositBox.__Setup
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSDepositBox.__Setup();
+
+Every interface needs some internal setup procedure..
+*)
+procedure TRSDepositBox.__Setup();
+begin
+  Self.FBounds := Mainscreen.GetBounds;
+  Self.FName   := 'Deposit Box';
+  Self.FStatic := True;
+end;
+
+(*
+DepositBox.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSDepositBox.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the depositbox - automatically.
+*)
+function TRSDepositBox.__Prepare(): Boolean;
+var
+  Body: TBox;
+begin
+  if not Self.Find() then
+    Exit(False);
+
+  with Self.ItemBounds do Body := [X1+28, Y1-1, X2-32, Y2-42];
+  Self.ItemBoxes := Body.PartitionEx(4,7, -5,-4);
+
+  with Self.ItemBounds do Body := [X1+74, Y2-43, X2-74, Y2];
+  Self.Buttons := Body.PartitionEx(1,3, -5,-15);
+
+  Result := True;
+end;
+
+(*
+DepositBox.Debug
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSDepositBox.Debug(); override;
+
+Debugs the bounds of the depositbox, mainly used when maintenance is needed.
+*)
+procedure TRSDepositBox.Debug(); override;
+var
+  BMP, i, c: Integer;
+begin
+  if not Self.__Prepare() then Exit();
+  BMP := BitmapFromClient(GetClientBounds());
+
+  DrawTPABitmap(BMP, EdgeFromBox(Self.FBounds), $FFFFFF);
+  DrawTPABitmap(BMP, EdgeFromBox(Self.ItemBounds), $00FFFF);
+  DrawTPABitmap(BMP, EdgeFromBox(Self.TitleBounds), $00FFFF);
+  DrawTPABitmap(BMP, EdgeFromBox(Self.CloseButton), $00FFFF);
+
+  for i:=0 to High(Self.ItemBoxes) do
+    DrawTPABitmap(BMP, EdgeFromBox(Self.ItemBoxes[i]), $0000FF);
+
+  for i:=0 to High(Self.Buttons) do
+    DrawTPABitmap(BMP, EdgeFromBox(Self.Buttons[i]), $FF0000);
+
+  ShowBitmap(BMP);
+  FreeBitmap(BMP);
+end;
+
+
+(*
+DepositBox.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSDepositBox.IsOpen(): Boolean;
+
+Checks if the depositbox is open.
+Internally also used to prepare the boundaries of the depositbox
+*)
+function TRSDepositBox.IsOpen(): Boolean;
+begin
+  Result := Self.__Prepare();
+end;
+
+(*
+DepositBox.ClickButton
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSDepositBox.ClickButton(Button: EDepositButton): Boolean;
+
+Clicks the button. Available buttons are ``(dbDepositInv, dbDepositWarnItems, dbDepositLoot, dbClose)``.
+*)
+function TRSDepositBox.ClickButton(Button: EDepositButton): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  if Button = dbClose then
+    mouse.Move(Self.CloseButton)
+  else
+    mouse.Move(Self.Buttons[Button]);
+
+  Wait(90,170);
+  Mouse.Click(mouse_left);
+  Exit(True);
+end;
+
+(*
+DepositBox.DepositItem
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSDepositBox.DepositItem(Slot, Amount:Int32; UpText:TStringArray=[]): Boolean;
+
+Attempts to deposit the item in the given slot. Amount can be any value, while
+``-1`` or ``DEPOSIT_ALL`` will cause it to deposit all of those items in that slot.
+*)
+function TRSDepositBox.DepositItem(Slot, Amount:Int32; UpText:TStringArray=[]): Boolean;
+var
+  b:TBox;
+const
+  TEXT_AREA:TBox = [200,393,450,412];
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  b := self.ItemBoxes[Slot];
+  if CountColor($010000, b) = 0 then
+    Exit(False); // no such item
+
+  mouse.Move(b);
+  Wait(40,450, wdLeft);
+
+  if (UpText <> []) and (not MainScreen.IsUpText(UpText)) then
+    Exit(False);
+
+  if (amount = 1) then
+  begin
+    Mouse.Click(mouse_left);
+    Exit(True);
+  end else
+  begin
+    ChooseOption.Open();
+    Wait(0,170, wdLeft);
+
+    if amount = DEPOSIT_ALL then
+      Result := ChooseOption.Select(['Deposit-All'])
+    else if ChooseOption.Select(['Deposit-'+ToString(amount)+' '],,False) then  // space after amount so it can't find "2" in 28
+      Result := True
+    else if ChooseOption.MissSelect('Deposit-X', 'Examine') then
+      Result := Chatbox.AnswerQuery('Enter amount', ToString(amount), 6000);
+  end;
+end;
+
+(*
+DepositBox.DepositInventory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSDepositBox.DepositInventory(CloseAfter: Boolean = True): Boolean;
+
+Deposits your whole inventory, waits for all the items to disappear, and alteratively
+closes the interface. It returns ``True`` if all items was cleared from your inventory.
+*)
+function TRSDepositBox.DepositInventory(CloseAfter: Boolean = True): Boolean;
+var
+  i,t: Int64;
+begin
+  Self.ClickButton(dbDepositInv);
+  Wait(60,770, wdLeft);
+
+  t := GetTickCount() + Random(4000, 5000);
+  while (not Result) and (GetTickCount() < t) do
+  begin
+    if CountColor($010000, self.ItemBoxes[i]) = 0 then Inc(i);
+    Result := i = Length(self.ItemBoxes);
+  end;
+
+  Wait(60,770, wdLeft);
+  if CloseAfter then Self.Close();
+end;
+
+(*
+DepositBox.Close
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSDepositBox.Close(): Boolean;
+
+Closes the depositbox intreface.
+*)
+function TRSDepositBox.Close(): Boolean;
+var
+  t: Int64;
+begin
+  if (not Self.IsOpen()) then
+    Exit(True);
+
+  if (srl.CloseInterfacesWithEscape) then
+  begin
+    Keyboard.PressKey(VK_ESCAPE);
+    t := GetTickCount() + Random(4000, 5000);
+    while (t > GetTickCount()) do
+    begin
+      if (not Self.IsOpen()) then
+        Exit(True);
+    end;
+    srl.ToggleCloseInterfacesWithEscape(False);
+  end;
+
+  Self.ClickButton(dbClose);
+  t := GetTickCount() + Random(4000, 5000);
+  while (t > GetTickCount()) do
+    if (not Self.IsOpen()) then
+      Exit(True);
+end;
+
+begin
+  DepositBox.__Setup();
+end;
