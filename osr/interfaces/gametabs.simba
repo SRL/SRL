@@ -68,7 +68,7 @@ Variable that stores functions and properties relating to gametabs.
 var
   Gametabs: TRSGametab;
 
-procedure TRSGametab.__setup();
+procedure TRSGametab.__Setup();
 var
   Upper,Lower:TBox;
 begin
@@ -88,9 +88,7 @@ end;
 (*
 Gametab.ToggleFKeys
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  procedure TRSGametab.ToggleFKeys(const Enable: Boolean);
+.. pascal:: procedure TRSGametab.ToggleFKeys(const Enable: Boolean);
 
 Enables support for FKeys to open tabs.
 *)
@@ -102,9 +100,7 @@ end;
 (*
 Gametab.GetBounds
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSGametab.GetBounds(Tab: EGametab): TBox;
+.. pascal:: function TRSGametab.GetBounds(Tab: EGametab): TBox;
 
 Returns the bounds of the tab-button
 *)
@@ -116,9 +112,7 @@ end;
 (*
 Gametab.PointToSlot
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSGametab.PointToSlot(pt: TPoint): Int32;
+.. pascal:: function TRSGametab.PointToSlot(pt: TPoint): Int32;
 
 Returns the tab-id under the location ``pt``, value is returned as
 an integer, as it will return ``-1`` if it fails. To convert it to a 
@@ -135,22 +129,20 @@ end;
 (*
 Gametab.IsOpen
 ~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;
+.. pascal:: function TRSGametab.IsOpen(Tab:EGametab; MaxWait:Int32=0): Boolean;
 
 Checks if the given tab is open or now. By default it wont wait (expecting it to open).
 *)
-function TRSGametab.IsOpen(Tab:EGametab; maxWait:Int32=0): Boolean;
+function TRSGametab.IsOpen(Tab:EGametab; MaxWait:Int32=0): Boolean;
 var
   FoundTab:Boolean;
   i,t:Int64;
 begin
-  t := GetTickCount64() + maxWait;
+  t := GetTickCount64() + MaxWait;
   repeat
     if CountColorTolerance(1910383, self.GetBounds(Tab), 13) > 0 then
       Exit(True)
-    else if (Tab = tabInventory) then //when in bank no tabs exist
+    else if (Tab = tabInventory) then //when in bank or shop no tabs exist
     begin
       FoundTab := False;
       for i:=0 to High(Self.Tabs) do
@@ -169,22 +161,20 @@ end;
 (*
 Gametab.Open
 ~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSGametab.Open(Tab: EGametab; tries: Int32=2): Boolean;
+.. pascal:: function TRSGametab.Open(Tab: EGametab; Tries: Int32=2): Boolean;
 
 Opens the given gametab, by default it retries twice.
 *)
-function TRSGametab.Open(Tab: EGametab; tries: Int32=2): Boolean;
+function TRSGametab.Open(Tab: EGametab; Tries: Int32=2): Boolean;
 var
   i:Int32;
   B:TBox;
 begin
-  B := self.getBounds(Tab);
+  B := self.GetBounds(Tab);
   if Self.IsOpen(Tab) then
     Exit(True);
 
-  for i:=1 to tries do
+  for i:=1 to Tries do
   begin
     if (Self.FKeysEnabled and (Keybindings[Ord(tab)] <> 0)) then
     begin
@@ -203,9 +193,7 @@ end;
 (*
 Gametab.Open
 ~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+.. pascal:: procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
 
 Only moves the mouse over the given tab.
 *)
@@ -218,9 +206,7 @@ end;
 (*
 Gametab.GetCurrent
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSGametab.GetCurrent(): EGametab;
+.. pascal:: function TRSGametab.GetCurrent(): EGametab;
 
 Returns the current open tab.
 *)
@@ -237,9 +223,9 @@ end;
 
 procedure TGtButton.Init(B:TBox; enaColor:Int32=1777019; disColor:Int32=5067346);
 begin
-  self.stateEnabled := enaColor;
-  self.stateDisabled := disColor;
-  self.bounds := B;
+  self.StateEnabled := enaColor;
+  self.StateDisabled := disColor;
+  self.Bounds := B;
 end;
 
 
@@ -260,7 +246,7 @@ function TGtButton.Toggle(out enabled:Boolean; tryTime:Int32=2000): Boolean; con
 var t:UInt64;
 begin
   enabled := not(Self.IsEnabled());
-  mouse.click(self.bounds, mouse_left);
+  Mouse.Click(self.bounds, mouse_left);
   t := GetTickCount64()+tryTime;
   repeat
     Result := Self.IsEnabled() = enabled;
@@ -269,10 +255,8 @@ begin
 end;
 
 
-
-
 begin
-  Gametabs.__setup();
+  Gametabs.__Setup();
 end;
 
 {$include_once gametabs/combat.simba}

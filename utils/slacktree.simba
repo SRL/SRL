@@ -1,16 +1,26 @@
+(*
+Slacktree
+==========
+Slacktree offers a KD-tree like tree-structure speicalized for TPointArrays (2D Points). 
+
+Adds fast alteratives to the most popular functions found in the AND_TPA.dll ``FilterTPADistTPA``. 
+The library loaded may not work properly on Linux distors.
+*)
 {$loadlib ../Includes/SRL/utils/slacktree/slacktree}
 
-// my answers to FilterTPADistTPA found in AND_TPA.pas
-// solves the problem in roughly O(n log n) time
-
 (*
- Returns all the points from `self` that are within range of any point in `other`.
- The parameters `mindist` and `maxdist` determine what "within range" means.
+TPointArray.PointsInRangeOf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+  function TPointArray.PointsInRangeOf(Other: TPointArray; MinDist, MaxDist: Double): TPointArray; constref;
+
+Returns all the points from `self` that are within range of any point in `other`.
+The parameters `mindist` and `maxdist` determine what "within range" means.
 *)
 function TPointArray.PointsInRangeOf(Other: TPointArray; MinDist, MaxDist: Double): TPointArray; constref;
 var
-  tree:TSlackTree;
-  pt:TPoint;
+  tree: TSlackTree;
+  pt: TPoint;
 begin
   tree.Init(Copy(Self));
   for pt in Other do
@@ -18,13 +28,17 @@ begin
 end;
 
 (*
- same as the above but lets you specify X- and Y-wise distance separately. This allows
- for a lot of cool stuff :p
+TPointArray.PointsInRangeOf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+  function TPointArray.PointsInRangeOf(Other: TPointArray; minDx, minDy, maxDx, maxDy: Int32): TPointArray; constref; overload;
+
+Same as the above but lets you specify X- and Y-wise min & max distance separately.
 *)
 function TPointArray.PointsInRangeOf(Other: TPointArray; minDx, minDy, maxDx, maxDy: Int32): TPointArray; constref; overload;
 var
-  tree:TSlackTree;
-  pt:TPoint;
+  tree: TSlackTree;
+  pt: TPoint;
 begin
   tree.Init(Copy(Self));
   for pt in Other do
@@ -33,15 +47,21 @@ end;
 
 
 (*
- An older version with some other parameters from what the above takes.
- I'll just drop it here.
+TPAOverlap
+~~~~~~~~~~
+.. pascal:: 
+  function TPAOverlap(TPA1,TPA2:TPointArray; r:Int32; overlap:EOverlap=eoBoth): TPointArray;
+  type EOverlap = (eoLeft,eoRight,eoBoth);
+  
+An older version with some other parameters from what the above takes.
+Exists here for legacy reasons.
 *)
 type EOverlap = (eoLeft,eoRight,eoBoth);
 
 function TPAOverlap(TPA1,TPA2:TPointArray; r:Int32; overlap:EOverlap=eoBoth): TPointArray;
 var
-  tree:TSlackTree;
-  pt:TPoint;
+  tree: TSlackTree;
+  pt: TPoint;
 begin
   if overlap = eoRight then Swap(TPA1, TPA2);
 

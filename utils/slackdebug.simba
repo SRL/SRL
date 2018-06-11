@@ -1,5 +1,24 @@
-// Slacky's little drawing util pack
+(*
+Slackdebug
+==========
+Slacky's little drawing util pack. 
+*)
 {$H-}
+(*
+.. pascal::
+   const
+     clProgRed    = $1F2164;
+     clProgBlue   = $783F37;
+     clProgGreen  = $26B58A;
+     clProgGreen2 = $12A20D;
+     clProgBrown  = $76ADB8;
+     clProgLBlue  = $B49946;
+     clProgOrange = $1493E2;
+     clProgPink   = $A869C9;
+     clProgYellow = $16D4F4;
+     clProgGray   = $B4BCBE;
+*)
+
 const
   clProgRed    = $1F2164;
   clProgBlue   = $783F37;
@@ -109,6 +128,18 @@ begin
   Self.DrawText(rText,Point(pt.x+w-5,ty), PROGGY_FONT, $FFFFFF, 1, True, 4);
 end;
 
+(*
+TMufasaBitmap.DrawSkillReport
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+  function TMufasaBitmap.DrawSkillReport(At: TPoint; Color:Int32; CurrentXP, GainedXP, Objectives: Int32; Skill:String=''): TBox;
+
+Draws a skill report at the given location. Color can be just about any color, it will be adjusted
+automatically to look as good as possible.
+ 
+You have to track your XP, gained XP, and how many "objects" you have complted yourself in your script. 
+This is only for debugging that.
+*)
 function TMufasaBitmap.DrawSkillReport(At: TPoint; Color:Int32; CurrentXP, GainedXP, Objectives: Int32; Skill:String=''): TBox;
 var
   w,h,z,currLvl,atNextLvl,atCurrLvl,rem,percent: Int32;

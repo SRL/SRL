@@ -1,3 +1,10 @@
+(*
+RSClient
+==========
+Adds addinal utilities for managing the RS client, like loosing focus, starting it, stopping it, and so on.
+
+Only works on Windows.
+*)
 {$DEFINE RSCLIENT}
 {$DEFINE RSCLIENT_AUTOFOCUS} // Automatic gain focus on mouse and key input.
 {$DEFINE RSCLIENT_RETARGET} // Automatic retarget the client if RS changes handles.
