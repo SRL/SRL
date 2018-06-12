@@ -136,7 +136,7 @@ end;
 
 (*
 TRSInterfaceBase.GetUpText
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSInterfaceBase.GetUpText(): String;
 
 Speical methods for checking uptext when the interface is open. Regular Mainscreen.GetUpText
@@ -148,8 +148,8 @@ function TRSInterfaceBase.GetUpText(): String;
 const
   OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 85];
 var
-  client:T2DIntArray;
-  bmp:Int32;
+  client: T2DIntArray;
+  bmp: Int32;
 begin
   bmp := BitmapFromClient(mainscreen.UpTextArea);
   FastReplaceColor(bmp, 2070783, 3424329);
@@ -160,11 +160,12 @@ end;
 
 
 (*
-TRSInterfaceBase.GetUpText
-~~~~~~~~~~~~~~~~~~~~~~~~~
+TRSInterfaceBase.Debug
+~~~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
 
-Debugs the bounds of the interface, mainly used when maintenance is needed.
+Debugs the bounds of the interface, mainly used when maintenance is needed. If RetImage is ``True``
+the image will not be debugged, but instead returned, otherwise the resul is ``nil``
 
 This applies to any interface that inherits from TRSInterfaceBase
 *)

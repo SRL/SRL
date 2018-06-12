@@ -66,22 +66,9 @@ begin
 end;
 
 (*
-ShopScreen.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSShopScreen.IsOpen(): Boolean;
-
-Checks if the interface is open.
-Internally also used to prepare the boundaries of the interface
-*)
-function TRSShopScreen.IsOpen(): Boolean;
-begin
-  Result := Self.__Prepare();
-end;
-
-(*
 ShopScreen.Debug
 ~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSShopScreen.Debug(RetImage: Boolean = False): TMufasaBitmap;
+.. pascal:: function TRSShopScreen.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 
 Debugs the bounds of the interface, mainly used when maintenance is needed.
 *)
@@ -102,9 +89,42 @@ begin
 end;
 
 (*
+ShopScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+*)
+function TRSShopScreen.IsOpen(): Boolean;
+begin
+  Result := Self.__Prepare();
+end;
+
+(*
+ShopScreen.FindItem
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSShopScreen.FindItem(DTM: Integer): Int32;
+
+Returns the slot index for the given item, if it's found, otherwise ``-1``
+*)
+function TRSShopScreen.FindItem(DTM: Integer): Int32;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  if not(self.IsOpen()) then Exit(-1);
+
+  for i:=0 to High(Self.ItemBoxes) do
+    if FindDTM(DTM, pt.x, pt.y, Self.ItemBoxes[i]) then
+      Exit(i);
+  Result := -1;
+end;
+
+(*
 ShopScreen.MouseOver
 ~~~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSShopScreen.ItemName(Slot: Int32): Boolean;
+.. pascal:: function TRSShopScreen.MouseOver(Slot: Int32): Boolean;
 
 Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
 *)
@@ -130,26 +150,6 @@ begin
     Exit(False);
 
   Result := CountColor($010000, Self.ItemBoxes[Slot]) = 0;
-end;
-
-(*
-ShopScreen.FindItem
-~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSShopScreen.FindItem(DTM: Integer): Int32;
-
-Returns the slot index for the given item, if it's found, otherwise ``-1``
-*)
-function TRSShopScreen.FindItem(DTM: Integer): Int32;
-var
-  i: Int32;
-  pt: TPoint;
-begin
-  if not(self.IsOpen()) then Exit(-1);
-
-  for i:=0 to High(Self.ItemBoxes) do
-    if FindDTM(DTM, pt.x, pt.y, Self.ItemBoxes[i]) then
-      Exit(i);
-  Result := -1;
 end;
 
 (*

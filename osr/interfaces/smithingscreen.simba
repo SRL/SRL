@@ -86,19 +86,6 @@ begin
 end;
 
 (*
-SmithingScreen.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSSmithingScreen.IsOpen(): Boolean;
-
-Checks if the interface is open.
-Internally also used to prepare the boundaries of the interface
-*)
-function TRSSmithingScreen.IsOpen(): Boolean;
-begin
-  Result := Self.__Prepare();
-end;
-
-(*
 SmithingScreen.Debug
 ~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSSmithingScreen.Debug(RetImage: Boolean = False): TMufasaBitmap;
@@ -124,6 +111,19 @@ begin
   Result.Debug();
   Result.Free();
   Result := nil;
+end;
+
+(*
+SmithingScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+*)
+function TRSSmithingScreen.IsOpen(): Boolean;
+begin
+  Result := Self.__Prepare();
 end;
 
 (*
@@ -157,7 +157,7 @@ function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
 begin
   if (not Self.IsOpen()) then
     Exit(False);
-
+  
   Result := True;
   Mouse.Move(Self.ItemBoxesIcon[Slot]);
 end;
