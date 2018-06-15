@@ -597,6 +597,64 @@ begin
 end;
 
 (*
+Chatbox.PointToButtonId
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.PointToButtonId(PT: TPoint): Int32;
+
+Returns the ID of the button under the given point and ``-1`` if it failed.
+*)
+function TRSChatbox.PointToButtonId(PT: TPoint): Int32;
+var
+  i: Int32;
+  TPA: TPointArray;
+  B: TBox;
+begin
+  if Self.GetButtonQuery() = '' then
+    Exit(-1);
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      if B.Contains(PT) then Exit(Result + 1);
+      Inc(Result);
+    end;
+  end;
+  Result := -1;
+end;
+
+(*
+Chatbox.GetButtonIdBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.GetButtonIdBounds(ID: Int32): TBox;
+
+Returns the bounds of the button with the given ID.
+*)
+function TRSChatbox.GetButtonIdBounds(ID: Int32): TBox;
+var
+  i: Int32;
+  TPA: TPointArray;
+  B: TBox;
+begin
+  if Self.GetButtonQuery() = '' then
+    Exit();
+
+  i := 1;
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      if i = ID then Exit(B);
+      Inc(i);
+    end;
+  end;
+end;
+
+(*
 Chatbox.ClickButtonColor
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;

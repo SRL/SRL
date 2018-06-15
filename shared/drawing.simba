@@ -30,11 +30,13 @@ Copy client to bitmap.
 procedure TMufasaBitmap.FromClient(Area: TBox=[0,0,-1,-1]);
 var 
   W,H: Int32;
+  m: TMufasaBitmap;
 begin
-  GetClientDimensions(W,H);
+  client.GetIOManager.GetDimensions(W,H);
   if Area = TBox([0,0,-1,-1]) then Area := [0,0,W-1,H-1];
   if (self <> nil) and (self.GetIndex() <> -1) then self.Free();
-  self := GetMufasaBitmap(BitmapFromClient(Area));
+  Self.Init(client.GetMBitmaps);
+  Self.CopyClientToBitmap(client.GetIOManager, True, Area.X1, Area.Y1, Area.X2, Area.Y2);
 end;
   
 (*

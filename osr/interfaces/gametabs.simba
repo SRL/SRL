@@ -48,7 +48,9 @@ type
   );
 
   TRSGametab = record
+    FBounds: TBox;
     Tabs: TBoxArray;
+    UpperTabs, LowerTabs: TBox;
     Keybindings: TIntegerArray;
     FKeysEnabled: Boolean;
   end;
@@ -69,16 +71,15 @@ var
   Gametabs: TRSGametab;
 
 procedure TRSGametab.__Setup();
-var
-  Upper,Lower:TBox;
 begin
   with Self do
   begin
-    Upper := [527,168,760,204];
-    Lower := [527,466,760,502];
+    UpperTabs := [527,168,760,204];
+    LowerTabs := [527,466,760,502];
+    FBounds := LowerTabs + UpperTabs;
 
-    Tabs := Upper.Partition(1, 7, -3);
-    Tabs.Extend(Lower.Partition(1, 7, -3));
+    Tabs := UpperTabs.Partition(1, 7, -3);
+    Tabs.Extend(LowerTabs.Partition(1, 7, -3));
 
     Keybindings := [VK_F1, VK_F2, VK_F3, VK_ESCAPE, VK_F4, VK_F5, VK_F6, VK_F7,
                     VK_F8, VK_F9, 0, VK_F10, VK_F11, VK_F12];
