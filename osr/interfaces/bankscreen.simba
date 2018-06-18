@@ -485,6 +485,25 @@ begin
   Result := CountColor($010000, self.GetSlotBox(slot)) <> 0;
 end;
 
+(*
+BankScreen.FindItem
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInventory.FindItem(DTM: Integer): Int32;
+
+Returns the index of the given DTM, ``-1`` if it's not found.
+*)
+function TRSBankScreen.FindItem(DTM: Integer): Int32;
+var
+  i,j: Int32;
+  pt: TPoint;
+begin
+  if not(self.IsOpen()) then Exit();
+
+  Result := -1;
+  for i:=0 to High(Self.FSlots) do
+    if FindDTM(DTM, pt.x, pt.y, Self.FSlots[i]) then
+      Exit(i);
+end;
 
 (*
 BankScreen.DepositAll

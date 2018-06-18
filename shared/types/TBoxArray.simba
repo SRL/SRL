@@ -230,6 +230,18 @@ begin
   end;
 end;
 
+function TBoxArray.Merge(): TBox;
+var i:Int32;
+begin
+  if Length(Self) = 0 then
+    Exit;
+
+  Result := Self[0];
+  for i:=1 to High(self) do
+    Result := Result + Self[i];
+end;
+
+
 (*
   As found in SRL-6, placed here for lack of a better spot to put.
 *)

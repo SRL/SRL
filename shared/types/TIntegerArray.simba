@@ -168,6 +168,50 @@ begin
 end;
 
 
+procedure TIntegerArray.SortWeighted(Weights: TIntegerArray; iLo, iHi: Int32; SortUp: Boolean);
+var
+  lo, hi, mid: Int32;
+begin
+  if (Length(weights) <> Length(self)) then Exit;
+  lo := iLo;
+  hi := iHi;
+  Mid := weights[(lo + hi) shr 1];
+  repeat
+    if SortUp then
+    begin
+      while (weights[lo] < mid) do Inc(lo);
+      while (weights[hi] > mid) do Dec(hi);
+    end else
+    begin
+      while (weights[Lo] > mid) do Inc(Lo);
+      while (weights[Hi] < mid) do Dec(Hi);
+    end;
+    if (lo <= hi) then
+    begin
+      Swap(weights[lo], weights[hi]);
+      Swap(self[lo], self[hi]);
+      Inc(lo);
+      Dec(hi);
+    end;
+  until Lo > Hi;
+  if (hi > iLo) then self.SortWeighted(weights, iLo, hi, SortUp);
+  if (lo < iHi) then self.SortWeighted(weights, lo, iHi, SortUp);
+end;
+
+procedure TIntegerArray.SortFrom(X: Int32);
+var
+  I, L: Int32;
+  Weights: TIntegerArray;
+begin
+  L := High(Self);
+  if (L <= 0) then Exit;
+  SetLength(weights, L + 1);
+  for i := 0 To L do Weights[i] := Round(Abs(X - Self[i]));
+  Self.SortWeighted(weights, 0, L, True);
+end;
+
+
+
 
 // ----------------------------------------------------------------------------
 // Type specific methods bellow
