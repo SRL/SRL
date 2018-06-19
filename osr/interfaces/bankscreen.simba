@@ -89,14 +89,18 @@ end;
 function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
 var
   TimeOut: UInt64;
+  Text: String;
+  i: Int32;
 begin
   Result := False;
   TimeOut := GetTickCount() + (WaitTime + Random(-20, 50));
 
   while (TimeOut >= GetTickCount()) do
   begin
-    if (IsArrInStr(SubStrs, Self.GetUpText())) then
-      Exit(True);
+    Text := Self.GetUpText();
+    for i:=0 to High(SubStrs) do
+      if (SubStrs[i] = '') or (SubStrs[i] in Text) then
+        Exit(True);
 
     Wait(Random(35, 75));
   end;
