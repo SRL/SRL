@@ -221,7 +221,7 @@ begin
 
   with self.GetSkillBox(skill) do
   begin
-    lvl := GetTextAtEx(Box(X1+25,y1+2,x2-13,y2-14), 0,3,2, $00FFFF,0, 'StatChars07_s');
+    lvl := GetTextAtEx(Box(X1+25,y1+2,x2-13,y2-14), 0,3,2, $00FFFF,0, 'StatChars07');
     Result := StrToIntDef(ExtractFromStr(lvl, NUMBERS), -1);
   end;
 end;
