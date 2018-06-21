@@ -64,6 +64,17 @@ begin
   Result := Length(TPA);
 end;
 
+
+(*
+srl.FindColors
+~~~~~~~~~~~~~~~
+.. pascal::
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTSColor;  Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTS1Color; Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTS2Color; Area: TBox): UInt32; constref;
+
+Searches for the given Color, returns the resulting points in the TPA.
+*)
 function TSRL.FindColors(out TPA: TPointArray; Color: TCTSColor; Area: TBox): UInt32; constref;
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 0);
@@ -93,7 +104,6 @@ function Equals(X, Y: Integer): Boolean; begin Result := X = Y; end;
 (*
 srl.WaitColorCount
 ~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function TSRL.WaitColorCount(Color: TCTS1Color; Area: TBox; CompareFunc: TCompareFunc; Count, WaitTime: Integer): Boolean;
@@ -196,7 +206,6 @@ type
 (*
 ColorSetting
 ~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Sat: Extended = 0.2): TColorSettings;
@@ -222,7 +231,6 @@ end;
 (*
 TColorSettings.Retrieve
 ~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     procedure TColorSettings.Retrieve();
@@ -244,7 +252,6 @@ end;
 (*
 TColorSettings.Apply
 ~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     procedure TColorSettings.Apply();
@@ -266,7 +273,6 @@ end;
 (*
 FindColorsTolerance; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function FindColorsTolerance(var TPA: TPointArray; Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Boolean; overload;
@@ -296,7 +302,6 @@ end;
 (*
 FindColorTolerance; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function FindColorTolerance(out x, y: Int32; Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Boolean; overload;
@@ -326,7 +331,6 @@ end;
 (*
 CountColorTolerance; overload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: pascal
 
     function CountColorTolerance(Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Integer; overload;
@@ -357,7 +361,6 @@ end;
 (*
 type TColorEx
 ~~~~~~~~~~~~~
-
 A simple record that stores a color, tolerance and color settings.
 
 Example:
