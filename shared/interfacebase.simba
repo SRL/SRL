@@ -1,3 +1,23 @@
+(*
+InterfaceBase
+=============
+This is the stub of most interface-structures, meaning they extend on in.
+
+For example ``Mainscreen.GetBounds`` or ``Chatbox.GetBounds()`` those methods are inherited 
+from here.
+*)
+
+(*
+TInterfaceBase
+~~~~~~~~~~~~~~
+.. pascal::
+  type
+    TInterfaceBase = record
+      FName: String;
+      FBounds: TBox;
+      FStatic: Boolean;
+    end;
+*)
 type
   TInterfaceBase = record
     FName: String;
@@ -5,36 +25,85 @@ type
     FStatic: Boolean;
   end;
 
+(*
+TInterfaceBase.SetName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TInterfaceBase.SetName(const Name: String);
+
+Sets the name of the interface.
+*)
 procedure TInterfaceBase.SetName(const Name: String);
 begin
   FName := Name;
 end;
 
+(*
+TInterfaceBase.GetName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TInterfaceBase.GetName(): String;
+
+Returns the name of the interface.
+*)
 function TInterfaceBase.GetName(): String;
 begin
   Result := FName;
 end;
 
+(*
+TInterfaceBase.SetStatic
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TInterfaceBase.SetStatic(const isStatic: Boolean);
+
+Supposed to represent if the interface is static or not. Not really much cared about as is.
+*)
 procedure TInterfaceBase.SetStatic(const isStatic: Boolean);
 begin
   FStatic := isStatic;
 end;
 
+(*
+TInterfaceBase.GetStatic
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TInterfaceBase.GetStatic(): Boolean;
+
+Returns True if the interface was declared as a static interface. 
+*)
 function TInterfaceBase.GetStatic(): Boolean;
 begin
   Result := FStatic;
 end;
 
+(*
+TInterfaceBase.SetBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TInterfaceBase.SetBounds(const NewBounds: TBox);
+
+Sets the bounds of the interface.
+*)
 procedure TInterfaceBase.SetBounds(const NewBounds: TBox);
 begin
   Self.FBounds := NewBounds;
 end;
  
+(*
+TInterfaceBase.GetBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TInterfaceBase.GetBounds(): TBox;
+
+Returns the bounds of the interface.
+*)
 function TInterfaceBase.GetBounds(): TBox;
 begin
   Result := Self.FBounds;
 end;
  
+(*
+TInterfaceBase.GetMiddle
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TInterfaceBase.GetMiddle(): TPoint;
+
+Returns the middle point of the interface.
+*)
 function TInterfaceBase.GetMiddle(): TPoint;
 begin
   Result := MiddleBox(Self.FBounds);

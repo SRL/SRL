@@ -1,22 +1,38 @@
-function TSRL.isLoggedIn(): Boolean;
-begin
-  Result := GetColor(443, 486) = $FFFFFF;
-end;
+(*
+client
+======
+Refers to the oldschool runescape client. Stores somewhat misc methods that relates to client checks.
+*)
 
-function TSRL.isLoggedIn(WaitTime: Integer): Boolean; overload;
+(*
+srl.IsLoggedIn
+~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.isLoggedIn(WaitTime: Int32 = 0): Boolean; overload;
+
+Returns ``True`` if your character is logged in.
+ By default it doesn't wait, but you can change ``WaitTime`` to whatever.
+*)
+function TSRL.isLoggedIn(WaitTime: Int32 = 0): Boolean; overload;
 var
   t: UInt64;
 begin
   Result := False;
-  t := GetTickCount64 + WaitTime;
+  t := GetTickCount() + WaitTime;
   repeat
-    if (Self.isLoggedIn()) then
+    if GetColor(443, 486) = $FFFFFF then
       Exit(True);
-    Wait(Random(50, 200));
-  until GetTickCount64() > t;
+    Wait(50,100);
+  until GetTickCount() >= t;
 end;
 
-function TSRL.isClientLoading(WaitTime: Integer = 0): Boolean;
+(*
+srl.isClientLoading
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.isClientLoading(WaitTime: Int32 = 0): Boolean;
+
+Returns ``True`` if we are still waiting for the client to boot up.
+*)
+function TSRL.isClientLoading(WaitTime: Int32 = 0): Boolean;
 
   function isLoading: Boolean;
   var
@@ -32,15 +48,22 @@ begin
   if (WaitTime = 0) then
     Exit(isLoading());
 
-  t := GetTickCount64() + WaitTime;
+  t := GetTickCount() + WaitTime;
   repeat
     if (isLoading()) then
       Exit(True);
 
     Wait(Random(50, 100));
-  until (GetTickCount64() >= t);
+  until (GetTickCount() >= t);
 end;
 
+(*
+srl.isClientLoading
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.WaitClientLoading: Boolean;
+
+Waits forever, or until the client has successfully booted.
+*)
 function TSRL.WaitClientLoading: Boolean;
 begin
   repeat
@@ -49,7 +72,15 @@ begin
   until Result;
 end;
 
-function TSRL.isClientReady(WaitTime: Integer): Boolean; overload;
+(*
+srl.isClientReady
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.isClientReady(WaitTime: Int32 = 0): Boolean; overload;
+
+Returns ``True`` if the client is ready to be used. 
+If the client isn't ready it will wait, expecting it to get ready.
+*)
+function TSRL.isClientReady(WaitTime: Int32 = 0): Boolean; overload;
 var
   T: UInt64;
   W, H: Int32;
@@ -68,9 +99,4 @@ begin
     if Self.isLoggedIn() or LoginScreen.isOpen() or Lobby.isOpen() then
       Exit(True);
   until (GetTickCount() >= T);
-end;
-
-function TSRL.isClientReady: Boolean; overload;
-begin
-  Result := Self.isClientReady(0);
 end;

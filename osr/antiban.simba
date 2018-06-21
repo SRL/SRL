@@ -60,6 +60,34 @@ Builtin antiban tasks that can be used directly with TAntiban:
 
 You can easily create your own tasks like the above in your script that does
 whatever. For a deeper look skip to the last lines of this file.
+
+
+**Example of how such a method would look:**
+
+.. pascal::
+  procedure TAntiban.HoverTotalLevel();
+  begin
+    Stats.HoverSkill(Random(SKILL_TOTAL), srl.GaussRand(3000,300));
+  end;
+  
+  
+** Example of usage in script **
+
+.. pascal::
+  var 
+    Antiban: TAntiban;
+    
+  begin
+    Antiban.Init(SKILL_MINING);
+                    //which method,            how often,     normal time variation
+    Antiban.AddTask([@Antiban.HoverTotalLevel, ONE_MINUTE*7,  0.33]);
+    Antiban.AddTask([@Antiban.HoverPlayers,    ONE_MINUTE*9,  0.33]);
+    Antiban.AddTask([@Antiban.CheckSkill,      ONE_MINUTE*13, 0.33]);
+    
+    // and inside the script loop you do the following
+    // which will look for antibans that are ready to be executed, and then execute them.
+    Antiban.DoAntiban();
+  end;
 *)
 
 type

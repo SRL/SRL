@@ -1,7 +1,7 @@
 (*
 WorldSwitcher
 =============
-Methods that relates to swithing world.
+Methods that relates to swithing world. Olly will one day document this some day.
 *)
 type
   ERSWorldProperty = (WORLD_FREE, WORLD_MEMBERS,
@@ -96,7 +96,7 @@ begin
   end;
 end;
 
-function TRSWorldSwitcher.isOpen(WaitTime: Integer = 0): Boolean;
+function TRSWorldSwitcher.IsOpen(WaitTime: Integer = 0): Boolean;
 var
   t: UInt64;
 begin
