@@ -8,10 +8,43 @@ const
   DIR_SOUTH = 180.0;
   DIR_WEST  = 270.0;
 
-type
-  EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
-  EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+(*
+Types and Vars
+---------------
+*)
+  
+(*
+EMinimapOrb
+~~~~~~~~~~~~
+.. pascal:: type EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
 
+The orbs around the minimap. Used when getting values from the orbs, or to toggle them.
+*)
+type EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
+
+(*
+EMinimapDotType
+~~~~~~~~~~~~~~~~
+.. pascal:: type EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+
+The differnet supported minimap dot types.
+*)
+type EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+
+(*
+TRSMinimap
+~~~~~~~~~~~
+.. pascal:: 
+  TRSMinimap = record(TInterfaceBase)
+    CompassInfo: TMMCompassInfo;
+    OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
+    MaskBMP: Int32;
+    MaskPoly: TPointArray;
+    Center: TPoint;
+  end;
+  
+Defines the type connected to the variable named `Minimap`.
+*)
 type
   TMMOrbInfo = record
     TextBox: TBox;
@@ -35,9 +68,23 @@ type
     Center: TPoint;
  end;
 
+(*
+Minimap
+~~~~~~~~
+.. pascal:: var Minimap: TRSMinimap;
+
+This is the variable that stores all minimap related methods and variables.
+*)
 var
   Minimap: TRSMinimap;
 
+  
+  
+(*
+Methods
+--------
+*)
+  
 procedure TRSMinimap.__Free();
 begin
   FreeBitmap(Self.MaskBMP);
@@ -362,10 +409,8 @@ end;
 (*
 Minimap.isPlayerMoving
 ~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
-
+.. pascal:: function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+    
 Returns `True` if your character is moving.
 *)
 function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
@@ -377,11 +422,11 @@ end;
 (*
 Minimap.FindFlag
 ~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
+.. pascal::
     function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
+    function TRSMinimap.FindFlag(out P: TPoint): Boolean; overload;
 
-Searches for the flag on a bitmap.
+First version searches for the flag on a bitmap. Second version searched for the flag on the client.
 *)
 function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
 const
@@ -584,11 +629,11 @@ Minimap.GetCompassAngle
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+    function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Double;
 
 Returns the current compass angle, default as degrees.
 *)
-function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Double;
 var
   north, south: TPoint;
   M: TPoint := Self.CompassInfo.Middle;
@@ -621,13 +666,12 @@ begin
 end;
 
 (*
-Minimap.MouseSetCompassAngle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+Minimap.SetCompassAngle_Mouse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
 
-    function TRSMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
-
-Some long code that does stuff.
+Uses the mouse to change the compass angle. This method should not be used directly, 
+but instead called through ``Minimap.SetCompassAngle``.
 *)
 function TRSMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
 type
@@ -780,6 +824,13 @@ begin
   end;
 end;
 
+(*
+Minimap.SetCompassAngle
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
+
+Sets the compass angle to the desired angle. 
+*)
 procedure TRSMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
 begin
   case Mouse of
@@ -790,11 +841,26 @@ begin
   end;
 end;
 
-procedure TRSMinimap.ClickCompass;
+(*
+Minimap.ClickCompass
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.ClickCompass();
+
+Clicks the compass so that you face towards north.
+*)
+procedure TRSMinimap.ClickCompass();
 begin
   Mouse.Click(Self.CompassInfo.Middle, Self.CompassInfo.Radius, mouse_Left);
 end;
 
+(*
+Minimap.GetDots
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+
+Returns all the dots of the given type. See the defintion of EMinimapDotType. By default it will sort
+all the points from the center of the minimap, meaning the closest to your come first in the result.
+*)
 function TRSMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 const
   DOT_COLOR: array[EMinimapDotType] of Int32 = [$EEEEEE, $0000CC, $00CCCC];
@@ -834,16 +900,37 @@ begin
   FreeBitmap(BMP);
 end;
 
+(*
+Minimap.FindDots
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+
+Returns True if the given number of dots can be found on the minimap. By default if it can find 1 dot of the given type.
+*)
 function TRSMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
 begin
   Result := Length(Self.GetDots(DotType, False)) >= MinCount;
 end;
 
+(*
+Minimap.isPointOn
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.isPointOn(P: TPoint): Boolean;
+
+Returns ``True`` if the given point is within the minimap.
+*)
 function TRSMinimap.isPointOn(P: TPoint): Boolean;
 begin
   Result := srl.PointInPoly(P, Self.MaskPoly);
 end;
 
+(*
+Minimap.FilterPoints
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
+
+Filters the TPA so that no points are outside the minimap circle.
+*)
 procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
 var
   i: Int32;
@@ -853,6 +940,14 @@ begin
       Delete(TPA, i, 1);
 end;
 
+(*
+Minimap.GetColorPercent
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
+
+Returns hte percentage of the minimap that contains the given color. 
+Can be handy when checking if you are above or bellow groundlevel.
+*)
 function TRSMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
 var
   Total: Int32;
@@ -865,12 +960,19 @@ begin
   Result := Round((Length(TPA) / Total) * 100);
 end;
 
-procedure TRSMinimap.RandomCompass(Min, Max: Int32; Mouse: Boolean = True);
-var
-  Degrees: Int32;
-begin
-  Degrees := Round(Self.GetCompassAngle());
+(*
+Minimap.RandomCompass
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.RandomCompass(Min, Max: Double; Mouse: Boolean = True);
 
+Rotates the compass to a random angle between Min and Max. Values are given as degrees.
+*)
+procedure TRSMinimap.RandomCompass(Min, Max: Double; Mouse: Boolean = True);
+var
+  Degrees: Double;
+begin
+  Degrees := Self.GetCompassAngle();
+  
   if (Random(2) = 0) then
     Self.SetCompassAngle(FixD(Degrees - Random(Min, Max)), Mouse)
   else
