@@ -246,6 +246,27 @@ begin
   end;
 end;
 
+(*
+TBox.Intersect
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TBox.Intersect(P: TPoint): TPoint; constref;
+
+Returns the point on the edge where point `P` intersects with the edge when crossing to the mean of the box.
+*)
+function TBox.Intersect(P: TPoint): TPoint; constref;
+var m,i: TPoint;
+begin
+  Result := P;
+  m := Self.Middle;
+  if srl.LinesIntersect(p,i, Point(X1,Y1), Point(X2,Y1), i) then Result := i
+  if srl.LinesIntersect(p,i, Point(X2,Y1), Point(X2,Y2), i) then Result := i
+  if srl.LinesIntersect(p,i, Point(X2,Y2), Point(X1,Y2), i) then Result := i
+  if srl.LinesIntersect(p,i, Point(X1,Y2), Point(X1,Y1), i) then Result := i;
+end;
+
+
 operator + (Left, Right: TBox): TBox;
 begin
   Result.X1 := Min(Min(Left.X1, Right.X2), Min(Right.X1, Left.X2));
