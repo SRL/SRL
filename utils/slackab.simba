@@ -29,7 +29,7 @@ begin
   Self.PPI       := (60 + 200*Self.Hash);
   Self.MouseArea := (03 + 5*Cos(Self.Hash*PI/2)) * Self.PPI;
   Self.MouseOff  := Random(0.0, Self.MouseArea);
-  Self.MaxSpeed  := Ceil(21 * (0.75 + 0.5 * Cos(Self.Hash*PI/2)));
+  Self.MaxSpeed  := Ceil(22 * (0.75 + 0.5 * Cos(Self.Hash*PI/2)));
   Self.MinSpeed  := Trunc(08 * (0.50 + 0.5 * Sin(Self.Hash*PI/1)));
 
   Self.IsSetup := True;
@@ -121,3 +121,5 @@ begin
 
   Result := inherited(Tab, Tries);
 end;
+
+

@@ -351,11 +351,15 @@ function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss:
 var
   i,j,l: Int32;
   choices: TOptionArray;
+  P: TPoint;
 begin
+  P := Mouse.GetPosition();
   while (Random(100) < ChanceOfMiss) do
   begin
     Self.Select(MissOpt);
     Wait(35,800, wdLeft);
+    Self.IsClosed(srl.NormalRange(900,1300));
+    Mouse.Move(P.Random(3,3, True));
   end;
 
   Result := Self.Select(Option);

@@ -360,6 +360,73 @@ begin
 end;
 
 (*
+Inventory.DropItem
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInventory.DropItem(Slot: Int32; UpText:TStringArray=[]): Boolean;
+
+Drops the given item.
+*)
+function TRSInventory.DropItem(Slot: Int32; UpText:TStringArray=[]): Boolean;
+var
+  idx,swt: Int32;
+  RealeaseShift, ShiftAlreadyDown: Boolean;
+label
+  START;
+begin
+  if not(self.Open()) then
+    Exit();
+
+  IsKeyDown(VK_SHIFT); // clear cache
+
+  ShiftAlreadyDown := IsKeyDown(VK_SHIFT);
+  RealeaseShift    := not ShiftAlreadyDown;
+
+  START:
+
+  if shiftDrop and (not ShiftAlreadyDown) then
+  begin
+    Keyboard.KeyDown(VK_SHIFT);
+    WaitEx(110,10);
+  end;
+
+  if self.IsSlotValid(Slot) and self.IsSlotUsed(Slot, False) then
+  begin
+    Mouse.Move(self.FSlots[Slot]);
+
+    if (UpText <> []) then
+    begin
+      swt := GetTimeRunning() + 50;
+      Wait(0,250,wdLeft);                //for uptext to refresh, and antiban
+      Wait(Max(1,swt-GetTimeRunning())); //we need min 50ms tho
+      if not mainscreen.IsUpText(UpText) then
+        Exit(False);
+    end;
+
+    if (not ShiftDrop) then
+      Result := ChooseOption.MissSelect('Drop', 'Examine')
+    else
+    begin
+      Mouse.Click(mouse_Left);
+      Result := (self.GetActiveSlot() = -1);
+      if (not Result) then
+      begin
+        Self.MouseSlot(self.GetActiveSlot(), mouse_Left);
+        ShiftAlreadyDown := False;
+        goto START;
+      end;
+    end;
+
+    Wait(0,250,wdLeft);
+  end;
+
+  if ShiftDrop and (RealeaseShift) then
+  begin
+    WaitEx(120,10);
+    Keyboard.KeyUp(VK_SHIFT);
+  end;
+end;
+
+(*
 Inventory.DropItems
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -384,48 +451,20 @@ jump randomly all over the inventory dropping items, you give it a ordered drop-
 *)
 procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR; UpText:TStringArray=[]);
 var
-  idx,swt: Int32;
-label
-  START;
+  idx: Int32;
 begin
   if not(self.Open()) then
     Exit();
 
-  START:
-
-  if shiftDrop then
+  if ShiftDrop then
   begin
     Keyboard.KeyDown(VK_SHIFT);
     WaitEx(110,10);
   end;
 
   for idx in Slots do
-    if self.IsSlotValid(idx) and self.IsSlotUsed(idx, False) then
-    begin
-      Mouse.Move(self.FSlots[idx]);
-
-      if (UpText <> []) then
-      begin
-        swt := GetTimeRunning() + 50;
-        Wait(0,250,wdLeft);                //for uptext to refresh, and antiban
-        Wait(Max(1,swt-GetTimeRunning())); //we need min 50ms tho
-        if not mainscreen.IsUpText(UpText) then
-          Continue;
-      end;
-
-      if (not ShiftDrop) then
-        ChooseOption.Select(['Drop'])
-      else
-      begin
-        Mouse.Click(mouse_Left);
-        if (self.GetActiveSlot() <> -1) then
-        begin
-          Self.MouseSlot(self.GetActiveSlot(), mouse_Left);
-          goto START;
-        end;
-      end;
-      Wait(0,250,wdLeft);
-    end;
+    if Self.DropItem(idx, UpText) then
+      Wait(10,400,wdLeft);
 
   if ShiftDrop then
   begin
