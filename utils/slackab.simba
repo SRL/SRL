@@ -115,7 +115,7 @@ begin
     if Gametabs.UpperTabs.Contains(Gametabs.Tabs[Ord(Tab)]) then
       inherited(EGametab(SRL.NormalRange(Ord(tabCombat), Ord(tabMagic), 6.0)), 1)
     else
-      inherited(EGametab(SRL.NormalRange(Ord(tabCombat), Ord(tabMagic), 6.0)), 1);
+      inherited(EGametab(SRL.NormalRange(Ord(tabClan), Ord(tabMusic), 6.0)), 1);
     Wait(30, 500, wdLeft);
   end;
 
