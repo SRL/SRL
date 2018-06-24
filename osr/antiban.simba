@@ -264,8 +264,9 @@ var i: Int32;
 begin
   Self.ActiveSkills := Skills;
   Self.HistorySize := LogSize;
-  Self.Patience  := 0.5;
-  Self.Endurance := 0.5;
+  Self.BioHash   := Random();
+  Self.Endurance := Cos(Self.BioHash*PI/2);
+  Self.Patience  := Sin(Self.BioHash*PI/1);
   Self.SetupBiometrics();
 end;
 
@@ -316,8 +317,8 @@ begin
     h := (h * $1000193) xor Ord(k[i]);
 
   Self.BioHash   := h / $FFFFFFFF;
-  Self.Endurance := (1+Cos(h)) / 2;
-  Self.Patience  := (1+Sin(h)) / 2;
+  Self.Endurance := Cos(Self.BioHash*PI/2);
+  Self.Patience  := Sin(Self.BioHash*PI/1);
 end;
 
 {
