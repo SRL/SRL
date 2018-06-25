@@ -127,24 +127,53 @@ begin
 end;
 
 (*
-SmithingScreen.FindItem
-~~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSSmithingScreen.FindItem(DTM: Integer): Int32;
-
-Returns the slot index for the given item, if it's found, otherwise ``-1``
+SmithingScreen.Find????
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+  function TRSSmithingScreen.FindDTM(DTM: Integer): Int32;
+  function TRSSmithingScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+  function TRSSmithingScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+  
+Returns the index of the given DTM, BMP or Mask, otherwise ``-1`` if it's not found.
 *)
-function TRSSmithingScreen.FindItem(DTM: Integer): Int32;
-var
-  i: Int32;
-  pt: TPoint;
+function TRSSmithingScreen.FindDTM(DTM: Integer): Int32;
+var A: TIntArray;
 begin
-  if not(self.IsOpen()) then Exit(-1);
-
-  for i:=0 to High(Self.ItemBoxesIcon) do
-    if FindDTM(DTM, pt.x, pt.y, Self.ItemBoxesIcon[i]) then
-      Exit(i);
-  Result := -1;
+  if self.IsOpen() then
+  begin
+    A := srl.FindDTMInTBA(DTM, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
 end;
+
+function TRSSmithingScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindBMPInTBA(BMP, Tolerance, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;
+
+function TRSSmithingScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindMaskInTBA(Mask, Tolerance, ContourTolerance, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;  
 
 (*
 SmithingScreen.MouseOver

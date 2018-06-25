@@ -490,23 +490,52 @@ begin
 end;
 
 (*
-BankScreen.FindItem
+BankScreen.Find????
 ~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSInventory.FindItem(DTM: Integer): Int32;
-
-Returns the index of the given DTM, ``-1`` if it's not found.
+.. pascal:: 
+  function TRSBankScreen.FindDTM(DTM: Integer): Int32;
+  function TRSBankScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+  function TRSBankScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+  
+Returns the index of the given DTM, BMP or Mask, otherwise ``-1`` if it's not found.
 *)
-function TRSBankScreen.FindItem(DTM: Integer): Int32;
-var
-  i,j: Int32;
-  pt: TPoint;
+function TRSBankScreen.FindDTM(DTM: Integer): Int32;
+var A: TIntArray;
 begin
-  if not(self.IsOpen()) then Exit();
+  if self.IsOpen() then
+  begin
+    A := srl.FindDTMInTBA(DTM, Self.FSlots, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;
 
-  Result := -1;
-  for i:=0 to High(Self.FSlots) do
-    if FindDTM(DTM, pt.x, pt.y, Self.FSlots[i]) then
-      Exit(i);
+function TRSBankScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindBMPInTBA(BMP, Tolerance, Self.FSlots, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;
+
+function TRSBankScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindMaskInTBA(Mask, Tolerance, ContourTolerance, Self.FSlots, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
 end;
 
 (*

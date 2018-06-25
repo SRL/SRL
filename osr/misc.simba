@@ -138,6 +138,80 @@ begin
 end;
 
 (*
+SRL.FindDTMInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindDTMInTBA(DTM: Integer; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the DTM in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindDTMInTBA(DTM: Integer; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if FindDTM(DTM, pt.x, pt.y, Areas[i]) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+(*
+SRL.FindMaskInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindMaskInTBA(Mask: TMask; Tolerance, ContourTolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the mask in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindMaskInTBA(Mask: TMask; Tolerance, ContourTolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if (FindMaskTolerance(Mask, pt.x, pt.y, Areas[i], Tolerance, ContourTolerance)) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+(*
+SRL.FindBMPInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindBMPInTBA(BMP: TMufasaBitmap; Tolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the BMP in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindBMPInTBA(BMP: TMufasaBitmap; Tolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if (FindBitmapToleranceIn(BMP.GetIndex(), pt.x, pt.y, Areas[i], Tolerance)) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+
+
+(*
 SRL.AvgBrightness
 ~~~~~~~~~~~~~~~~~~
 .. pascal:: function TSRL.AvgBrightness(B: TBox): Int32;
@@ -170,4 +244,6 @@ begin
   Result := BMP.PeakBrightness();
   BMP.Free();
 end;
+
+
 
