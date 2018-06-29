@@ -22,18 +22,28 @@ var
   SlackAB: TSlackAB;
 
 
-procedure TSlackAB.Init();
+procedure TSlackAB.Init(YourAntiban: TAntiban);
 begin
-  Self.Antiban.Init(0,0);
+  Self.Antiban := YourAntiban;
   Self.Hash := Self.Antiban.BioHash;
 
   Self.PPI       := (100.0 + (100/3*2) * Self.Hash);
-  Self.MouseArea := (4.5 + 1.5 * Cos(Self.Hash*PI/2)) * Self.PPI;
+  Self.MouseArea := (500 + 600 * Cos(Self.Hash*PI/2));
   Self.MouseOff  := Random(0.0, Self.MouseArea);
   Self.MaxSpeed  := Ceil(22 * (0.75 + 0.5 * Cos(Self.Hash*PI/2)));
   Self.MinSpeed  := Trunc(08 * (0.50 + 0.5 * Sin(Self.Hash*PI/1)));
 
   Self.IsSetup := True;
+end;
+
+procedure TSlackAB.ScaleArea(AreaScale: Double);
+begin
+  Self.MouseArea *= AreaScale;
+end;
+
+procedure TSlackAB.ScalePPI(PPIScale: Double);
+begin
+  Self.PPI *= PPIScale;
 end;
 
 procedure Wait(min, max: Double; weight: EWaitDir=wdMean); override;
