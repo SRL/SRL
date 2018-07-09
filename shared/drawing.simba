@@ -410,6 +410,14 @@ begin
   Self.DrawTPA(TPA, color);
 end;
 
+function TMufasaBitmap.DrawCuboid(Top, Btm: TRectangle; color: Int32): Boolean;
+begin
+  Self.DrawRect([Top.Left, Top.Btm, Btm.Btm, Btm.Left], color);
+  Self.DrawRect([Top.Top, Top.Right, Btm.Right, Btm.Top], color);
+  Self.DrawRect([Top.Top, Btm.Top, Btm.Left, Top.Left], color);
+  Self.DrawRect([Top.Right, Btm.Right, Btm.Btm, Top.Btm], color);
+end;
+
 (*
 TMufasaBitmap.DrawPoly
 ~~~~~~~~~~~~~~~~~~~~~~

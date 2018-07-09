@@ -144,7 +144,7 @@ begin
 
   for 0 to Trunc(srl.TruncatedGauss(0,3.5)) do
   begin
-    TPA := Minimap.GetDots(MMDotPlayer);
+    TPA := Minimap.GetDots([MMDotPlayer]);
     FilterPointsDist(TPA,0,24, MM2MS.MMCX, MM2MS.MMCY);
     if Length(TPA) = 0 then Exit;
 
@@ -226,7 +226,7 @@ begin
   if (textAt = Point(0,0)) then
     Exit;
 
-  Dots := Minimap.GetDots(MMDotNPC);
+  Dots := Minimap.GetDots([MMDotNPC]);
   for i:=0 to High(Dots) do
     TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
 
@@ -729,6 +729,5 @@ begin
   else
     Result := srl.MsToTime(Round(Break.NextAtTime - TimeRunning()), Format);
 end;
-
 
 

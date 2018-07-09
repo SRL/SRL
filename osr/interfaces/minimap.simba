@@ -135,11 +135,11 @@ begin
     end;
 
     Self.MaskPoly := [
-                      [638,9], [654,10], [669,14], [683,21], [695,31], [705,43], [712,57],
-                      [713,73], [711,89], [707,105], [697,118], [683,127], [669,136], [659,148],
-                      [645,157], [629,155], [620,142], [608,132], [594,124], [581,115], [574,101],
-                      [571,85], [570,69], [574,54], [583,40], [593,28], [606,19], [622,12]
-                     ];
+      [638,9], [654,10], [669,14], [683,21], [695,31], [705,43], [712,57],
+      [713,73], [711,89], [707,105], [697,118], [683,127], [669,136], [659,148],
+      [645,157], [629,155], [620,142], [608,132], [594,123], [581,115], [574,101],
+      [571,85], [570,69], [574,54], [583,40], [593,28], [606,19], [622,12]
+    ];
 
     MaskBMP := BitmapFromString(147, 149, 'meJzt2kF22zAUxVDvf9NtM2lO' +
         'YleSJZEgUtwVfD0MONHj8XP82kRf91/bTnMF/WU/07heFRxhZq8KX' +
@@ -856,60 +856,104 @@ end;
 (*
 Minimap.GetDots
 ~~~~~~~~~~~~~~~
-.. pascal:: function TRSMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+.. pascal:: function TRSMinimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 
-Returns all the dots of the given type. See the defintion of EMinimapDotType. By default it will sort
+Returns all the dots of the given types. See the defintion of EMinimapDotType. By default it will sort
 all the points from the center of the minimap, meaning the closest to your come first in the result.
+
+The points in the resulting array are the top-left corner of the dot, so for the center offset it by 2 or 3, 2.5 for dead center.
+
+**Example**
+
+.. pascal::
+  dotTPA := Minimap.GetDots([MMDotNPC, MMDotPlayer]);
 *)
-function TRSMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
-const
-  DOT_COLOR: array[EMinimapDotType] of Int32 = [$EEEEEE, $0000CC, $00CCCC];
-  BORDER_COLOR = 65536;
+function Minimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 var
-  BMP: Int32;
-  TPA: TPointArray;
-  ATPA: T2DPointArray;
-  B: TBox;
-begin
-  BMP := BitmapFromClient(Self.FBounds);
-  B := [2, 2, Self.GetBounds().Width() - 2, Self.GetBounds().Height() - 2];
-
-  if FindColorsBitmap(BMP, TPA, BORDER_COLOR) then
+  blacks: TPointArray;
+  BMP: TMufasaBitmap;
+  function FindDots(blacks: TPointArray; Color, T: Int32): TPointArray;
+  var
+    i: Int32;
+    p: TPoint;
+    left, right: Boolean;
   begin
-    ATPA := SplitTPAEx(TPA, 1, 0);
-
-    for TPA in ATPA do
+    for i:=0 to High(blacks)-1 do
     begin
-      SortTPAByX(TPA, True);
+      left := ((BMP.GetPixel(blacks[i].x+3,blacks[i].y+0) = 65536) and (BMP.GetPixel(blacks[i].x+1,blacks[i].y-1) <> 65536)) or
+              ((BMP.GetPixel(blacks[i].x+2,blacks[i].y+1) = 65536) and (BMP.GetPixel(blacks[i].x+1,blacks[i].y+0) <> 65536));
 
-      if (Length(TPA) <> 2) or (not PointInBox(TPA[0], B)) then
-        Continue;
-      if (FastGetPixel(BMP, TPA[0].X - 1, TPA[0].Y - 1) <> BORDER_COLOR) then
-        Continue;
-      if (FastGetPixel(BMP, TPA[1].X + 1, TPA[1].Y - 1) <> BORDER_COLOR) then
-        Continue;
+      right := False;
+      if not left then
+        right := ((BMP.GetPixel(blacks[i].x-2,blacks[i].y+1) = 65536) and (BMP.GetPixel(blacks[i].x-1,blacks[i].y+0) <> 65536));
 
-      if (SimilarColors(FastGetPixel(BMP, TPA[0].X, TPA[0].Y - 1), DOT_COLOR[DotType], 25)) then
-        Result += Point(TPA[0].X + Self.FBounds.X1, TPA[0].Y + Self.FBounds.Y1 - 2);
+      if left or right then
+      begin
+        p := blacks[i];
+        if right then p.x -= 3;
+        p.y -= 3;
+        if Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+0), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+0), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+0,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+3,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+0,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+3,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+3), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+3), t)) >= 8 then
+        begin
+          Result += p;
+        end;
+      end;
     end;
   end;
+begin
+  BMP := GetMufasaBitmap(BitmapFromClient(Minimap.GetBounds));
+  try
+    BMP.FindColors(blacks, 65536);
+    blacks := blacks.FilterBox(Box(2,4,BMP.GetWidth-4, BMP.GetHeight-1));
 
-  if (Length(Result) > 0) and SortFromPlayer then
-    SortTPAFrom(Result, Self.Center);
+    if MMDotPlayer in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.001,0.001);
+      Result := FindDots(blacks, $FFFFFF, 30);
+    end;
 
-  FreeBitmap(BMP);
+    if MMDotNPC in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.05,1);
+      Result += FindDots(blacks, $00FFFF, 30);
+    end;
+
+    if MMDotItem in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.05,1);
+      Result += FindDots(blacks, $0000FF, 30);
+    end;
+
+    Result.Offset(Point(Minimap.GetBounds.X1, Minimap.GetBounds.Y1));
+    if SortFromPlayer then Result.Sort(Minimap.Center);
+  finally
+    BMP.Free();
+  end;
 end;
 
 (*
 Minimap.FindDots
 ~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+.. pascal:: function TRSMinimap.FindDots(DotType: set of EMinimapDotType; MinCount: UInt32 = 1): Boolean;
 
 Returns True if the given number of dots can be found on the minimap. By default if it can find 1 dot of the given type.
 *)
-function TRSMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+function TRSMinimap.FindDots(DotTypes: set of EMinimapDotType; MinCount: UInt32 = 1): Boolean;
 begin
-  Result := Length(Self.GetDots(DotType, False)) >= MinCount;
+  Result := Length(Self.GetDots(DotTypes, False)) >= MinCount;
 end;
 
 (*
