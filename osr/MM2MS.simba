@@ -82,7 +82,7 @@ begin
     Self := [
       513, 335,
       B.Middle.X, B.Middle.Y,
-      B.X2 - 81, B.Y2 - 81,
+      B.X2 - 81, B.Y1 + 84,    //this may needs tweaking if the minimap moves
       1.08 * B.Height / 503, 4.4 * B.Height / 503,
       0.0,
       24
