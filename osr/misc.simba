@@ -121,9 +121,7 @@ begin
   for i := 0 to High(TEXT_COLORS) do
     if (System.FindColors(TPA, TEXT_COLORS[i], Area.X1, Area.Y1, Area.X2, Area.Y2)) then
     begin
-      b := GetTPABounds(TPA);
-      b.Expand(2);
-      b.LimitTo(GetClientBounds());
+      b := GetTPABounds(TPA).Expand(2, GetClientBounds());
 
       Text := StringReplace(GetTextAtEx(b, 0, 3, 3, TEXT_COLORS[i], 5, 'StatChars07'), 'O', '0', [rfReplaceAll]);
       Result := StrToIntDef(ExtractFromStr(Text, Numbers), 0);

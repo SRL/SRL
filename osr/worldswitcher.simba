@@ -153,7 +153,7 @@ begin
 
     if srl.FindText(P, toString(wo), 'UpChars07_s', clBlack, 0, B) then
     begin
-      B.Expand(-2, 3); { Adjust the bounds so it's the whole button }
+      B := B.Expand(-2, 3); { Adjust the bounds so it's the whole button }
       B.X2 += 60;
       Mouse.Click(B, mouse_Left);
       Wait(Random(200, 500));

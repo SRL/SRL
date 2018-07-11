@@ -242,8 +242,7 @@ begin
 
   for TPA in ClusterTPAEx(TPA, 15, 1) do
   begin
-    b := GetTPABounds(TPA);
-    b.Expand(1);
+    b := GetTPABounds(TPA).Expand(1);
     for color in TextColors do
     begin
       s := OCR.Recognize(b, TCompareRules([color]), NPCFont);
@@ -678,7 +677,7 @@ begin
     B := TPA.Bounds;
     if (B.Width > 30) and (B.Height > 60) then
     begin
-      tmp := CountColorTolerance(Color, B.ExpandFunc(-6), Tolerance);
+      tmp := CountColorTolerance(Color, B.Expand(-6), Tolerance);
       if (tmp = 0) then continue;
 
       if (Length(best) = 0) or (tmp > best[0].Count) then

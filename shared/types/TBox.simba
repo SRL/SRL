@@ -48,33 +48,7 @@ begin
   Result := Point((Self.X2 + Self.X1) div 2, (Self.Y2 + Self.Y1) div 2);
 end;
 
-procedure TBox.Expand(SizeMod: Int32);
-begin
-  Self.X1 -= SizeMod;
-  Self.Y1 -= SizeMod;
-  Self.X2 += SizeMod;
-  Self.Y2 += SizeMod;
-end;
-
-procedure TBox.Expand(WidMod,HeiMod: Int32); overload;
-begin
-  Self.X1 -= WidMod;
-  Self.Y1 -= HeiMod;
-  Self.X2 += WidMod;
-  Self.Y2 += HeiMod;
-end;
-
-procedure TBox.Expand(SizeMod: Int32; MaxBounds: TBox); overload;
-begin
-  Self.X1 -= SizeMod;
-  Self.Y1 -= SizeMod;
-  Self.X2 += SizeMod;
-  Self.Y2 += SizeMod;
-
-  Self.LimitTo(MaxBounds);
-end;
-
-function TBox.ExpandFunc(SizeMod: Int32): TBox; constref;
+function TBox.Expand(SizeMod: Int32): TBox; constref;
 begin
   Result.X1 := Self.X1 - SizeMod;
   Result.Y1 := Self.Y1 - SizeMod;
@@ -82,35 +56,53 @@ begin
   Result.Y2 := Self.Y2 + SizeMod;
 end;
 
-function TBox.Combine(b: TBox): TBox; constref;
+function TBox.Expand(WidMod,HeiMod: Int32): TBox; constref; overload;
 begin
-  Result.X1 := Min(Min(Self.X1, b.X2), Min(b.X1, Self.X2));
-  Result.Y1 := Min(Min(Self.Y1, b.Y2), Min(b.Y1, Self.Y2));
-  Result.X2 := Max(Max(Self.X1, b.X2), Max(b.X1, Self.X2));
-  Result.Y2 := Max(Max(Self.Y1, b.Y2), Max(b.Y1, Self.Y2));
+  Result.X1 := Self.X1 - WidMod;
+  Result.Y1 := Self.Y1 - HeiMod;
+  Result.X2 := Self.X2 + WidMod;
+  Result.Y2 := Self.Y2 + HeiMod;
 end;
 
-function TBox.Overlap(b: TBox): Boolean; constref;
+function TBox.Expand(SizeMod: Int32; MaxBounds: TBox): TBox; constref; overload;
 begin
-  Result := (Self.X1 <= b.X2) and (Self.X2 >= b.X1) and 
-            (Self.Y1 <= b.Y2) and (Self.Y2 >= b.Y1);
+  Result.X1 := Self.X1 - SizeMod;
+  Result.Y1 := Self.Y1 - SizeMod;
+  Result.X2 := Self.X2 + SizeMod;
+  Result.Y2 := Self.Y2 + SizeMod;
+  
+  Result.LimitTo(MaxBounds);
 end;
 
-function TBox.Contains(other: TPoint): Boolean; constref;
+function TBox.Combine(Other: TBox): TBox; constref;
 begin
-  Result := InRange(other.x, self.x1,self.x2) and
-            InRange(other.y, self.y1,self.y2);
+  Result.X1 := Min(Min(Self.X1, Other.X2), Min(Other.X1, Self.X2));
+  Result.Y1 := Min(Min(Self.Y1, Other.Y2), Min(Other.Y1, Self.Y2));
+  Result.X2 := Max(Max(Self.X1, Other.X2), Max(Other.X1, Self.X2));
+  Result.Y2 := Max(Max(Self.Y1, Other.Y2), Max(Other.Y1, Self.Y2));
 end;
 
-function TBox.Contains(other: TBox): Boolean; constref; overload;
+function TBox.Overlap(Other: TBox): Boolean; constref;
 begin
-  Result := InRange(other.x1, self.x1,self.x2) and
-            InRange(other.x2, self.x1,self.x2) and
-            InRange(other.y1, self.y1,self.y2) and
-            InRange(other.y2, self.y1,self.y2);
+  Result := (Self.X1 <= Other.X2) and (Self.X2 >= Other.X1) and 
+            (Self.Y1 <= Other.Y2) and (Self.Y2 >= Other.Y1);
 end;
 
-procedure TBox.Offset(pt:TPoint);
+function TBox.Contains(Other: TPoint): Boolean; constref;
+begin
+  Result := InRange(Other.x, self.x1,self.x2) and
+            InRange(Other.y, self.y1,self.y2);
+end;
+
+function TBox.Contains(Other: TBox): Boolean; constref; overload;
+begin
+  Result := InRange(Other.x1, self.x1,self.x2) and
+            InRange(Other.x2, self.x1,self.x2) and
+            InRange(Other.y1, self.y1,self.y2) and
+            InRange(Other.y2, self.y1,self.y2);
+end;
+
+procedure TBox.Offset(pt: TPoint);
 begin
   self.x1 += pt.x;
   self.y1 += pt.y;
@@ -118,7 +110,7 @@ begin
   self.y2 += pt.y;
 end;
 
-function TBox.OffsetFunc(pt:TPoint): TBox; constref;
+function TBox.OffsetFunc(pt: TPoint): TBox; constref;
 begin
   Result.x1 := self.x1 + pt.x;
   Result.y1 := self.y1 + pt.y;

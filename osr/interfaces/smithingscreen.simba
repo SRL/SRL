@@ -36,7 +36,6 @@ Every interface needs some internal setup procedure..
 *)
 procedure TRSSmithingScreen.__Setup();
 begin
-  Self.FBounds := Mainscreen.GetBounds;
   Self.FName   := 'Deposit Box';
   Self.FStatic := True;
   Self.FTitles := ['What would', 'you like', 'to make?']; //uptext can cover it

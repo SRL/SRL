@@ -198,8 +198,7 @@ begin
   for color in [$100000, $00FFFF] do
     if (FindColors(TPA, color, Self.FButtons[cbtSpecialAttack])) then
     begin
-      b := GetTPABounds(TPA);
-      b.Expand(1);
+      b := GetTPABounds(TPA).Expand(1);
       Text := ocr.Recognize(b, TCompareRules([color]), StatFont);
       Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
     end;

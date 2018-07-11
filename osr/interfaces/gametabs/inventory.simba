@@ -28,9 +28,9 @@ type
  function TRSInventory.GetUsedSlots(): TIntegerArray;
  procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR);
  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
- function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
- function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
- function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+ function TRSInventory.FindMask(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+ function TRSInventory.FindDTM(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; 
+ function TRSInventory.FindBMP(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray;
  function TRSInventory.Count(): Byte;
  function TRSInventory.GetActiveSlot(): Int8;
  function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
@@ -500,42 +500,39 @@ begin
 end;
 
 (*
-Inventory.FindItem
+Inventory.FindXXXX
 ~~~~~~~~~~~~~~~~~~~
 .. pascal::
-  function TRSInventory.FindItem(Mask: TMask; Tolerance, ContourTolerance:Int32 = 30; MaxToFind:Byte = 0): TIntArray;
-  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 0): TIntArray; overload;
-  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntArray; overload;
+  function TRSInventory.FindMask(Mask: TMask; Tolerance, ContourTolerance:Int32 = 30; MaxToFind:Byte = 0): TIntArray;
+  function TRSInventory.FindDTM(DTM: Integer; MaxToFind:Byte = 0): TIntArray; overload;
+  function TRSInventory.FindBMP(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 0): TIntArray; overload;
 
 Find the slots with the given item defined by a `TMask`, `DTM`, or `BMP`.
 The last parameter ``MaxToFind`` defines how many you want us to find, by default
 it will look for all, but can be used to only search for 1 item if that's all you need.
 
-.. note::
-  _Last parameter is not defaulted in the last overload ``FindItem(BMP..)`` for technical reasons._
-
 **Example:**
 
 .. pascal::
-   items := Inventory.FindItem(myMask);
+   items := Inventory.FindMask(myMask);
    if itemArr = [] then
      WriteLn('Not found')
    else
      WriteLn('Found in slots: ', items);
 *)
-function TRSInventory.FindItem(Mask: TMask; Tolerance, ContourTolerance:Int32 = 30; MaxToFind:Byte = 0): TIntArray;
+function TRSInventory.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32=30; MaxToFind: Byte=0): TIntArray;
 begin
   if self.Open() then
     Result := srl.FindMaskInTBA(Mask, Tolerance, ContourTolerance, Self.FSlots, MaxToFind);
 end;
 
-function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 0): TIntArray; overload;
+function TRSInventory.FindDTM(DTM: Integer; MaxToFind: Byte=0): TIntArray;
 begin
   if self.Open() then
     Result := srl.FindDTMInTBA(DTM, Self.FSlots, MaxToFind);
 end;
 
-function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntArray; overload;
+function TRSInventory.FindBMP(BMP: Integer; Tolerance: Int32; MaxToFind: Byte=0): TIntArray;
 begin
   if self.Open() then
     Result := srl.FindBMPInTBA(GetMufasaBitmap(BMP), Tolerance, Self.FSlots, MaxToFind);
@@ -554,17 +551,17 @@ Counts the number of slots containing this item
 *)
 function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32; overload;
 begin
-  Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,28));
+  Result := Length(Self.FindMask(Mask,Tolerance,ContourTolerance,28));
 end;
 
 function TRSInventory.Count(DTM: Integer): Int32; overload;
 begin
-  Result := Length(Self.FindItem(DTM));
+  Result := Length(Self.FindDTM(DTM));
 end;
 
 function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
 begin
-  Result := Length(Self.FindItem(BMP,Tolerance,28));
+  Result := Length(Self.FindBMP(BMP,Tolerance,28));
 end;
 
 (*
@@ -580,17 +577,17 @@ Returns true if the inventory contains the given item
 *)
 function TRSInventory.Contains(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Boolean;
 begin
-  Result := Length(Self.FindItem(Mask,Tolerance,ContourTolerance,1)) <> 0;
+  Result := Length(Self.FindMask(Mask,Tolerance,ContourTolerance,1)) <> 0;
 end;
 
 function TRSInventory.Contains(DTM: Integer): Boolean; overload;
 begin
-  Result := Length(Self.FindItem(DTM,1)) <> 0;
+  Result := Length(Self.FindDTM(DTM,1)) <> 0;
 end;
 
 function TRSInventory.Contains(BMP: Integer; Tolerance:Int32): Boolean; overload;
 begin
-  Result := Length(Self.FindItem(BMP,Tolerance,1)) <> 0;
+  Result := Length(Self.FindBMP(BMP,Tolerance,1)) <> 0;
 end;
 
 

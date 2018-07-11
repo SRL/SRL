@@ -368,10 +368,7 @@ var
   B: TBox;
 begin
   with Self.OrbInfo[MMOrbRun] do
-  begin
-    B := [Middle.X, Middle.Y, Middle.X, Middle.Y];
-    B.Expand(Radius);
-  end;
+    B := Box(Middle.X, Middle.Y, Middle.X, Middle.Y).Expand(Radius);
 
   Result := srl.WaitColorCount([101547, 40], B, @GreaterThan, 5, WaitTime);
 end;
@@ -736,8 +733,7 @@ var
 begin
   T := GetTickCount() + 10000;
 
-  Area := GetClientBounds();
-  Area.Expand(-10);
+  Area := GetClientBounds().Expand(-10);
 
   Distance := Round(Minimap.GetCompassAngle() - Degrees);
   Pixels := Round(Abs(srl.DeltaAngle(Minimap.GetCompassAngle(), Degrees)) * DEG_PER_PIXEL);

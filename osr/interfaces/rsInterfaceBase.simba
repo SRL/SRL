@@ -1,8 +1,10 @@
 (*
 RSInterfaceBase
 ================
-Specializes the generic TInterfaceBase towards Oldschool runescape.
+Specializes the generic TInterfaceBase towards Oldschool Runescape MainScreen.
 Used to find interfaces on the go, versus the static coordinates based ones.
+
+All new interfaces that exits on the mainscreen should inherit from this base. 
 *)
 type
   TRSInterfaceBase = record(TInterfaceBase)
@@ -56,7 +58,7 @@ var
   Bounds: TBox;
   OCR_TITLE:  TCompareRules = [2070783,1,True,65];
 begin
-  srl.FindColors(TPA, CTS2(3424329,10), Self.FBounds);
+  srl.FindColors(TPA, CTS2(3424329,10), MainScreen.GetBounds());
   ATPA := TPA.Cluster(1,3);
   SortATPAFromSize(ATPA, 0, False);
 
@@ -65,8 +67,7 @@ begin
     Self.TitleBounds := ATPA[1].Bounds();
     Self.ItemBounds  := ATPA[0].Bounds();
 
-    Self.FBounds := Self.ItemBounds.Combine(Self.TitleBounds);
-    Self.FBounds.Expand(6);
+    Self.FBounds := Self.ItemBounds.Combine(Self.TitleBounds).Expand(6); 
 
     with Self.FBounds do
       Self.CloseButton := Box(X2-27, Y1+7, X2-7, Y1+27);

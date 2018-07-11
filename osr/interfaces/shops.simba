@@ -2,9 +2,9 @@
 Shop Interface
 ==============
 For interacting with various shop interfaces.
-All may not work, but I think most should work. There's a good chance the only
-thing lacking is that title of your shop interface, so if it doesn't work add
-the shops title - or a subset of it by doing
+They may not all work, but I think most should work. There's a good chance the 
+only thing lacking is that title of your shop interface, so if it doesn't work 
+add the shops title - or a subset of it by doing:
 
 .. pascal:: ShopScreen.AppendTitle('Wallmart');
 
@@ -31,7 +31,6 @@ Every interface needs some internal setup procedure..
 *)
 procedure TRSShopScreen.__Setup();
 begin
-  Self.FBounds := Mainscreen.GetBounds;
   Self.FName   := 'StoreScreen';
   Self.FStatic := True;
   Self.FTitles := [

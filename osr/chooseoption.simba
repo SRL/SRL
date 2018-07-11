@@ -178,8 +178,7 @@ begin
     ATPA := ClusterTPAEx(TPA,1,1);
     SortATPAFromFirstPoint(ATPA, pt);
     
-    Self.Bounds := GetTPABounds(ATPA[0]);
-    Self.Bounds.Expand(1);
+    Self.Bounds := GetTPABounds(ATPA[0]).Expand(1);
     Self.Bounds.LimitTo(B);
   end;
 end;

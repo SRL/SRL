@@ -154,9 +154,9 @@ stats.SkillIsVaild
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
+  function TRSStats.IsSkillVaild(Skill: Int32): Boolean;
 *)
-function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
+function TRSStats.IsSkillVaild(Skill: Int32): Boolean;
 begin
   Result := InRange(Skill, 0, High(Self.FSlots));
 end;
@@ -167,7 +167,7 @@ Stats.GetSkillBox
 ~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillBox(Skill:Int32): TBox;
+  function TRSStats.GetSkillBox(Skill: Int32): TBox;
 
 Returns the bounding box covering the given skill-index.
 *)
@@ -185,11 +185,11 @@ Stats.MouseOver
 ~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.MouseOver(skill:Int32): Boolean;
+  function TRSStats.MouseOver(skill: Int32): Boolean;
 
 Moves the mouse over the given skill-index.
 *)
-function TRSStats.MouseOver(Skill:Int32): Boolean;
+function TRSStats.MouseOver(Skill: Int32): Boolean;
 begin
   if not(self.Open()) then Exit();
   
@@ -206,13 +206,13 @@ Stats.GetCurrentLevel
 ~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetCurrentLevel(Skill:Int32);
+  function TRSStats.GetCurrentLevel(Skill: Int32);
 
 Returns the current level of a skill, handy for task that require prayer.
 
 Returns `-1` on failure.
 *)
-function TRSStats.GetCurrentLevel(Skill:Int32): Int32;
+function TRSStats.GetCurrentLevel(Skill: Int32): Int32;
 var
   lvl:String;
 begin
@@ -232,11 +232,11 @@ Stats.GetSkillInfo
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillInfo(skill:Int32): TSkillInfo;
+  function TRSStats.GetSkillInfo(skill: Int32; WaitTime: Int32=400): TSkillInfo;
 
 Returns the level info: "Level", "xp", "next level at" and "remainder"
 *)
-function TRSStats.GetSkillInfo(Skill:Int32; WaitTime:Int32=400): TSkillInfo;
+function TRSStats.GetSkillInfo(Skill: Int32; WaitTime: Int32=400): TSkillInfo;
 const
   TextColor:TCompareRules = [0];
 var

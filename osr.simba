@@ -1,13 +1,17 @@
-{$IFDEF SIMBAMAJOR980}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
+// --- FIGURE OUT IF YOUR SIMBA CAN RUN SRL:
+{$IFDEF SIMBAMAJOR980}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}  
 {$IFDEF SIMBAMAJOR1000}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
 {$IFDEF SIMBAMAJOR1100}{$DEFINE INCOMPATIBLE_VERSION}{$ENDIF}
 
-{$IFNDEF INCOMPATIBLE_VERSION}
-{$IFNDECL SRL}
-{$DEFINE OSR}
-{$IFNDEF SRL:DEBUG}
+{$IFNDEF INCOMPATIBLE_VERSION}    // --- VERIFY SIMBA VERSION                (¹)
+{$IFNDECL SRL}                    // --- IF SRL ISN'T INCLUDED ALREADY       (²)
+
+{$DEFINE SRLVERSION := 2.0.0}     // --- SRL VERSION DEFINE
+{$DEFINE OSR}                     // --- OSRS BASEDEFINE
+
+{$IFNDEF SRL:DEBUG}               // --- ENABLE LAPE HINTS FOR SRL INTERNALS (³) 
   {$IFDEF HINTS}{$DEFINE !HAD_HINTS}{$H-}{$ENDIF}
-{$ENDIF}
+{$ENDIF}                          // --- ENDIF LAPE HINTS FOR SRL INTERNALS  (³) (see file-end)
 
 {$include_once shared.simba}
 
@@ -15,10 +19,10 @@ begin
   srl.DefaultClientBounds := [0, 0, 764, 502];
 end;
 
-{$IFDEF SMART}
+{$IFDEF SMART}                    // --- IF USER ENABLED SMART
   {$include_once shared/smartbase.simba}
   {$include_once osr/smart.simba}
-{$ENDIF}
+{$ENDIF}                          // --- ENDIF USER ENABLED SMART
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
@@ -38,7 +42,6 @@ end;
 {$include_once osr/interfaces/rsInterfaceBase.simba}
 {$include_once osr/interfaces/bankscreen.simba}
 {$include_once osr/interfaces/depositbox.simba}
-{.$include_once osr/interfaces/makescreen.simba}
 {$include_once osr/interfaces/smithingscreen.simba}
 {$include_once osr/interfaces/shops.simba}
 {$include_once osr/interfaces/grandexch.simba}
@@ -72,9 +75,9 @@ begin
     Self.Writeln('Client ready!');
 end;
 
-{$IFDEF !HAD_HINTS}{$H+}{$ENDIF}
-{$ENDIF}
-{$ELSE}
+{$IFDEF !HAD_HINTS}{$H+}{$ENDIF}  // --- ENABLE LAPE HINTS FOR SRL INTERNALS       (³)
+{$ENDIF}                          // --- ENDIF SRL ISN'T INCLUDED ALREADY          (²)
+{$ELSE}                           // --- ELSE VERIFY SIMBA VERSION                 (¹)
 begin
   WriteLn('ERROR: Unable to include SRL, Incompatible Simba version detected.');
   WriteLn('       SRL requires Simba 1.2 or newer.');
@@ -83,4 +86,4 @@ begin
   WriteLn('  [alt]  http://nala.villavu.com/downloads/master/05a0dc6397ebfbf77d10eae153e58a5050678f87/Simba.i386-win32.exe');
   TerminateScript;
 end;
-{$ENDIF}
+{$ENDIF}                          // --- ENDIF VERIFY SIMBA VERSION                (¹)

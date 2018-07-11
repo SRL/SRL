@@ -383,10 +383,7 @@ begin
     begin
       B := GetTPABounds(ATPA[i]);
       if (B.Width() < 16) and (B.Height() < 16) then
-      begin
-        B.Expand(1);
-        FAdjButtons.Append(B);
-      end;
+        FAdjButtons.Append(B.Expand(1));
     end;
 
     FindColorsTolerance(TPA, $100000, FAdjBounds[1], 30);
@@ -658,8 +655,7 @@ var
   B:TBox;
   y,count:Int32;
 begin
-  B := FMiscBoxes[11];
-  B.Expand(-1);
+  B := FMiscBoxes[11].Expand(-1);
   y := B.Middle().y;
   B.y1 := y;
   B.y2 := y;
@@ -918,8 +914,7 @@ var
   B:TBox;
   y,count:Int32;
 begin
-  B := self.OffsetToTable(Slot, FExchBoxes[3]);
-  B.Expand(-1);
+  B := self.OffsetToTable(Slot, FExchBoxes[3]).Expand(-1);
   y := B.Middle().y;
   B.y1 := y;
   B.y2 := y;
