@@ -953,6 +953,8 @@ begin
     if SortFromPlayer then Result.Sort(Minimap.Center);
   finally
     BMP.Free();
+    SetColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2,0.2);
   end;
 end;
 
