@@ -1,7 +1,7 @@
 {$DEFINE SRL}
 
 {$include_once shared/globals.simba}
-{$include_once shared/onterminate.simba}
+{$IFDEF SIMBAMAJOR1200}{$include_once shared/onterminate.simba}{$ENDIF}
 {$include_once shared/interfacebase.simba}
 {$include_once shared/wrappers.simba}
 

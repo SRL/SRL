@@ -688,7 +688,7 @@ Inventory.WaitCount
 Waits for intentory amount to meet expected size. By default it waits till it's equal
 to given Amount, but can wait till it's not equal, less than or greater than.
 *)
-function TRSInventory.WaitCount(Amount: Int32; Time: Int32; Compare: TComparator = __EQ__): Boolean;
+function TRSInventory.WaitCount(Amount: Int32; Time: Int32; Compare: EComparator = __EQ__): Boolean;
 var
   T: UInt64;
 begin

@@ -1,7 +1,10 @@
 type
   TIntArray = TIntegerArray;
   TExtArray = TExtendedArray;
-  TComparator = (__EQ__, __NE__, __LT__, __GT__);
+
+  {$IFDEF SIMBAMAJOR1200}
+  EComparator = (__EQ__, __NE__, __LT__, __GT__);
+  {$ENDIF}
 
 
 {$include_once types/Other.simba}

@@ -661,7 +661,11 @@ var
   tpa, tpaShadow: TPointArray;
   w,h: Int32;
 begin
-  with client.GetMOCR() do TPA := TextToFontTPA(txt, font, w,h);
+  {$IFDEF SIMBAMAJOR1200}
+  with client.GetMOCR() do TPA := TextToFontTPA();
+  {$ELSE} //-- Simba 1300
+  TPAFromText(txt, font, w,h);
+  {$ENDIF}
   OffsetTPA(TPA, pt);
 
   if (shadow) then

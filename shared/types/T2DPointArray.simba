@@ -163,7 +163,7 @@ begin
 end;
 
 
-procedure T2DPointArray.FilterSize(MinLen:Int32; KeepIf:TComparator=__LT__);
+procedure T2DPointArray.FilterSize(MinLen:Int32; KeepIf:EComparator=__LT__);
 var
   tmp:T2DPointArray;
   TPA:TPointArray;

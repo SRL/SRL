@@ -386,7 +386,7 @@ function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 var
   B:TBox;
   pt:TPoint;
-  dir:PPoint;
+  dir: record R,T: Double; end;
   OldHook: TMouseMovedEvent;
   
   procedure TrackMovment(Sender: Pointer; X,Y: Int32); static;
