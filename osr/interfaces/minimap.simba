@@ -880,7 +880,7 @@ The points in the resulting array are the top-left corner of the dot, so for the
 .. pascal::
   dotTPA := Minimap.GetDots([MMDotNPC, MMDotPlayer]);
 *)
-function Minimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+function TRSMinimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 var
   blacks: TPointArray;
   BMP: TMufasaBitmap;

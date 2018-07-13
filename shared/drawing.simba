@@ -126,19 +126,22 @@ TMufasaBitmap.AvgBrightness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMufasaBitmap.AvgBrightness();
+    procedure TMufasaBitmap.AvgBrightness(Area: TBox = [0,0,-1,-1]);
 
 Returns a value between 0 and 100 that defines how bright the image is.
 *)
-function TMufasaBitmap.AvgBrightness(): Int32; constref;
+function TMufasaBitmap.AvgBrightness(Area: TBox = [0,0,-1,-1]): Int32; constref;
 var
   x,y,t: Int64;
   px:TRGB32;
 begin
-  for y:=0 to self.GetHeight()-1 do
+  if Area.X2 < 0 then Area.X2 := self.GetWidth()-Area.X2;
+  if Area.Y2 < 0 then Area.Y2 := self.GetHeight()-Area.Y2;
+
+  for y:=Area.Y1 to Area.Y2 do
   begin
     t := 0;
-    for x:=0 to self.GetWidth()-1 do
+    for x:=Area.X1 to Area.X2 do
     begin
       px := TRGB32(self.GetPixel(x,y));
       t += Round((px.R+px.G+px.B) / 3 * 0.392);
@@ -154,17 +157,20 @@ TMufasaBitmap.PeakBrightness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMufasaBitmap.PeakBrightness();
+    procedure TMufasaBitmap.PeakBrightness(Area: TBox = [0,0,-1,-1]);
 
 Returns the maximum brightness in the image in the range `0..100`.
 *)
-function TMufasaBitmap.PeakBrightness(): Int32; constref;
+function TMufasaBitmap.PeakBrightness(Area: TBox = [0,0,-1,-1]): Int32; constref;
 var
   x,y,t: Int64;
   px:TRGB32;
 begin
-  for y:=0 to self.GetHeight()-1 do
-    for x:=0 to self.GetWidth()-1 do
+  if Area.X2 < 0 then Area.X2 := self.GetWidth()-Area.X2;
+  if Area.Y2 < 0 then Area.Y2 := self.GetHeight()-Area.Y2;
+
+  for y:=Area.Y1 to Area.Y2 do
+    for x:=Area.X1 to Area.X2 do
     begin 
       px := TRGB32(self.GetPixel(x,y));
       t := Max(Max(px.R,px.G),px.B);
