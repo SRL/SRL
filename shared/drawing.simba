@@ -668,7 +668,7 @@ var
   w,h: Int32;
 begin
   {$IFDEF SIMBAMAJOR1200}
-  with client.GetMOCR() do TPA := TextToFontTPA();
+  with client.GetMOCR() do TPA := TextToFontTPA(txt, font, w,h);
   {$ELSE} //-- Simba 1300
   TPAFromText(txt, font, w,h);
   {$ENDIF}
