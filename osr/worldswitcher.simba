@@ -67,7 +67,7 @@ begin
           World.Properties += WORLD_SKILL;
         'deadman':
           World.Properties += WORLD_DEADMAN;
-        'pvp world - high risk', 'pvp world':
+        'pvp world - high risk', 'pvp world', 'pvp world - free':
           World.Properties += WORLD_PVP;
         'united states':
           World.Properties += WORLD_USA;
