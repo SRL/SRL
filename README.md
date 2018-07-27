@@ -2,6 +2,9 @@ SRL Resource Library
 =====================
 SRL is a library meant to aid you when writing bots in Simba for the game Runescape.
 
+You can find the documentation for SRL hosted at:
+https://srldocs.github.io/SRL/
+
 
 Contributing
 -------------
