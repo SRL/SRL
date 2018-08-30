@@ -26,11 +26,11 @@ end;
 
 {$include_once osr/misc.simba}
 {$include_once osr/text.simba}
+{$include_once osr/client.simba}
 {$include_once osr/misc.simba}
 {$include_once osr/lobby.simba}
 {$include_once osr/worldswitcher.simba}
 {$include_once osr/login.simba}
-{$include_once osr/client.simba}
 {$include_once osr/chooseoption.simba}
 {$include_once osr/xpbar.simba}
 {$include_once osr/interfaces/minimap.simba}

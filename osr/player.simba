@@ -98,7 +98,7 @@ begin
   srl.Writeln('TPlayer.Login()', dtHeader);
 
   while (Attempts < 20) do
-  try
+  begin
     Inc(Attempts);
 
     if srl.isLoggedIn() then
@@ -137,7 +137,6 @@ begin
     end;
 
     Wait(Random(200, 400));
-  except
   end;
 
   srl.Writeln('TPlayer.Login(): Result = False', dtFooter);

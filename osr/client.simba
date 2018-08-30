@@ -1,102 +1,172 @@
 (*
 client
 ======
-Refers to the oldschool runescape client. Stores somewhat misc methods that relates to client checks.
+Refers to the oldschool runescape client. Stores general methods checking the state of the client.
 *)
+
+type
+  ERSClientState = (csLoggedIn, csLogin, csWorldSwitcher, csLobby);
+  ERSClientStateSet = set of ERSClientState;
+
+(*
+srl.IsClientState
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientState(States: ERSClientStateSet): Boolean; overload;
+
+Returns ``True`` if the client state equals any of the ``States```
+*)
+function TSRL.IsClientState(States: ERSClientStateSet): Boolean; overload;
+
+  function FindText(Text: String; B: TBox;  Color: Int32 = $FFFFFF; Font: String = 'StatChars07'): Boolean;
+  begin
+    if Client.GetMOCR().GetTextAt(B.X1, B.Y1, B.X2, B.Y2, 1, 3, 3, Color, 0, Font) = Text then
+      Exit(True);
+  end
+
+begin
+  // LOGGED IN: `All` in `All` chat filter
+  if (csLoggedIn in States) and FindText('All', [27, 486, 37, 493]) then
+    Exit(True);
+
+  // LOGIN SCREEN: `Click` in `Click to switch` button
+  if (csLogin in States) and FindText('Click', [21, 483, 42, 490]) then
+    Exit(True);
+
+  // WORLD SWITCHER: `Cancel` in `Cancel` button
+  if (csWorldSwitcher in States) and FindText('Cancel', [717, 7, 748, 14]) then
+    Exit(True);
+
+  // LOBBY: `Never` in `Never tell anybody your password...`
+  if (csLobby in States) and FindText('Never', [141, 106, 172, 115], $00FFFF, 'SmallChars07') then
+    Exit(True);
+end;
+
+(*
+srl.IsClientState
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientState(State: ERSClientState): Boolean; overload;
+
+Returns ``True`` if the clients state equals the ``State``
+*)
+function TSRL.IsClientState(State: ERSClientState): Boolean; overload;
+begin
+  Result := Self.IsClientState([State]);
+end;
 
 (*
 srl.IsLoggedIn
-~~~~~~~~~~~~~~~~
-.. pascal:: function TSRL.isLoggedIn(WaitTime: Int32 = 0): Boolean; overload;
+~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsLoggedIn: Boolean; overload;
 
-Returns ``True`` if your character is logged in.
- By default it doesn't wait, but you can change ``WaitTime`` to whatever.
+Returns ``True`` if a player is in game.
 *)
-function TSRL.isLoggedIn(WaitTime: Int32 = 0): Boolean; overload;
-var
-  t: UInt64;
+function TSRL.IsLoggedIn: Boolean; overload;
 begin
-  Result := False;
-  t := GetTickCount() + WaitTime;
-  repeat
-    if GetColor(443, 486) = $FFFFFF then
-      Exit(True);
-    Wait(50,100);
-  until GetTickCount() >= t;
+  Result := Self.IsClientState(csLoggedIn);
 end;
 
 (*
-srl.isClientLoading
-~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TSRL.isClientLoading(WaitTime: Int32 = 0): Boolean;
+srl.IsLoggedIn
+~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsLoggedIn(WaitTime: Int32): Boolean; overload;
 
-Returns ``True`` if we are still waiting for the client to boot up.
+Overload that accepts a ``WaitTime`` parameter.
 *)
-function TSRL.isClientLoading(WaitTime: Int32 = 0): Boolean;
-
-  function isLoading: Boolean;
-  var
-    p: TPoint;
-  begin
-    Result := srl.FindText(p, 'lease wait', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50)) or
-              srl.FindText(p, 'oading', 'SmallChars07', clWhite, 0, Box(0, 0, 200, 50));
-  end;
-
-var
-  t: UInt64;
-begin
-  if (WaitTime = 0) then
-    Exit(isLoading());
-
-  t := GetTickCount() + WaitTime;
-  repeat
-    if (isLoading()) then
-      Exit(True);
-
-    Wait(Random(50, 100));
-  until (GetTickCount() >= t);
-end;
-
-(*
-srl.isClientLoading
-~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TSRL.WaitClientLoading: Boolean;
-
-Waits forever, or until the client has successfully booted.
-*)
-function TSRL.WaitClientLoading: Boolean;
-begin
-  repeat
-    Result := not Self.isClientLoading();
-    Wait(Random(500, 1000));
-  until Result;
-end;
-
-(*
-srl.isClientReady
-~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TSRL.isClientReady(WaitTime: Int32 = 0): Boolean; overload;
-
-Returns ``True`` if the client is ready to be used. 
-If the client isn't ready it will wait, expecting it to get ready.
-*)
-function TSRL.isClientReady(WaitTime: Int32 = 0): Boolean; overload;
+function TSRL.IsLoggedIn(WaitTime: Int32): Boolean; overload;
 var
   T: UInt64;
-  W, H: Int32;
 begin
-  GetClientDimensions(W, H);
-  if (W < 765) or (H < 503) then
-    Exit(False);
-
   T := GetTickCount() + WaitTime;
-  repeat
-    if Self.IsClientLoading() then
-      Self.WaitClientLoading();
-    if WorldSwitcher.isOpen() then
-      WorldSwitcher.Close();
-
-    if Self.isLoggedIn() or LoginScreen.isOpen() or Lobby.isOpen() then
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsLoggedIn() then
       Exit(True);
-  until (GetTickCount() >= T);
+
+    Wait(50, 100);
+  end;
+end;
+
+(*
+srl.IsClientReady
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientReady: Boolean; overload;
+
+Returns true if the client is in a known state, this means either of the following are active:
+  - Logged in
+  - Login screen
+  - World switcher
+  - Lobby
+*)
+function TSRL.IsClientReady: Boolean; overload;
+begin
+  Result := Self.IsClientState([csLoggedIn, csLogin, csWorldSwitcher, csLobby]);
+end;
+
+(*
+srl.IsClientReady
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientReady: Boolean; overload;
+
+Overload that accepts ``WaitTime`` parameter.
+*)
+function TSRL.IsClientReady(WaitTime: Int32): Boolean; overload;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + WaitTime;
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsClientReady() then
+      Exit(True);
+
+    Wait(50, 100);
+  end;
+end;
+
+(*
+srl.IsClientLoading
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientLoading: Boolean; overload;
+
+Returns ``True`` if the client is loading by checking for ``Loading - please wait`` in the top left.
+*)
+function TSRL.IsClientLoading: Boolean; overload;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'wait.', 'SmallChars07', $FFFFFF, 0, Box(6, 6, 135, 25));
+end;
+
+(*
+srl.IsClientLoading
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.IsClientLoading: Boolean; overload;
+
+Overload that accepts ``WaitTime`` parameter.
+*)
+function TSRL.IsClientLoading(WaitTime: Int32): Boolean; overload;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + WaitTime;
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsClientLoading() then
+      Exit(True);
+
+    Wait(50, 100);
+  end;
+end;
+
+(*
+srl.WaitClientLoading
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TSRL.WaitClientLoading;
+
+Waits forever until the client has finished loading.
+*)
+procedure TSRL.WaitClientLoading;
+begin
+  while Self.IsClientLoading() do
+    Wait(100, 1000);
 end;

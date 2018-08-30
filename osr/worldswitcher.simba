@@ -98,18 +98,17 @@ end;
 
 function TRSWorldSwitcher.IsOpen(WaitTime: Integer = 0): Boolean;
 var
-  t: UInt64;
+  T: UInt64;
 begin
-  Result := False;
-  t := GetTickCount64() + WaitTime;
+  T := GetTickCount() + WaitTime;
 
   repeat
-    if (WaitTime > 0) then
-      Wait(Random(50, 100));
-
-    if (GetColor(146, 6) = 1682881) and (not srl.isLoggedIn()) then
+    if srl.IsClientState(csWorldSwitcher) then
       Exit(True);
-  until (GetTickCount64() >= t);
+
+    if (WaitTime > 0) then
+      Wait(50, 100);
+  until (GetTickCount() >= T);
 end;
 
 function TRSWorldSwitcher.FixWorld(wo: Integer): Integer;
