@@ -789,6 +789,13 @@ begin
   TerminateScript();
 end;
 
+procedure SetTarget(Handle: PtrUInt; Free: Boolean = True); overload;
+begin
+  if Free then
+    FreeTarget(0);
+
+  Client.GetIOManager().SetTarget2(Handle);
+end;
 
 {$ifndecl GetTickCount64}
 var GetTickCount64: function():UInt64 := GetTickCount;

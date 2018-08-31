@@ -19,7 +19,7 @@ function TSRL.IsClientState(States: ERSClientStateSet): Boolean; overload;
 
   function FindText(Text: String; B: TBox;  Color: Int32 = $FFFFFF; Font: String = 'StatChars07'): Boolean;
   begin
-    if Client.GetMOCR().GetTextAt(B.X1, B.Y1, B.X2, B.Y2, 1, 3, 3, Color, 0, Font) = Text then
+    if IsTargetValid() and (GetTextAtEx(B.X1, B.Y1, B.X2, B.Y2, 1, 3, 3, Color, 0, Font) = Text) then
       Exit(True);
   end
 
