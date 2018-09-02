@@ -197,7 +197,7 @@ Example:
 
     Bars := MainScreen.FindHPBars(MainScreen.GetBounds());
 *)
-function TRSMainScreen.FindHPBars(const Area: TBox): THPBarArray;
+function TRSMainScreen.FindHPBars(Area: TBox): THPBarArray;
 const
   COLOR_BARS = [$00FF00, $0000FF];
   COLOR_SPLATS = [16728128, 11339523, 5571843, 192, 197503, 65889, $FFFFFF, 0];
@@ -257,13 +257,15 @@ var
 begin
   Freeze();
 
+  Area.LimitTo(Self.GetBounds());
+
   try
-    for color in COLOR_BARS do
-      if (FindColors(tmp, color, Area)) then
+    for Color in COLOR_BARS do
+      if (FindColors(tmp, Color, Area)) then
         TPA += tmp;
 
-    for color in COLOR_SPLATS do
-      if (FindColors(tmp, color, Area)) then
+    for Color in COLOR_SPLATS do
+      if (FindColors(tmp, Color, Area)) then
         Splats += tmp;
 
     if (Length(TPA) < 10) then
