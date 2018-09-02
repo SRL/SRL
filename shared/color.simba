@@ -100,6 +100,27 @@ begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 2, Color.HueMod, Color.SatMod);
 end;
 
+function TSRL.CountColor(Color: TCTSColor; Area: TBox): Int32; overload;
+var
+  TPA: TPointArray;
+begin
+  Result := Self.FindColors(TPA, Color, Area);
+end;
+
+function TSRL.CountColor(Color: TCTS1Color; Area: TBox): Int32; overload;
+var
+  TPA: TPointArray;
+begin
+  Result := Self.FindColors(TPA, Color, Area);
+end;
+
+function TSRL.CountColor(Color: TCTS2Color; Area: TBox): Int32; overload;
+var
+  TPA: TPointArray;
+begin
+  Result := Self.FindColors(TPA, Color, Area);
+end;
+
 
 // -----------------------------------------------------------------------------
 // Wait functions

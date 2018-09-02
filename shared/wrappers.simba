@@ -794,7 +794,7 @@ begin
   if Free then
     FreeTarget(0);
 
-  Client.GetIOManager().SetTarget2(Handle);
+  Client.GetIOManager().SetTarget(Handle);
 end;
 
 {$ifndecl GetTickCount64}
