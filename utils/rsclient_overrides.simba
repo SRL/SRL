@@ -87,7 +87,7 @@ begin
   inherited;
 end;
 
-procedure SendKeys(const s: string; keywait, keymodwait: Int32); override;
+procedure SendKeys(s: string; keywait, keymodwait: Int32); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
@@ -343,7 +343,7 @@ begin
   Result := inherited;
 end;
 
-function GetTextATPA(const ATPA: T2DPointArray; const maxvspacing: integer; const font: string): string; override;
+function GetTextATPA(constref ATPA: T2DPointArray; maxvspacing: integer; font: string): string; override;
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
@@ -351,7 +351,7 @@ begin
   Result := inherited;
 end;
 
-function GetTextAt(const atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; const font: string): string; override;
+function GetTextAt(atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; font: string): string; override;
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
@@ -359,7 +359,7 @@ begin
   Result := inherited;
 end;
 
-function GetTextAtEx(const xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; const font: string): string; override;
+function GetTextAtEx(xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; font: string): string; override;
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();

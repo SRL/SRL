@@ -465,7 +465,7 @@ begin
       for i:=0 to High(ATPA) do
       begin
         B := GetTPABounds(ATPA[i]);
-        str := self.RecognizeStr(B, 0, 'SmallChars');
+        str := self.RecognizeStr(B, 0, 'SmallChars07');
         if (Exact and (str = name)) or ((not Exact) and (Pos(name,str) > 0)) then
         begin
           Mouse.Click(B, mouse_left);

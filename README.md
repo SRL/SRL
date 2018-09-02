@@ -5,6 +5,10 @@ SRL is a library meant to aid you when writing bots in Simba for the game Runesc
 You can find the documentation for SRL hosted at:
 https://srldocs.github.io/SRL/
 
+Installing
+-----------
+Download the latest release and extract into your `Includes` directory. Make sure to rename the folder to `SRL`.
+The master branch is the development branch which can also be installed if you know what you're doing. 
 
 Contributing
 -------------
