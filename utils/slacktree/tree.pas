@@ -7,12 +7,6 @@ unit tree;
 {$mode objfpc}{$H+}
 {$modeswitch advancedrecords}
 {$inline on}
-{$macro on}
-
-{$define callconv :=
-  {$IFDEF WINDOWS}{$IFDEF CPU32}cdecl;{$ELSE}{$ENDIF}{$ENDIF}
-  {$IFDEF LINUX}{$IFDEF CPU32}cdecl;{$ELSE}{$ENDIF}{$ENDIF}
-}
 
 interface
 
@@ -70,23 +64,7 @@ type
     function RefArray: TNodeRefArray;
   end;
 
-
-
-procedure TSlackTree_Init(var tree:TSlackTree; TPA:TPointArray); callconv
-procedure TSlackTree_Free(var tree:TSlackTree); callconv
-function TSlackTree_IndexOf(var tree:TSlackTree; p:TPoint): Int32; callconv
-function TSlackTree_Find(var tree:TSlackTree; p:TPoint): PNode; callconv
-procedure TSlackTree_HideNode(var tree:TSlackTree; idx:Int32); callconv
-function TSlackTree_HideNode2(var tree:TSlackTree; pt:TPoint): LongBool; callconv
-function TSlackTree_RawNearest(var tree:TSlackTree; pt:TPoint; notEqual:LongBool=False): PNode; callconv
-function TSlackTree_Nearest(var tree:TSlackTree; pt:TPoint; notEqual:LongBool=False): TPoint; callconv
-function TSlackTree_RawKNearest(var tree:TSlackTree; pt:TPoint; k:Int32; notEqual:LongBool=False): TNodeRefArray; callconv
-function TSlackTree_KNearest(var tree:TSlackTree; pt:TPoint; k:Int32; notEqual:LongBool=False): TPointArray; callconv
-function TSlackTree_RawRangeQuery(var tree:TSlackTree; B:TBox): TNodeRefArray; callconv
-function TSlackTree_RangeQuery(var tree:TSlackTree; B:TBox; hide:LongBool=False): TPointArray; callconv
-function TSlackTree_RangeQueryEx(var tree:TSlackTree; query:TPoint; xRad,yRad:double; hide:LongBool=False): TPointArray; callconv
-function TSlackTree_RangeQueryEx2(var tree:TSlackTree; query:TPoint; xmin,ymin,xmax,ymax:double; hide:LongBool=False): TPointArray; callconv
-function TSlackTree_RefArray(var tree:TSlackTree): TNodeRefArray; callconv
+  PSlackTree = ^TSlackTree;
 
 const
   NONE = -1;
@@ -483,84 +461,4 @@ begin
   SetLength(Result, c);
 end;
 
-
-
-//---------| Export friendly methods |-------------------------------
-
-procedure TSlackTree_Init(var tree:TSlackTree; TPA:TPointArray); callconv
-begin
- tree.Init(TPA);
-end;
-
-procedure TSlackTree_Free(var tree:TSlackTree); callconv
-begin
-  tree.Free();
-end;
-
-function TSlackTree_IndexOf(var tree:TSlackTree; p:TPoint): Int32; callconv
-begin
-  Result := tree.IndexOf(p);
-end;
-
-function TSlackTree_Find(var tree:TSlackTree; p:TPoint): PNode; callconv
-begin
-  Result := tree.Find(p);
-end;
-
-procedure TSlackTree_HideNode(var tree:TSlackTree; idx:Int32); callconv
-begin
-  tree.HideNode(idx);
-end;
-
-function TSlackTree_HideNode2(var tree:TSlackTree; pt:TPoint): LongBool; callconv
-begin
-  Result := tree.HideNode(pt);
-end;
-
-function TSlackTree_RawNearest(var tree:TSlackTree; pt:TPoint; notEqual:LongBool=False): PNode; callconv
-begin
-  result := tree.RawNearest(pt, notEqual);
-end;
-
-function TSlackTree_Nearest(var tree:TSlackTree; pt:TPoint; notEqual:LongBool=False): TPoint; callconv
-begin
-  result := tree.Nearest(pt, notEqual);
-end;
-
-function TSlackTree_RawkNearest(var tree:TSlackTree; pt:TPoint; k:Int32; notEqual:LongBool=False): TNodeRefArray; callconv
-begin
-  result := tree.RawKNearest(pt, k, notEqual);
-end;
-
-function TSlackTree_KNearest(var tree:TSlackTree; pt:TPoint; k:Int32; notEqual:LongBool=False): TPointArray; callconv
-begin
-  result := tree.KNearest(pt, k, notEqual);
-end;
-
-
-function TSlackTree_RawRangeQuery(var tree:TSlackTree; B:TBox): TNodeRefArray; callconv
-begin
-  Result := tree.RawRangeQuery(B);
-end;
-
-function TSlackTree_RangeQuery(var tree:TSlackTree; B:TBox; hide:LongBool=False): TPointArray; callconv
-begin
-  Result := tree.RangeQuery(B, hide);
-end;
-
-function TSlackTree_RangeQueryEx(var tree:TSlackTree; query:TPoint; xRad,yRad:double; hide:LongBool=False): TPointArray; callconv
-begin
-  Result := tree.RangeQueryEx(query, xRad,yRad, hide);
-end;
-
-function TSlackTree_RangeQueryEx2(var tree:TSlackTree; query:TPoint; xmin,ymin,xmax,ymax:double; hide:LongBool=False): TPointArray; callconv
-begin
-  Result := tree.RangeQueryEx(query, xmin,ymin,xmax,ymax, hide);
-end;
-
-function TSlackTree_RefArray(var tree:TSlackTree): TNodeRefArray; callconv
-begin
-  Result := tree.RefArray();
-end;
-
-end.
+end.

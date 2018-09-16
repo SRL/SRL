@@ -6,7 +6,7 @@ Slacktree offers a KD-tree like tree-structure speicalized for TPointArrays (2D 
 Adds fast alteratives to the most popular functions found in the AND_TPA.dll ``FilterTPADistTPA``. 
 The library loaded may not work properly on Linux distors.
 *)
-{$loadlib ../Includes/SRL/utils/slacktree/slacktree}
+{$loadlib slacktree/libslacktree}
 
 (*
 TPointArray.PointsInRangeOf
@@ -22,9 +22,12 @@ var
   tree: TSlackTree;
   pt: TPoint;
 begin
-  tree.Init(Copy(Self));
-  for pt in Other do
-    Result += tree.RangeQueryEx(pt, minDist,minDist, maxDist,maxDist, True);
+  if (Length(Self) > 0) and (Length(Other) > 0) then
+  begin
+    tree.Init(Copy(Self));
+    for pt in Other do
+      Result += tree.RangeQueryEx(pt, minDist,minDist, maxDist,maxDist, True);
+  end;
 end;
 
 (*
@@ -40,41 +43,10 @@ var
   tree: TSlackTree;
   pt: TPoint;
 begin
-  tree.Init(Copy(Self));
-  for pt in Other do
-    Result += tree.RangeQueryEx(pt, minDx, minDy, maxDx, maxDy, True);
-end;
-
-
-(*
-TPAOverlap
-~~~~~~~~~~
-.. pascal:: 
-  function TPAOverlap(TPA1,TPA2:TPointArray; r:Int32; overlap:EOverlap=eoBoth): TPointArray;
-  type EOverlap = (eoLeft,eoRight,eoBoth);
-  
-An older version with some other parameters from what the above takes.
-Exists here for legacy reasons.
-*)
-type EOverlap = (eoLeft,eoRight,eoBoth);
-
-function TPAOverlap(TPA1,TPA2:TPointArray; r:Int32; overlap:EOverlap=eoBoth): TPointArray;
-var
-  tree: TSlackTree;
-  pt: TPoint;
-begin
-  if overlap = eoRight then Swap(TPA1, TPA2);
-
-  tree.Init(TPA1);
-  for pt in TPA2 do
-    Result += tree.RangeQueryEx(pt, r,r, True);
-  tree.Free();
-
-  if overlap=eoBoth then
+  if (Length(Self) > 0) and (Length(Other) > 0) then
   begin
-    tree.Init(TPA2);
-    for pt in TPA1 do
-      Result += tree.RangeQueryEx(pt, r,r, True);
-    tree.Free();
+    tree.Init(Copy(Self));
+    for pt in Other do
+      Result += tree.RangeQueryEx(pt, minDx, minDy, maxDx, maxDy, True);
   end;
 end;

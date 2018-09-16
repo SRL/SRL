@@ -4,89 +4,111 @@ library slacktree;
   Project: SlackTree
   License: GNU Lesser GPL (http://www.gnu.org/licenses/lgpl.html)
 [==============================================================================}
-{$mode objfpc}{$H+}
-{$macro on}
-{$inline on}
 
-{$DEFINE callconv :=
-  {$IFDEF WINDOWS}{$IFDEF CPU32}cdecl;{$ELSE}{$ENDIF}{$ENDIF}
-  {$IFDEF LINUX}{$IFDEF CPU32}cdecl;{$ELSE}{$ENDIF}{$ENDIF}
-}
+{$mode objfpc}{$H+}
+{$inline on}
 
 uses
   SysUtils,
-  Math,
-  tree;
+  tree, types;
 
+{$I simbaplugin.inc}
 
-{$I SimbaPlugin.inc}
-
-
-function GetPluginABIVersion: Integer; callconv export;
+procedure TSlackTree_Init(const Params: PParamArray); cdecl;
 begin
-  Result := 2;
+  PSlackTree(Params^[0])^.Init(PPointArray(Params^[1])^);
 end;
 
-procedure SetPluginMemManager(MemMgr : TMemoryManager); callconv export;
+procedure TSlackTree_Free(const Params: PParamArray); cdecl;
 begin
-  if memisset then
-    exit;
-  GetMemoryManager(OldMemoryManager);
-  SetMemoryManager(MemMgr);
-  memisset := True;
+  PSlackTree(Params^[0])^.Free();
 end;
 
-
-procedure OnDetach; callconv export;
+procedure TSlackTree_IndexOf(const Params: PParamArray; const Result: Pointer); cdecl;
 begin
-  SetMemoryManager(OldMemoryManager);
+  PInt32(Result)^ := PSlackTree(Params^[0])^.IndexOf(PPoint(Params^[1])^);
 end;
 
-
-function GetFunctionCount: Integer; callconv export;
+procedure TSlackTree_Find(const Params: PParamArray; const Result: Pointer); cdecl;
 begin
-  if not MethodsLoaded then LoadExports;
-  Result := Length(Methods);
+  PPointer(Result)^ := PSlackTree(Params^[0])^.Find(PPoint(Params^[1])^);
 end;
 
-function GetFunctionInfo(x: Integer; var ProcAddr: Pointer; var ProcDef: PChar): Integer; callconv export;
+procedure TSlackTree_HideNode(const Params: PParamArray); cdecl;
 begin
-  Result := x;
-  if (x > -1) and InRange(x, 0, High(Methods)) then
-  begin
-    ProcAddr := Methods[x].procAddr;
-    StrPCopy(ProcDef, Methods[x].ProcDef);
-    if (x = High(Methods)) then FreeMethods;
-  end;
+  PSlackTree(Params^[0])^.HideNode(PInt32(Params^[1])^);
 end;
 
-
-
-function GetTypeCount: Integer; callconv export;
+procedure TSlackTree_HideNode2(const Params: PParamArray; const Result: Pointer); cdecl;
 begin
-  if not TypesLoaded then LoadExports;
-  Result := Length(TypeDefs);
+  PBoolean(Result)^ := PSlackTree(Params^[0])^.HideNode(PPoint(Params^[1])^);
 end;
 
-function GetTypeInfo(x: Integer; var TypeName, TypeDef: PChar): Integer; callconv export;
+procedure TSlackTree_RawNearest(const Params: PParamArray; const Result: Pointer); cdecl;
 begin
-  Result := x;
-  if (x > -1) and InRange(x, 0, High(TypeDefs)) then
-  begin
-    StrPCopy(TypeName, TypeDefs[x].TypeName);
-    StrPCopy(TypeDef,  TypeDefs[x].TypeDef);
-    if (x = High(TypeDefs)) then FreeTypes;
-  end;
+  PPointer(Result)^ := PSlackTree(Params^[0])^.RawNearest(PPoint(Params^[1])^, PBoolean(Params^[2])^);
 end;
 
+procedure TSlackTree_Nearest(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  PPoint(Result)^ := PSlackTree(Params^[0])^.Nearest(PPoint(Params^[1])^, PBoolean(Params^[2])^);
+end;
 
-exports GetPluginABIVersion;
-exports SetPluginMemManager;
-exports GetTypeCount;
-exports GetTypeInfo;
-exports GetFunctionCount;
-exports GetFunctionInfo;
-exports OnDetach;
+procedure TSlackTree_RawKNearest(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  TNodeRefArray(Result^) := PSlackTree(Params^[0])^.RawKNearest(PPoint(Params^[1])^, PInt32(Params^[2])^, PBoolean(Params^[3])^);
+end;
+
+procedure TSlackTree_KNearest(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  PPointArray(Result)^ := PSlackTree(Params^[0])^.KNearest(PPoint(Params^[1])^, PInt32(Params^[2])^, PBoolean(Params^[3])^);
+end;
+
+procedure TSlackTree_RawRangeQuery(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  TNodeRefArray(Result^) := PSlackTree(Params^[0])^.RawRangeQuery(PBox(Params^[1])^);
+end;
+
+procedure TSlackTree_RangeQuery(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  PPointArray(Result)^ := PSlackTree(Params^[0])^.RangeQuery(PBox(Params^[1])^, PBoolean(Params^[2])^);
+end;
+
+procedure TSlackTree_RangeQueryEx(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  PPointArray(Result)^ := PSlackTree(Params^[0])^.RangeQueryEx(PPoint(Params^[1])^, PDouble(Params^[2])^, PDouble(Params^[3])^, PBoolean(Params^[4])^);
+end;
+
+procedure TSlackTree_RangeQueryEx2(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  PPointArray(Result)^ := PSlackTree(Params^[0])^.RangeQueryEx(PPoint(Params^[1])^, PDouble(Params^[2])^, PDouble(Params^[3])^, PDouble(Params^[4])^, PDouble(Params^[5])^, PBoolean(Params^[6])^);
+end;
+
+procedure TSlackTree_RefArray(const Params: PParamArray; const Result: Pointer); cdecl;
+begin
+  TNodeRefArray(Result^) := PSlackTree(Params^[0])^.RefArray;
+end;
 
 begin
+  addGlobalType('packed record split: TPoint; l,r: Int32; hidden: Boolean; end;', 'TSlackNode');
+  addGlobalType('^TSlackNode', 'PSlackNode');
+  addGlobalType('array of TSlackNode;', 'TSlackArray');
+  addGlobalType('array of PSlackNode;', 'TSlackRefArray');
+  addGlobalType('packed record Data: TSlackArray; Size: Int32; end;', 'TSlackTree');
+
+  addGlobalFunc('procedure TSlackTree.Init(TPA:TPointArray); native;', @TSlackTree_Init);
+  addGlobalFunc('procedure TSlackTree.Free(); native;', @TSlackTree_Free);
+  addGlobalFunc('function TSlackTree.IndexOf(pt:TPoint): Int32; native;', @TSlackTree_IndexOf);
+  addGlobalFunc('function TSlackTree.Find(pt:TPoint): PSlackNode; native;', @TSlackTree_Find);
+  addGlobalFunc('procedure TSlackTree.Hide(idx:Int32); native;', @TSlackTree_HideNode);
+  addGlobalFunc('function TSlackTree.Hide(pt:TPoint): LongBool; overload; native;', @TSlackTree_HideNode2);
+  addGlobalFunc('function TSlackTree.Nearest_N(pt:TPoint; notEqual:LongBool=False): PSlackNode; native;', @TSlackTree_RawNearest);
+  addGlobalFunc('function TSlackTree.Nearest(pt:TPoint; notEqual:LongBool=False): TPoint; native;', @TSlackTree_Nearest);
+  addGlobalFunc('function TSlackTree.RawKNearest(pt:TPoint; k:Int32; notEqual:LongBool=False): TSlackRefArray; native;', @TSlackTree_RawKNearest);
+  addGlobalFunc('function TSlackTree.KNearest(pt:TPoint; k:Int32; notEqual:LongBool=False): TPointArray; native;', @TSlackTree_KNearest);
+  addGlobalFunc('function TSlackTree.RawRangeQuery(B:TBox): TSlackRefArray; native;', @TSlackTree_RawRangeQuery);
+  addGlobalFunc('function TSlackTree.RangeQuery(B:TBox; hide:LongBool=False): TPointArray; native;', @TSlackTree_RangeQuery);
+  addGlobalFunc('function TSlackTree.RangeQueryEx(query:TPoint; xRad,yRad:Double; hide:LongBool=False): TPointArray; overload; native;', @TSlackTree_RangeQueryEx);
+  addGlobalFunc('function TSlackTree.RangeQueryEx(query:TPoint; xmin,ymin,xmax,ymax:double; hide:LongBool=False): TPointArray; overload; native;', @TSlackTree_RangeQueryEx2);
+  addGlobalFunc('function TSlackTree.RefArray: TSlackRefArray; native;', @TSlackTree_RefArray);
 end.

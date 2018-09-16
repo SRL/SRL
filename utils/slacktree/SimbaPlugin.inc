@@ -1,73 +1,119 @@
-{==============================================================================]
-  Copyright (c) 2016, Jarl `slacky` Holta
-  Project: SlackTree
-  License: GNU Lesser GPL (http://www.gnu.org/licenses/lgpl.html)
-[==============================================================================}
+// Helpers
+
+type  
+  PParamArray = ^TParamArray;
+  TParamArray = array[Word] of Pointer;
+
+type
+  TSynchronizeMethod = procedure(Data: Pointer); cdecl;
+
+  TSimbaMethods = packed record
+    Synchronize: procedure(Method: TSynchronizeMethod; Data: Pointer = nil); cdecl;
+  end;
+
 var
-  Methods: array of record procAddr: Pointer; ProcDef:PChar; end;
-  TypeDefs: array of record TypeName, TypeDef:PChar; end;
-  TypesLoaded: Boolean = False;
-  MethodsLoaded: Boolean = False;
-  
-  OldMemoryManager: TMemoryManager;
-  MemIsset: Boolean = False;
+  SimbaMethods: TSimbaMethods;
 
+  SimbaImports: record
+    Functions: array of record Header: String; Method: Pointer; end;
+    Types: array of record Str: String; Name: String; end;
+    Code: String;
+  end;
 
-procedure AddMethod(ProcAddr: Pointer; ProcDef: PChar);
-var L: Integer;
+procedure addGlobalFunc(Header: String; Method: Pointer);
 begin
-  L := Length(Methods);
-  SetLength(Methods, L + 1);
-  Methods[l].ProcAddr := ProcAddr;
-  Methods[l].ProcDef := ProcDef;
+  with SimbaImports do
+  begin
+    SetLength(Functions, Length(Functions) + 1);
+
+    Functions[High(Functions)].Header := Header;
+    Functions[High(Functions)].Method := Method;
+  end;
 end;
 
-procedure AddType(TypeName, TypeDef: PChar);
-var L: Integer;
+procedure addGlobalType(Str: String; Name: String);
 begin
-  L := Length(TypeDefs);
-  SetLength(TypeDefs, L + 1);
-  TypeDefs[l].TypeName := TypeName;
-  TypeDefs[l].TypeDef := TypeDef;
+  with SimbaImports do
+  begin
+    SetLength(Types, Length(Types) + 1);
+
+    Types[High(Types)].Str := Str;
+    Types[High(Types)].Name := Name;
+  end;
 end;
 
-procedure LoadExports;
+procedure addCode(Code: String);
 begin
-  AddType('TSlackNode', 'packed record split: TPoint; l,r: Int32; hidden: Boolean; end;');
-  AddType('PSlackNode', '^TSlackNode');
-  AddType('TSlackArray', 'array of TSlackNode;');
-  AddType('TSlackRefArray', 'array of PSlackNode;');
-  AddType('TSlackTree', 'packed record data: TSlackArray; size: Int32; end;');
-  
-  AddMethod(@TSlackTree_Init,          'procedure TSlackTree.Init(TPA:TPointArray);');
-  AddMethod(@TSlackTree_Free,          'procedure TSlackTree.Free();');
-  AddMethod(@TSlackTree_IndexOf,       'function TSlackTree.IndexOf(pt:TPoint): Int32;');
-  AddMethod(@TSlackTree_Find,          'function TSlackTree.Find(pt:TPoint): PSlackNode;');
-  AddMethod(@TSlackTree_HideNode,      'procedure TSlackTree.Hide(idx:Int32);');
-  AddMethod(@TSlackTree_HideNode2,     'function TSlackTree.Hide(pt:TPoint): LongBool; overload;');
-  AddMethod(@TSlackTree_RawNearest,    'function TSlackTree.Nearest_N(pt:TPoint; notEqual:LongBool=False): PSlackNode;');
-  AddMethod(@TSlackTree_Nearest,       'function TSlackTree.Nearest(pt:TPoint; notEqual:LongBool=False): TPoint;');
-  AddMethod(@TSlackTree_RawKNearest,   'function TSlackTree.RawKNearest(pt:TPoint; k:Int32; notEqual:LongBool=False): TSlackRefArray;');
-  AddMethod(@TSlackTree_KNearest,      'function TSlackTree.KNearest(pt:TPoint; k:Int32; notEqual:LongBool=False): TPointArray;');
-  AddMethod(@TSlackTree_RawRangeQuery, 'function TSlackTree.RawRangeQuery(B:TBox): TSlackRefArray;');
-  AddMethod(@TSlackTree_RangeQuery,    'function TSlackTree.RangeQuery(B:TBox; hide:LongBool=False): TPointArray;');
-  AddMethod(@TSlackTree_RangeQueryEx,  'function TSlackTree.RangeQueryEx(query:TPoint; xRad,yRad:Double; hide:LongBool=False): TPointArray; overload;');
-  AddMethod(@TSlackTree_RangeQueryEx2, 'function TSlackTree.RangeQueryEx(query:TPoint; xmin,ymin,xmax,ymax:double; hide:LongBool=False): TPointArray; overload;');
-  AddMethod(@TSlackTree_RefArray,      'function TSlackTree.RefArray: TSlackRefArray;');
-
-  MethodsLoaded := True;
-  TypesLoaded := True;
+  SimbaImports.Code := SimbaImports.Code + Code;
 end;
 
-procedure FreeMethods;
+// Exports
+
+function GetTypeCount(): Int32; cdecl;
 begin
-  SetLength(Methods, 0);
-  MethodsLoaded := False;
+  Result := Length(SimbaImports.Types);
 end;
 
-
-procedure FreeTypes;
+function GetTypeInfo(Index: Int32; var Name, Str: PChar): Int32; cdecl;
 begin
-  SetLength(TypeDefs, 0);
-  TypesLoaded := False;
+  with SimbaImports do
+  begin
+    StrPCopy(Name, Types[Index].Name);
+    StrPCopy(Str, Types[Index].Str);
+  end;
+
+  Result := Index;
 end;
+
+function GetFunctionCount: Int32; cdecl;
+begin
+  Result := Length(SimbaImports.Functions);
+end;
+
+function GetFunctionInfo(Index: Int32; var Method: Pointer; var Header: PChar): Int32; cdecl;
+begin
+  with SimbaImports do
+  begin
+    StrPCopy(Header, Functions[Index].Header);
+
+    Method := Functions[Index].Method;
+  end;
+
+  Result := Index;
+end;
+
+function GetCodeLength: Int32; cdecl;
+begin
+  Result := Length(SimbaImports.Code);
+end;
+
+procedure GetCode(var Code: PChar); cdecl;
+begin
+  StrPCopy(Code, SimbaImports.Code);
+end;
+
+function GetPluginABIVersion: Int32; cdecl;
+begin
+  Result := 2;
+end;
+
+procedure SetPluginMemManager(MemoryManager: TMemoryManager); cdecl;
+begin
+  SetMemoryManager(MemoryManager);
+end;
+
+procedure SetPluginSimbaMethods(Methods: TSimbaMethods); cdecl;
+begin
+  SimbaMethods := Methods;
+end;
+
+exports GetTypeCount;
+exports GetTypeInfo;
+exports GetFunctionCount;
+exports GetFunctionInfo;
+exports GetCodeLength;
+exports GetCode;
+exports GetPluginABIVersion;
+exports SetPluginMemManager;
+exports SetPluginSimbaMethods;
+
