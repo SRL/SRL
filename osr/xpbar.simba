@@ -4,8 +4,7 @@ XPBar
 XPBar related methods
 *)
 type
-  TXPBar = record
-    FBounds: TBox;
+  TXPBar = record(TInterfaceBase)
     FTextArea: TBox;
 
     FButtonBounds: TBox;

@@ -35,6 +35,10 @@ begin;
   Result := ClearTPAfromTPA(TPAFromBox(box), TotalTPA); 
 end;
 
+function TPAFromLine(Start, Stop: TPoint): TPointArray; overload;
+begin
+  Result := TPAFromLine(Start.X, Start.Y, Stop.X, Stop.Y);
+end;
 
 (*
 GetClientBounds

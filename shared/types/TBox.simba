@@ -102,6 +102,11 @@ begin
             InRange(Other.y2, self.y1,self.y2);
 end;
 
+function TBox.Contains(Other: TRectangle): Boolean; constref; overload;
+begin
+  Result := Self.Contains(Other.Top) and Self.Contains(Other.Left) and Self.Contains(Other.Btm) and Self.Contains(Other.Right);
+end;
+
 procedure TBox.Offset(pt: TPoint);
 begin
   self.x1 += pt.x;
