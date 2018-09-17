@@ -1,376 +1,227 @@
 {$loadlib libsmartremote}
 
 type
-  TSmartBase = record
-    Parameters: record Root, Param, UserAgent, InitSeq: String; Plugins: TStringArray; end;
-    Name, JavaPath: String;
-    Width, Height: UInt16;
-    Image: TMufasaBitmap;
-    Target: PtrUInt;
-    PID, InitAttempts: Integer;
-    ForceSpawn, EnableDrawing, _isDrawingSetup, ShowConsole, FindJavaPath: Boolean;
-    GetParams: function(): Boolean of object;
+  TSmartParameters = record
+    Root: String;
+    Param: String;
+    UserAgent: String;
+    InitSeq: String;
+    Plugins: TStringArray;
   end;
 
-{$ifdecl TChildWindowArr}
-function TSmartBase.GetHWND(): PtrUInt;
-var
-  a: TSysProcArr := Client.GetIOManager().GetProcesses();
-  c: TChildWindowArr;
-  i, j: Integer;
-begin
-  Result := 0;
+  TSmartSpawnEvent = function(var Params: TSmartParameters): Boolean of object;
+  TSmartFreeEvent = procedure of object;
 
-  for i := 0 to High(a) do
-    if (a[i].PID = Self.PID) then
-    begin
-      c := Client.getIOManager().GetChildWindows(a[i].Handle);
+  TSmartBase = record
+    Parameters: TSmartParameters;
+    JavaPath: String;
+    Width, Height: Int32;
+    Image: TMufasaBitmap;
+    Target: PtrUInt;
+    PID: UInt32;
+    ForceSpawn: Boolean;
+    ShowConsole: Boolean;
+    EnableDrawing: Boolean;
+    OnSpawn: TSmartSpawnEvent;
+    OnFree: TSmartFreeEvent;
+  end;
 
-      for j := 0 to High(c) do
-        if (c[j].Width = Self.Width) and (c[j].Height = Self.Height) then
-          Exit(c[j].Handle);
-    end;
-
-  srl.WriteLn(Self.Name + 'GetHWND(): Failed to find hwnd');
-end;
-{$else}
-function TSmartBase.GetHWND(): PtrUInt;
-begin
-  srl.WriteLn(Self.Name + 'GetHWND(): You need a newer Simba version to use this function');
-end;
-{$endif}
-
-procedure TSmartBase.SetDebug(const Enable: Boolean);
+procedure TSmartBase.SetDebug(Enable: Boolean);
 begin
   SmartSetDebug(Self.Target, Enable);
 
-  if (Self.EnableDrawing) and (Enable) and (not Self._isDrawingSetup) then
+  if Enable and (Image = nil) then
   begin
     Self.Image.Init(Client.getMBitmaps());
 
-    with (Self.Image) do
+    with Self.Image do
     begin
-      setName(Format('Smart[%d] Image', [Self.PID]));
-      setSize(Width, Height);
-      setPersistentMemory(SmartDebugArray(Self.Target), Self.Width, Self.Height);
-      DrawClear($000000);
+      SetName(Format('Smart[%d] Image', [Self.PID]));
+      SetSize(Width, Height);
+      SetPersistentMemory(SmartDebugArray(Self.Target), Self.Width, Self.Height);
+	  DrawClear($000000);
     end;
-
-    Self._isDrawingSetup := True;
   end;
 end;
 
-function TSmartBase.GetImage(): PtrUInt;
-begin
-  if (Self.Target <> 0) then
-    Result := PtrUInt(SmartImageArray(Self.Target));
-end;
-
-procedure TSmartBase.SetEnabled(const Enable: Boolean);
+procedure TSmartBase.SetEnabled(Enable: Boolean);
 begin
   SmartSetEnabled(Self.Target, Enable);
 end;
 
-function TSmartBase.GetEnabled(): Boolean;
+function TSmartBase.GetEnabled: Boolean;
 begin
   Result := SmartEnabled(Self.Target);
 end;
 
-function TSmartBase.LocateJavaPath(var Res: String; x86: Boolean; Dir: char = 'A'; Recursive: Boolean = False): Boolean;
-
-  function GetDirectoryName(Directory, Path: String): String;
-  var
-    I: Integer;
-    Directories: TStringArray;
-  begin
-    Directories := GetDirectories(Path);
-    for I := 0 To High(Directories) Do
-      if ExecRegExpr(Directory, Directories[I]) then
-      begin
-        Result := Directories[I];
-        Exit;
-      end;
-  end;
-
-  function GetDirectoryNames(Directory, Path: String): TStringArray;
-  var
-    I: Integer;
-    Directories: TStringArray;
-  begin
-    Directories := GetDirectories(Path);
-    for I := 0 To High(Directories) Do
-      if ExecRegExpr(Directory, Directories[I]) then
-        Result := Result + Directories[I];
-  end;
-
-  function FindDirectory(Directory, Path: String): Boolean;
-  begin
-    Result := Length(GetDirectoryName(Directory, Path)) > 0;
-  end;
-
-var
-  Drive: String;
-  CurrentPath, c: String;
-  Drives: TStringArray;
-  i: Integer;
-begin
-  Result := False;
-  Res := '';
-
-  if (Recursive) then
-  begin
-    Drive := Dir + ':/';
-  end else
-    Drive := Copy(PluginPath, 0, 3);
-
-  if (x86) then
-    CurrentPath := Drive + 'Program Files (x86)\'
-  else
-   CurrentPath := Drive + 'Program Files\';
-
-  if (FindDirectory('Java|java', CurrentPath + '\')) then
-  begin
-    CurrentPath := CurrentPath + 'Java\';
-  end else
-    if (Dir <> 'Z') then
-      Result := Self.LocateJavaPath(Res, x86, chr(ord(Dir) + 1), True);
-
-  if (Result) then
-    Exit();
-
-  Drives := GetDirectoryNames('jre', CurrentPath);
-
-  if (Length(Drives) > 0) then
-  begin
-    c := CurrentPath;
-    for i := 0 to High(Drives) do
-      begin
-        CurrentPath := c;
-        if (Self.ShowConsole) then
-          CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
-        else
-          CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
-
-        Result := FileExists(CurrentPath);
-        if (Result) then
-          Break;
-      end;
-  end else begin
-    Drives := GetDirectoryNames('jdk', CurrentPath);
-    c := CurrentPath;
-
-    for i := 0 to High(Drives) do
-    begin
-      CurrentPath := c;
-      if (Self.ShowConsole) then
-        CurrentPath := CurrentPath + Drives[i] + '\bin\java.exe'
-      else
-        CurrentPath := CurrentPath + Drives[i] + '\bin\javaw.exe';
-
-      Result := FileExists(CurrentPath);
-      if (Result) then
-        Break;
-    end;
-  end;
-
-  Result := FileExists(CurrentPath);
-  Res := CurrentPath;
-end;
-
-function TSmartBase.SetAsTarget(): Boolean;
-var
-  idx: Integer = -1;
+function TSmartBase.SetTarget: Boolean;
 begin
   try
-    idx := SetEIOSTarget('libsmartremote', IntToStr(Self.PID));
+    Result := SetEIOSTarget('libsmartremote', IntToStr(Self.PID)) > 0;
   except
-    srl.WriteFmt('Failed to set libsmartremote(%d) as our target', [Self.PID]);
-    idx := -1;
-  finally
-    Result := (idx > -1);
+    srl.WriteLn('[SMART]: EIOS target failed');
   end;
 end;
 
-function TSmartBase.CreateClient(): Boolean;
+function TSmartBase.CreateClient: Boolean;
+var
+  Files: TStringArray;
 begin
-  Result := True;
-  srl.WriteLn(Self.Name + '.CreateClient()', dtHeader);
-
-  if (@Self.GetParams <> nil) then
-    if (not Self.GetParams()) then
-      Exit(srl.WriteLn('Failed to create client, Could not find spawn parameters', False, Self.Name + '.CreateClient(): Result = False'));
-
-  with (Self.Parameters) do
+  {$IFDEF WINDOWS}
+  if Self.JavaPath = '' then
   begin
-    if (JavaPath = '') then
-    begin
-      JavaPath := 'java';
-      if (not Self.ShowConsole) then
-        JavaPath += 'w';
-    end;
+    {$IFDEF CPU32}
+    Files := FindFile('C:\Program Files (x86)\Java\', 'java.exe') +
+             FindFile('E:\Program Files (x86)\Java\', 'java.exe');
+    {$ELSE}
+    Files := FindFile('C:\Program Files\Java\', 'java.exe') +
+             FindFile('E:\Program Files\Java\', 'java.exe')
+    {$ENDIF}
 
-    {$IFDEF WINDOWS}
-    if (Pos('.exe', JavaPath) = 0) then
-      JavaPath += '.exe'
-    {$ENDIF};
+    if Length(Files) > 0 then
+      Self.JavaPath := Files[0];
+  end;
+  {$ENDIF}
 
-    srl.WriteLn('Java path: ' + JavaPath);
-    srl.WriteLn('Params: ' + Root + Param);
-    srl.WriteLn('Plugins: ' + toString(Plugins));
+  if Self.JavaPath = '' then
+  begin
+    srl.WriteLn('[SMART]: Unable to find java path.');
+    srl.WriteLn('[SMART]: Java path is set with `Smart.JavaPath := ' + #39 + 'path/to/java.exe' + #39 + '`');
+    srl.WriteLn('[SMART]: Make sure Java matches Simba''s bitness. (' + {$IFDEF CPU32}'32'{$ELSE}'64'{$ENDIF} ' bit)');
 
-    Self.Target := SmartSpawnClient(JavaPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]),
-                                    Root, Param, Width, Height, InitSeq, UserAgent, '', Implode(',', Plugins));
+    Exit(False);
+  end;
+
+  if (@Self.OnSpawn <> nil) and (not Self.OnSpawn(Self.Parameters)) then
+  begin
+    srl.WriteLn('[SMART]: Cannot spawn client: parameters failed');
+
+    Exit(False);
+  end;
+
+  if not Self.ShowConsole then
+    JavaPath := ExtractFilePath(Self.JavaPath) + 'javaw' {$IFDEF WINDOWS} + '.exe' {$ENDIF};
+
+  with Self.Parameters do
+  begin
+    srl.WriteLn('[SMART]: Java: ' + Self.JavaPath);
+    srl.WriteLn('[SMART]: Root: ' + Root);
+    srl.WriteLn('[SMART]: Param: ' + Param);
+    srl.WriteLn('[SMART]: Plugins: ' + ToString(Plugins));
+
+    Self.Target := SmartSpawnClient(JavaPath, StringReplace(PluginPath, '\', '/', [rfReplaceAll]), Root, Param, Width, Height, InitSeq, UserAgent, '', Implode(',', Plugins));
   end;
 
   if (Self.Target = 0) then
-    Exit(srl.WriteLn('Failed to create client, invaild target, Make sure you have 32-bit java', False, Self.Name + '.CreateClient(): Result = False'));
+  begin
+    srl.WriteLn('[SMART]: Error spawning client. Check Simba''s console for more infomation.');
+
+    Exit(False);
+  end;
 
   Self.PID := SmartGetClientPID(Self.Target);
-  if (not Self.SetAsTarget()) then
+
+  if Self.SetTarget() then
   begin
+    srl.WriteLn('[SMART]: Created SMART[' + ToString(Self.PID) + ']');
+
+    Exit(True);
+  end else
+  begin
+    srl.WriteLn('[SMART]: Error targeting SMART');
+
     SmartFreeClient(Self.Target);
-    Exit(srl.WriteLn('Failed to create client, Failed to set as target', False, Self.Name + '.CreateClient(): Result = False'));
-  end;
-
-  srl.WriteLn('Succesfully created a SMART client, PID = ' + toString(Self.PID));
-  srl.WriteLn(Self.Name + '.CreateClient(): Result = True', dtFooter);
-end;
-
-function TSmartBase.PairToExisting(): Boolean;
-
-  function GetPIDs(): TIntegerArray;
-  var
-    i: Integer;
-  begin
-    for i := 0 to SmartGetClients(True) - 1 do
-      Result :=Result + SmartGetAvailablePID(i);
-  end;
-
-var
-  Pids: TIntegerArray;
-  i: Integer;
-  tmp: PtrUInt;
-begin
-  Result := False;
-
-  Pids := GetPIDs();
-  if (Length(Pids) = 0) then
-    Exit();
-
-  srl.WriteLn(Self.Name + '.PairToExisting()', dtHeader);
-  srl.WriteFmt('Free clients: %s', [toString(Pids)]);
-
-  for i := 0 to High(Pids) do
-  begin
-    if (Pids[i] = 0) then
-      Continue();
-
-    tmp := 0;
-    tmp := SmartPairClient(Pids[i]);
-
-    if (tmp > 0) then
-    begin
-      Self.PID := Pids[i];
-
-      if (Self.SetAsTarget()) then
-      begin
-        Self.Target := tmp;
-        srl.WriteFmt('Succesfully paired to existing client; SMART[%d]', [Self.PID]);
-        srl.WriteLn(Self.Name + '.PairToExisting(): Result = True', dtFooter);
-        Exit(True);
-      end;
-    end else begin
-      srl.WriteFmt('Failed to pair to SMART[%d]', [Pids[i]]);
-      SmartFreeClient(tmp);
-    end;
-  end;
-
-  srl.WriteLn(Self.Name + '.PairToExisting(): Result = False', dtFooter);
-end;
-
-function TSmartBase.Reload(): Boolean;
-var
-  img: Integer;
-  b: Boolean;
-begin
-  if (EnableDrawing) then
-    img := CopyBitmap(Self.Image.getIndex());
-
-  Self.Free();
-  SmartKillClient(Self.PID);
-
-  try
-    b := Self.ForceSpawn;
-    Self.ForceSpawn := True;
-    Result := Self.Init();
-  finally
-    Self.ForceSpawn := b;
-  end;
-
-  if (Result) and (EnableDrawing) then
-  begin
-    getMufasaBitmap(img).DrawTransparent(0, 0, Self.Image);
-    FreeBitmap(img);
   end;
 end;
 
-function TSmartBase.Init(): Boolean;
+function TSmartBase.PairToExisting: Boolean;
 var
-  i: Integer = 0;
+  i: Int32;
 begin
-  Result := False;
-  Self.Name := GetGlobalName(@Self);
-
-  srl.WriteLn(Self.Name + '.Init()', dtHeader);
-
-  if (Self.InitAttempts = 0) then
-    Self.InitAttempts := 1;
-
-  while (not Result) do
+  for i := 0 to SmartGetClients(True) - 1 do
   begin
-    Inc(i);
+    Self.Target := SmartPairClient(SmartGetAvailablePID(i));
+    Self.PID := SmartGetAvailablePID(i);
 
-    if (i > Self.InitAttempts) then
+    if (Self.Target > 0) and Self.SetTarget() then
     begin
-      srl.WriteFmt('Reached max(%d) init attempts', [Self.InitAttempts]);
-      srl.WriteLn(Self.Name + '.Init(): Result = False');
-      Exit(False);
-    end;
+      srl.WriteLn('[SMART]: Paired to existing client');
 
-    if (not Self.ForceSpawn) then
-    begin
-      if (not Self.PairToExisting()) then
-        if (not Self.CreateClient()) then
-          Continue();
+      Exit(True);
     end else
-      if (not Self.CreateClient()) then
-        Continue();
-
-    Result := True;
+      SmartFreeClient(Self.Target);
   end;
 
-  if (Self.getEnabled() = False) then
-    Self.setEnabled(True);
-
-  if (Self.EnableDrawing) then
-    Self.setDebug(True)
-  else
-    Self.SetDebug(False);
-
-  srl.WriteLn(Self.Name + '.Init(): Result = True', dtFooter);
+  srl.WriteLn('[SMART]: No free clients');
 end;
 
-procedure TSmartBase.Free();
+function TSmartBase.Reload(Delay: Int32 = 0): Boolean;
+var
+  Copy: TMufasaBitmap;
 begin
-  srl.WriteFmt('Freeing SMART[%d]', [Self.PID]);
+  if (Self.Image <> nil) then
+    Copy := Self.Image.Copy();
 
-  if (Self._isDrawingSetup) then
+  Self.Free(True);
+
+  Wait(Delay);
+
+  if Self.Init(True) then
   begin
-    Self.Image.ResetPersistentMemory();
-    Self.Image.Free();
-    Self._isDrawingSetup := False;
+    if (Copy <> nil)then
+    begin
+      if Self.Image <> nil then
+        Copy.DrawTransparent(0, 0, Self.Image);
+      Copy.Free();
+    end;
+
+    Exit(True);
   end;
+
+  srl.Writeln('[SMART]: Failed to reload');
+end;
+
+procedure TSmartBase.Free(Kill: Boolean); overload;
+begin
+  if (@OnFree <> nil) then
+    OnFree();
+
+  if (Self.Image <> nil) then
+    Self.Image.Free();
 
   if (Self.Target > 0) then
+  begin
+    srl.WriteFmt('[SMART]: Freeing SMART[%d]', [Self.PID]);
+
     SmartFreeClient(Self.Target);
+    if Kill then
+      SmartKillClient(Self.PID);
+  end;
+
+  Self.Image := nil;
+  Self.Target := 0;
+  Self.PID := 0;
+end;
+
+procedure TSmartBase.Free; overload;
+begin
+  Self.Free(False);
+end;
+
+function TSmartBase.Init(Reloading: Boolean = False): Boolean;
+begin
+  AddOnTerminateAlways(@Self.Free);
+
+  if Reloading or Self.ForceSpawn or (not Self.PairToExisting()) then
+    Result := Self.CreateClient()
+  else
+    Result := True; // paired
+
+  if Result then
+  begin
+    if Self.EnableDrawing then
+      Self.SetDebug(True);
+
+    Self.SetEnabled(True);
+  end;
 end;

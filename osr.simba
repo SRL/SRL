@@ -56,23 +56,20 @@ begin
     Self.OnSetup();
 
   Self.WriteLn('Setting up SRL for OSR');
-  Self.Writeln('Waiting for client to load...');
+  Self.WriteLn('Waiting for client to load...');
 
   {$IFDEF SMART}
-  if (Players.GetCount() > 0) then
-    if (Players.GetCurrent()^.World <> 0) then
-      Smart.World := WorldSwitcher.FixWorld(Players.GetCurrent()^.World);
-
-  Smart.Init();
+  if (not Smart.Init()) then
+    Self.WriteLn('Failed to setup SMART', dtFatal);
   {$ELSE}
   if (soActivateClient in Options) then
     ActivateClient();
   {$ENDIF}
 
-  if (not Self.isClientReady(60000 * 3)) then
-    Self.Writeln('Timed out waiting for client. Make sure OSRS is setup correctly', dtFatal)
+  if (not Self.IsClientReady(60000 * 3)) then
+    Self.WriteLn('OSRS didn''t load into a state where we can detect it.', dtFatal)
   else
-    Self.Writeln('Client ready!');
+    Self.WriteLn('Client ready!');
 end;
 
 {$IFDEF !HAD_HINTS}{$H+}{$ENDIF}  // --- ENABLE LAPE HINTS FOR SRL INTERNALS       (³)
