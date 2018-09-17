@@ -9,12 +9,105 @@
         <Filename Value="libasyncmouse.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="7"/>
-        <CursorPos X="31" Y="27"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="153"/>
+        <CursorPos X="28" Y="167"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="23" HistoryIndex="22">
+      <Position1>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="105" Column="12" TopLine="87"/>
+      </Position1>
+      <Position2>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="96" Column="17" TopLine="71"/>
+      </Position2>
+      <Position3>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="140" Column="27" TopLine="121"/>
+      </Position3>
+      <Position4>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="78" Column="18" TopLine="64"/>
+      </Position4>
+      <Position5>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="146" Column="39" TopLine="129"/>
+      </Position5>
+      <Position6>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="135" Column="32" TopLine="111"/>
+      </Position6>
+      <Position7>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="147" Column="38" TopLine="131"/>
+      </Position7>
+      <Position8>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="107" Column="33" TopLine="85"/>
+      </Position8>
+      <Position9>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="110" Column="19" TopLine="106"/>
+      </Position9>
+      <Position10>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="107" Column="15" TopLine="94"/>
+      </Position10>
+      <Position11>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="108" Column="17" TopLine="100"/>
+      </Position11>
+      <Position12>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="134" Column="30" TopLine="111"/>
+      </Position12>
+      <Position13>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="125" Column="38" TopLine="114"/>
+      </Position13>
+      <Position14>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="130" Column="21" TopLine="114"/>
+      </Position14>
+      <Position15>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="164" Column="31" TopLine="46"/>
+      </Position15>
+      <Position16>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="166" Column="54" TopLine="128"/>
+      </Position16>
+      <Position17>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="144" Column="28" TopLine="129"/>
+      </Position17>
+      <Position18>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="127" Column="17" TopLine="115"/>
+      </Position18>
+      <Position19>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="126" Column="3" TopLine="125"/>
+      </Position19>
+      <Position20>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="130" Column="78" TopLine="116"/>
+      </Position20>
+      <Position21>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="153" Column="38" TopLine="138"/>
+      </Position21>
+      <Position22>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="120" Column="62" TopLine="106"/>
+      </Position22>
+      <Position23>
+        <Filename Value="libasyncmouse.lpr"/>
+        <Caret Line="171" TopLine="168"/>
+      </Position23>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>
