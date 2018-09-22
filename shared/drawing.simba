@@ -1130,3 +1130,31 @@ begin
   SetLength(new, j);
   TPA := new;
 end;
+
+procedure Debug(TPA: TPointArray; Color: TColor = $0000FF); overload;
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP.FromClient();
+  BMP.DrawTPA(TPA, Color);
+  BMP.Debug();
+  BMP.Free();
+end;
+
+procedure Debug(ATPA: T2DPointArray); overload;
+var
+  TPA: TPointArray;
+begin
+  for TPA in ATPA do
+    Debug(TPA, Random($FFFFFF));
+end;
+
+procedure Debug(R: TRectangle; Color: TColor = $0000FF); overload;
+begin
+  Debug(R.ToTPA.Connect(), Color);
+end;
+
+procedure Debug(B: TBox; Color: TColor = $0000FF); overload;
+begin
+  Debug(EdgeFromBox(B), Color);
+end;
