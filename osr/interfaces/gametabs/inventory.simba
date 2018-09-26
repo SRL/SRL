@@ -631,6 +631,19 @@ begin
   Result := Self.ActivateSlot(Slot);
 end;
 
+function TRSInventory.IsSlotActivated(Slot: Int32; Time: Int32 = 0): Boolean;
+var
+  T: UInt64 := GetTickCount() + Time;
+begin
+  repeat
+    if Self.GetActiveSlot() = Slot then
+      Exit(True);
+
+    if Time > 0 then
+      Wait(50);
+  until (GetTickCount() >= T);
+end;
+
 (*
 Inventory.ActivateSlot
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -643,38 +656,33 @@ Activates (Presses) the given slot, however if ``Slot`` is ``-1`` then it will d
 function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 var
   i: Int32;
-  procedure Deactivate(Slot: Int32);
-  begin
-    if (Slot > -1) then
-    begin
-      Inventory.MouseSlot(Slot, mouse_Left);
-      Wait(Random(200, 300));
-    end;
-  end;
 begin
-  Result := True;
-
-  // Deactivate whatever is activated
-  if (Slot = -1) and (Self.GetActiveSlot() <> -1) then
+  if (Slot = -1) then
   begin
-    Deactivate(Self.GetActiveSlot());
-    Exit;
-  end;
+    Slot := Self.GetActiveSlot();
+    if Slot > -1 then
+      Inventory.MouseSlot(Slot, MOUSE_LEFT);
 
-  i := Self.GetActiveSlot();
-  if (Slot = i) then
-    Exit;
-
-  if (i > -1) then
-    DeActivate(i);
-
-  Inventory.MouseSlot(Slot);
-  if Mainscreen.IsUptext('Use ') then
-  begin
-    Mouse.Click(mouse_Left);
-    Result := True;
+    Result := not Self.IsSlotActivated(Slot, 500);
   end else
-    Result := ChooseOption.Select(['Use']);
+  begin
+    if Self.GetActiveSlot() >= 0 then
+    begin
+      if Self.GetActiveSlot() = Slot then
+        Exit(True);
+
+      Self.MouseSlot(Self.GetActiveSlot(), MOUSE_LEFT);
+    end;
+
+    Self.MouseSlot(Slot);
+
+    if Mainscreen.IsUptext('Use ') then
+      Mouse.Click(MOUSE_LEFT)
+    else
+      ChooseOption.Select('Use');
+
+    Result := Self.IsSlotActivated(Slot, 500);
+  end;
 end;
 
 
