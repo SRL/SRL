@@ -3,15 +3,15 @@
   <ProjectSession>
     <PathDelim Value="\"/>
     <Version Value="10"/>
-    <BuildModes Active="32"/>
+    <BuildModes Active="64"/>
     <Units Count="1">
       <Unit0>
         <Filename Value="libasyncmouse.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="153"/>
-        <CursorPos X="28" Y="167"/>
-        <UsageCount Value="22"/>
+        <TopLine Value="157"/>
+        <CursorPos X="36" Y="146"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>

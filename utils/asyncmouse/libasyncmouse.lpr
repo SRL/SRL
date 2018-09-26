@@ -3,6 +3,9 @@ library libasyncmouse;
 {$mode objfpc}{$H+}
 
 uses
+  {$IFDEF LINUX}
+  cmem, cthreads,
+  {$ENDIF}
   classes, sysutils, math;
 
 {$i simbaplugin.inc}
@@ -52,8 +55,8 @@ type
     FClient: TTarget;
   end;
 
-// BenLand100
-// `Exit(False)` if FDestination changes while moving.
+// BenLand100's WindMouse
+// Return false if FDestination changes while moving.
 function TWindMouseThread.WindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, maxStep, targetArea, accuracy: Double): Boolean;
 var
   veloX, veloY, windX, windY, veloMag, dist, randomDist, step: Double;
@@ -140,7 +143,7 @@ end;
 
 procedure Lape_ASyncMouse_WindMouse(const Params: PParamArray); cdecl;
 begin
-  with TWindMouseThread.Create(True, 256) do
+  with TWindMouseThread.Create(True) do
   begin
     FreeOnTerminate := True;
 
