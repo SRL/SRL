@@ -42,7 +42,7 @@ type
 
 (*
 var MM2MS
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~
 .. pascal::
   var MM2MS: TMinimapToMS;
 
@@ -54,7 +54,7 @@ var
 
 (*
 MM2MS.Init
-~~~~~~~~~~~
+~~~~~~~~~~
 .. pascal:: procedure TMinimapToMS.Init(Resizable: Boolean);
 
 This method is called automatically once SRL loads. So you don't have to deal with it.
@@ -72,7 +72,7 @@ begin
       513, 335,     // ms size
       259, 172,     // ms center
       642, 84,      // mm center
-      1.0, 3.5,     // scale min, scale max
+      0.47, 3.5,    // scale min, scale max
       0.0,          // current zoom
       12            // zoom Y offset (imperfect)
     ];
@@ -93,7 +93,7 @@ end;
 
 (*
 MM2MS.Transform
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. pascal:: function TMinimapToMS.Transform(coord: Vector3; matrix: TMatrix4): Vector3;
 
 Transforms the given coordinate with the given transformation matrix ``matrix``
@@ -111,7 +111,7 @@ end;
 
 (*
 MM2MS.Project
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 .. pascal:: function TMinimapToMS.Project(Coords: Vector3Array; Rotation: Vector3): TPointArray;
 
 Projects the given coordinates ``coords`` and applys the given ``Rotation`` vector to the projection.
@@ -135,7 +135,7 @@ end;
 
 (*
 MM2MS.Run
-~~~~~~~~~~
+~~~~~~~~~
 .. pascal:: function TMinimapToMS.Run(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray;
 
 The method we actually call (internally) to project our coordinates from the minimap to the mainscreen.
@@ -152,28 +152,34 @@ end;
 
 (*
 MM2MS.SetZoom
-~~~~~~~~~~~~~~~~~
-.. pascal:: function TMinimapToMS.SetZoom(ZoomLevel: Double): TPointArray;
+~~~~~~~~~~~~~
+.. pascal:: procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch);
 
-If you are not playing at fully zoomed out you need to set the zoom-level for MM2MS to operate with.
-The expected input is a value between ``0`` and ``100`` where ``100`` is fully zoomed out.
-
-** Example **
+Changes the zoom level MM2MS operates at.
 
 .. pascal::
-  MM2MS.SetZoom(Options.GetZoom());
+  MM2MS.SetZoom(Options.GetZoomNotch());
 
-The example sets the zoom to whatever level is set in the RS options.
 *)
-function TMinimapToMS.SetZoom(ZoomLevel: Double): TPointArray;
+procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch);
 begin
-  Self.ZOOM := ZoomLevel / 100;
+  if (Notch = ZOOM_NOTCH_UNKNOWN) then
+    srl.WriteLn('MM2MS only works at a fixed zoom notch!', dtFatal);
+
+  case Notch of
+    ZOOM_NOTCH_0:   Self.ZOOM := 0.000;
+    ZOOM_NOTCH_25:  Self.ZOOM := 0.075;
+    ZOOM_NOTCH_50:  Self.ZOOM := 0.275;
+    ZOOM_NOTCH_75:  Self.ZOOM := 0.555;
+    ZOOM_NOTCH_100: Self.ZOOM := 1.000;
+  end;
 end;
 
 
 {$IFNDEF CODEINSIGHT}
 begin
   MM2MS.Init(False);
+  MM2MS.SetZoom(ZOOM_NOTCH_DEFAULT);
 end;
 {$ENDIF}
 
@@ -186,7 +192,7 @@ Extend the minimap-functionality with MM2MS functions
 
 (*
 Minimap.ArrToMs
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. pascal:: 
   function TRSMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
   function TRSMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF): TPointArray; overload;
@@ -224,7 +230,7 @@ end;
 
 (*
 Minimap.VecToMs
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. pascal:: function TRSMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF): TPoint;
 
 Takes a single coordinate as a Vector3 on the minimap, and converts it to a point on the mainscreen.
@@ -279,7 +285,7 @@ end;
 
 (*
 Minimap.PointToMsRect
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF): TRectangle;
 
 Takes a single coordinate as a TPoint on the minimap, and converts it to a rectangle / tile on the mainscreen.
@@ -299,7 +305,7 @@ end;
 
 (*
 Minimap.VecToMsBox
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSMinimap.VecToMsBox(Vec: Vector3; Roll:Single=$FFFF): TBox;
 
 Takes a single coordinate as a Vector3 on the minimap, and converts it to a rough box on the mainscreen.
@@ -319,7 +325,7 @@ end;
 
 (*
 Minimap.VecToMsBox
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
 
 Takes a single coordinate as a TPoint on the minimap, and converts it to a rough box on the mainscreen.
@@ -356,7 +362,7 @@ end;
 
 (*
 Minimap.StaticToMs
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSMinimap.StaticToMs(StaticMMPoint: TPoint; Height:Int32=0): TPoint;
 
 This is the same as the above, only that it returns a single point on the mainscreen.
@@ -380,7 +386,7 @@ Extend the mainscreen-functionality with MS2MM function
 
 (*
 Mainscreen.PointToMM
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSMainScreen.PointToMM(MS: TPoint; Height: Int32=0; Accuracy:Double=0.2): Vector3;
 
 Takes a mainscreen point and converts it to a point on the minimap.

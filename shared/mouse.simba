@@ -168,8 +168,7 @@ begin
     Wait(Round((maxWait - minWait) * (step / maxStep) + minWait));
   end;
 
-  if Self.GetPosition() <> Point(Round(xe), Round(ye)) then
-    Self.SetPosition(Point(Round(xs), Round(ys)));
+  Self.SetPosition(Point(Round(xe), Round(ye)));
 end;
 
 procedure TMouse.Move(P: TPoint);
