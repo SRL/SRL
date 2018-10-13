@@ -30,37 +30,37 @@ type
 
 (*
 var Stats
-~~~~~~~~~~~
+~~~~~~~~~~
 Variable that stores functions and properties of the Runescape stats gametab.
 *)
 var 
   Stats: TRSStats;
 
 const
-  SKILL_ATTACK     = 0;
-  SKILL_HITPOINTS  = 1;
-  SKILL_MINING     = 2;
-  SKILL_STRENGTH   = 3;
-  SKILL_AGILITY    = 4;
-  SKILL_SMITHING   = 5;
-  SKILL_DEFENCE    = 6;
-  SKILL_HERBLORE   = 7;
-  SKILL_FISHING    = 8;
-  SKILL_RANGE      = 9;
-  SKILL_THIEVING   = 10;
-  SKILL_COOKING    = 11;
-  SKILL_PRAYER     = 12;
-  SKILL_CRAFTING   = 13;
-  SKILL_FIREMAKING = 14;
-  SKILL_MAGIC      = 15;
-  SKILL_FLETCHING  = 16;
-  SKILL_WOODCUTTING = 17;
+  SKILL_ATTACK       = 0;
+  SKILL_HITPOINTS    = 1;
+  SKILL_MINING       = 2;
+  SKILL_STRENGTH     = 3;
+  SKILL_AGILITY      = 4;
+  SKILL_SMITHING     = 5;
+  SKILL_DEFENCE      = 6;
+  SKILL_HERBLORE     = 7;
+  SKILL_FISHING      = 8;
+  SKILL_RANGE        = 9;
+  SKILL_THIEVING     = 10;
+  SKILL_COOKING      = 11;
+  SKILL_PRAYER       = 12;
+  SKILL_CRAFTING     = 13;
+  SKILL_FIREMAKING   = 14;
+  SKILL_MAGIC        = 15;
+  SKILL_FLETCHING    = 16;
+  SKILL_WOODCUTTING  = 17;
   SKILL_RUNECRAFTING = 18;
-  SKILL_SLAYER     = 19;
-  SKILL_FARMING    = 20;
+  SKILL_SLAYER       = 19;
+  SKILL_FARMING      = 20;
   SKILL_CONSTRUCTION = 21;
-  SKILL_HUNTER     = 22;
-  SKILL_TOTAL      = 23;
+  SKILL_HUNTER       = 22;
+  SKILL_TOTAL        = 23;
 
 
 const
@@ -108,7 +108,7 @@ end;
 
 procedure TRSStats.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FSlots, False, $0000FF);
@@ -121,7 +121,7 @@ end;
 
 (*
 Stats.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSStats.Open(): Boolean;
@@ -136,7 +136,7 @@ end;
 
 (*
 Stats.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSStats.IsOpen(maxWait:Int32=0): Boolean;
@@ -151,14 +151,12 @@ end;
 
 (*
 stats.SkillIsVaild
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
-
----
+  function TRSStats.IsSkillVaild(Skill: Int32): Boolean;
 *)
-function TRSStats.IsSkillVaild(Skill:Int32): Boolean;
+function TRSStats.IsSkillVaild(Skill: Int32): Boolean;
 begin
   Result := InRange(Skill, 0, High(Self.FSlots));
 end;
@@ -166,16 +164,14 @@ end;
 
 (*
 Stats.GetSkillBox
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillBox(Skill:Int32): TBox;
+  function TRSStats.GetSkillBox(Skill: Int32): TBox;
 
 Returns the bounding box covering the given skill-index.
-
-.. note:: by slacky
 *)
-function TRSStats.GetSkillBox(Skill:Int32): TBox;
+function TRSStats.GetSkillBox(Skill: Int32): TBox;
 begin
   if Self.IsSkillVaild(Skill) then
     Result := Self.FSlots[Skill]
@@ -186,16 +182,14 @@ end;
 
 (*
 Stats.MouseOver
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.MouseOver(skill:Int32): Boolean;
+  function TRSStats.MouseOver(skill: Int32): Boolean;
 
 Moves the mouse over the given skill-index.
-
-.. note:: by slacky
 *)
-function TRSStats.MouseOver(Skill:Int32): Boolean;
+function TRSStats.MouseOver(Skill: Int32): Boolean;
 begin
   if not(self.Open()) then Exit();
   
@@ -209,15 +203,16 @@ end;
 
 (*
 Stats.GetCurrentLevel
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetCurrentLevel(Skill:Int32);
+  function TRSStats.GetCurrentLevel(Skill: Int32);
 
 Returns the current level of a skill, handy for task that require prayer.
-Returns `-1` n failure.
+
+Returns `-1` on failure.
 *)
-function TRSStats.GetCurrentLevel(Skill:Int32): Int32;
+function TRSStats.GetCurrentLevel(Skill: Int32): Int32;
 var
   lvl:String;
 begin
@@ -226,7 +221,7 @@ begin
 
   with self.GetSkillBox(skill) do
   begin
-    lvl := GetTextAtEx(Box(X1+25,y1+2,x2-13,y2-14), 0,3,2, $00FFFF,0, 'StatChars07_s');
+    lvl := GetTextAtEx(Box(X1+25,y1+2,x2-13,y2-14), 0,3,2, $00FFFF,0, 'StatChars07');
     Result := StrToIntDef(ExtractFromStr(lvl, NUMBERS), -1);
   end;
 end;
@@ -234,16 +229,14 @@ end;
 
 (*
 Stats.GetSkillInfo
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.GetSkillInfo(skill:Int32): TSkillInfo;
+  function TRSStats.GetSkillInfo(skill: Int32; WaitTime: Int32=400): TSkillInfo;
 
 Returns the level info: "Level", "xp", "next level at" and "remainder"
-
-.. note:: by slacky
 *)
-function TRSStats.GetSkillInfo(Skill:Int32; WaitTime:Int32=400): TSkillInfo;
+function TRSStats.GetSkillInfo(Skill: Int32; WaitTime: Int32=400): TSkillInfo;
 const
   TextColor:TCompareRules = [0];
 var
@@ -296,16 +289,16 @@ Stats.HoverSkill
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
+  function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True): TSkillInfo;
 
-Holds the mouse over the given skill.
+Holds the mouse over the given skill. Returns skill info, in case you care about it.
 *)
-procedure TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True);
+function TRSStats.HoverSkill(Skill: Int32; HoverTime: Double; ReturnToCurrentTab: Boolean = True): TSkillInfo;
 var
   old: EGametab;
 begin
   old := Gametabs.GetCurrent();
-  Stats.GetSkillInfo(Skill);
+  Result := Stats.GetSkillInfo(Skill);
   Wait(Max(0,Round(HoverTime)));
   if (ReturnToCurrentTab) then
     Gametabs.Open(old);

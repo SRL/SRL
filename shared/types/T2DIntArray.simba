@@ -1,3 +1,9 @@
+(*
+T2DIntArray
+=============
+T2DIntArray related methods
+*)
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure T2DIntArray.Append(const Value: TIntegerArray);

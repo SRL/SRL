@@ -1,23 +1,50 @@
-(* 
+(*
+String
+======
+String related methods
+*)
+
+{
  `AnsiString` is used instead of `string`, because 
   code completion doesn't support `string`
   
   Another code completion workaround:
-*)
+}
 {$IFDEF CodeInsight}type String = AnsiString;{$ENDIF}
 const STR_WHITESPACE := #9#10#11#12#13#32;
 
-function AnsiString.Len(): Integer;
+(*
+AnsiString.Len
+~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Len(): Int32; constref;
+
+Returns the length of the string
+*)
+function AnsiString.Len(): Int32; constref;
 begin
   Result := Length(Self);
 end;
 
+(*
+AnsiString.Pos
+~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Pos(SubStr: String): Int32; constref;
+
+Returns the position of the position of the first occurance of the substring
+*)
 function AnsiString.Pos(SubStr: String): Int32; constref;
 begin
   Result := System.Pos(SubStr, self);
 end;
 
-function AnsiString.PosR(SubStr: String): Int32; constref;
+(*
+AnsiString.PosR
+~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.PosR(SubStr: String): Int32; constref;
+
+Returns the position of the position of the last occurance of the substring
+*)
+function AnsiString.PosR(SubStr: String): Int32; constref; 
 var 
   list:TIntegerArray;
 begin
@@ -28,16 +55,37 @@ begin
     Result := 0;
 end;
 
+(*
+AnsiString.PosEx
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.PosEx(SubStr: String): TIntegerArray; constref;
+
+Returns the position of every occurance of the substring
+*)
 function AnsiString.PosEx(SubStr: String): TIntegerArray; constref;
 begin
   Result := System.PosMulti(SubStr, self);
 end;
 
+(*
+AnsiString.Startswith
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Startswith(Prefix: String): Boolean; constref;
+
+Returns ``True`` if the string starts with the given string ``Prefix``
+*)
 function AnsiString.Startswith(Prefix: String): Boolean; constref;
 begin
   Result := Self.Pos(Prefix) = 1;
 end;
 
+(*
+AnsiString.Endswith
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Endswith(Suffix: String): Boolean; constref;
+
+Returns ``True`` if the string ends with the given string ``Suffix``
+*)
 function AnsiString.Endswith(Suffix: String): Boolean; constref;
 var
   i,l: Int32;
@@ -51,130 +99,106 @@ begin
       Exit(False);
 end;
 
+(*
+AnsiString.Capitalize
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Capitalize(): String; constref;
+
+Returns the string with every word captalized
+*)
 function AnsiString.Capitalize(): String; constref;
 begin
   Result := System.Capitalize(Self);
 end;
 
+(*
+AnsiString.Upper
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Upper(): String; constref;
+
+Returns the string with every character converted to uppercase
+*)
 function AnsiString.Upper(): String; constref;
 begin
   Result := Uppercase(Self);
 end;
 
+(*
+AnsiString.Lower
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Lower(): String; constref;
+
+Returns the string with every character converted to lowercase
+*)
 function AnsiString.Lower(): String; constref;
 begin
   Result := Lowercase(Self);
 end;
 
 (*
-  Copy the string from after the first occurrence of SubStr
+AnsiString.After
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.After(SubStr: String): String; constref;
+
+Copy the string from after the first occurrence of SubStr
 *)
 function AnsiString.After(SubStr: String): String; constref;
 var
   p: UInt32;
 begin
-  p := System.Pos(Self, SubStr);
-  if (p = 0) then Exit('');
+  p := System.Pos(SubStr, Self);
+  if (p = 0) then Exit(Self);
   Inc(p, Length(SubStr));
   Result := Copy(Self, p, Length(Self) - p + 1);
 end;
 
 (*
-  Copy the string from before the first occurrence of SubStr
+AnsiString.Before
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Before(SubStr: String): String; constref;
+
+Copy the string from before the first occurrence of SubStr
 *)
 function AnsiString.Before(SubStr: String): String; constref;
 var
   p: UInt32;
 begin
-  p := Self.Pos(SubStr);
-  if (p = 0) then Exit('');
+  p := System.Pos(SubStr, Self);
+  if (p = 0) then Exit(Self);
   Result := Copy(Self, 1, p - 1);
 end;
 
 (*
-  Count the number of occurrences of the given string.
+AnsiString.Count
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Count(Str: String): Int32; constref;
+
+Count the number of occurrences of the given string.
 *)
-function AnsiString.Count(Str: String): Integer;
+function AnsiString.Count(Str: String): Int32;
 begin
   Result := Length(Self.PosEx(Str));
 end;
 
 (*
-  Replace occurrences of the given SubStr with with ReplaceStr
-  For larger string this algorithm is way faster than `Replace` in Simba.
+AnsiString.Replace
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Replace(SubStr, ReplaceStr: String; Flags: TReplaceFlags=[rfReplaceAll]): String; constref;
+
+Replace [all by default] occurrences of the given SubStr with with ReplaceStr
 *)
 function AnsiString.Replace(SubStr, ReplaceStr: String; Flags: TReplaceFlags=[rfReplaceAll]): String; constref;
-var
-  Hi,HiSub,HiRep,i,j,k: Integer;
-  Prev,Curr:Integer;
-  Subs: TIntegerArray;
-  strCmp: function(s1,s2:string):Int32;
 begin
-  Hi := Length(Self);
-  if Hi = 0 then Exit;
-
-  HiRep := Length(ReplaceStr);
-  HiSub := Length(SubStr);
-  if HiSub = 0 then Exit(Self);
-  
-  strCmp := @CompareStr;
-  if (rfIgnoreCase in Flags) then strCmp := @CompareText;
-  
-  k := 1;
-  Prev := 1;
-  case (rfReplaceAll in Flags) and True of
-  True:
-    begin
-      //If substring and replacement string is only 1 char, then it's simpler:
-      if (HiRep = 1) and (HiSub = 1) then begin
-        Result := Copy(Self,1,hi);
-        for i:=1 to Length(Self) do
-          if strCmp(Self[i], SubStr[1]) = 0 then
-            Result[i] := Self[i];
-        Exit();
-      end;
-      
-      case (rfIgnoreCase in Flags) of
-        True: Subs := LowerCase(Self).PosEx(LowerCase(SubStr));
-        False:Subs := Self.PosEx(SubStr);
-      end;
-      
-      SetLength(Result, Hi + (Length(Subs) * (HiRep-HiSub)));
-      if Length(Subs) = 0 then Exit(Copy(Self, 1,Hi));
-      for i:=0 to High(Subs) do
-      begin
-        Curr := Subs[i];
-        j := (Curr-Prev);
-        MemMove(Self[Prev], Result[k], j);
-        k += j;
-        if HiRep > 0 then
-        begin
-          MemMove(ReplaceStr[1], Result[k], HiRep);
-          k += HiRep;
-        end;
-        Prev := Curr + HiSub;
-      end;
-      MemMove(Self[Prev], Result[k], Hi-Prev+1);
-    end;
-  False:
-    begin
-      SetLength(Result, Hi + (HiRep-HiSub));
-      case (rfIgnoreCase in flags) of
-        True: Curr := LowerCase(Self).Pos(LowerCase(SubStr));
-        False:Curr := Self.Pos(SubStr);
-      end;
-      if Curr = 0 then Exit(Copy(Self, 1,Hi));
-
-      MemMove(Self[1], Result[1], Curr-1);
-      if HiRep > 0 then MemMove(ReplaceStr[1], Result[Curr], HiRep);
-      MemMove(Self[(Curr+HiSub)], Result[Curr+HiRep], Hi-(Curr+HiSub)+1);
-      SetLength(Result, Hi+(HiRep-HiSub));
-    end;
-  end;
+  Result := StringReplace(Self, SubStr, ReplaceStr, Flags);
 end;
 
+
 (*
-  Blow up the string at each delimiter into smaller strings
+AnsiString.Explode
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Explode(Delimiter: String): TStringArray; constref;
+
+Blow up the string at each delimiter into smaller strings
 *)
 function AnsiString.Explode(Delimiter: String): TStringArray; constref;
 begin
@@ -182,7 +206,11 @@ begin
 end;
 
 {*
-  Return a copy of the string with leading and trailing characters removed.
+AnsiString.Strip
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.Strip(Chars:String = STR_WHITESPACE): String; constref;
+
+Return a copy of the string with leading and trailing characters removed.
 *}
 function AnsiString.Strip(Chars:String = STR_WHITESPACE): String; constref;
 var Lo,Hi: UInt32 = 1;
@@ -195,7 +223,11 @@ end;
 
 
 {*
-  Return a copy of the string with leading characters removed.
+AnsiString.StripL
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.StripL(Chars:String = STR_WHITESPACE): String; constref;
+
+Return a copy of the string with leading characters removed.
 *}
 function AnsiString.StripL(Chars:String = STR_WHITESPACE): String; constref;
 var Lo,Hi: UInt32 = 1;
@@ -207,7 +239,11 @@ end;
 
 
 {*
-  Return a copy of the string with trailing characters removed.
+AnsiString.StripR
+~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.StripR(Chars:String = STR_WHITESPACE): String; constref;
+
+Return a copy of the string with trailing characters removed.
 *}
 function AnsiString.StripR(Chars:String = STR_WHITESPACE): String; constref;
 var Lo,Hi: UInt32 = 1;
@@ -218,7 +254,11 @@ begin
 end; 
 
 (*
-  test if a string only contains alpha numerical characters.
+AnsiString.IsAlphaNum
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.IsAlphaNum(): Boolean; constref;
+
+Test if a string only contains alpha numerical characters.
 *)
 function AnsiString.IsAlphaNum(): Boolean; constref;
 var ptr: PChar; hiptr:PtrUInt;
@@ -240,7 +280,11 @@ begin
 end;
 
 (*
-  test if a sting is a digit
+AnsiString.IsDigit
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.IsDigit(): Boolean; constref;
+
+Test if a sting is a digit
 *)
 function AnsiString.IsDigit(): Boolean; constref;
 var 
@@ -264,7 +308,11 @@ begin
 end;
 
 (*
-  test if a string is a floating point number
+AnsiString.IsFloat
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.IsFloat(): Boolean; constref;
+
+Test if a string is a floating point number
 *)
 function AnsiString.IsFloat(): Boolean; constref;
 var 
@@ -299,7 +347,11 @@ begin
 end;
 
 (*
-  test if a string only contains letters a-zA-Z
+AnsiString.IsAlpha
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.IsAlpha(): Boolean; constref;
+
+Test if a string only contains letters a-zA-Z
 *)
 function AnsiString.IsAlpha(): Boolean; constref;
 var 
@@ -323,15 +375,55 @@ begin
 end;
 
 (*
-  Extract all the integers found in the string.
+AnsiString.ExtractNumbers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.ExtractNumbers(): TExtendedArray; constref;
+
+Extract all the numbers found in the string, as there could be floating point numbers 
+as well it reutnrs a TExtendedArray.
 *)
-function AnsiString.ExtractNumbers(): TIntegerArray; constref;
+function AnsiString.ExtractNumbers(): TExtendedArray; constref;
+var
+  i,c,l:Int32;
+  Tmp: TStringArray;
+begin
+  L := Length(Self);
+  for i:=1 to Length(Self) do
+  begin
+    if Self[i].IsDigit() then
+    begin
+      Tmp += Self[i];
+      while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      if (i <= L) and (Self[i] = '.') then
+      begin
+        Tmp[c] += Self[i];
+        while (Inc(i) <= L) and (Self[i].IsDigit()) do Tmp[c] += Self[i];
+      end;
+      if (i > L) then Break;
+      Inc(c);
+    end;
+  end;
+
+  SetLength(Result, Length(tmp));
+  for i:=0 to High(Tmp) do
+    Result[i] := StrToFloat(Tmp[i]);
+end;
+
+(*
+AnsiString.ExtractNumbersEx
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.ExtractNumbersEx(): TExtendedArray; constref;
+
+Extract all the numbers found in the string, this time every number 
+ends up in each their index. For example ``'1234'`` would return ``[1,2,3,4]``
+*)
+function AnsiString.ExtractNumbersEx(): TExtendedArray; constref;
 var
   i, c: Int32;
 begin
   SetLength(Result, 0);
   c := 0;
-  
+
   for i := 1 to High(Self) do
     if (Self[i] in ['0'..'9']) then
     begin
@@ -341,9 +433,41 @@ begin
     end;
 end;
 
-//---| operator overloads bellow this |---------------------------------------\\
+(*
+AnsiString.FileExt
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.FileExt(): String; constref;
 
-operator * (left:AnsiString; Right:Int32): String;
+Returns the file extension
+*)
+function AnsiString.FileExt(): String; constref;
+begin
+  Result := ExtractFileExt(Self);
+  Delete(Result,1,1);
+end;
+
+(*
+AnsiString.FileName
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function AnsiString.FileName(): String; constref;
+
+Returns the file name
+*)
+function AnsiString.FileName(): String; constref;
+begin
+  if Length(Self) <> 0 then
+    Result := Self.Explode('.')[0];
+end;
+
+//---| operator overloads bellow this |---------------------------------------\\
+(*
+string * int32
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: operator * (left:AnsiString; Right:Int32): String;
+
+Replicates the string the given amount of times. So ``'ho!' * 3`` would generate ``ho!ho!ho!``
+*)
+operator * (left: AnsiString; Right: Int32): String;
 var
   i,H: Int32;
 begin
@@ -361,6 +485,13 @@ begin
   Result := String(Left) * Right;
 end;
 
+(*
+string in string
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: operator in (left:String; Right:String): Boolean;
+
+Returns ``True`` if the string exists in the other string. So ``'hell' in 'hello world'`` would be ``True`` 
+*)
 operator in (left:Char; Right:String): Boolean;
 begin
   Result := System.Pos(left, Right) > 0;
@@ -369,4 +500,13 @@ end;
 operator in (left:String; Right:String): Boolean;
 begin
   Result := System.Pos(left, Right) > 0;
+end;
+
+operator in (Right: TStringArray; Left: String): Boolean;
+var
+  i: Int32;
+begin
+  for i := 0 to High(Right) do
+    if System.Pos(Right[i], Left) > 0 then
+      Exit(True);
 end;

@@ -1,3 +1,10 @@
+(*
+T2DExtendedArray
+================
+T2DExtendedArray related methods
+*)
+
+
 type T2DExtArray = T2DExtendedArray;
 
 //--| Type helpers |----------------------------------------------------------->

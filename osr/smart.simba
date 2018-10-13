@@ -1,63 +1,23 @@
 type
-  TSmart = record(TSmartBase)
-    World: Integer;
+  TOSRSSmart = record(TSmartBase)
+    World: Int32; // not used anymore.
     {$IFDEF CODEINSIGHT}Image:TMufasaBitmap;{$ENDIF}
   end;
 
-function TSmart.GetSpawnParams(): Boolean;
-const
-  RS_URL = 'http://oldschool%d.runescape.com/';
-var
-  s: String;
+function TOSRSSmart.SetSpawmParameters(var Params: TSmartParameters): Boolean;
 begin
-  if (Self.World <> 0) then
-    Self.Parameters.Root := Format(RS_URL, [Self.World])
-  else begin
-    s := Between('<span>(Old School', ')', GetPage('http://oldschool.runescape.com/slu'));
-    Self.World := StrToIntDef(ExtractFromStr(s, Numbers), -1);
+  Params.Root := 'http://oldschool2a.runescape.com/';
+  Params.Param := #0;
 
-    if (Self.World = -1) then
-    begin
-      srl.Writeln(Self.Name + '.getParams(): Failed to grab best world.. falling back to world 2');
-      Self.World := 2;
-    end;
-
-    Self.Parameters.Root := Format(RS_URL, [Self.World]);
-  end;
-
-  Self.Parameters.Param := 'j1';
-  Result := True; // Can't really fail unlike the RS3 version
-end;
-
-function TSmart.Init(): Boolean; override;
-begin
-  {$IFDEF WINDOWS}
-  if (Self.FindJavaPath) and (Self.JavaPath = '') then // Hasnt been set already
-    if (not Self.LocateJavaPath(Self.JavaPath, True)) then
-      if (not Self.LocateJavaPath(Self.JavaPath, False)) then
-      begin
-        srl.Writeln('TSmart.Init() Failed to find java path, if you can''t enter a graphics mode set Smart.JavaPath to your java.exe' + LineEnding +
-                    'Make sure you have no empty java directorys, Looked in: ' + Self.JavaPath);
-        Self.JavaPath := '';
-      end;
-  {$ENDIF}
-
-  Result := inherited();
-
-  if (Result) then
-  begin
-    Wait(Random(500, 1000));
-    AddOnTerminate(@Self.Free);
-  end;
+  Exit(True);
 end;
 
 var
-  Smart: TSmart;
+  Smart: TOSRSSmart;
 
 begin
-  Smart.FindJavaPath := True;
   Smart.Width := 765;
   Smart.Height := 503;
-  Smart.getParams := @Smart.GetSpawnParams;
+  Smart.OnSpawn := @Smart.SetSpawmParameters;
 end;
 

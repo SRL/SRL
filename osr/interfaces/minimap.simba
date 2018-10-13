@@ -1,13 +1,50 @@
+(*
+Minimap
+==========
+*)
 const
   DIR_NORTH = 0.00;
   DIR_EAST  = 90.0;
   DIR_SOUTH = 180.0;
   DIR_WEST  = 270.0;
 
-type
-  EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun);
-  EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+(*
+Types and Vars
+---------------
+*)
+  
+(*
+EMinimapOrb
+~~~~~~~~~~~~
+.. pascal:: type EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
 
+The orbs around the minimap. Used when getting values from the orbs, or to toggle them.
+*)
+type EMinimapOrb = (MMOrbHP, MMOrbPrayer, MMOrbRun, MMOrbSpecialAttack);
+
+(*
+EMinimapDotType
+~~~~~~~~~~~~~~~~
+.. pascal:: type EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+
+The differnet supported minimap dot types.
+*)
+type EMinimapDotType = (MMDotPlayer, MMDotItem, MMDotNPC);
+
+(*
+TRSMinimap
+~~~~~~~~~~~
+.. pascal:: 
+  TRSMinimap = record(TInterfaceBase)
+    CompassInfo: TMMCompassInfo;
+    OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
+    MaskBMP: Int32;
+    MaskPoly: TPointArray;
+    Center: TPoint;
+  end;
+  
+Defines the type connected to the variable named `Minimap`.
+*)
 type
   TMMOrbInfo = record
     TextBox: TBox;
@@ -19,91 +56,114 @@ type
   TMMCompassInfo = record
     Middle: TPoint;
     Bounds: TBox;
-    Radius: Byte;
+    Radius: UInt8;
  end;
 
 type
-  TMinimap = record(TInterfaceBase)
+  TRSMinimap = record(TInterfaceBase)
     CompassInfo: TMMCompassInfo;
-    OrbInfo: array [EMinimapOrb] of TMMOrbInfo;
-    MaskBMP: Integer;
-    MaskTPA: TPointArray;
-    Center:TPoint;
+    OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
+    MaskBMP: Int32;
+    MaskPoly: TPointArray;
+    Center: TPoint;
  end;
 
-var
-  Minimap: TMinimap;
+(*
+Minimap
+~~~~~~~~
+.. pascal:: var Minimap: TRSMinimap;
 
-procedure TMinimap.__Free();
+This is the variable that stores all minimap related methods and variables.
+*)
+var
+  Minimap: TRSMinimap;
+
+  
+  
+(*
+Methods
+--------
+*)
+  
+procedure TRSMinimap.__Free();
 begin
-  if (BitmapExists(Self.MaskBMP)) then
-    FreeBitmap(Self.MaskBMP);
+  FreeBitmap(Self.MaskBMP);
 end;
 
-procedure TMinimap.__Setup();
+procedure TRSMinimap.__Setup();
 begin
-  with (Self) do
+  with Self do
   begin
     SetName('Minimap');
     SetStatic(True);
     SetBounds([570, 9, 716, 157]);
     Center := [642, 84];
     
-    with (CompassInfo) do
+    with CompassInfo do
     begin
       Bounds := [545, 4, 576, 36];
       Middle := [561, 20];
       Radius := 15;
     end;
 
-    with (OrbInfo[Ord(MMOrbHP)]) do
+    with OrbInfo[MMOrbHP] do
     begin
       Middle := [555, 57];
       Radius := 13;
       TextBox := [520, 55, 539, 68];
     end;
 
-    with (OrbInfo[Ord(MMOrbPrayer)]) do
+    with OrbInfo[MMOrbPrayer] do
     begin
-      Middle := [557, 101];
-      Radius := 11;
-      TextBox := [521, 99, 540, 112];
+      Middle := [555, 91];
+      Radius := 13;
+      TextBox := [520, 89, 541, 102];
     end;
 
-    with (OrbInfo[Ord(MMOrbRun)]) do
+    with OrbInfo[MMOrbRun] do
     begin
-      Middle := [581, 136];
-      Radius := 11;
-      TextBox := [545, 135, 564, 148];
+      Middle := [566, 124];
+      Radius := 13;
+      TextBox := [530, 121, 551, 134];
     end;
 
-    AddOnTerminate(@Self.__Free);
+    with OrbInfo[MMOrbSpecialAttack] do
+    begin
+      Middle := [587, 148];
+      Radius := 13;
+      TextBox := [552, 146, 573, 159];
+    end;
 
-    MaskBMP := BitmapFromString(147, 149, 'meJzt1cGOhCAUBdH+/5+emZXp' +
-              'jIqIwnsFdVPbTlpO0M9nnv0UF/3vll6Z5smin2zO9fNSsMdGein4f' +
-              'A+O+jQF++0hTXMKtq360LqnYOWSeDULRp9fwHJ6tQlGn+W45fe6Kx' +
-              'h9ot1HJFucj062IN9MZOvwzao2t93EZJV80QK3twjZZHyrkdXwRZt' +
-              'cb2U1rt3iZJd80T4H86JV2qXiU41opxrRTrInfKohSmKnGtFONaid' +
-              'au/aqUZpvJ1qRDs/bV3hOtmpBrVTjQin2ki+TmrC9YZ7xU41qJ1qU' +
-              'XaqUXrRTjginGpQO+GIcKoR7Y5+a2Fw9XaqZbNTjVKDnXAZugunWp' +
-              '5u2amWKuGgVcL5nsxW5dtStYQJB+0Szvdkzi7flqqlTThowkErwPm' +
-              'By1zhM6da5oSDdgbnezJ5NXDhf9L2CQfNDxw04aAJB004aMJBEw6a' +
-              'cNCEgyYcNOGgCQdNOGjCQTuD0y5zBTXhMiccNOGgCQdNOGj1cNrla' +
-              'b/PbsIl7FJNuJwJB004aMJBEw7aXTjtMrTfIZyXLluVal66VNVfN+' +
-              'FSdQvOt2Webql56ZJ097oJl6QGON+WGWpQ89KF13bdhAuvGU47qJp' +
-              'wXDjtoGrCceG0g6rt4eQbRvYQ7tAu/DHn63U17bhq2nHVDuG0Q8Bp' +
-              'N4bsdTXtuGracdXk45Jph1Yr2ClY6RWlJh+XbJt2RLXvaVdWi/a52' +
-              'LK3D3TFzrag3QRq2xbhm4lsW/Gh8JUXffYvbEq7ucm2zXT1pr9o+0' +
-              '1gtxrZ97h8y5JtI8Kptg1kJ9m/IexUO1tmO8nKy2mnWs2y2alWvyS' +
-              'fPD9qDQu3U615gXaqPVweuOiT4C0DXPQZUDfYTrUXFwUX/dwzbDxc' +
-              '9BNPsjGXzuv2+gZ86fy6dVpXO9X6bXe2vdSEe3fCcXdwxB0W/ZRzT' +
-              'jX0JONONeiE4061v/0CYW7pQw==');
+    Self.MaskPoly := [
+      [638,9], [654,10], [669,14], [683,21], [695,31], [705,43], [712,57],
+      [713,73], [711,89], [707,105], [697,118], [683,127], [669,136], [659,148],
+      [645,157], [629,155], [620,142], [608,132], [594,123], [581,115], [574,101],
+      [571,85], [570,69], [574,54], [583,40], [593,28], [606,19], [622,12]
+    ];
 
+    MaskBMP := BitmapFromString(147, 149, 'meJzt2kF22zAUxVDvf9NtM2lO' +
+        'YleSJZEgUtwVfD0MONHj8XP82kRf91/bTnMF/WU/07heFRxhZq8KX' +
+        'sf2ekbvsTq6zz56obXQNc6gN4PR819F7wegJ78TveU89NL3oxcdjh' +
+        '54LHrdIehR56GXvg09JINe/Sp6PxK9/Xn0cjy6wNvowdZC1ziK3ml' +
+        'FdJN99ELrostsobdZHd3nBXoSE7rVJ3oJH7rYB3oDq6p5Vc2ral5V' +
+        '8yqcVNW8quZVNa+qeRVOqmpeVfOqmlfhpKrmVTipqnkVTqpqXlXzK' +
+        'pxU1bwKJ1U1r8JJFU6qal6FkyqcVNW8CidVOKnCSVXNq3BShZOqml' +
+        'ThpApn1AMnVTipwkkVTqpwUoWTKpxU4aQKJ1U4qcJJFU6qcFL9umD' +
+        '0+Io+J0cVTqpwUoWTKpxU4aQeT+iLsu+5WuEUCidVOKnCSRVOqnBS' +
+        'L8PVbnH/qla4xRVOaiNc7Za1Xa1wyyqc1G642i3oSLXCLahwUgfD1' +
+        'W4px6sVbilvhavdIt6tVrhFnAhXO9y5aoXDnQ5XO9CVarWjXK9Wu/' +
+        'nuqla4yW4MV7tp7q1WuzlGVKvdaOOqlW+QCclqd7uZ1Wp3l/nVync' +
+        'RmOwvegMfuth39B6ro/vsoOdZEd3kKHqntdA13kYPxqMLnEcvR6K3' +
+        'vwE94Wz03neit5yHXnoIetSx6HWHowe+H73oPPTSd6K3BNCTX0XvR' +
+        '6K3P49ebgl0hPfQa62FrnEUvdOK6Cb76IXWRZfZQm+zOrrPa/QqDn' +
+        'Sl7+g9TOhWn+glfOhiH+gNrKrmVTWvqkkVTqpwXlWTKpxU4byq5lU' +
+        '1tZJ5VU2qcF5V++M31594lA==');
 
     SetBitmapName(Self.MaskBMP, 'Minimap mask');
-    FindColorsBitmap(Self.MaskBMP, Self.MaskTPA, $000000);
-    OffsetTPA(Self.MaskTPA, Point(Self.FBounds.X1, Self.FBounds.Y1));
+    SetTransparentColor(Self.MaskBMP, $FFFFFF);
   end;
+
+  AddOnTerminate(@Self.__Free);
 end;
 
 (*
@@ -111,38 +171,53 @@ Minimap.GetMiddle
 ~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetMiddle(): TPoint;
+    function TRSMinimap.GetMiddle: TPoint;
 
 Returns the center of the minimap
 *)
-function TMinimap.GetMiddle(): TPoint; override;
+function TRSMinimap.GetMiddle: TPoint; override;
 begin
   Result := Self.Center;
 end;
 
+(*
+Minimap._GetOrbValue
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-function TMinimap._GetOrbValue(const orb: EMinimapOrb): Integer;
-const
-  IgnoreCols = [4938344, 0];
-  Font = 'StatChars07';
-var
-  ATPA: T2DPointArray;
-  TextTPA: TPointArray;
-  Text: String;
-  i: Int32;
-begin
-  SetLength(ATPA, Length(IgnoreCols));
-  for i:=0 to High(IgnoreCols) do
-    FindColors(ATPA[i], IgnoreCols[i], OrbInfo[Ord(orb)].TextBox);
-  
-  TextTPA := MergeATPA(ATPA);
-  if Length(TextTPA) > 0 then
+    function TRSMinimap._GetOrbValue(Orb: EMinimapOrb): Int32;
+
+Returns the value of the orb. Offsets the text shadow to figure out the text color.
+*)
+function TRSMinimap._GetOrbValue(Orb: EMinimapOrb): Int32;
+
+  function GetTextTPA(BMP: TMufasaBitmap): TPointArray;
+  var
+    TPA: TPointArray;
+    TIA: TIntegerArray;
   begin
-    TextTPA := ReturnPointsNotInTPA(TextTPA, OrbInfo[Ord(orb)].TextBox);
-    // look into a better fix
-    Text := StringReplace(srl.GetTextFromTPA(TextTPA, 1, 3, 100, Font), 'O', '0', [rfReplaceAll]);
-    Result := StrToIntDef(Text, 0);
+    if BMP.FindColors(TPA, $000000) then
+    begin
+      TPA := TPA.FilterBox([0, 0, BMP.GetWidth()-1, BMP.GetHeight()-1]);
+      TPA.Offset([-1, -1]);
+
+      TIA := BMP.GetPixels(TPA);
+      if (Length(TIA) > 0) then
+        BMP.FindColors(Result, TIA.Mode());
+    end;
   end;
+
+var
+  TPA: TPointArray;
+  BMP: TMufasaBitmap;
+begin
+  BMP := GetMufasaBitmap(BitmapFromClient(OrbInfo[Orb].TextBox));
+
+  TPA := GetTextTPA(BMP);
+  if (Length(TPA) > 0) then
+    Result := StrToIntDef(srl.GetTextFromTPA(TPA, 1, 3, 1, 'StatChars07'), 0);
+
+  BMP.Free();
 end;
 
 (*
@@ -150,11 +225,11 @@ Minimap.GetPrayerLevel
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetPrayerLevel(): Integer;
+    function TRSMinimap.GetPrayerLevel(): Int32;
 
 Returns your current prayer level
 *)
-function TMinimap.GetPrayerLevel(): Integer;
+function TRSMinimap.GetPrayerLevel: Int32;
 begin
   Result := Self._GetOrbValue(MMOrbPrayer);
 end;
@@ -164,11 +239,11 @@ Minimap.GetHPLevel
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetHPLevel(): Integer;
+    function TRSMinimap.GetHPLevel: Int32;
 
 Returns your current HP level
 *)
-function TMinimap.GetHPLevel(): Integer;
+function TRSMinimap.GetHPLevel: Int32;
 begin
   Result := Self._GetOrbValue(MMOrbHP);
 end;
@@ -178,11 +253,11 @@ Minimap.GetHPPercent
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetHPPercent(): Byte;
+    function TRSMinimap.GetHPPercent(): Int32;
 
 Returns your current HP level as a percentage `0..100`
 *)
-function TMinimap.GetHPPercent(): Byte;
+function TRSMinimap.GetHPPercent: Int32;
 var
   tb, b: TBox;
   TPA: TPointArray;
@@ -195,15 +270,64 @@ begin
 end;
 
 (*
+Minimap.GetSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSMinimap.GetSpecialAttack(): Int32;
+
+Returns your special attack.
+*)
+function TRSMinimap.GetSpecialAttack: Int32;
+begin
+  Result := Self._GetOrbValue(MMOrbSpecialAttack);
+end;
+
+(*
+Minimap.IsPoisoned
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TRSMinimap.IsPoisoned: Boolean;
+
+Returns true if you're poisoned by checking the minimap orb.
+*)
+function TRSMinimap.IsPoisoned: Boolean;
+var
+  B: TBox;
+begin
+  with Minimap.OrbInfo[MMOrbHP] do
+    B := [Middle.X - Radius, Middle.Y - Radius, Middle.X + Radius, Middle.Y + Radius];
+
+  Result := CountColorTolerance(101136, B, 85) > 0;
+end;
+
+(*
+Minimap.CurePoison
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TRSMinimap.CurePoison;
+
+Clicks the hitpoints orb if currently poisoned.
+*)
+procedure TRSMinimap.CurePoison;
+begin
+  if Self.IsPoisoned() then
+    with Minimap.OrbInfo[MMOrbHP] do
+      Mouse.Click(Middle, Radius, mouse_Left);
+end;
+
+(*
 Minimap.GetRunEnergy
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetRunEnergy(): Integer;
+    function TRSMinimap.GetRunEnergy(): Integer;
 
 Returns your current energy level 
 *)
-function TMinimap.GetRunEnergy(): Integer;
+function TRSMinimap.GetRunEnergy(): Integer;
 begin
   Result := Self._GetOrbValue(MMOrbRun);
 end;
@@ -213,11 +337,11 @@ Minimap.isPrayerEnabled
 ~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+    function TRSMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
 
 Returns `True` if you have enabled it otherwise `False`.
 *)
-function TMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
+function TRSMinimap.isPrayerEnabled(const Time: UInt32 = 0): Boolean;
 var
   b: TBox;
 begin
@@ -235,17 +359,18 @@ Minimap.isRunEnabled
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
+    function TRSMinimap.isRunEnabled(WaitTime: Int32 = 0): Boolean;
 
 Returns `True` if you have enabled it otherwise `False`.
 *)
-function TMinimap.isRunEnabled(WaitTime: UInt32 = 0): Boolean;
+function TRSMinimap.isRunEnabled(WaitTime: Int32 = 0): Boolean;
 var
-  b: TBox;
+  B: TBox;
 begin
-  with (Self.OrbInfo[MMOrbRun].Middle) do
-    b := [X - 8, Y - 8, X + 8, Y + 15];
-  Result := srl.WaitColorCount([101547, 40], b, @GreaterThan, 5, WaitTime);
+  with Self.OrbInfo[MMOrbRun] do
+    B := Box(Middle.X, Middle.Y, Middle.X, Middle.Y).Expand(Radius);
+
+  Result := srl.WaitColorCount([101547, 40], B, @GreaterThan, 5, WaitTime);
 end;
 
 (*
@@ -253,11 +378,11 @@ Minimap.TogglePrayer
 ~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+    function TRSMinimap.TogglePrayer(const Enable: Boolean): Boolean;
 
 A toggle to enable or disable prayer.
 *)
-function TMinimap.TogglePrayer(const Enable: Boolean): Boolean;
+function TRSMinimap.TogglePrayer(const Enable: Boolean): Boolean;
 var t: TCountDown;
 begin
   if (Enable = Self.isPrayerEnabled()) then Exit(True);
@@ -276,11 +401,11 @@ Minimap.ToggleRun
 ~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+    function TRSMinimap.ToggleRun(const Enable: Boolean): Boolean;
 
 A toggle to enable or disable running.
 *)
-function TMinimap.ToggleRun(const Enable: Boolean): Boolean;
+function TRSMinimap.ToggleRun(const Enable: Boolean): Boolean;
 var t: TCountDown;
 begin
   if (Enable = Self.isRunEnabled()) then Exit(True);
@@ -297,80 +422,71 @@ end;
 (*
 Minimap.isPlayerMoving
 ~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
-
+.. pascal:: function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
+    
 Returns `True` if your character is moving.
 *)
-function TMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
-var
-  m: TPoint;
+function TRSMinimap.isPlayerMoving(MinShift: Integer = 300): Boolean;
 begin
-  m := Self.GetMiddle();
-  Result := srl.GetPixelShift([m.x - 35, m.y - 35, m.x + 35, m.y + 35], 350) > MinShift;
+  with Self.Center do
+    Result := srl.GetPixelShift([X - 35, Y - 35, X + 35, Y + 35], System.Random(300, 350)) >= MinShift;
 end;
-
 
 (*
 Minimap.FindFlag
-~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+~~~~~~~~~~~~~~~~
+.. pascal::
+    function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
+    function TRSMinimap.FindFlag(out P: TPoint): Boolean; overload;
 
-    function TMinimap.FindFlag(out p: TPoint): Boolean;
-
-Locate the current postion of the flag on the minimap, returns `False` if it can't be found.
+First version searches for the flag on a bitmap. Second version searched for the flag on the client.
 *)
-function TMinimap.FindFlag(out p: TPoint): Boolean;
+function TRSMinimap.FindFlag(BMP: Int32; out P: TPoint): Boolean; overload;
 const
-  PoleColor = 1127261;
-  FlagColor = 255;
-  LightPoleColor = 284358;
+  COL_DARK_POLE = 1127261;
+  COL_LIGHT_POLE = 284358;
+  COL_FLAG = 255;
 var
-  pt: TPoint;
-  TPA, TPAPoles, column: TPointArray;
-  w, h, img: Integer;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i, Color: Int32;
 begin
-  p := [-1, -1];
-  Img := BitmapFromClient(Self.getBounds());
-  SetBitmapName(Img, 'Find flag bitmap');
-  GetBitmapSize(Img, w, h);
+  if FindColorsBitmap(BMP, TPA, COL_DARK_POLE) then
+  begin
+    ATPA := SplitTPA(TPA, 1);
 
-  try
-    if (not FindColorsBitmap(Img, TPA, PoleColor)) then
-      Exit(False);
+    for TPA in ATPA do
+      for i := High(TPA) downto 0 do
+      begin
+        if (TPA[i].X = 0) then
+          Continue;
 
-    with GetMufasaBitmap(Img) do
-      for pt in TPA do
-        if (pt.X > 2) and (pt.Y > 2) and (pt.X < w) and (pt.Y < h) then
-          if (GetPixel(pt.x - 1, pt.y) = FlagColor) or (GetPixel(pt.x - 1, pt.y) = LightPoleColor) and
-             (GetPixel(pt.X, pt.y - 1) = PoleColor) or (GetPixel(pt.x, pt.y + 1) = PoleColor) then
-                TPAPoles += pt;
+        Color := FastGetPixel(BMP, TPA[i].X - 1, TPA[i].Y);
 
-    if (Length(TPAPoles) = 0) then
-      Exit(False);
-    
-    for column in FindTPAColumns(TPAPoles) do
-    begin
-      for TPA in SplitTPA(column, 1) do
-        if (InRange(GetTPABounds(TPA).Height, 4, 20)) then
+        if (Color = COL_LIGHT_POLE) or (Color = COL_FLAG) then
         begin
-          Result := True;
-          p := TPA[0];
+          P := TPA[i];
 
-          while (p.y < (Self.GetBounds().Height - 1)) and (FastGetPixel(Img, p.x, p.y) = PoleColor) do
-            Inc(p.y);
-
-          if (FastGetPixel(Img, p.x, p.y) <> PoleColor) then // Make sure we have the bottom of the pole
-            Dec(p.y);
+          Exit(True);
         end;
-    end;
-  finally
-    FreeBitmap(Img);
+      end;
   end;
+end;
 
-  Inc(p.x, Self.GetBounds().X1);
-  Inc(p.y, Self.GetBounds().Y1);
+function TRSMinimap.FindFlag(out P: TPoint): Boolean; overload;
+var
+  B: TBox;
+  BMP: Int32;
+begin
+  B := Self.GetBounds();
+  BMP := CreateBitmap(0, 0);
+  CopyClientToBitmap(BMP, B.X1, B.Y1, B.X2, B.Y2);
+
+  Result := Self.FindFlag(BMP, P);
+  if Result then
+    P.Offset([B.X1, B.Y1]);
+
+  FreeBitmap(BMP);
 end;
 
 (*
@@ -378,24 +494,28 @@ Minimap.isFlagPresent
 ~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
+    function TRSMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
 
 Returns True if the flag can be found on the minimap.. otherwise False.
 *)
-function TMinimap.isFlagPresent(const WaitTime: UInt32 = 0): Boolean;
+function TRSMinimap.isFlagPresent(WaitTime: Int32 = 0): Boolean;
 var
-  TimeOut: UInt64;
-  p: TPoint;
+  T: UInt64;
+  P: TPoint;
 begin
-  Result := False;
-  TimeOut := GetTickCount64() + WaitTime;
+  if (WaitTime = 0) then
+    Result := Self.FindFlag(P)
+  else
+  begin
+    T := GetTickCount() + WaitTime;
 
-  repeat
-    if (Self.FindFlag(p)) then
-      Exit(True);
+    repeat
+      if (Self.FindFlag(P)) then
+        Exit(True);
 
-    Wait(Random(50, 200));
-  until (GetTickCount64() > TimeOut);
+      Wait(Random(50, 100));
+    until (GetTickCount64() > T);
+  end;
 end;
 
 (*
@@ -403,38 +523,42 @@ Minimap.WaitFlag
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
+    procedure TRSMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
 
-Wait while the flag is present, can return early if the position from it to minimap center is less
-than `dist`.
+Waits while the flag distance is greater than `dist`. Timeout is ~20 seconds which
+is reset when flag distance has changed.
 *)
-procedure TMinimap.WaitFlag(const Dist: UInt32 = 0; ExitIfNotMoving: Boolean = True);
+procedure TRSMinimap.WaitFlag(Dist: Int32 = 0);
 var
-  TimeOut: UInt64;
-  d, LastDist, SameDists: UInt32;
-  p: TPoint;
+  P: TPoint;
+  TimeOut: TCountDown;
+  D, BMP: Int32;
+  B: TBox;
 begin
-  TimeOut := GetTickCount64() + Random(23000, 25000);
-  LastDist := 500;
-  SameDists := 0;
+  B := Self.GetBounds();
+  BMP := CreateBitmap(0, 0);
 
-  while (TimeOut > GetTickCount64()) and (Self.FindFlag(p)) do
+  TimeOut.Init(Random(20000, 25000));
+
+  while (not TimeOut.IsFinished()) do
   begin
-    d := Distance(p, Self.getMiddle());
-    if (d <= Dist) then
-      Exit();
+    CopyClientToBitmap(BMP, B.X1, B.Y1, B.X2, B.Y2);
+    if (not Self.FindFlag(BMP, P)) then
+      Break;
 
-    if (d = LastDist) then
-      Inc(SameDists)
-    else
-      SameDists := 0;
+    P.Offset([B.X1, B.Y1]);
 
-    if (ExitIfNotMoving) and (SameDists >= 20) then
-      Exit();
+    if (Distance(P, Self.Center) <> D) then
+      TimeOut.Restart();
 
-    LastDist := d;
+    D := Distance(P, Self.Center);
+    if (D <= Dist) then
+      Break;
+
     Wait(Random(50, 100));
   end;
+
+  FreeBitmap(BMP);
 end;
 
 (*
@@ -442,11 +566,11 @@ Minimap.WaitPlayerMoving
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+    procedure TRSMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
 
 Waits till your character is no longer moving.
 *)
-procedure TMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
+procedure TRSMinimap.WaitPlayerMoving(UseFlag: Boolean = True; TimeOut: Integer = 30000; MinShift: Integer = 300);
 var
   t: UInt64;
 begin
@@ -467,7 +591,7 @@ Minimap.WaitFlagEx
 
 .. code-block:: pascal
 
-    function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+    function TRSMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
 
 Extra WaitFlag method that Waits for the flag to disapear but will return if the
 position we walked to is where the flag was first clicked.
@@ -484,7 +608,7 @@ Example:
     else
       srl.Writeln('We have finished walking, but the flag moved alot so we didnt hit our target pos');
 *)
-function TMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
+function TRSMinimap.WaitFlagEx(MaxDist: Byte = 5): Boolean;
 var
   OldPt, NewPt: TPoint;
   t: UInt64;
@@ -518,453 +642,399 @@ Minimap.GetCompassAngle
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-    function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+    function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Double;
 
 Returns the current compass angle, default as degrees.
 *)
-function TMinimap.GetCompassAngle(AsDegrees:Boolean=True): Extended;
+function TRSMinimap.GetCompassAngle(AsDegrees:Boolean=True): Double;
 var
-  north,south: TPoint;
-  M:TPoint := Self.CompassInfo.Middle;
-  TPA:TPointArray;
+  north, south: TPoint;
+  M: TPoint := Self.CompassInfo.Middle;
+  TPA: TPointArray;
 begin
-  if (not FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 25)) then
-    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find the `N` in the compass', 0.00));
+  if FindColorsTolerance(TPA, 1911089, Self.CompassInfo.Bounds, 25) then
+    FilterPointsDist(TPA, 8, 15, M.X, M.Y);
 
-  FilterPointsDist(TPA, 8, 15, M.x, M.y);
-  if (Length(TPA) = 0) then
-    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find the `N` in the compass (after filter)', 0.00));
-  north := MiddleTPA(SplitTPA(TPA,3)[0]);
-  south := RotatePoint(north, PI, M.x, M.y);
-  if (not FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25)) then
-    Exit(srl.Writeln('Minimap.GetCompassAngle: Failed to find red compass dots color', 0.00));
-  
-  FilterPointsDist(TPA, 0,6, south.x,south.y);
-  SortTPAFrom(TPA, M);
   if (Length(TPA) > 0) then
   begin
-    Result := FixRad(ArcTan2(TPA[high(tpa)].y-M.y, TPA[high(tpa)].x-M.x) - (PI/2));
-    if (Result <> 0) then Result += 0.0333; //compass dial is floored.. this makes us more accurate.
-  end
-  else
-    srl.Writeln('Minimap.GetCompassAngle: Failed to find compass dial color');
+    north := MiddleTPA(SplitTPA(TPA,3)[0]);
+    south := RotatePoint(north, PI, M.X, M.Y);
 
-  if (AsDegrees) then
+    if FindColorsTolerance(TPA, 920735, Self.CompassInfo.Bounds, 25) then
+      FilterPointsDist(TPA, 0,6, south.X, south.Y);
+    SortTPAFrom(TPA, M);
+
+    if (Length(TPA) > 0) then
+    begin
+      Result := FixRad(ArcTan2(TPA[High(TPA)].Y-M.Y, TPA[High(TPA)].X-M.X) - (PI/2));
+      if (Result <> 0) then
+	      Result += 0.0333; //compass dial is floored.. this makes us more accurate.
+    end else
+      srl.Writeln('Compass dots not found');
+  end else
+    srl.WriteLn('Compass `N` not found');
+
+  if AsDegrees then
     Result := Degrees(Result);
 end;
 
-
 (*
-Minimap.MouseSetCompassAngle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+Minimap.SetCompassAngle_Mouse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
 
-    function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
-
-Some long code that does stuff.
+Uses the mouse to change the compass angle. This method should not be used directly, 
+but instead called through ``Minimap.SetCompassAngle``.
 *)
-function TMinimap.MouseSetCompassAngle(Angle, Tolerance: Extended): Boolean;
-  procedure MoveRotate(xs, ys, xe, ye, Angle, Tolerance: Extended);
-  const
-    sqrt2 := sqrt(2);
-    sqrt3 := sqrt(3);
-    sqrt5 := sqrt(5);
-  var
-    veloX, veloY, windX, windY, veloMag, dist, randomDist, lastDist, D, compassDist: Extended;
-    TargetArea, Wind, Gravity: Extended;
-    lastX, lastY, Speed, W, TDist, rnd_xs, rnd_ys, maxDist, rand, rand2: Integer;
-    maxStep, rCnc: Extended;
-    t: UInt64;
-    oldSpeed: Integer;
-  begin
-    oldSpeed := Mouse.GetSpeed();
-    Mouse.SetSpeed(Random(20, 22));
-
-    Speed := Mouse.GetSpeed();
-    Gravity := Mouse.GetGravity(mouse_Human);
-    Wind := Mouse.GetWind(mouse_Human);
-    TargetArea := 10.0 * ((Random(Speed) / 2.0 + Speed) / 10.0);
-    rand := Random(25, 40);
-    rand2 := Random(7, 12);
-    MaxDist := 15;
-    TDist := Distance(Round(xs), Round(ys), Round(xe), Round(ye));
-    t := GetTickCount64() + Random(7000, 8500);
-    Mouse.Hold(mouse_Middle);
-
-    repeat
-      if (GetTickCount64() > t) then
-        Break;
-
-      dist := hypot(xs - xe, ys - ye);
-      wind := minE(wind, dist);
-      if (dist < 1) then
-        dist := 1;
-
-      D := (Round((Round(TDist)*0.3))/7);
-      if (D > maxDist) then
-        D := maxDist;
-      if (D < 4) then
-        D := 4;
-
-      rCnc := random(6);
-      if (rCnc = 1) then
-        D := Random(2, 3);
-
-      if (D <= Round(dist)) then
-        maxStep := D
-      else
-        maxStep := round(dist);
-
-      if (dist >= targetArea) then
-      begin
-        windX := windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
-        windY := windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
-      end else
-      begin
-        windX := windX / sqrt2;
-        windY := windY / sqrt2;
-      end;
-
-      veloX := veloX + windX;
-      veloY := veloY + windY;
-      veloX := veloX + gravity * (xe - xs) / dist;
-      veloY := veloY + gravity * (ye - ys) / dist;
-
-      if (hypot(veloX, veloY) > maxStep) then
-      begin
-        randomDist := maxStep / 2.0 + random(round(maxStep) div 2);
-        veloMag := sqrt(veloX * veloX + veloY * veloY);
-        veloX := (veloX / veloMag) * randomDist;
-        veloY := (veloY / veloMag) * randomDist;
-      end;
-
-      lastX := round(xs);
-      lastY := round(ys);
-      xs := xs + veloX;
-      ys := ys + veloY;
-      rnd_xs := Round(xs);
-      rnd_ys := Round(ys);
-
-      if (lastX <> rnd_xs) or (lastY <> rnd_ys) then
-        Mouse.SetPosition(Point(rnd_xs, rnd_ys));
-
-      W := (Random((round(100/Speed)))*6);
-      if (W < 4) then
-        W := 4;
-      W := Round(W * 0.4);
-
-      Wait(W);
-      LastDist := dist;
-      CompassDist := Abs(srl.DeltaAngle(Self.GetCompassAngle(), Angle));
-      if ((CompassDist < Rand) or (CompassDist < Rand2)) then
-      begin
-        if (CompassDist < Rand) then
-          maxDist := Random(5, 8);
-        if (CompassDist < Rand2) then
-          maxDist := Random(2, 4);
-      end else
-        maxDist := 15; // Default
-
-      if (CompassDist <= Tolerance) then
-        Break;
-    until (Hypot(xs - xe, ys - ye) < 1);
-
-    Mouse.Release(mouse_Middle);
-    Wait(Random(150, 250));
-
-    Mouse.setSpeed(oldSpeed);
-  end;
-
+function TRSMinimap.SetCompassAngle_Mouse(Degrees: Double): Boolean;
+type
+  EMoveDirection = (mdLeft, mdRight);
 const
-  MIN_Y_DROP = 105;
-  MIN_X_MOVE = 130;
+  DEG_PER_PIXEL = 2.83;
+  RIGHT_START: TBox = [10, 10, 100, 330];
+  LEFT_START: TBox = [664, 10, 754, 330];
+var
+  Area: TBox;
+  Distance, Pixels, Step: Int32;
+  Direction: EMoveDirection;
 
-  RIGHT_START: TBox = [0, 0, 150, 380];
-  RIGHT_END_START_X = [620, 675];
+  function GetMaxStep: Int32;
+  var
+    P: TPoint;
+  begin
+    P := Mouse.GetPosition();
 
-  LEFT_START: TBox = [600, 0, 765, 380];
-  LEFT_END_START_X = [0, 140];
+    case Direction of
+      mdLeft:
+        begin
+          P.X -= Pixels;
+
+          if (P.X < Area.X1) then
+            Result := Pixels - (Area.X1 - P.X) - srl.NormalRange(0, 100)
+          else
+            Result := Pixels;
+        end;
+
+      mdRight:
+        begin
+          P.X += Pixels;
+
+          if (P.X > Area.X2) then
+            Result := Pixels - (P.X - Area.X2) - srl.NormalRange(0, 100)
+          else
+            Result := Pixels;
+        end;
+    end;
+  end;
 
 var
-  CurrentAngle, AngleDistance: Extended;
-  CompassDist: Extended;
-  mp, p: TPoint;
-  moveRight: Boolean;
-  t: UInt64;
+  P: TPoint;
+  T: UInt64;
 begin
-  Result := False;
+  T := GetTickCount() + 10000;
 
-  Angle := FixD(Angle);
-  CurrentAngle := Self.GetCompassAngle();
-  CompassDist := Abs(srl.DeltaAngle(CurrentAngle, Angle));
-  if (CompassDist <= 3) then
-    Exit(True);
+  Area := GetClientBounds().Expand(-10);
 
-  t := GetTickCount64() + Random(5000, 7000);
-  while (CompassDist > Tolerance) and (t > GetTickCount64()) do
-  begin
-    AngleDistance := CurrentAngle - Angle;
-    moveRight := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
-    mp := Mouse.GetPosition();
+  Distance := Round(Minimap.GetCompassAngle() - Degrees);
+  Pixels := Round(Abs(srl.DeltaAngle(Minimap.GetCompassAngle(), Degrees)) * DEG_PER_PIXEL);
 
-    if (moveRight) then
-    begin
-      if (not PointInBox(mp, GetClientBounds())) then
-        Mouse.Move(RIGHT_START, False, rndRandom);
-
-      if ((mp.x + MIN_X_MOVE) < RIGHT_END_START_X[0]) then
-        { No need to move mouse! }
-      else
-        Mouse.Move(RIGHT_START, False, rndRandom);
-
-      mp := Mouse.GetPosition();
-      p.x := Random(RIGHT_END_START_X[0], RIGHT_END_START_X[1]);
-      p.y := Random(mp.y + MIN_Y_DROP, GetClientBounds().Y2);
-    end else // moveLeft
-    begin
-      if (not PointInBox(mp, GetClientBounds())) then
-        Mouse.Move(LEFT_START, False, rndRandom);
-
-      if ((mp.x - MIN_X_MOVE) > LEFT_END_START_X[1]) then
-        { No need to move mouse! }
-      else
-        Mouse.Move(LEFT_START, False, rndRandom);
-
-      mp := Mouse.GetPosition();
-      p.x := Random(LEFT_END_START_X[0], LEFT_END_START_X[1]);
-      p.y := Random(mp.y + MIN_Y_DROP, GetClientBounds().Y2);
-    end;
-
-    MoveRotate(mp.x, mp.y, p.x, p.y, Angle, Tolerance);
-    CurrentAngle := Self.GetCompassAngle();
-    CompassDist := Abs(srl.DeltaAngle(CurrentAngle, Angle));
+  case ((Distance > 0) and (Abs(Distance) <= 180)) or ((Distance < 0) and (Abs(Distance) > 180)) of
+    True:
+      Direction := mdRight;
+    False:
+      Direction := mdLeft;
   end;
 
-  Result := CompassDist < Tolerance;
+  if (Abs(Distance) > 5) then
+    while (Pixels > 0) do
+    begin
+      if (GetTickCount() > T) then
+        RaiseException('SetCompassAngle timed out');
+
+      Step := GetMaxStep();
+
+      P := Mouse.GetPosition();
+      P.Y := Round(srl.TruncatedGauss(P.Y + 80, Area.Y2));
+
+      case Direction of
+        mdLeft:
+          P.X -= Step;
+        mdRight:
+          P.X += Step;
+      end;
+
+      if (Step < 0) or (not PointInBox(P, Area)) or (not PointInBox(Mouse.GetPosition(), Area)) then
+      begin
+        case Direction of
+          mdLeft:
+            Mouse.Move(LEFT_START);
+          mdRight:
+            Mouse.Move(RIGHT_START);
+        end;
+      end else
+      begin
+        Mouse.Hold(mouse_Middle);
+        Mouse.Move(P);
+        Mouse.Release(mouse_Middle);
+
+        Pixels -= Step;
+      end;
+    end;
+end;
+
+procedure TRSMinimap.SetCompassAngle_Key(Degrees: Double);
+var
+  Keys: record Left, Right: Boolean; end;
+
+  procedure HoldKey;
+  var
+    Distance: Double;
+  begin
+    Distance := Round(Minimap.GetCompassAngle() - Degrees);
+
+    case ((Distance > 0) and (Abs(Distance) <= 180)) or ((Distance < 0) and (Abs(Distance) > 180)) of
+      True:
+        begin
+          if Keys.Right then
+            Keyboard.KeyUp(VK_RIGHT);
+          if (not Keys.Left) then
+            Keyboard.KeyDown(VK_LEFT);
+
+          Keys := [True, False];
+        end;
+
+      False:
+        begin
+         if Keys.Left then
+           Keyboard.KeyUp(VK_LEFT);
+         if (not Keys.Right) then
+           Keyboard.KeyDown(VK_RIGHT);
+
+         Keys := [False, True];
+       end;
+    end;
+  end;
+
+var
+  T: UInt64;
+begin
+  T := GetTickCount64() + 10000;
+
+  try
+    while srl.isLoggedIn() and (Round(Abs(srl.DeltaAngle(Minimap.GetCompassAngle(), Degrees))) > 5) do
+    begin
+      if (GetTickCount() > T) then
+        RaiseException('SetCompassAngle_Key timed out');
+      HoldKey();
+      Wait(Random(50, 100));
+    end;
+  finally
+    if (Keys.Left) then
+       Keyboard.KeyUp(VK_LEFT);
+    if (Keys.Right) then
+      Keyboard.KeyUp(VK_RIGHT);
+  end;
 end;
 
 (*
 Minimap.SetCompassAngle
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
 
-    function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 5): Boolean;
-
-Set the compass angle.
+Sets the compass angle to the desired angle. 
 *)
-function TMinimap.SetCompassAngle(Angle: Extended; UseMouse: Boolean = True; Tolerance: Integer = 5): Boolean;
-
-  function Compass_Distance(Angle, Target: Extended): Extended;
-  begin
-    if (Abs(Target - Angle) < 180) then
-    begin
-      Result := Target - Angle;
-      Exit;
-    end;
-
-    if (Target > Angle) then
-      Result := Target - Angle - 360
-    else
-      Result := Target - Angle + 360;
+procedure TRSMinimap.SetCompassAngle(Degrees: Double; Mouse: Boolean = True);
+begin
+  case Mouse of
+    True:
+      Self.SetCompassAngle_Mouse(Degrees);
+    False:
+      Self.SetCompassAngle_Key(Degrees);
   end;
+end;
 
-  procedure Key(Left: Boolean);
-  begin
-    case (Left) of
-      True:
-        begin
-          KeyUp(VK_RIGHT);
-          KeyDown(VK_LEFT);
-        end;
-      False:
-        begin
-          KeyUp(VK_LEFT);
-          KeyDown(VK_RIGHT);
-        end;
-    end;
-  end;
+(*
+Minimap.ClickCompass
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.ClickCompass();
 
+Clicks the compass so that you face towards north.
+*)
+procedure TRSMinimap.ClickCompass();
+begin
+  Mouse.Click(Self.CompassInfo.Middle, Self.CompassInfo.Radius, mouse_Left);
+end;
+
+(*
+Minimap.GetDots
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
+
+Returns all the dots of the given types. See the defintion of EMinimapDotType. By default it will sort
+all the points from the center of the minimap, meaning the closest to your come first in the result.
+
+The points in the resulting array are the top-left corner of the dot, so for the center offset it by 2 or 3, 2.5 for dead center.
+
+**Example**
+
+.. pascal::
+  dotTPA := Minimap.GetDots([MMDotNPC, MMDotPlayer]);
+*)
+function TRSMinimap.GetDots(DotTypes: set of EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
 var
-  TimeOut: UInt64;
-  CurrentAngle, AngleDistance: Extended;
-  Left: Boolean;
-begin
-  if (UseMouse) then
-    Exit(Self.MouseSetCompassAngle(Angle, Tolerance));
-
-  Angle := FixD(Angle);
-  CurrentAngle := Self.GetCompassAngle();
-  if (CurrentAngle = Angle) then
-    Exit(True);
-
-  TimeOut := GetTickCount64() + Random(9000, 11000);
-  while (Abs(Compass_Distance(CurrentAngle, Angle)) > Tolerance) and (GetTickCount64() < TimeOut) do
-  begin
-    AngleDistance := CurrentAngle - Angle;
-    Left := ((AngleDistance > 0) and (Abs(AngleDistance) <= 180)) or ((AngleDistance < 0) and (Abs(AngleDistance) > 180));
-    Key(Left);
-
-    CurrentAngle := Self.GetCompassAngle();
-    Result := Abs(Compass_Distance(CurrentAngle, Angle)) <= Tolerance;
-    if (Result) then
-      Break();
-
-    Wait(Random(15, 30));
-  end;
-
-  if (GetTickCount64() >= TimeOut) then
-    srl.Writeln('Minimap.SetCompassAngle(): Setting angle timed out');
-
-  KeyUp(VK_LEFT);
-  KeyUp(VK_RIGHT);
-
-  Wait(Random(270, 420));
-end;
-
-function TMinimap.GetDots(DotType: EMinimapDotType; SortFromPlayer: Boolean = True): TPointArray;
-const { aligned with EMinimapDotType }
-  DOT_COL_DIFF = [1907997, 23, 4369];
-  NPC_DOT_DIFF_2 = 1114626;
-var
-  pt: TPoint;
-  img, w, h: Integer;
-  TPA: TPointArray;
-begin
-  img := BitmapFromClient(Self.GetBounds());
-  GetBitmapSize(img, w, h);
-  w -= 2; h -= 2;
-
-  try
-    if (not FindColorsBitmap(img, TPA, 65536)) then
-      Exit;
-
-    for pt in TPA do
-      if (pt.X > 2) and (pt.Y > 2) and (pt.X < w) and (pt.Y < h) then
-        if (FastGetPixel(img, pt.X-1, pt.Y-1) - FastGetPixel(img, pt.X, pt.Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-          Result += Point(pt.X, pt.Y - 2)
-        else
-        begin
-          if (FastGetPixel(img, pt.X, pt.Y-2) - FastGetPixel(img, pt.X, pt.Y-1) = DOT_COL_DIFF[Ord(DotType)]) then
-            Result += Point(pt.X - 1, pt.Y - 1)
-          else if (DotType = MMDotNPC) then
-          begin
-            if (FastGetPixel(img, pt.X, pt.Y-2) - FastGetPixel(img, pt.X, pt.Y-1) = NPC_DOT_DIFF_2) then
-              Result += Point(pt.X + 2, pt.Y - 1);
-          end;
-        end;
-
-    if (Length(Result) > 0) then
-    begin
-      ClearDoubleTPA(Result);
-      OffsetTPA(Result, Point(Self.GetBounds().X1, Self.GetBounds().Y1));
-      if (SortFromPlayer) then
-        SortTPAFrom(Result, Self.GetMiddle());
-    end;
-  finally
-    FreeBitmap(img);
-  end;
-end;
-
-function TMinimap.FindDots(DotType: EMinimapDotType; MinCount: UInt32 = 1): Boolean;
-begin
-  Result := Length(Self.GetDots(DotType, False)) >= MinCount;
-end;
-
-function TMinimap.isPointOn(pt: TPoint; Full: Boolean = True): Boolean;
-var
-  p: TPoint;
-begin
-  Result := False;
-
-  if (PointInBox(pt, Self.getBounds())) then
-  begin
-    p := [pt.X - Self.GetBounds().X1, pt.Y - Self.GetBounds().Y1];
-    if (GetMufasaBitmap(Self.MaskBMP).PointInBitmap(p.x, p.y)) then
-    begin
-      if (Full) then
-        Result := (FastGetPixel(Self.MaskBMP, p.x, p.y) = $FFFFFF) or
-                  (FastGetPixel(Self.MaskBMP, p.x, p.y) = $FF)
-      else
-        Result := FastGetPixel(Self.MaskBMP, p.x, p.y) = $FF;
-    end;
-  end;
-end;
-
-procedure TMinimap.FilterPoints(var TPA: TPointArray);
-begin
-  TPA := ClearTPAFromTPA(TPA, Self.MaskTPA);
-end;
-
-function TMinimap.FindDTMs(const DTM: Integer; out Matches: TPointArray; Step: Extended = 1.00; Range: UInt32 = 25): Boolean;
-
-  function GetSearchAngles(TheAngle, TheRange: Extended): T2DExtendedArray;
+  blacks: TPointArray;
+  BMP: TMufasaBitmap;
+  function FindDots(blacks: TPointArray; Color, T: Int32): TPointArray;
   var
-    StartA, EndA: Extended;
+    i: Int32;
+    p: TPoint;
+    left, right: Boolean;
   begin
-    StartA := (TheAngle - TheRange);
-    EndA := (TheAngle + TheRange);
+    for i:=0 to High(blacks)-1 do
+    begin
+      left := ((BMP.GetPixel(blacks[i].x+3,blacks[i].y+0) = 65536) and (BMP.GetPixel(blacks[i].x+1,blacks[i].y-1) <> 65536)) or
+              ((BMP.GetPixel(blacks[i].x+2,blacks[i].y+1) = 65536) and (BMP.GetPixel(blacks[i].x+1,blacks[i].y+0) <> 65536));
 
-    SetLength(Result, 2);
-    if (StartA < 0.00) then
-    begin
-      Result[0] := [360.0 + StartA, 360];
-      Result[1] := [0.0, 0 + EndA];
-    end else if (EndA > 360) then
-    begin
-      Result[0] := [StartA, 360];
-      Result[1] := [0.0, 0 + Abs(EndA - 360)];
-    end else
-    begin
-      SetLength(Result, 1);
-      Result[0] := [StartA, EndA];
+      right := False;
+      if not left then
+        right := ((BMP.GetPixel(blacks[i].x-2,blacks[i].y+1) = 65536) and (BMP.GetPixel(blacks[i].x-1,blacks[i].y+0) <> 65536));
+
+      if left or right then
+      begin
+        p := blacks[i];
+        if right then p.x -= 3;
+        p.y -= 3;
+        if Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+0), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+0), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+0,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+3,p.y+1), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+0,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+3,p.y+2), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+1,p.y+3), t)) +
+           Ord(SimilarColors(Color, BMP.GetPixel(p.x+2,p.y+3), t)) >= 8 then
+        begin
+          Result += p;
+        end;
+      end;
     end;
   end;
-
-var
-  SearchAngles, FoundAngles, tmp: T2DExtendedArray;
-  i: integer;
-  TPA: TPointArray;
 begin
-  SetLength(Matches, 0);
-  SearchAngles := GetSearchAngles(Self.GetCompassAngle(), Range);
+  BMP := GetMufasaBitmap(BitmapFromClient(Minimap.GetBounds));
+  try
+    BMP.FindColors(blacks, 65536);
+    blacks := blacks.FilterBox(Box(2,4,BMP.GetWidth-4, BMP.GetHeight-1));
 
-  for i := 0 to High(SearchAngles) do
-    with Self.GetBounds() do
-      if (FindDTMsRotatedSE(DTM, TPA, X1,Y1,X2,Y2, SearchAngles[i][0], SearchAngles[i][1], Step, tmp)) then
-      begin
-        Insert(tmp, FoundAngles, Length(FoundAngles));
-        AppendTPA(Matches, TPA);
-      end;
+    if MMDotPlayer in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.001,0.001);
+      Result := FindDots(blacks, $FFFFFF, 30);
+    end;
 
-  Self.FilterPoints(Matches);
-  Result := Length(Matches) > 0;
+    if MMDotNPC in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.05,1);
+      Result += FindDots(blacks, $00FFFF, 30);
+    end;
+
+    if MMDotItem in DotTypes then
+    begin
+      SetColorToleranceSpeed(2);
+      SetToleranceSpeed2Modifiers(0.05,1);
+      Result += FindDots(blacks, $0000FF, 30);
+    end;
+
+    Result.Offset(Point(Minimap.GetBounds.X1, Minimap.GetBounds.Y1));
+    if SortFromPlayer then Result.Sort(Minimap.Center);
+  finally
+    BMP.Free();
+    SetColorToleranceSpeed(1);
+    SetToleranceSpeed2Modifiers(0.2,0.2);
+  end;
 end;
 
-function TMinimap.GetColorPercent(Color: Integer; Tolerance: Integer = 0): Integer;
+(*
+Minimap.FindDots
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.FindDots(DotType: set of EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+
+Returns True if the given number of dots can be found on the minimap. By default if it can find 1 dot of the given type.
+*)
+function TRSMinimap.FindDots(DotTypes: set of EMinimapDotType; MinCount: UInt32 = 1): Boolean;
+begin
+  Result := Length(Self.GetDots(DotTypes, False)) >= MinCount;
+end;
+
+(*
+Minimap.isPointOn
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.isPointOn(P: TPoint): Boolean;
+
+Returns ``True`` if the given point is within the minimap.
+*)
+function TRSMinimap.isPointOn(P: TPoint): Boolean;
+begin
+  Result := srl.PointInPoly(P, Self.MaskPoly);
+end;
+
+(*
+Minimap.FilterPoints
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
+
+Filters the TPA so that no points are outside the minimap circle.
+*)
+procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
 var
-  TPA, TPA2: TPointArray;
-  Max: Integer;
+  i: Int32;
+begin
+  for i := High(TPA) downto 0 do
+    if (not srl.PointInPoly(TPA[i], Self.MaskPoly)) then
+      Delete(TPA, i, 1);
+end;
+
+(*
+Minimap.GetColorPercent
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
+
+Returns hte percentage of the minimap that contains the given color. 
+Can be handy when checking if you are above or bellow groundlevel.
+*)
+function TRSMinimap.GetColorPercent(Color: Int32; Tolerance: Int32 = 0): Int32;
+var
+  Total: Int32;
+  TPA: TPointArray;
 begin
   FindColorsBitmap(Self.MaskBMP, TPA, $FFFFFF);
-  FindColorsBitmap(Self.MaskBMP, TPA2, $FF);
-  TPA.Extend(TPA2);
-  Max := Length(TPA);
-  FindColorsTolerance(TPA, Color, Self.GetBounds(), Tolerance);
+  Total := Length(TPA);
+  FindColorsTolerance(TPA, Color, Self.FBounds, Tolerance);
   Self.FilterPoints(TPA);
-  Result := Round((Length(TPA) / Max) * 100);
+  Result := Round((Length(TPA) / Total) * 100);
 end;
 
-function TMinimap.RandomCompass(MinMovement, MaxMovement: Integer; UseMouse: Boolean = True): Extended;
+(*
+Minimap.RandomCompass
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSMinimap.RandomCompass(Min, Max: Double; Mouse: Boolean = True);
+
+Rotates the compass to a random angle between Min and Max. Values are given as degrees.
+*)
+procedure TRSMinimap.RandomCompass(Min, Max: Double; Mouse: Boolean = True);
 var
-  a: Integer;
+  Degrees: Double;
 begin
-  a := Round(Self.GetCompassAngle());
+  Degrees := Self.GetCompassAngle();
+  
   if (Random(2) = 0) then
-    a -= Random(MinMovement, MaxMovement)
+    Self.SetCompassAngle(FixD(Degrees - Random(Min, Max)), Mouse)
   else
-    a += Random(MinMovement, MaxMovement);
-  Self.SetCompassAngle(FixD(a), UseMouse, Random(5, 10));
-  Result := Self.GetCompassAngle();
+    Self.SetCompassAngle(FixD(Degrees + Random(Min, Max)), Mouse);
 end;
 
 begin

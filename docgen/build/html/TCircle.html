@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TCircle &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="TExtendedArray" href="TExtendedArray.html" />
+    <link rel="prev" title="TBoxArray" href="TBoxArray.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="TExtendedArray.html" title="TExtendedArray"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TBoxArray.html" title="TBoxArray"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tcircle">
+<h1>TCircle<a class="headerlink" href="#tcircle" title="Permalink to this headline">¶</a></h1>
+<p>TCircle related methods</p>
+<p>type definition is found in shared/globals.simba</p>
+<div class="section" id="tcircle-totpa">
+<h2>TCircle.ToTPA<a class="headerlink" href="#tcircle-totpa" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">ToTPA</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a full TPA of the circles circumference</p>
+</div>
+<div class="section" id="tcircle-bounds">
+<h2>TCircle.Bounds<a class="headerlink" href="#tcircle-bounds" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Bounds</span><span class="p">()</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Return a TBox covering the circle</p>
+</div>
+<div class="section" id="tcircle-contains">
+<h2>TCircle.Contains<a class="headerlink" href="#tcircle-contains" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">p</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Test if the point is within the circle</p>
+</div>
+<div class="section" id="tcircle-circumferencetpa">
+<h2>TCircle.CircumferenceTPA<a class="headerlink" href="#tcircle-circumferencetpa" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">CircumferenceTPA</span><span class="p">()</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Alias of <cite>.ToTPA</cite></p>
+</div>
+<div class="section" id="tcircle-mean">
+<h2>TCircle.Mean<a class="headerlink" href="#tcircle-mean" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Mean</span><span class="p">()</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Middle of the circle, same as <cite>Point(Circle.X, Circle.Y)</cite></p>
+</div>
+<div class="section" id="tcircle-circumference">
+<h2>TCircle.Circumference<a class="headerlink" href="#tcircle-circumference" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Circumference</span><span class="p">()</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the distance around the outside of a circle.</p>
+</div>
+<div class="section" id="tcircle-area">
+<h2>TCircle.Area<a class="headerlink" href="#tcircle-area" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Area</span><span class="p">()</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the area the circle covers</p>
+</div>
+<div class="section" id="tcircle-filter">
+<h2>TCircle.Filter<a class="headerlink" href="#tcircle-filter" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Filter</span><span class="p">(</span><span class="n">TestSet</span><span class="o">:</span> <span class="n">TPointArray</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Extract all the points from <cite>TestSet</cite> that fits within this circle.</p>
+</div>
+<div class="section" id="tcircle-expand">
+<h2>TCircle.Expand<a class="headerlink" href="#tcircle-expand" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TCircle</span><span class="o">.</span><span class="nf">Expand</span><span class="p">(</span><span class="nb">Inc</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TCircle</span><span class="o">;</span> <span class="n">constref</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Increase or decrease the radius of the circle, same as <cite>Circle.Radius + Incr</cite>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TCircle</a><ul>
+<li><a class="reference internal" href="#tcircle-totpa">TCircle.ToTPA</a></li>
+<li><a class="reference internal" href="#tcircle-bounds">TCircle.Bounds</a></li>
+<li><a class="reference internal" href="#tcircle-contains">TCircle.Contains</a></li>
+<li><a class="reference internal" href="#tcircle-circumferencetpa">TCircle.CircumferenceTPA</a></li>
+<li><a class="reference internal" href="#tcircle-mean">TCircle.Mean</a></li>
+<li><a class="reference internal" href="#tcircle-circumference">TCircle.Circumference</a></li>
+<li><a class="reference internal" href="#tcircle-area">TCircle.Area</a></li>
+<li><a class="reference internal" href="#tcircle-filter">TCircle.Filter</a></li>
+<li><a class="reference internal" href="#tcircle-expand">TCircle.Expand</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="TBoxArray.html"
+                        title="previous chapter">TBoxArray</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="TExtendedArray.html"
+                        title="next chapter">TExtendedArray</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TCircle.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="TExtendedArray.html" title="TExtendedArray"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TBoxArray.html" title="TBoxArray"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

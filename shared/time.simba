@@ -1,6 +1,37 @@
+(*
+Time
+=======
+Time related methods
+*)
+
+(*
+TTimeFormat
+~~~~~~~~~~~~
+.. pascal::
+  type TTimeFormat = (Time_Formal, Time_Short, Time_Abbrev, Time_Bare, Time_FStop, Time_Formal_Long);
+
+Formats used when converting time to string.
+*)
 type
   TTimeFormat = (Time_Formal, Time_Short, Time_Abbrev, Time_Bare, Time_FStop, Time_Formal_Long);
 
+const
+  ONE_SECOND     = 1000;
+  ONE_MINUTE     = ONE_SECOND * 60;
+  FIVE_MINUTES   = ONE_MINUTE * 5;
+  THIRTY_MINUTES = ONE_MINUTE * 30;
+  ONE_HOUR       = ONE_MINUTE * 60;
+  ONE_DAY        = ONE_HOUR   * 24;
+  
+  
+(*
+srl.MsToTime
+~~~~~~~~~~~~~
+.. pascal::
+  function TSRL.MsToTime(const MS: UInt64; const Format: TTimeFormat): String; constref;
+
+Converts milliseconds to a string following the given time-format.
+*)
 function TSRL.MsToTime(const MS: UInt64; const Format: TTimeFormat): String; constref;
 var
   STA: array [0..5] of TVariantArray;
@@ -34,11 +65,28 @@ begin
       Result += PadZ(IntToStr(Time[i]), STA[Ord(Format)][tl+1]) + STA[Ord(Format)][i];
 end;
 
+  
+(*
+srl.TimeRunning
+~~~~~~~~~~~~~~~~
+.. pascal::
+  function TSRL.TimeRunning(TheType: TTimeFormat = Time_Formal_Long): String; constref;
+
+Returns time the script has been running as a string with the given time-format.
+*)
 function TSRL.TimeRunning(TheType: TTimeFormat = Time_Formal_Long): String; constref;
 begin
   Result := MsToTime(GetTimeRunning(), TheType);
 end;
 
+(*
+srl.WaitFunc
+~~~~~~~~~~~~~
+.. pascal::
+  function TSRL.WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean; constref;
+
+Waits till the given function returns ``True``, or otherwise time out defineds by ``MaxTime``.
+*)
 function TSRL.WaitFunc(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean; constref;
 var
   t: UInt64;
@@ -54,6 +102,14 @@ begin
   end;
 end;
 
+(*
+srl.WaitTypeFunc
+~~~~~~~~~~~~~~~~~
+.. pascal::
+  function TSRL.WaitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean; constref;
+
+Waits till the given function returns ``True``, or otherwise time out defineds by ``MaxTime``.
+*)
 function TSRL.WaitTypeFunc(Func: function: Boolean of object; WaitPerLoop, MaxTime: Integer): Boolean; constref;
 var
   t: UInt64;
@@ -72,7 +128,6 @@ end;
 (*
 TTimeMarker
 ~~~~~~~~~~~
-
 .. code-block:: pascal
 
     type TTimeMarker = record
@@ -95,7 +150,6 @@ type
 (*
 TTimeMarker.Start
 ~~~~~~~~~~~~~~~~~
-
 .. code-block pascal
 
     procedure TTimeMarker.Start();
@@ -129,7 +183,6 @@ end;
 (*
 TTimeMarker.Reset
 ~~~~~~~~~~~~~~~~~
-
 .. code-block pascal
 
     procedure TTimeMarker.Reset();
@@ -157,7 +210,6 @@ end;
 (*
 TTimeMarker.Pause
 ~~~~~~~~~~~~~~~~~
-
 .. code-block pascal
 
     procedure TTimeMarker.Pause();
@@ -185,7 +237,6 @@ end;
 (*
 TTimeMarker.GetTime
 ~~~~~~~~~~~~~~~~~~~
-
 .. code-block pascal
 
     function TTimeMarker.GetTime(): UInt64;
@@ -217,7 +268,6 @@ end;
 (*
 TTimeMarker.GetTotalTime
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block pascal
 
     function TTimeMarker.GetTotalTime(): UInt64;
@@ -250,6 +300,7 @@ TCountDown
 A neat and simple timer type.
 
 Example:
+
 .. code-block:: pascal
 
   myTimer.Init(3000); //3000ms
@@ -294,13 +345,20 @@ end;
 {$IFDEF WINDOWS}
 function PerformanceTimer(): Double;
 var
-  frequency,count: UInt64;
-  function QPF(out F: UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
-  function QPC(out C: UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  frequency,counter: ^UInt64;
+  function QPF(F: ^UInt64): LongBool; static; external 'QueryPerformanceFrequency@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
+  function QPC(C: ^UInt64): LongBool; static; external 'QueryPerformanceCounter@Kernel32.dll '+{$IFDEF CPU386}'stdcall'{$ELSE}'win64'{$ENDIF};
 begin
-  QPF(frequency);
-  QPC(count);
-  Result := count / frequency * 1000;        
+  frequency := GetMem(SizeOf(UInt64)); // at least qword aligned
+  counter   := GetMem(SizeOf(UInt64)); // ...
+
+  if QPF(frequency) and QPC(counter) then
+    Result := counter^ / frequency^ * 1000
+  else
+    Result := GetTickCount();
+
+  FreeMem(frequency);
+  FreeMem(counter);
 end;
 {$ELSE}
 function PerformanceTimer(): Double;

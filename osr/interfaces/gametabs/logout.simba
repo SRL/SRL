@@ -121,7 +121,7 @@ begin
       else
         Wait(25);
     until GetTickCount64() > t;
-    srl.NormalWait(0,seed);
+    Wait(0,seed);
   end;
 end;
 
@@ -239,10 +239,9 @@ begin
   ATPA := ClusterTPAEx(TPA, 20, 2); // Get bounds of each world number
   for i := 0 to High(ATPA) do
   begin
-    b := GetTPABounds(ATPA[i]);
-    b.Expand(2);
+    b := GetTPABounds(ATPA[i]).Expand(2);
 
-    for j := 0 to High(WORLD_COLORS) do
+    for j:=0 to High(WORLD_COLORS) do
     begin
       Text := GetTextAtEx(b, 0, 3, 0, WORLD_COLORS[j], 0, 'SmallChars07');
       if (Text <> '') then

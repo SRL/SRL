@@ -1,13 +1,66 @@
 (*
-  This file is a work in progress.
-  In other words:
-  * it will be a subject to change
-  * it doesn't have any documentation
-  * it may lack a lot of safety checks
-  * it will no be included by default
-  * it could contain bugs
-  
-  - slacky was here!
+GrandExchange
+==============
+This file is a work in progress.
+In other words:
+
+* it could be a subject to change
+
+* it may lack safety checks
+
+* it could contain bugs
+
+- slacky was here!
+*)
+
+(*
+Types and Variables
+-------------------
+*)
+
+(*
+type EGEInterface
+~~~~~~~~~~~~~~~~~~
+.. pascal:: EGEInterface = (geOverview, geOfferStatus, geSetupOffer);
+
+Type that covers the interfaces
+*)
+
+(*
+type EExchButton
+~~~~~~~~~~~~~~~~~~
+.. pascal:: EGEInterface = (ebHistory, ebAbort, ebReturn, ebCollect, ebClose);
+
+The main buttons buttons
+*)
+
+(*
+type EAdjustButton
+~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+   EAdjustButton = (
+     abDecQuant, abQuantInc, abDecPrice, abIncPrice,
+     abIncQuant1, abIncQuant10, abIncQuant100, abIncQuant1K, abEnterQuantity,
+     abDecPrice5Prc, abGuidePrice, abEnterPrice, abIncPrice5Prc
+   );
+
+The buttons found in the offer-interface.
+*)
+
+(*
+type EExchType
+~~~~~~~~~~~~~~
+.. pascal::  EExchType = (etEmpty, etBuy, etSell);
+
+The type of the offer-interface (Undefined, Buy, Sell)
+*)
+
+(*
+type EOfferState
+~~~~~~~~~~~~~~~~
+.. pascal::  EOfferState = (osIncomplete, osCompleted, osAborted);
+
+The result of the offer, incomplete, completed, aborted.
 *)
 type
   EGEInterface = (geOverview, geOfferStatus, geSetupOffer);
@@ -20,6 +73,22 @@ type
   EExchType   = (etEmpty, etBuy, etSell);
   EOfferState = (osIncomplete, osCompleted, osAborted);
 
+(*
+type TExchangeInfo
+~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+   TExchangeInfo = record
+     Item: String;
+     Typ: EExchType;
+     Status: EOfferState;
+     Progress: Int32;
+     Price: Int32;
+     Sum: Int32;
+   end;
+
+Contains all the data regarding an offer.
+*)
+type
   TExchangeInfo = record
     Item: String;
     Typ: EExchType;
@@ -35,8 +104,8 @@ type
 
   TGrandExchStub = record(TInterfaceBase)
     FHeader:TBox;
-    FTitles:Array [EGEInterface] of String;
-    FButtons: Array [EExchButton] of TBox;
+    FTitles: array [EGEInterface] of String;
+    FButtons: array [EExchButton] of TBox;
     FMiscBoxes: TBoxArray;
   end;
 
@@ -60,11 +129,35 @@ const
   clGELiteOrange = 4176127;
   clGEProgOrange = 2130136;
 
+(*
+var GrandExchange
+~~~~~~~~~~~~~~~~~~~
+The variable used to interact with the grand exchange interface.
+
+**Example**
+
+.. pascal::
+  if GrandExchange.IsOpen() then
+  begin
+    GrandExchange.PlaceOffer(0, etSell);  // slot = 0, sell it
+    GrandExchange.Offer.SellItem(4);      // item at inventory slot = 4
+    GrandExchange.Offer.SetPrice(1000);   // 1000 each
+    GrandExchange.Offer.SetQuantity(5);   // 5 of these items
+    GrandExchange.Offer.Confirm(); 
+  end;  
+*)
 var
   GrandExchange: TRSGrandExch;
 
 
-//====| The base of GE interfaces |===========================================\\
+//----------------------------------------------------------------------------
+
+(*
+GrandExchange Stub
+------------------
+These methods are available through both `GrandExchange` and `GrandExchange.Offer`.
+*)
+
 procedure TGrandExchStub.__Setup();
 begin
   self.FBounds := [23,24,496,317];
@@ -84,7 +177,15 @@ begin
   FTitles[geSetupOffer] := 'Set up offer';
 end;
 
+(*
+GrandExchange.RecognizeStr
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+   function TGrandExchStub.RecognizeStr(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                        WSplit:Int32=3; HSplit:Int32=2): String;
 
+Internally used to to get the text at the given coordinates.
+*)
 function TGrandExchStub.RecognizeStr(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                      WSplit:Int32=3; HSplit:Int32=2): String;
 var
@@ -102,7 +203,15 @@ begin
   end;
 end;
 
+(*
+GrandExchange.RecognizeInt
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+   function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                        WSplit:Int32=3; HSplit:Int32=2): Int32;
 
+Internally used to to get the text as an integer at the given coordinates.
+*)
 function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                      WSplit:Int32=3; HSplit:Int32=2): Int32;
 var tmp:String;
@@ -111,14 +220,32 @@ begin
   Result := StrToIntDef(ExtractFromStr(tmp, NUMBERS), -1);
 end;
 
+(*
+GrandExchange.Title
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchStub.Title(): String;
 
+Get the title of the current interface
+*)
 function TGrandExchStub.Title(): String;
 begin
   Result := RecognizeStr(FHeader, clGEOrange, 'UpChars07_s',,,4);
 end;
 
+(*
+GrandExchange.CurrentInterface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchStub.CurrentInterface(Wtime: Int32=0): EGEInterface;
 
-function TGrandExchStub.CurrentInterface(wtime:Int32=0): EGEInterface;
+Returns the current interface, ``geOverview``, ``geOfferStatus`` and ``geSetupOffer``.
+
+- ``geOverview`` is the main interface
+
+- ``geOfferStatus`` is the screen where you inspect your offer
+
+- ``geSetupOffer`` is the screen where you place a buy/sell offer
+*)
+function TGrandExchStub.CurrentInterface(Wtime: Int32=0): EGEInterface;
 var
   title:String;
   t:Int64;
@@ -135,8 +262,14 @@ begin
   until (GetTickCount64() > t);
 end;
 
+(*
+GrandExchange.IsOpen
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchStub.IsOpen(Screen: EGEInterface=geOverview; Wtime: Int32=0): Boolean;
 
-function TGrandExchStub.IsOpen(screen:EGEInterface=geOverview; wtime:Int32=0): Boolean;
+Returns ``True`` if the given GE interface is open.
+*)
+function TGrandExchStub.IsOpen(Screen: EGEInterface=geOverview; Wtime: Int32=0): Boolean;
 var
   title:String;
   t:Int64;
@@ -153,24 +286,51 @@ begin
   until (GetTickCount64() > t) or (Result);
 end;
 
+(*
+GrandExchange.Click
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TGrandExchStub.Click(Button: EExchButton);
 
-procedure TGrandExchStub.Click(button:EExchButton);
+Clicks one of the many exchange buttons.
+
+**Example**
+
+.. pascal:: 
+  GrandExchange.Offer.Click(ebAbort); // abort the offer
+  GrandExchange.Click(ebCollect);     // collect items / money
+*)
+procedure TGrandExchStub.Click(Button: EExchButton);
 begin
-  Mouse.Click(self.FButtons[ord(button)], mouse_left);
+  Mouse.Click(self.FButtons[Ord(Button)], mouse_left);
+end;
+
+(*
+GrandExchange.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchStub.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debug the GrandExchange (stub).
+*)
+function TGrandExchStub.Debug(RetImage: Boolean = False): TMufasaBitmap;
+begin
+  Result := GetMufasaBitmap(BitmapFromClient(GetClientBounds()));
+  Result.DrawBox(FBounds, False, $FFFFFF);
+  Result.DrawBox(FHeader, False, $FF0000);
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
 end;
 
 
-{$IFDEF SMART}
-procedure TGrandExchStub.Debug();
-begin
-  Smart.Image.DrawBox(FBounds, False, $FFFFFF);
-  Smart.Image.DrawBox(FHeader, False, $FF0000);
-end;
-{$ENDIF}
 
+//----------------------------------------------------------------------------
 
-
-//====| GE Offer Interface (Sell & Buy) |=====================================\\
+(*
+GrandExchange Offer
+-------------------
+These are the methods for GE Offer Interface (Sell & Buy)
+*)
 procedure TGrandExchOffer.__Setup(); override;
 begin
   inherited;
@@ -201,7 +361,13 @@ begin
   FConfimButton.Offset(Point(FBounds.X1, FBounds.Y1));
 end;
 
+(*
+GrandExchange.Offer.LoadButtons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.LoadButtons(): TBoxArray;
 
+Internally used to load the loaction of the various buttons in the GE offer-interface.
+*)
 function TGrandExchOffer.LoadButtons(): TBoxArray;
 var
   i:Int32;
@@ -217,10 +383,7 @@ begin
     begin
       B := GetTPABounds(ATPA[i]);
       if (B.Width() < 16) and (B.Height() < 16) then
-      begin
-        B.Expand(1);
-        FAdjButtons.Append(B);
-      end;
+        FAdjButtons.Append(B.Expand(1));
     end;
 
     FindColorsTolerance(TPA, $100000, FAdjBounds[1], 30);
@@ -236,23 +399,56 @@ begin
   Result := FAdjButtons;
 end;
 
-procedure TGrandExchOffer.Click(button:EAdjustButton; times:Int32=1); overload;
+(*
+GrandExchange.Offer.Click
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TGrandExchOffer.Click(Button: EAdjustButton; Times: Int32=1); overload;
+
+Click one of the adjustment buttons see [type-EAdjustButton]_
+
+**Example**
+
+.. pascal:: 
+   GrandExchange.Offer.Click(abIncPrice5Prc, 2); //click `+5%`, 2 times.
+*)
+procedure TGrandExchOffer.Click(Button: EAdjustButton; Times: Int32=1); overload;
 var i:Int32;
 begin
   self.LoadButtons();
   for i:=1 to times do
   begin
     Mouse.Click(self.FAdjButtons[ord(button)], mouse_left);
-    srl.NormalWait(65,220);
+    Wait(65,220);
   end;
 end;
 
+(*
+GrandExchange.Offer.Confirm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TGrandExchOffer.Confirm();
+
+Press that bigass confirm button.
+*)
 procedure TGrandExchOffer.Confirm();
 begin
   Mouse.Click(self.FConfimButton, mouse_left);
 end;
 
-function TGrandExchOffer.SelectItem(name:String; Exact:Boolean=False; wtime:Int32=2000): Boolean;
+(*
+GrandExchange.Offer.SelectItem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.SelectItem(Name: String; Exact: Boolean=False; Wtime: Int32=2000): Boolean;
+
+Once you have searched for an item, this function is used to select it.
+
+**Example**
+
+.. pascal::
+  GrandExchange.PlaceOffer(0, etBuy);              // slot = 0, buy it
+  GrandExchange.Offer.SearchFor('Rune scimitar');  // search for
+  GrandExchange.Offer.SelectItem('Rune scimitar'); // select
+*)
+function TGrandExchOffer.SelectItem(Name: String; Exact: Boolean=False; Wtime: Int32=2000): Boolean;
 var
   i,t:Int64;
   B:TBox;
@@ -269,7 +465,7 @@ begin
       for i:=0 to High(ATPA) do
       begin
         B := GetTPABounds(ATPA[i]);
-        str := self.RecognizeStr(B, 0, 'SmallChars');
+        str := self.RecognizeStr(B, 0, 'SmallChars07');
         if (Exact and (str = name)) or ((not Exact) and (Pos(name,str) > 0)) then
         begin
           Mouse.Click(B, mouse_left);
@@ -280,18 +476,39 @@ begin
   until (GetTickCount64() > t);
 end;
 
-function TGrandExchOffer.SetQuantity(quantity:Int32): Boolean;
+(*
+GrandExchange.Offer.SetQuantity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.SetQuantity(Quantity: Int32): Boolean;
+
+Sets the number of items you wish to sell or buy.
+*)
+function TGrandExchOffer.SetQuantity(Quantity: Int32): Boolean;
 begin
   Self.Click(abEnterQuantity);
-  Result := Chatbox.AnswerQuery('How many', IntToStr(quantity), True, 2500);
+  Result := Chatbox.AnswerQuery('How many', IntToStr(Quantity), 2500, True);
 end;
 
-function TGrandExchOffer.SetPrice(price:Int32): Boolean;
+(*
+GrandExchange.Offer.SetPrice
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.SetPrice(Price: Int32): Boolean;
+
+Sets the price per item that you wish to buy the items for.
+*)
+function TGrandExchOffer.SetPrice(Price: Int32): Boolean;
 begin
   Self.Click(abEnterPrice);
-  Result := Chatbox.AnswerQuery('Set a price', IntToStr(price), True, 2500);
+  Result := Chatbox.AnswerQuery('Set a price', IntToStr(price), 2500, True);
 end;
 
+(*
+GrandExchange.Offer.ExchangeType
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.ExchangeType(): EExchType;
+
+Returns the type of the offer, if it's a sell or a buy offer, or otherwise undefined / empty.
+*)
 function TGrandExchOffer.ExchangeType(): EExchType;
 var str:String;
 begin
@@ -304,6 +521,13 @@ begin
   end;
 end;
 
+(*
+GrandExchange.Offer.OfferIcon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.OfferIcon(): TMufasaBitmap;
+
+Returns an image of the item icon that relates to this offer.
+*)
 function TGrandExchOffer.OfferIcon(): TMufasaBitmap;
 var bmp:Integer;
 begin
@@ -314,21 +538,49 @@ begin
   end;
 end;
 
+(*
+GrandExchange.Offer.ItemValue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.ItemValue(): Int32;
+
+Returns the value of the item according to GE
+*)
 function TGrandExchOffer.ItemValue(): Int32;
 begin
   Result := self.RecognizeInt(FMiscBoxes[2], clGELiteOrange, 'StatChars07');
 end;
 
+(*
+GrandExchange.Offer.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.ItemName(): String;
+
+Returns the full name of the item.
+*)
 function TGrandExchOffer.ItemName(): String;
 begin
   Result := self.RecognizeStr(FMiscBoxes[3], clGEOrange, 'UpChars07_s');
 end;
 
+(*
+GrandExchange.Offer.ItemDesc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.ItemDesc(): String;
+
+Returns the description of the item.
+*)
 function TGrandExchOffer.ItemDesc(): String;
 begin
   Result := self.RecognizeStr(FMiscBoxes[4], clGELiteOrange, 'StatChars07');
 end;
 
+(*
+GrandExchange.Offer.Quantity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Quantity(): Int32;
+
+Returns the quantity set up to buy or sell.
+*)
 function TGrandExchOffer.Quantity(): Int32;
 var iface:EGEInterface;
 begin
@@ -341,6 +593,13 @@ begin
     Result := -1;
 end;
 
+(*
+GrandExchange.Offer.Price
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Price(): Int32;
+
+Returns the price it's set up to buy or sell at.
+*)
 function TGrandExchOffer.Price(): Int32;
 var iface:EGEInterface;
 begin
@@ -353,6 +612,13 @@ begin
     Result := -1;
 end;
 
+(*
+GrandExchange.Offer.Sum
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Sum(): Int32;
+
+Returns the total cost or revenue from buying or selling this item.
+*)
 function TGrandExchOffer.Sum(): Int32;
 var iface:EGEInterface;
 begin
@@ -365,20 +631,31 @@ begin
     Result := -1;
 end;
 
+(*
+GrandExchange.Offer.Status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Status(): String;
+
+Returns the current offers status message
+*)
 function TGrandExchOffer.Status(): String;
 begin
   Result := self.RecognizeStr(FMiscBoxes[8], clGEOrange, 'StatChars07', 60);
 end;
 
+(*
+GrandExchange.Offer.Progress
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Progress(): Int32;
 
-//untested (I assume it works)
+Returns the offer's buy/sell progress in percent.
+*)
 function TGrandExchOffer.Progress(): Int32;
 var
   B:TBox;
   y,count:Int32;
 begin
-  B := FMiscBoxes[11];
-  B.Expand(-1);
+  B := FMiscBoxes[11].Expand(-1);
   y := B.Middle().y;
   B.y1 := y;
   B.y2 := y;
@@ -386,6 +663,13 @@ begin
   Result := Round(count / B.Width() * 100);
 end;
 
+(*
+GrandExchange.Offer.State
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.State(): EOfferState;
+
+Returns the offers state, as in incomplete, aborted, or completed.
+*)
 function TGrandExchOffer.State(): EOfferState;
 var B:TBox;
 begin
@@ -395,7 +679,14 @@ begin
   if CountColorTolerance(24320,B,30) > 500 then Exit(osCompleted);
 end;
 
-function TGrandExchOffer.SearchFor(name:String): Boolean;
+(*
+GrandExchange.Offer.SearchFor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.SearchFor(Name: String): Boolean;
+
+Searches for the given item when buying an item.
+*)
+function TGrandExchOffer.SearchFor(Name: String): Boolean;
 begin
   if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etBuy) then
     Exit(False);
@@ -404,20 +695,34 @@ begin
   begin
     Mouse.Click(FMiscBoxes[1], mouse_left);
   end;
-  Result := Chatbox.AnswerQuery('What would you', name, False, 2500);
+  Result := Chatbox.AnswerQuery('What would you', Name, 2500, False);
 end;
 
-function TGrandExchOffer.SellItem(invIndex:Int32): Boolean;
+(*
+GrandExchange.Offer.SellItem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.SellItem(InvIndex: Int32): Boolean;
+
+Selects the item from your inventory to sell.
+*)
+function TGrandExchOffer.SellItem(InvIndex: Int32): Boolean;
 begin
   if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etSell) then
     Exit(False);
 
-  Result := Inventory.SlotIsUsed(invIndex);
+  Result := Inventory.IsSlotUsed(InvIndex);
   WriteLn(Result);
   if Result then
-    Inventory.MouseSlot(invIndex, mouse_Left);
+    Inventory.MouseSlot(InvIndex, mouse_Left);
 end;
 
+(*
+GrandExchange.Offer.Info
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Info(): TExchangeInfo;
+
+Returns all the data related to the current offer, the type of the offer, and it's state, progress, name, price, sum.
+*)
 function TGrandExchOffer.Info(): TExchangeInfo;
 begin
   Result.Typ     := self.ExchangeType();
@@ -428,32 +733,50 @@ begin
   Result.Sum     := self.Sum();
 end;
 
+(*
+GrandExchange.Offer.Debug
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TGrandExchOffer.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 
-{$IFDEF SMART}
-procedure TGrandExchOffer.Debug(); override;
-var i:Int32;
+Debug the Offer-interface. Important for maintenace purposes.
+*)
+function TGrandExchOffer.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+var 
+  i:Int32;
 begin
-  inherited;
-  Smart.Image.DrawBoxes(FAdjBounds, False, $777777);
-  Smart.Image.DrawBoxes(Self.LoadButtons(), False, $0077FF);
+  Result := inherited(True);
+  Result.DrawBoxes(FAdjBounds, False, $777777);
+  Result.DrawBoxes(Self.LoadButtons(), False, $0077FF);
 
   if Self.CurrentInterface() = geSetupOffer then
   begin
-    Smart.Image.DrawBoxes(Copy(FMiscBoxes, 0, Length(FMiscBoxes)-4), False, $FFFF00);
-    Smart.Image.DrawBox(FConfimButton, False, $FFFFFF);
+    Result.DrawBoxes(Copy(FMiscBoxes, 0, Length(FMiscBoxes)-4), False, $FFFF00);
+    Result.DrawBox(FConfimButton, False, $FFFFFF);
   end
   else
-    Smart.Image.DrawBoxes(FMiscBoxes, False, $FFFF00);
+    Result.DrawBoxes(FMiscBoxes, False, $FFFF00);
 
   for i:=0 to High(FButtons) do
     if i <> ord(ebCollect) then
-      Smart.Image.DrawBox(FButtons[i], False, $0000FF);
+      Result.DrawBox(FButtons[i], False, $0000FF);
+  
+  if RetImage then Exit();
+  
+  Result.Debug();
+  Result.Free();
+  Result := nil;
 end;
-{$ENDIF}
 
 
+//----------------------------------------------------------------------------
 
-//====| GrandExchange Interface |=============================================\\
+
+(*
+GrandExchange
+-------------
+These are the methods for the main GE interface.
+*)
+
 procedure TRSGrandExch.__Setup(); override;
 var
   i:Int32;
@@ -492,13 +815,19 @@ begin
   Result := B;
 end;
 
+(*
+GrandExchange.ExchangeType
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.ExchangeType(Slot: Int32): EExchType;
 
-function TRSGrandExch.ExchangeType(slot:Int32): EExchType;
+Returns the exchange type at the given slot ``(etEmpty, etBuy, etSell)``
+*)
+function TRSGrandExch.ExchangeType(Slot: Int32): EExchType;
 var
   B:TBox;
   str:String;
 begin
-  B := self.OffsetToTable(slot, FExchBoxes[0]);
+  B := self.OffsetToTable(Slot, FExchBoxes[0]);
   str := Self.RecognizeStr(B, clGEOrange, 'UpChars07_s');
   SetLength(str,3);
   case Lowercase(str) of
@@ -508,8 +837,14 @@ begin
   end;
 end;
 
+(*
+GrandExchange.Available
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Available(Slot: Int32): Boolean;
 
-function TRSGrandExch.Available(slot:Int32): Boolean;
+Returns ``True`` if the given exchangle slot is not currently in use.
+*)
+function TRSGrandExch.Available(Slot: Int32): Boolean;
 var B:TBox;
 begin
   if self.ExchangeType(slot) = etEmpty then
@@ -520,43 +855,66 @@ begin
   end;
 end;
 
+(*
+GrandExchange.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.ItemName(Slot: Int32): String;
 
-function TRSGrandExch.ItemName(slot:Int32): String;
+Returns the name of the item in the given slot.
+*)
+function TRSGrandExch.ItemName(Slot: Int32): String;
 var
   B:TBox;
   i:Int32;
   tmp:String;
 begin
-  B := self.OffsetToTable(slot, FExchBoxes[1]);
+  B := self.OffsetToTable(Slot, FExchBoxes[1]);
   Result := self.RecognizeStr(B, clGELiteOrange, 'StatChars07');
 end;
 
+(*
+GrandExchange.State
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.State(Slot: Int32): EOfferState;
 
-function TRSGrandExch.State(slot:Int32): EOfferState;
+Returns the state of the offer at the given slot.
+*)
+function TRSGrandExch.State(Slot: Int32): EOfferState;
 var B:TBox;
 begin
-  B := self.OffsetToTable(slot, FExchBoxes[3]);
+  B := self.OffsetToTable(Slot, FExchBoxes[3]);
   Result := osIncomplete;
   if CountColorTolerance(143,  B,30) > 500 then Exit(osAborted);
   if CountColorTolerance(24320,B,30) > 500 then Exit(osCompleted);
 end;
 
+(*
+GrandExchange.Price
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Price(Slot: Int32): Int32;
 
-function TRSGrandExch.Price(slot:Int32): Int32;
+Returns the price of the offer at the given slot.
+*)
+function TRSGrandExch.Price(Slot: Int32): Int32;
 var B:TBox;
 begin
-  B := self.OffsetToTable(slot, FExchBoxes[4]);
+  B := self.OffsetToTable(Slot, FExchBoxes[4]);
   Result := self.RecognizeInt(B, clGELiteOrange, 'StatChars07');
 end;
 
-//untested (I assume it works)
-function TRSGrandExch.Progress(slot:Int32): Int32;
+(*
+GrandExchange.Progress
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Progress(Slot: Int32): Int32;
+
+Returns the progress percent of the offer in the given slot.
+*)
+function TRSGrandExch.Progress(Slot: Int32): Int32;
 var
   B:TBox;
   y,count:Int32;
 begin
-  B := self.OffsetToTable(slot, FExchBoxes[3]);
-  B.Expand(-1);
+  B := self.OffsetToTable(Slot, FExchBoxes[3]).Expand(-1);
   y := B.Middle().y;
   B.y1 := y;
   B.y2 := y;
@@ -564,37 +922,63 @@ begin
   Result := Round(count / B.Width() * 100);
 end;
 
+(*
+GrandExchange.Sum
+~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Sum(Slot: Int32): Int32;
 
-function TRSGrandExch.Sum(slot:Int32): Int32;
+This function is a stub, it wont give you any valuable information.
+*)
+function TRSGrandExch.Sum(Slot: Int32): Int32;
 begin
   Result := -1;
 end;
 
+(*
+GrandExchange.Info
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Info(Slot: Int32): TExchangeInfo;
 
-function TRSGrandExch.Info(slot:Int32): TExchangeInfo;
+Returns all the data related to the offer at the given slot. 
+You get the type of the offer, and it's state, progress, name and price. The Sum filed will be ``-1``
+*)
+function TRSGrandExch.Info(Slot: Int32): TExchangeInfo;
 begin
-  Result.Typ     := self.ExchangeType(slot);
-  Result.Status  := self.State(slot);
-  Result.Progress:= self.Progress(slot);
-  Result.Item    := self.ItemName(slot);
-  Result.Price   := self.Price(slot);
-  Result.Sum     := self.Sum(slot);
+  Result.Typ     := self.ExchangeType(Slot);
+  Result.Status  := self.State(Slot);
+  Result.Progress:= self.Progress(Slot);
+  Result.Item    := self.ItemName(Slot);
+  Result.Price   := self.Price(Slot);
+  Result.Sum     := self.Sum(Slot);
 end;
 
+(*
+GrandExchange.PlaceOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.PlaceOffer(Slot: Int32; Typ: EExchType): Boolean;
 
-function TRSGrandExch.PlaceOffer(slot:Int32; typ:EExchType): Boolean;
+Prapares to create a sell or buy offer in the given slot.
+*)
+function TRSGrandExch.PlaceOffer(Slot: Int32; Typ: EExchType): Boolean;
 var
   B:TBox;
 begin
-  if self.Available(slot) then
+  if self.Available(Slot) then
   begin
-    B := self.OffsetToTable(slot, FOfferButtons[ord(typ)]);
+    B := self.OffsetToTable(Slot, FOfferButtons[Ord(Typ)]);
     Mouse.Click(B, mouse_left);
     Result := self.IsOpen(geSetupOffer, 2500);
   end;
 end;
 
-function TRSGrandExch.PlaceOffer(typ:EExchType): Boolean; overload;
+(*
+GrandExchange.PlaceOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.PlaceOffer(Typ: EExchType): Boolean; overload;
+
+Prapares to create a sell or buy offer in the first abilable slot.
+*)
+function TRSGrandExch.PlaceOffer(Typ: EExchType): Boolean; overload;
 var slot:Int32;
 begin
   for slot:=0 to High(ExchTables) do
@@ -602,8 +986,14 @@ begin
       Exit(self.PlaceOffer(slot, typ));
 end;
 
+(*
+GrandExchange.ViewOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.ViewOffer(Slot: Int32): Boolean;
 
-function TRSGrandExch.ViewOffer(slot:Int32): Boolean;
+Opens the offer at the given slot.
+*)
+function TRSGrandExch.ViewOffer(Slot: Int32): Boolean;
 begin
   if not self.Available(slot) then
   begin
@@ -612,42 +1002,51 @@ begin
   end;
 end;
 
+(*
+GrandExchange.Debug
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 
-{$IFDEF SMART}
-procedure TRSGrandExch.Debug(); override;
+Debugs any of the GE interfaces depending on which one is open.
+*)
+function TRSGrandExch.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
 var
-  curr:EGEInterface;
-  i,j:Int32;
+  curr: EGEInterface;
+  i,j: Int32;
 begin
   curr := CurrentInterface();
   if (curr = geOverview) then
   begin
-    inherited;
-    Smart.Image.DrawBoxes(self.ExchTables, False, 1);
-    Smart.Image.DrawBox(FButtons[ebClose],   False, $0000FF);
-    Smart.Image.DrawBox(FButtons[ebCollect], False, $0000FF);
-    Smart.Image.DrawBox(FButtons[ebHistory], False, $0000FF);
+    Result := inherited(True);
+    Result.DrawBoxes(self.ExchTables, False, 1);
+    Result.DrawBox(FButtons[ebClose],   False, $0000FF);
+    Result.DrawBox(FButtons[ebCollect], False, $0000FF);
+    Result.DrawBox(FButtons[ebHistory], False, $0000FF);
     for i:=0 to High(ExchTables) do
     begin
-      Smart.Image.DrawBox(OffsetToTable(i, FExchBoxes[0]),False,$DDDDDD);
+      Result.DrawBox(OffsetToTable(i, FExchBoxes[0]),False,$DDDDDD);
       if self.ExchangeType(i) = etEmpty then
       begin
-        Smart.Image.DrawBox(OffsetToTable(i, FOfferButtons[ord(etSell)]), False, $0077FF);
-        Smart.Image.DrawBox(OffsetToTable(i, FOfferButtons[ord(etBuy)]),  False, $00FFFF);
-      end
+        Result.DrawBox(OffsetToTable(i, FOfferButtons[ord(etSell)]), False, $0077FF);
+        Result.DrawBox(OffsetToTable(i, FOfferButtons[ord(etBuy)]),  False, $00FFFF);
+      end 
       else for j:=1 to High(FExchBoxes) do
-      begin
-        Smart.Image.DrawBox(OffsetToTable(i, FExchBoxes[j]),False,$00FFFF);
-      end;
+        Result.DrawBox(OffsetToTable(i, FExchBoxes[j]),False,$00FFFF);
     end;
   end
   else if curr in [geSetupOffer, geOfferStatus] then
   begin
-    self.offer.Debug();
+    Result := self.offer.Debug(True);
   end;
+  
+  if RetImage then
+    Exit();
+    
+  Result.Debug();
+  Result.Free();
+  Result := nil;
 end;
-{$ENDIF}
 
 begin
   GrandExchange.__Setup();
-end.
+end;

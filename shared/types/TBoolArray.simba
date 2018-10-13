@@ -1,3 +1,9 @@
+(*
+TBoolArray
+==========
+TBoolArray related methods
+*)
+
 procedure TBoolArray.Append(const Value: Boolean);
 var top:Int32;
 begin

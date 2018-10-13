@@ -6,7 +6,7 @@ The file holds functions and procedures that are used for controlling equipment.
 
 (*
 type TRSEquipment
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 The type that holds functions and properties of the Runescape equipment interface.
 *)  
 type 
@@ -22,7 +22,7 @@ type
 
 (*
 var Equipment
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape equipment interface.
 *)
 var 
@@ -55,7 +55,7 @@ end;
 
 procedure TRSEquipment.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FBoxes, False, $0000FF);
@@ -67,7 +67,7 @@ end;
 
 (*
 Equipment.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.Open(): Boolean;
@@ -80,8 +80,23 @@ begin
 end;
 
 (*
+Equipment.IsSlotUsed
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
+
+Opens the eqiupment tab and checks if a slot is used.
+*)
+function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
+begin
+  if Self.Open() then
+    Result := CountColor($10000, FBoxes[Slot]) > 0;
+end;
+
+(*
 Equipment.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.IsOpen(): Boolean;
@@ -93,9 +108,21 @@ begin
   Result := Gametabs.IsOpen(tabEquipment, maxWait);
 end;
 
+function TRSEquipment.MouseSlot(Slot: Int32; Button: Int32 = mouse_Move): Boolean;
+begin
+  if Self.Open() and (CountColor($10000, FBoxes[Slot]) > 0) then
+  begin
+    Mouse.Move(FBoxes[Slot]);
+    if (Button <> mouse_Move) then
+      Mouse.Click(Button);
+
+    Exit(True);
+  end;
+end;
+
 (*
 Equipment.InteractSlot
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.InteractSlot(): Boolean;
@@ -104,22 +131,22 @@ Interacts with the item at the given slot using given option
 *)
 function TRSEquipment.InteractSlot(Slot: Integer; Option: String; UpText: String = ''): Boolean;
 var
-  b: TBox;
+  B: TBox;
 begin
   if (not Self.Open) then
     Exit(False);
-  b := FBoxes[Slot];
-  if (CountColor($10000, b) = 0) then
+  B := FBoxes[Slot];
+  if (CountColor($10000, B) = 0) then
     Exit(False);
-  Mouse.Move(b);
-  if (UpText <> '') and (not Mainscreen.IsUpText(UpText)) then
+  Mouse.Move(B);
+  if (UpText <> '') and (not Mainscreen.isUpText(UpText)) then
     Exit(False);
   Result := ChooseOption.Open() and ChooseOption.Select(Option);
 end;
 
 (*
 Equipment.Remove
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSEquipment.Remove(): Boolean;

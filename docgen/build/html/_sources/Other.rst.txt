@@ -1,0 +1,4 @@
+
+Other datatypes
+===============
+Defines methods for some other datatypes

@@ -18,7 +18,7 @@ type
  procedure TRSCombat.__setup();
  function TRSCombat.Open(): Boolean;
  function TRSCombat.IsOpen(): Boolean;
- function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+ function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
  function TRSCombat.GetCombatLevel(): Int32;
  function TRSCombat.GetWeapon(): String;
 }
@@ -32,16 +32,16 @@ var
   Combat: TRSCombat;
 
 (*
-type ECombatButton
-~~~~~~~~~~~~~~~
+type ECombatStyle
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  ECombatButton = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
+  ECombatStyle = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
 
 identifiers that is used for pressing the different buttons in the combat interface
 *) 
 type
-  ECombatButton = (
+  ECombatStyle = (
     cbtAccurate, 
     cbtAggressive, 
     cbtControlled, 
@@ -71,7 +71,7 @@ end;
 
 procedure TRSCombat.Debug();
 var
-  BMP:TMufasaBitmap;
+  BMP: TMufasaBitmap;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FButtons, False, $0000FF);
@@ -114,11 +114,11 @@ Combat.ToggleButton
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+  function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
 
 Changes the state of the given button ``btn`` (if needed) to the given state ``enable``.
 *)
-function TRSCombat.ToggleButton(btn: ECombatButton; enable:Boolean; tryTime:Int32=2000): Boolean;
+function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
 var 
   state:boolean;
   t:UInt64;
@@ -176,12 +176,21 @@ begin
     Result := ocr.Recognize(TBox([x1,212,x2,230]), TCompareRules([2070783]), 70);
 end;
 
-function TRSCombat.GetSpecialAttack(): Integer;
+(*
+Combat.GetSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.GetSpecialAttack(): Int32;
+
+Returns the specual attack level
+*)
+function TRSCombat.GetSpecialAttack(): Int32;
 var
   Text: String;
   TPA: TPointArray;
   b: TBox;
-  color: Integer;
+  color: Int32;
 begin
   if (not Self.Open()) then
     Exit(-1);
@@ -189,28 +198,50 @@ begin
   for color in [$100000, $00FFFF] do
     if (FindColors(TPA, color, Self.FButtons[cbtSpecialAttack])) then
     begin
-      b := GetTPABounds(TPA);
-      b.Expand(1);
+      b := GetTPABounds(TPA).Expand(1);
       Text := ocr.Recognize(b, TCompareRules([color]), StatFont);
       Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
     end;
 end;
 
+(*
+Combat.SpecialAttackEnabled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.SpecialAttackEnabled(): Boolean;
+
+Returns ``True`` if special attack has been activated
+*)
 function TRSCombat.SpecialAttackEnabled(): Boolean;
 var
-  x, y: Integer;
+  x, y: Int32;
 begin
   if (not Self.Open()) then
     Exit(False);
   Result := FindColor(x, y, 65535, Self.FButtons[cbtSpecialAttack]);
 end;
 
-function TRSCombat.UseSpecialAttack(): Integer;
+(*
+Combat.UseSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.UseSpecialAttack(): Boolean;
+
+Attempts to enabled special attack, returns ``True`` if it managed to, or if it was already enabled.
+*)
+function TRSCombat.UseSpecialAttack(): Boolean;
 begin
   if (not Self.Open()) then
-    Exit(-1);
-  if (not Self.SpecialAttackEnabled()) then
+    Exit(False);
+  
+  Result := Self.SpecialAttackEnabled();
+  if (not Result) then
+  begin
     Mouse.Click(Self.FButtons[cbtSpecialAttack], mouse_Left);
+    Result := True;
+  end;
 end;
 
 begin

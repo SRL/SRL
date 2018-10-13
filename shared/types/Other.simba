@@ -1,3 +1,9 @@
+(*
+Other datatypes
+===============
+Defines methods for some other datatypes
+*)
+
 type
   TMatrix4 = packed record
     M11,M12,M13,M14,
@@ -14,12 +20,12 @@ type
   Vector3Array = array of Vector3;
 
 
-function Vec3(x:Single=0; y:Single=0; z:Single=0): Vector3;
+function Vec3(X,Y,Z: Single = 0): Vector3;
 begin
   Result := [x,y,z];
 end;
 
-function Vec2(x:Single=0; y:Single=0): Vector2;
+function Vec2(X,Y: Single = 0): Vector2;
 begin
   Result := [x,y];
 end;
@@ -29,30 +35,30 @@ end;
 // VECTOR 2
 function Vector2.ToPoint(): TPoint; constref;
 begin
-  Result.x := Trunc(X);
-  Result.y := Trunc(Y);
+  Result.X := Trunc(X);
+  Result.Y := Trunc(Y);
 end;
 
 function Vector2.ToVec3(): Vector3; constref;
 begin
-  Result.x := X;
-  Result.y := Y;
-  Result.z := 0;
+  Result.X := X;
+  Result.Y := Y;
+  Result.Z := 0;
 end;
 
 function Vector2.Magnitude(): Single; constref;
 begin
-  Result := Sqrt(Sqr(self.X) + Sqr(self.Y));
+  Result := Sqrt(Sqr(Self.X) + Sqr(Self.Y));
 end;
 
 function Vector2.Distance(Other: Vector2): Single; constref;
 begin
-  Result := Sqrt(Sqr(self.X-Other.X) + Sqr(self.Y-Other.Y));
+  Result := Sqrt(Sqr(Self.X-Other.X) + Sqr(self.Y-Other.Y));
 end;
 
 function Vector2.SqDistance(Other: Vector2): Single; constref;
 begin
-  Result := Sqr(self.X-Other.X) + Sqr(self.Y-Other.Y);
+  Result := Sqr(Self.X-Other.X) + Sqr(Self.Y-Other.Y);
 end;
 
 function Vector2.Cross(Other: Vector2): Single; constref;
@@ -78,10 +84,10 @@ begin
   end;
 end;
 
-function Vector2.Rotate(angle:Single; mx,my:Single): Vector2; constref;
+function Vector2.Rotate(Angle:Single; Mx,My:Single): Vector2; constref;
 begin
-  Result.X := mx + Cos(angle) * (Self.x - mx) - Sin(angle) * (Self.y - my);
-  Result.Y := my + Sin(angle) * (Self.x - mx) + Cos(angle) * (Self.y - my);
+  Result.X := Mx + Cos(Angle) * (Self.x - Mx) - Sin(Angle) * (Self.y - My);
+  Result.Y := My + Sin(Angle) * (Self.x - Mx) + Cos(Angle) * (Self.y - My);
 end;
 
 
@@ -161,6 +167,12 @@ begin
   Result.Y := Self.Y;
 end;
 
+function Vector3.ToPoint(): TPoint; constref;
+begin
+  Result.X := Trunc(X);
+  Result.Y := Trunc(Y);
+end;
+
 function Vector3.Abs(): Vector3; constref;
 begin
   Result.X := System.Abs(Self.X);
@@ -209,14 +221,14 @@ begin
   end;
 end;
 
-function Vector3.RotateXY(Angle:Single; mx,my:Single): Vector3; constref;
+function Vector3.RotateXY(Angle: Single; Mx,My: Single): Vector3; constref;
 begin
-  Result.X := mx + Cos(angle) * (Self.x - mx) - Sin(angle) * (Self.y - my);
-  Result.Y := my + Sin(angle) * (Self.x - mx) + Cos(angle) * (Self.y - my);
+  Result.X := Mx + Cos(angle) * (Self.x - Mx) - Sin(angle) * (Self.y - My);
+  Result.Y := My + Sin(angle) * (Self.x - Mx) + Cos(angle) * (Self.y - My);
   Result.Z := Self.Z;
 end;
 
-function Vector3.TransformCoordinate(Coordinate:Vector3; Transform: TMatrix4): Vector3; static;
+function Vector3.TransformCoordinate(Coordinate: Vector3; Transform: TMatrix4): Vector3; static;
 var vec: Vector4;
 begin
   vec.X := (coordinate.X * transform.M11) + (coordinate.Y * transform.M21) + (coordinate.Z * transform.M31) + transform.M41;
@@ -354,7 +366,7 @@ begin
   end;
 end;
 
-function Vector3Array.Mean(Vec: Vector3): Vector3;
+function Vector3Array.Mean(): Vector3;
 var
   i: Int32;
 begin
@@ -380,11 +392,11 @@ const
                                0.0, 0.0, 0.0, 1.0];
 
   
-function TMatrix4.RotationX(angle: Single): TMatrix4; static;
+function TMatrix4.RotationX(Angle: Single): TMatrix4; static;
 var tcos, tsin: Single;
 begin
-  tcos := Cos(angle);
-  tsin := Sin(angle);
+  tcos := Cos(Angle);
+  tsin := Sin(Angle);
 
   Result := Matrix_Identity;
   Result.M22 := tcos;
@@ -393,11 +405,11 @@ begin
   Result.M33 := tcos;
 end;
 
-function TMatrix4.RotationY(angle: Single): TMatrix4; static;
+function TMatrix4.RotationY(Angle: Single): TMatrix4; static;
 var tcos, tsin: Single;
 begin
-  tcos := Cos(angle);
-  tsin := Sin(angle);
+  tcos := Cos(Angle);
+  tsin := Sin(Angle);
 
   Result := Matrix_Identity;
   Result.M11 := tcos;
@@ -406,11 +418,11 @@ begin
   Result.M33 := tcos;
 end;
 
-function TMatrix4.RotationZ(angle: Single): TMatrix4; static;
+function TMatrix4.RotationZ(Angle: Single): TMatrix4; static;
 var tcos, tsin: Single;
 begin
-  tcos := Cos(angle);
-  tsin := Sin(angle);
+  tcos := Cos(Angle);
+  tsin := Sin(Angle);
 
   Result := Matrix_Identity;
   Result.M11 := tcos;
@@ -511,16 +523,16 @@ begin
   yz := rotation.Y * rotation.Z;
   xw := rotation.X * rotation.W;
 
-  result := Matrix_Identity;
-  result.M11 := 1.0 - (2.0 * (yy + zz));
-  result.M12 := 2.0 * (xy + zw);
-  result.M13 := 2.0 * (zx - yw);
-  result.M21 := 2.0 * (xy - zw);
-  result.M22 := 1.0 - (2.0 * (zz + xx));
-  result.M23 := 2.0 * (yz + xw);
-  result.M31 := 2.0 * (zx + yw);
-  result.M32 := 2.0 * (yz - xw);
-  result.M33 := 1.0 - (2.0 * (yy + xx));
+  Result := Matrix_Identity;
+  Result.M11 := 1.0 - (2.0 * (yy + zz));
+  Result.M12 := 2.0 * (xy + zw);
+  Result.M13 := 2.0 * (zx - yw);
+  Result.M21 := 2.0 * (xy - zw);
+  Result.M22 := 1.0 - (2.0 * (zz + xx));
+  Result.M23 := 2.0 * (yz + xw);
+  Result.M31 := 2.0 * (zx + yw);
+  Result.M32 := 2.0 * (yz - xw);
+  Result.M33 := 1.0 - (2.0 * (yy + xx));
 end;
 
 function TMatrix4.RotationYawPitchRoll(yaw, pitch, roll: Single): TMatrix4; static;

@@ -1,3 +1,9 @@
+(*
+TStringArray
+=============
+TStringArray related methods
+*)
+
 procedure TStringArray.Append(const Value: String);
 var top:Int32;
 begin
@@ -157,10 +163,13 @@ begin
 end;
 
 function TStringArray.Merge(glue:String=''): String; constref;
-var i:Int32;
+var
+  i:Int32;
 begin
-  if Length(result) = 0 then Exit('');
-  Result := self[0];
-  for i:=1 to High(self) do
-    Result += glue + self[i];
+  if Length(Self) = 0 then
+    Exit();
+
+  Result := Self[0];
+  for i:=1 to High(Self) do
+    Result += glue + Self[i];
 end;

@@ -35,6 +35,10 @@ begin;
   Result := ClearTPAfromTPA(TPAFromBox(box), TotalTPA); 
 end;
 
+function TPAFromLine(Start, Stop: TPoint): TPointArray; overload;
+begin
+  Result := TPAFromLine(Start.X, Start.Y, Stop.X, Stop.Y);
+end;
 
 (*
 GetClientBounds
@@ -57,7 +61,7 @@ function GetClientBounds(): TBox;
 var
   W, H: Integer;
 begin
-  GetClientDimensions(W, H);
+  client.GetIOManager().GetDimensions(W,H);
   Result := TBox([0, 0, Max(0, W-1), Max(0, H-1)])
 end;
 
@@ -194,7 +198,7 @@ Example:
 *)
 function FindColorsTolerance(var Points: TPointArray; const Color: Integer; const SearchBox: TBox; const Tolerance: Integer): Boolean; overload;
 begin
-  Result := FindColorsTolerance(Points, Color, SearchBox.x1, SearchBox.y1, SearchBox.x2, SearchBox.y2, Tolerance);
+  Result := System.FindColorsTolerance(Points, Color, SearchBox.x1, SearchBox.y1, SearchBox.x2, SearchBox.y2, Tolerance);
 end;
 
 (*
@@ -781,6 +785,20 @@ end;
 function FindMaskTolerance(Mask: TMask; out x, y: Integer; SearchArea: TBox; Tolerance, ContourTolerance: Integer): Boolean; overload;
 begin
   Result := FindMaskTolerance(Mask, x, y, SearchArea.X1, SearchArea.Y1, SearchArea.X2, SearchArea.Y2, Tolerance, ContourTolerance);
+end;
+
+procedure TerminateScript(Reason: String); overload;
+begin
+  WriteLn('Terminating: '+Reason);
+  TerminateScript();
+end;
+
+procedure SetTarget(Handle: PtrUInt; Free: Boolean = True); overload;
+begin
+  if Free then
+    FreeTarget(0);
+
+  Client.GetIOManager().SetTarget(Handle);
 end;
 
 {$ifndecl GetTickCount64}

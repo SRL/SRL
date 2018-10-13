@@ -1,0 +1,4 @@
+
+TExtendedArray
+==============
+TExtendedArray related methods

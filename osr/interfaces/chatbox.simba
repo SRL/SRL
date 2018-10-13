@@ -68,17 +68,13 @@ end;
 (*
 Chatbox.GetTextOnLine
 ~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+.. pascal:: function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
 
-  function TRSChatbox.GetTextOnLine(line: Int32; colors:TIntegerArray = CHATBOX_COLORS): String;
+Returns the text at the given line ``[0..8]``. ``8`` is the last line (the input-field)
 
-Returns the text at the given line ``[0..8]``. 8 is the last line (the input-field)
+**Example:**
 
-.. note:: by slacky
-
-Example:
-.. code-block:: pascal
-
+.. pascal:: 
     // returns the text at line 6
     chatbox.GetTextOnLine(6);
 *)
@@ -107,21 +103,16 @@ end;
 (*
 Chatbox.FindTextOnLines
 ~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): boolean;
+.. pascal:: function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): boolean;
 
 Returns true if the text in 'txt' is found on the 'lines' of the chatbox.  The
 lines start with 0 being the bottom chat line.
 
-.. note:: by slacky
+**Example:**
 
-Example:
-
-.. code-block:: pascal
-
-    // returns True if "Hello" is found on the first 4 lines
-    chatbox.FindTextOnLines(['Hello'], [0..3]);
+.. pascal::
+   // returns True if "Hello" is found on the first 4 lines
+   chatbox.FindTextOnLines(['Hello'], [0..3]);
 *)
 function TRSChatbox.FindTextOnLines(txt: TStringArray; lines: TIntegerArray; colors:TIntegerArray = CHATBOX_COLORS): Boolean;
 var
@@ -136,13 +127,9 @@ end;
 (*
 Chatbox.GetLastMessage
 ~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
+.. pascal:: function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
 
 Returns the text at the last line in the chatbox
-
-.. note:: by slacky
 *)
 function TRSChatbox.GetLastMessage(colors:TIntegerArray = CHATBOX_COLORS): String;
 begin
@@ -153,13 +140,9 @@ end;
 (*
 Chatbox.GetChatArea
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.GetChatArea(): TBox;
+.. pascal:: function TRSChatbox.GetChatArea(): TBox;
 
 Returns a TBox which only covers the chat-area, does not include the scrollbar and input-field.
-
-.. note:: by slacky
 *)
 function TRSChatbox.GetChatArea(): TBox;
 begin
@@ -171,18 +154,14 @@ end;
 (*
 Chatbox.ClickContinue
 ~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.ClickContinue(): Boolean;
+.. pascal:: function TRSChatbox.ClickContinue(SpamClick: Boolean = False): Boolean;
 
 Clicks the "Click here to continue"-text in the chatbox.
-Returns `True` if the text was found.
-
-.. note:: by slacky
+Returns ``True`` if the text was found.
 *)
-function TRSChatbox.ClickContinue(): Boolean;
+function TRSChatbox.ClickContinue(SpamClick: Boolean = False): Boolean;
 var
-  tpa:Array [0..2] of TPoint;
+  tpa: array [0..2] of TPoint;
 begin
   //match each word separately to avoid any future whitespace-issues.
   Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
@@ -191,40 +170,57 @@ begin
   if Result then
   begin
     tpa[2].y += 15;
-    mouse.Click(GetTPABounds(tpa), mouse_left);
+    mouse.Click(GetTPABounds(tpa), mouse_Left);
+    if SpamClick then
+      for 5 to Round(srl.TruncatedGauss(0,14)) do
+      begin
+        Mouse.Click(mouse_Left); //spam click
+        WaitEx(80,10);
+      end;
     Exit();
   end;
 end;
 
 
 (*
-Chatbox.HandleLevelUp
+Chatbox.GotLevelUp
 ~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+.. pascal:: function TRSChatbox.GotLevelUp(): Boolean;
 
-    function TRSChatbox.HandleLevelUp(): Boolean;
-
-Clicks the "Click here to continue" if text containing `Congratulations` was found
-
-.. note:: by Olly
+Returns ``True`` if text containing `Congratulations` was found
 *)
-function TRSChatbox.HandleLevelUp(): Boolean;
-const
-  C_CHAR_POS: TPoint = [107, 383];
-  TEXT_COL = 8388608;
+function TRSChatbox.GotLevelUp(): Boolean;
 var
+  TEXT_COL = 8388608;
   p: TPoint;
 begin
-  if (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds)) then
-    Exit(Self.ClickContinue());
+  Result := (srl.FindText(p, 'Congratulations', 'CharsNPC07', TEXT_COL, 0, Self.FBounds));
+end;
+
+(*
+Chatbox.HandleLevelUp
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.HandleLevelUp(): Boolean;
+
+Clicks the "Click here to continue" if text containing `Congratulations` was found
+*)
+function TRSChatbox.HandleLevelUp(): Boolean;
+begin
+  if self.GotLevelUp() then
+  begin
+    Result := Self.ClickContinue(True);
+    while Self.GetDisplayName() = '' do
+    begin
+      Wait(60);
+      Self.ClickContinue(True);
+    end;
+  end;
 end;
 
 (*
 Chatbox.GetOptions
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
+.. pascal:: function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
 
 Returns all the options found in teh chatbox area
 *)
@@ -246,8 +242,7 @@ begin
 
   for TPA in ClusterTPAEx(TPA, 15, 1) do
   begin
-    b := GetTPABounds(TPA);
-    b.Expand(1);
+    b := GetTPABounds(TPA).Expand(1);
     for color in TextColors do
     begin
       s := OCR.Recognize(b, TCompareRules([color]), NPCFont);
@@ -257,13 +252,24 @@ begin
   end;
 end;
 
+function TRSChatbox.FindOption(Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+var
+  i: Int32;
+  Options: array of TChatOption;
+begin
+  Options := Self.GetOptions(TextColors);
+
+  for i := 0 to High(Options) do
+    if IsArrInStr(Text, Options[i].Text) then
+      Exit(True);
+end;
+
 (*
 Chatbox.ClickOption
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
-    function TRSChatbox.ClickOption(const Text: TStringArray; WaitTime: Integer; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean; overload;
+.. pascal::
+   function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+   function TRSChatbox.ClickOption(const Text: TStringArray; WaitTime: Integer; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean; overload;
 
 Clicks the preferred option by text. If the option cant be found it will return with `False`.
 *)
@@ -298,9 +304,7 @@ end;
 (*
 Chatbox.PleaseWait
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.PleaseWait(): Boolean;
+.. pascal:: function TRSChatbox.PleaseWait(): Boolean;
 
 Waits as long as the "Please wait" text exists.
 *)
@@ -339,9 +343,7 @@ end;
 (*
 Chatbox.ChatToOption
 ~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
+.. pascal:: function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 
 I have no clue wtf this is. Therefor it's either a stupid or an awesome function!
 Seems to be a function that should have been named something like `ContinueToOption` (as in click continue until it no longer can)
@@ -389,9 +391,7 @@ end;
 (*
 Chatbox.GetDisplayName
 ~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.GetDisplayName(): String;
+.. pascal:: function TRSChatbox.GetDisplayName(): String;
 
 Returns your username / display name
 *)
@@ -408,9 +408,7 @@ end;
 (*
 Chatbox.ClickTab
 ~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.ClickTab(tab: EChatTab; Option: String = ''): Boolean;
+.. pascal:: function TRSChatbox.ClickTab(tab: EChatTab; Option: String = ''): Boolean;
 
 A tab would be the filters for the chatbox. So you click one of them..
 *)
@@ -431,9 +429,7 @@ end;
 (*
 Chatbox.GetQuery
 ~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.GetQuery(answer:Boolean=False): String;
+.. pascal::  function TRSChatbox.GetQuery(answer:Boolean=False): String;
 
 Returns the question-text, like "Enter amount:" when doing "Withdraw X" from a bank.
 If `answer` is `True` it returns the value you have filled in.
@@ -466,9 +462,7 @@ end;
 (*
 Chatbox.WaitQuery
 ~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
+.. pascal:: function TRSChatbox.WaitQuery(Query: String; WaitTime: Int32): Boolean;
 
 Wait till the query shows up. If it doesn't show up within `WaitTime` it returns `False`.
 *)
@@ -489,9 +483,7 @@ end;
 (*
 Chatbox.AnswerQuery
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
+.. pascal:: function TRSChatbox.AnswerQuery(Query, Response: String; WaitTime: Int32; PressEnter:Boolean=True): Boolean;
 
 Answer the query, first it will wait for the quary `Query` to show up, then it fills in the given `Response`.
 *)
@@ -516,15 +508,203 @@ begin
 end;
 
 (*
+Chatbox.GetButtonQuery
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.GetButtonQuery(): String;
+
+Returns the question-text, like "What would you like to smelt"
+*)
+function TRSChatbox.GetButtonQuery(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  FindColors(TPA, $203040, Self.GetChatArea());
+  if (Length(TPA) > 10) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10, 4);
+    SortATPAFromFirstPointY(ATPA, Point(0, 0));
+    b := GetTPABounds(ATPA[0]);
+    Result := GetTextAtEx(B, 0,3,4, $203040,0, 'UpChars07_s');
+  end;
+end;
+
+(*
+Chatbox.WaitButtonQuery
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.WaitButtonQuery(Query: String; WaitTime: Int32): Boolean;
+
+Wait till the query shows up. If it doesn't show up within `WaitTime` it returns `False`.
+*)
+function TRSChatbox.WaitButtonQuery(Query: String; WaitTime: Int32): Boolean;
+var
+  t: UInt64;
+begin
+  Result := False;
+  t := GetTickCount() + WaitTime;
+  while (t > GetTickCount()) do
+  begin
+    if (Pos(Query, Self.GetButtonQuery()) > 0) then
+      Exit(True);
+    Wait(Random(100, 200));
+  end;
+end;
+
+(*
+Chatbox.ClickButtonId
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.ClickButtonId(Query: String; Id:Int32; UpText:String; WaitTime: Int32): Boolean;
+
+Clicks the button `Id`, checks uptext to verify that the corrrect button was clicked
+If the given button id doesn't match the UpText it will sift through the other buttons looking for it.
+*)
+function TRSChatbox.ClickButtonId(Query: String; Id:Int32; UpText:String; WaitTime: Int32): Boolean;
+var
+  i: Int32;
+  TPA: TPointArray;
+  Buttons: TBoxArray;
+  B: TBox;
+begin
+  if not Self.WaitButtonQuery(Query, WaitTime) then
+    Exit;
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+
+    if (B.Width > 30) and (B.Height > 60) then
+      Buttons += B;
+  end;
+
+  if Id <= Length(Buttons) then
+  begin
+    Buttons.SortFromMidPoint(Buttons[Id-1].Middle);
+    for i:=0 to High(Buttons) do
+    begin
+      Mouse.Move(Buttons[i]);
+      Result := MainScreen.IsUpText(uptext);
+      if Result then
+      begin
+        Wait(60,120);
+        Mouse.Click(mouse_Left);
+        Exit;
+      end;
+    end;
+  end;
+end;
+
+(*
+Chatbox.PointToButtonId
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.PointToButtonId(PT: TPoint): Int32;
+
+Returns the ID of the button under the given point and ``-1`` if it failed.
+*)
+function TRSChatbox.PointToButtonId(PT: TPoint): Int32;
+var
+  i: Int32;
+  TPA: TPointArray;
+  B: TBox;
+begin
+  if Self.GetButtonQuery() = '' then
+    Exit(-1);
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      if B.Contains(PT) then Exit(Result + 1);
+      Inc(Result);
+    end;
+  end;
+  Result := -1;
+end;
+
+(*
+Chatbox.GetButtonIdBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.GetButtonIdBounds(ID: Int32): TBox;
+
+Returns the bounds of the button with the given ID.
+*)
+function TRSChatbox.GetButtonIdBounds(ID: Int32): TBox;
+var
+  i: Int32;
+  TPA: TPointArray;
+  B: TBox;
+begin
+  if Self.GetButtonQuery() = '' then
+    Exit();
+
+  i := 1;
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      if i = ID then Exit(B);
+      Inc(i);
+    end;
+  end;
+end;
+
+(*
+Chatbox.ClickButtonColor
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;
+
+Clicks the button matching both color and uptext, starting with the one that had the best
+initial match, and then sifting down to less good matches.
+*)
+function TRSChatbox.ClickButtonColor(Query: String; Color, Tolerance:Int32; UpText:String; WaitTime: Int32): Boolean;
+var
+  i, tmp: Int32;
+  TPA: TPointArray;
+  B: TBox;
+  best: array of record Box: TBox; Count: Int32; end;
+begin
+  if not Self.WaitButtonQuery(Query, WaitTime) then
+    Exit;
+
+  FindColorsTolerance(TPA, $080808, Self.GetChatArea(), 16);
+  for TPA in TPA.Cluster(2) do
+  begin
+    B := TPA.Bounds;
+    if (B.Width > 30) and (B.Height > 60) then
+    begin
+      tmp := CountColorTolerance(Color, B.Expand(-6), Tolerance);
+      if (tmp = 0) then continue;
+
+      if (Length(best) = 0) or (tmp > best[0].Count) then
+        Insert([B,tmp], best, 0);
+    end;
+  end;
+
+  for i:=0 to High(best) do
+  begin
+    Mouse.Move(best[i].Box);
+    Result := MainScreen.IsUpText(uptext);
+    if Result then
+    begin
+      Wait(60,120);
+      Mouse.Click(mouse_Left);
+      Exit();
+    end;
+  end;
+end;
+
+
+(*
 Chatbox.GetTitle
 ~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-    function TRSChatBox.GetTitle: String;
+.. pascal:: function TRSChatBox.GetTitle: String;
 
 Returns the title of a chatbox interaction such as the NPC name.
-
-.. note:: by Olly
 *)
 function TRSChatBox.GetTitle(): String;
 var
@@ -543,6 +723,32 @@ begin
   b.X2 := GetTPABounds(ATPA[High(ATPA)]).X2;
   b.Y2 += 5;
   Result := OCR.Recognize(b, TCompareRules([128]), NPCFont);
+end;
+
+(*
+Chatbox.GetNotification
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSChatBox.GetNotification: String;
+
+Returns the title of a chatbox notification such as the "inventory is too full".
+*)
+function TRSChatBox.GetNotification(): String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  b: TBox;
+begin
+  FindColors(TPA, 0, Self.GetChatArea());
+  if (Length(TPA) < 10) then
+    Exit;
+
+  ATPA := ClusterTPAEX(TPA, 1, 5);
+  SortATPAFromFirstPointX(ATPA, Point(0, 0));
+  b := GetTPABounds(ATPA[0]);
+  b.Y1 -= 1;
+  b.X2 := GetTPABounds(ATPA[High(ATPA)]).X2;
+  b.Y2 += 5;
+  Result := OCR.Recognize(b, TCompareRules([0,5]), NPCFont);
 end;
 
 begin

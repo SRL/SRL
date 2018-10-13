@@ -1,130 +1,114 @@
+(*
+WorldSwitcher
+=============
+Methods that relates to swithing world. Olly will one day document this some day.
+*)
 type
-  EWorldType = (wtFree, wtMembers);
-  EWorldActivity = (waPVP, waDeadman, waSkill, waNone);
+  ERSWorldProperty = (WORLD_FREE, WORLD_MEMBERS,
+                      WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT,
+                      WORLD_USA, WORLD_GERMANY, WORLD_UK, WORLD_AUSTRALIA
+                     );
+  TRSWorldProperties = set of ERSWorldProperty;
 
-  TWorldInfo = record
-    World: Integer;
-    Typ: EWorldType;
-    Activity: EWorldActivity;
+  TRSWorld = record
+    ID: Int32;
+    Properties: TRSWorldProperties;
   end;
-  TWorldInfoArray = array of TWorldInfo;
+  TRSWorldArray = array of TRSWorld;
 
+  TRSWorldFilter = record
+    Properties: TRSWorldProperties;
+    Worlds: TIntegerArray;
+  end;
+
+var
+  DEFAULT_WORLD_FILTER: TRSWorldFilter = [[WORLD_PVP, WORLD_DEADMAN, WORLD_SKILL, WORLD_EVENT, WORLD_AUSTRALIA], [302, 330]]; // 302 & 330 are often full.
+
+type
   TRSWorldSwitcher = record(TInterfaceBase)
-    Worlds: TWorldInfoArray;
+    Worlds: TRSWorldArray; // Must be initalized once with WorldSwitcher.Worlds.Load()
  end;
 
 var
   WorldSwitcher: TRSWorldSwitcher;
 
-procedure TWorldInfoArray.Fill;
+procedure TRSWorldArray.Load;
 var
-  WorldList, WorldInfo: TStringArray;
-  i: Integer;
+  List, Info: TStringArray;
+  World: TRSWorld;
+  Prop: String;
+  i: Int32;
 begin
-  WorldList := MultiBetween(GetPage('http://oldschool.runescape.com/slu'), '<tr class=''server-list__row', '</tr>');
-  for i := 0 to High(WorldList) do
+  List := MultiBetween(GetPage('http://oldschool.runescape.com/slu'), '<tr class=''server-list__row', '</tr>');
+
+  for i := 0 to High(List) do
   begin
-    {0 = World URL, 1 = Player count, 2 = Location, 3 = Type, 4 = Activity }
-    WorldInfo := MultiBetween(WorldList[i], 'server-list__row-cell', '</td>');
-    if (Length(WorldInfo) <> 5) then
+    // [0]URL
+    // [1]Players
+    // [2]Location
+    // [3]Type
+    // [4]Activity
+
+    Info := MultiBetween(List[i], 'server-list__row-cell', '</td>');
+    if (Length(Info) <> 5) then
       Continue;
 
-    SetLength(Self, Length(Self) + 1);
-    with Self[High(Self)] do
-    begin
-      World := StrToIntDef(Between('world-', '''', WorldInfo[0]), - 1);
+    World := [StrToIntDef(Between('world-', '''', Info[0]), - 1)];
+    if (World.ID > 400) then
+      World.Properties += WORLD_EVENT;
 
-      if (Pos('Free', WorldInfo[3]) > 0) then
-        Typ := wtFree
-      else
-        Typ := wtMembers;
+    for Prop in [Info[2], Info[3], Info[4]] do
+      case LowerCase(Copy(Prop, Pos('>', Prop) + 1)) of
+        'members':
+          World.Properties += WORLD_MEMBERS;
+        'free':
+          World.Properties += WORLD_FREE;
+        '500 skill total', '750 skill total', '1000 skill total', '1250 skill total', '1500 skill total', '1750 skill total', '2000 skill total':
+          World.Properties += WORLD_SKILL;
+        'deadman':
+          World.Properties += WORLD_DEADMAN;
+        'pvp world - high risk', 'pvp world', 'pvp world - free':
+          World.Properties += WORLD_PVP;
+        'united states':
+          World.Properties += WORLD_USA;
+        'germany':
+          World.Properties += WORLD_GERMANY;
+        'united kingdom':
+          World.Properties += WORLD_UK;
+        'australia':
+          World.Properties += WORLD_AUSTRALIA;
+      end;
 
-      if (Pos('PVP', WorldInfo[4]) > 0) then
-        Activity := waPVP
-      else
-      if (Pos('Deadman', WorldInfo[4]) > 0) then
-        Activity := waDeadman
-      else
-      if (Pos('skill total', WorldInfo[4]) > 0) then
-        Activity := waSkill
-      else
-        Activity := waNone;
-    end;
+    Self += World;
   end;
+
+  if (Length(Self) = 0) then
+    srl.WriteLn('Failed to load worlds', dtFatal);
 end;
 
-function TWorldInfoArray.ToString: String;
-var
-  i, c: Integer;
-begin
-  Result := '[' + LineEnding + '  ';
-  for i := 0 to High(Self) do
-  begin
-    Result := Result + Format('[%d, %s, %s]', [Self[i].World, System.ToStr(Self[i].Typ), System.ToString(Self[i].Activity)]);
-    if (i < High(Self)) then
-      Result := Result + ', ';
-
-    if (Inc(c) = 3) then
-    begin
-      Result := Result + LineEnding + '  ';
-      c := 0;
-    end;
-  end;
-  Result := Result + LineEnding + '];';
-end;
-
-procedure TRSWorldSwitcher.__Setup();
+procedure TRSWorldSwitcher.Setup();
 begin
   with Self do
   begin
     SetName('World switcher');
     SetStatic(True);
     SetBounds(srl.DefaultClientBounds);
-
-    // todo: Generate these when needed? - Worlds.Fill();
-    Worlds := [
-                [393, wtFree, waNone], [385, wtFree, waNone], [394, wtFree, waNone],
-                [301, wtFree, waNone], [384, wtFree, waNone], [335, wtFree, waNone],
-                [383, wtFree, waNone], [326, wtFree, waNone], [382, wtFree, waNone],
-                [316, wtFree, waNone], [381, wtFree, waNone], [308, wtFree, waNone],
-                [321, wtMembers, waDeadman], [345, wtMembers, waDeadman], [337, wtMembers, waPVP],
-                [361, wtMembers, waSkill], [362, wtMembers, waNone], [369, wtMembers, waNone],
-                [353, wtMembers, waSkill], [354, wtMembers, waNone], [378, wtMembers, waNone],
-                [313, wtMembers, waNone], [370, wtMembers, waNone], [386, wtMembers, waNone],
-                [338, wtMembers, waNone], [346, wtMembers, waNone], [314, wtMembers, waNone],
-                [377, wtMembers, waNone], [322, wtMembers, waNone], [306, wtMembers, waNone],
-                [305, wtMembers, waNone], [330, wtMembers, waNone], [329, wtMembers, waNone],
-                [343, wtMembers, waNone], [368, wtMembers, waNone], [367, wtMembers, waNone],
-                [352, wtMembers, waNone], [319, wtMembers, waNone], [320, wtMembers, waNone],
-                [360, wtMembers, waNone], [375, wtMembers, waNone], [359, wtMembers, waNone],
-                [336, wtMembers, waNone], [328, wtMembers, waNone], [327, wtMembers, waNone],
-                [351, wtMembers, waNone], [376, wtMembers, waNone], [304, wtMembers, waNone],
-                [312, wtMembers, waNone], [311, wtMembers, waNone], [344, wtMembers, waNone],
-                [303, wtMembers, waNone], [317, wtMembers, waDeadman], [349, wtMembers, waSkill],
-                [325, wtMembers, waPVP], [365, wtMembers, waNone], [373, wtMembers, waSkill],
-                [341, wtMembers, waNone], [342, wtMembers, waNone], [374, wtMembers, waNone],
-                [350, wtMembers, waNone], [366, wtMembers, waSkill], [334, wtMembers, waNone],
-                [357, wtMembers, waNone], [310, wtMembers, waNone], [333, wtMembers, waNone],
-                [358, wtMembers, waNone], [309, wtMembers, waNone], [318, wtMembers, waNone],
-                [302, wtMembers, waNone]
-              ];
   end;
 end;
 
-function TRSWorldSwitcher.isOpen(WaitTime: Integer = 0): Boolean;
+function TRSWorldSwitcher.IsOpen(WaitTime: Integer = 0): Boolean;
 var
-  t: UInt64;
+  T: UInt64;
 begin
-  Result := False;
-  t := GetTickCount64() + WaitTime;
+  T := GetTickCount() + WaitTime;
 
   repeat
-    if (WaitTime > 0) then
-      Wait(Random(50, 100));
-
-    if (GetColor(146, 6) = 1682881) and (not srl.isLoggedIn()) then
+    if srl.IsClientState(csWorldSwitcher) then
       Exit(True);
-  until (GetTickCount64() >= t);
+
+    if (WaitTime > 0) then
+      Wait(50, 100);
+  until (GetTickCount() >= T);
 end;
 
 function TRSWorldSwitcher.FixWorld(wo: Integer): Integer;
@@ -146,8 +130,8 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
   i: Integer;
-  b: TBox;
-  p: TPoint;
+  B: TBox;
+  P: TPoint;
 begin
   Result := False;
   if (not FindColors(TPA, clBlack, Self.GetBounds())) then
@@ -156,70 +140,83 @@ begin
   srl.Writeln('WorldSwitcher.SelectWorld: Searching for world ' + toString(wo));
 
   { Pretty much get everything black, remove the biggest (the background)
-    and then a simple cluster so we have text :) }
+    and then a simple cluster so we have text }
   ATPA := FloodFillTPA(TPA);
   SortATPASize(ATPA, True);
   TPA := MergeATPA(Copy(ATPA, 1, Length(ATPA) - 1));
   ATPA := ClusterTPAEx(TPA, 5, 1);
 
   for i := 0 to High(ATPA) do
-    if (srl.FindText(p, toString(wo), 'UpChars07_s', clBlack, 0, TBox(b := GetTPABounds(ATPA[i])))) then
-    begin
-      b.Expand(-2, 3); { Adjust the bounds so it's the whole button }
-      b.X2 += 60;
-      Mouse.click(b, mouse_Left);
-      Wait(Random(200, 500));
-      Exit(True);
-    end;
+  begin
+    B := GetTPABounds(ATPA[i]);
 
-  srl.Writeln('Failed to find and select world');
+    if srl.FindText(P, toString(wo), 'UpChars07_s', clBlack, 0, B) then
+    begin
+      B := B.Expand(-2, 3); { Adjust the bounds so it's the whole button }
+      B.X2 += 60;
+      Mouse.Click(B, mouse_Left);
+      Wait(Random(200, 500));
+      Exit(srl.WriteLn('World succesfully selected', True));
+    end;
+  end;
+
+  srl.Writeln('World not found');
 end;
 
 procedure TRSWorldSwitcher.Close;
 begin
-  Mouse.Click(srl.RandomPoint(Point(734,12), 5), mouse_Left);
+  Mouse.Click(srl.RandomPoint(Point(734, 12), 5), mouse_Left);
   Wait(Random(500, 1000));
 end;
 
 (*
-WorldSwitcher.RandomMembers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+WorldSwitcher.GetWorld
+~~~~~~~~~~~~~~~~~~~~~~
 
-  function TRSWorldSwitcher.RandomMembers(ActivityFilter: set of EWorldActivity = [waPVP, waDeadman, waSkill]; WorldFilter: TIntegerArray = []): Integer;
+  function TRSWorldSwitcher.GetWorld(Filter: TRSWorldFilter): Int32; overload;
 
-Select's a random members world that isn't a part of the activity filter and world filter.
+Selects a random world which isn't a filter world and has no filter properties.
 
 Example:
 .. code-block:: pascal
 
-// Would return a random members world that isn't a pvp world and isn't world 302
-World := WorldSwitcher.RandomMembers(waPVP, [302]);
-
-.. note:: by Olly
+  // Returns a random world that isn't world 302 and isn't a free world.
+  World := WorldSwitcher.GetWorld([[WORLD_FREE], [302]]);
 *)
-function TRSWorldSwitcher.RandomMembers(ActivityFilter: set of EWorldActivity = [waPVP, waDeadman, waSkill]; WorldFilter: TIntegerArray = []): Integer;
+function TRSWorldSwitcher.GetWorld(Filter: TRSWorldFilter): Int32; overload;
 var
-  Arr: TIntegerArray;
-  i: Integer;
+  World: TRSWorld;
+  Filtered: TRSWorldArray;
+  Prop: ERSWorldProperty;
+  i: Int32;
+label
+  Rejected;
 begin
-  for i := 0 to High(Worlds) do
-    if (Worlds[i].Typ = wtMembers) and (not (Worlds[i].Activity in ActivityFilter)) then
-    begin
-      if (WorldFilter <> []) and (InIntArray(WorldFilter, Worlds[i].World)) then
-        Continue;
+  if (Length(Self.Worlds) = 0) then
+    Self.Worlds.Load();
 
-      Arr := Arr + Worlds[i].World;
-    end;
+  for World in Self.Worlds do
+  begin
+    for i := 0 to High(Filter.Worlds) do
+      if (Self.FixWorld(World.ID) = Self.FixWorld(Filter.Worlds[i])) then
+        goto Rejected;
+    for Prop := Low(ERSWorldProperty) to High(ERSWorldProperty) do
+       if (Prop in World.Properties) and (Prop in Filter.Properties) then
+         goto Rejected;
 
-  if (Length(Arr) = 0) then
-    srl.Writeln('WorldSwitcher.RandomMembers: All worlds have been filtered!', dtFatal);
+    Filtered += World;
 
-  Result := Arr[Random(Length(Arr))];
+    Rejected:
+  end;
+
+  if (Length(Filtered) = 0) then
+    srl.WriteLn('All worlds have been filtered', dtFatal);
+
+  Result := Filtered[Random(Length(Filtered))].ID;
 end;
 
 begin
-  WorldSwitcher.__Setup();
+  WorldSwitcher.Setup();
 end;
 
 

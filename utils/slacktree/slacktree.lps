@@ -2,49 +2,49 @@
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="9"/>
-    <BuildModes Active="Default"/>
+    <Version Value="10"/>
+    <BuildModes Active="64"/>
     <Units Count="5">
       <Unit0>
         <Filename Value="slacktree.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="4" Y="18"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="73"/>
+        <CursorPos X="83" Y="78"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="slacktree.pas"/>
-        <UnitName Value="slacktree"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
       </Unit1>
       <Unit2>
         <Filename Value="types.pas"/>
-        <UnitName Value="types"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="15" Y="9"/>
+        <TopLine Value="13"/>
+        <CursorPos X="36" Y="21"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="tree.pas"/>
-        <UnitName Value="tree"/>
         <EditorIndex Value="2"/>
-        <CursorPos Y="10"/>
+        <TopLine Value="432"/>
+        <CursorPos Y="463"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="SimbaPlugin.inc"/>
+        <Filename Value="simbaplugin.inc"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="41"/>
-        <CursorPos X="19" Y="57"/>
+        <TopLine Value="29"/>
+        <CursorPos X="11" Y="45"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit4>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
         <Filename Value="slacktree.lpr"/>
         <Caret Line="13" Column="23"/>
@@ -75,6 +75,82 @@
         <Filename Value="slacktree.lpr"/>
         <Caret Line="5" Column="16" TopLine="2"/>
       </Position8>
+      <Position9>
+        <Filename Value="SimbaPlugin.inc"/>
+        <Caret Line="66" Column="4" TopLine="37"/>
+      </Position9>
+      <Position10>
+        <Filename Value="SimbaPlugin.inc"/>
+        <Caret Line="53" Column="24" TopLine="37"/>
+      </Position10>
+      <Position11>
+        <Filename Value="tree.pas"/>
+        <Caret Line="87" Column="17" TopLine="73"/>
+      </Position11>
+      <Position12>
+        <Filename Value="tree.pas"/>
+        <Caret Line="553" Column="3" TopLine="537"/>
+      </Position12>
+      <Position13>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="18" Column="32"/>
+      </Position13>
+      <Position14>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="89" Column="8" TopLine="55"/>
+      </Position14>
+      <Position15>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="80" Column="28" TopLine="55"/>
+      </Position15>
+      <Position16>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="76" Column="19" TopLine="55"/>
+      </Position16>
+      <Position17>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="27" Column="10" TopLine="13"/>
+      </Position17>
+      <Position18>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="54" Column="93" TopLine="34"/>
+      </Position18>
+      <Position19>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="59" Column="64" TopLine="38"/>
+      </Position19>
+      <Position20>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="69" Column="25" TopLine="48"/>
+      </Position20>
+      <Position21>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="107" Column="18" TopLine="73"/>
+      </Position21>
+      <Position22>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="12" Column="13"/>
+      </Position22>
+      <Position23>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="37" Column="56" TopLine="21"/>
+      </Position23>
+      <Position24>
+        <Filename Value="simbaplugin.inc"/>
+        <Caret Line="15" Column="3"/>
+      </Position24>
+      <Position25>
+        <Filename Value="simbaplugin.inc"/>
+        <Caret Line="45" Column="11" TopLine="29"/>
+      </Position25>
+      <Position26>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="111" Column="96" TopLine="82"/>
+      </Position26>
+      <Position27>
+        <Filename Value="slacktree.lpr"/>
+        <Caret Line="110" Column="128" TopLine="82"/>
+      </Position27>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

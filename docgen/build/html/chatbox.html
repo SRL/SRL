@@ -1,0 +1,346 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Chatbox &#8212; SRL  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Combat" href="combat.html" />
+    <link rel="prev" title="BankScreen" href="bankscreen.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="combat.html" title="Combat"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bankscreen.html" title="BankScreen"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="chatbox">
+<h1>Chatbox<a class="headerlink" href="#chatbox" title="Permalink to this headline">¶</a></h1>
+<p>The chatbox file holds functions and procedures that are used in the
+Runescape chat box.</p>
+<div class="section" id="type-trschatbox">
+<h2>type TRSChatbox<a class="headerlink" href="#type-trschatbox" title="Permalink to this headline">¶</a></h2>
+<p>The type that holds functions and properties of the Runescape chat box interface.</p>
+</div>
+<div class="section" id="var-chatbox">
+<h2>var Chatbox<a class="headerlink" href="#var-chatbox" title="Permalink to this headline">¶</a></h2>
+<p>Variable that stores functions and properties of the Runescape chatbox interface.</p>
+</div>
+<div class="section" id="const-chatbox-colors">
+<h2>const CHATBOX_COLORS<a class="headerlink" href="#const-chatbox-colors" title="Permalink to this headline">¶</a></h2>
+<p>constant that holds all the possible text-colors</p>
+</div>
+<div class="section" id="chatbox-gettextonline">
+<h2>Chatbox.GetTextOnLine<a class="headerlink" href="#chatbox-gettextonline" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetTextOnLine</span><span class="p">(</span><span class="n">line</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">colors</span><span class="o">:</span><span class="n">TIntegerArray</span> <span class="o">=</span> <span class="n">CHATBOX_COLORS</span><span class="p">)</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the text at the given line <code class="docutils literal notranslate"><span class="pre">[0..8]</span></code>. 8 is the last line (the input-field)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:
+.. code-block:: pascal</p>
+<blockquote>
+<div>// returns the text at line 6
+chatbox.GetTextOnLine(6);</div></blockquote>
+</div>
+<div class="section" id="chatbox-findtextonlines">
+<h2>Chatbox.FindTextOnLines<a class="headerlink" href="#chatbox-findtextonlines" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">FindTextOnLines</span><span class="p">(</span><span class="n">txt</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">lines</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span> <span class="n">colors</span><span class="o">:</span><span class="n">TIntegerArray</span> <span class="o">=</span> <span class="n">CHATBOX_COLORS</span><span class="p">)</span><span class="o">:</span> <span class="kt">boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if the text in ‘txt’ is found on the ‘lines’ of the chatbox.  The
+lines start with 0 being the bottom chat line.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="c1">// returns True if &quot;Hello&quot; is found on the first 4 lines</span>
+<span class="n">chatbox</span><span class="o">.</span><span class="n">FindTextOnLines</span><span class="p">([</span><span class="s">&#39;Hello&#39;</span><span class="p">]</span><span class="o">,</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">3</span><span class="p">])</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chatbox-getlastmessage">
+<h2>Chatbox.GetLastMessage<a class="headerlink" href="#chatbox-getlastmessage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetLastMessage</span><span class="p">(</span><span class="n">colors</span><span class="o">:</span><span class="n">TIntegerArray</span> <span class="o">=</span> <span class="n">CHATBOX_COLORS</span><span class="p">)</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the text at the last line in the chatbox</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chatbox-getchatarea">
+<h2>Chatbox.GetChatArea<a class="headerlink" href="#chatbox-getchatarea" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetChatArea</span><span class="p">()</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a TBox which only covers the chat-area, does not include the scrollbar and input-field.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chatbox-clickcontinue">
+<h2>Chatbox.ClickContinue<a class="headerlink" href="#chatbox-clickcontinue" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickContinue</span><span class="p">(</span><span class="n">SpamClick</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">False</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the “Click here to continue”-text in the chatbox.
+Returns <cite>True</cite> if the text was found.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by slacky</p>
+</div>
+</div>
+<div class="section" id="chatbox-gotlevelup">
+<h2>Chatbox.GotLevelUp<a class="headerlink" href="#chatbox-gotlevelup" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GotLevelUp</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <cite>True</cite> if text containing <cite>Congratulations</cite> was found</p>
+</div>
+<div class="section" id="chatbox-handlelevelup">
+<h2>Chatbox.HandleLevelUp<a class="headerlink" href="#chatbox-handlelevelup" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">HandleLevelUp</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the “Click here to continue” if text containing <cite>Congratulations</cite> was found</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by Olly</p>
+</div>
+</div>
+<div class="section" id="chatbox-getoptions">
+<h2>Chatbox.GetOptions<a class="headerlink" href="#chatbox-getoptions" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetOptions</span><span class="p">(</span><span class="n">TextColors</span><span class="o">:</span> <span class="n">TIntegerArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">clBlack</span><span class="o">,</span> <span class="n">clWhite</span><span class="p">])</span><span class="o">:</span> <span class="k">array</span> <span class="k">of</span> <span class="n">TChatOption</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns all the options found in teh chatbox area</p>
+</div>
+<div class="section" id="chatbox-clickoption">
+<h2>Chatbox.ClickOption<a class="headerlink" href="#chatbox-clickoption" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickOption</span><span class="p">(</span><span class="k">const</span> <span class="n">Text</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">TextColors</span><span class="o">:</span> <span class="n">TIntegerArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">clBlack</span><span class="o">,</span> <span class="n">clWhite</span><span class="p">])</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickOption</span><span class="p">(</span><span class="k">const</span> <span class="n">Text</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span> <span class="n">TextColors</span><span class="o">:</span> <span class="n">TIntegerArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">clBlack</span><span class="o">,</span> <span class="n">clWhite</span><span class="p">])</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the preferred option by text. If the option cant be found it will return with <cite>False</cite>.</p>
+</div>
+<div class="section" id="chatbox-pleasewait">
+<h2>Chatbox.PleaseWait<a class="headerlink" href="#chatbox-pleasewait" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">PleaseWait</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Waits as long as the “Please wait” text exists.</p>
+</div>
+<div class="section" id="chatbox-chattooption">
+<h2>Chatbox.ChatToOption<a class="headerlink" href="#chatbox-chattooption" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ChatToOption</span><span class="p">(</span><span class="n">Option</span><span class="o">:</span> <span class="n">TStringArray</span><span class="o">;</span> <span class="n">ClickOption</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">TextColors</span><span class="o">:</span> <span class="n">TIntegerArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">clBlack</span><span class="o">,</span> <span class="n">clWhite</span><span class="p">])</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>I have no clue wtf this is. Therefor it’s either a stupid or an awesome function!
+Seems to be a function that should have been named something like <cite>ContinueToOption</cite> (as in click continue until it no longer can)</p>
+</div>
+<div class="section" id="chatbox-getdisplayname">
+<h2>Chatbox.GetDisplayName<a class="headerlink" href="#chatbox-getdisplayname" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetDisplayName</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your username / display name</p>
+</div>
+<div class="section" id="chatbox-clicktab">
+<h2>Chatbox.ClickTab<a class="headerlink" href="#chatbox-clicktab" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickTab</span><span class="p">(</span><span class="n">tab</span><span class="o">:</span> <span class="n">EChatTab</span><span class="o">;</span> <span class="n">Option</span><span class="o">:</span> <span class="k">String</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>A tab would be the filters for the chatbox. So you click one of them..</p>
+</div>
+<div class="section" id="chatbox-getquery">
+<h2>Chatbox.GetQuery<a class="headerlink" href="#chatbox-getquery" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetQuery</span><span class="p">(</span><span class="n">answer</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">False</span><span class="p">)</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the question-text, like “Enter amount:” when doing “Withdraw X” from a bank.
+If <cite>answer</cite> is <cite>True</cite> it returns the value you have filled in.</p>
+</div>
+<div class="section" id="chatbox-waitquery">
+<h2>Chatbox.WaitQuery<a class="headerlink" href="#chatbox-waitquery" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">WaitQuery</span><span class="p">(</span><span class="n">Query</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wait till the query shows up. If it doesn’t show up within <cite>WaitTime</cite> it returns <cite>False</cite>.</p>
+</div>
+<div class="section" id="chatbox-answerquery">
+<h2>Chatbox.AnswerQuery<a class="headerlink" href="#chatbox-answerquery" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">AnswerQuery</span><span class="p">(</span><span class="n">Query</span><span class="o">,</span> <span class="n">Response</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">PressEnter</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Answer the query, first it will wait for the quary <cite>Query</cite> to show up, then it fills in the given <cite>Response</cite>.</p>
+</div>
+<div class="section" id="chatbox-getbuttonquery">
+<h2>Chatbox.GetButtonQuery<a class="headerlink" href="#chatbox-getbuttonquery" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">GetButtonQuery</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the question-text, like “What would you like to smelt”</p>
+</div>
+<div class="section" id="chatbox-waitbuttonquery">
+<h2>Chatbox.WaitButtonQuery<a class="headerlink" href="#chatbox-waitbuttonquery" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">WaitButtonQuery</span><span class="p">(</span><span class="n">Query</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Wait till the query shows up. If it doesn’t show up within <cite>WaitTime</cite> it returns <cite>False</cite>.</p>
+</div>
+<div class="section" id="chatbox-clickbuttonid">
+<h2>Chatbox.ClickButtonId<a class="headerlink" href="#chatbox-clickbuttonid" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickButtonId</span><span class="p">(</span><span class="n">Query</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">Id</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">UpText</span><span class="o">:</span><span class="k">String</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the button <cite>Id</cite>, checks uptext to verify that the corrrect button was clicked
+If the given button id doesn’t match the UpText it will sift through the other buttons looking for it.</p>
+</div>
+<div class="section" id="chatbox-clickbuttoncolor">
+<h2>Chatbox.ClickButtonColor<a class="headerlink" href="#chatbox-clickbuttoncolor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatbox</span><span class="o">.</span><span class="nf">ClickButtonColor</span><span class="p">(</span><span class="n">Query</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">Color</span><span class="o">,</span> <span class="n">Tolerance</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">UpText</span><span class="o">:</span><span class="k">String</span><span class="o">;</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the button matching both color and uptext, starting with the one that had the best
+initial match, and then sifting down to less good matches.</p>
+</div>
+<div class="section" id="chatbox-gettitle">
+<h2>Chatbox.GetTitle<a class="headerlink" href="#chatbox-gettitle" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatBox</span><span class="o">.</span><span class="nf">GetTitle</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the title of a chatbox interaction such as the NPC name.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">by Olly</p>
+</div>
+</div>
+<div class="section" id="chatbox-getnotification">
+<h2>Chatbox.GetNotification<a class="headerlink" href="#chatbox-getnotification" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSChatBox</span><span class="o">.</span><span class="nf">GetNotification</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the title of a chatbox notification such as the “inventory is too full”.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Chatbox</a><ul>
+<li><a class="reference internal" href="#type-trschatbox">type TRSChatbox</a></li>
+<li><a class="reference internal" href="#var-chatbox">var Chatbox</a></li>
+<li><a class="reference internal" href="#const-chatbox-colors">const CHATBOX_COLORS</a></li>
+<li><a class="reference internal" href="#chatbox-gettextonline">Chatbox.GetTextOnLine</a></li>
+<li><a class="reference internal" href="#chatbox-findtextonlines">Chatbox.FindTextOnLines</a></li>
+<li><a class="reference internal" href="#chatbox-getlastmessage">Chatbox.GetLastMessage</a></li>
+<li><a class="reference internal" href="#chatbox-getchatarea">Chatbox.GetChatArea</a></li>
+<li><a class="reference internal" href="#chatbox-clickcontinue">Chatbox.ClickContinue</a></li>
+<li><a class="reference internal" href="#chatbox-gotlevelup">Chatbox.GotLevelUp</a></li>
+<li><a class="reference internal" href="#chatbox-handlelevelup">Chatbox.HandleLevelUp</a></li>
+<li><a class="reference internal" href="#chatbox-getoptions">Chatbox.GetOptions</a></li>
+<li><a class="reference internal" href="#chatbox-clickoption">Chatbox.ClickOption</a></li>
+<li><a class="reference internal" href="#chatbox-pleasewait">Chatbox.PleaseWait</a></li>
+<li><a class="reference internal" href="#chatbox-chattooption">Chatbox.ChatToOption</a></li>
+<li><a class="reference internal" href="#chatbox-getdisplayname">Chatbox.GetDisplayName</a></li>
+<li><a class="reference internal" href="#chatbox-clicktab">Chatbox.ClickTab</a></li>
+<li><a class="reference internal" href="#chatbox-getquery">Chatbox.GetQuery</a></li>
+<li><a class="reference internal" href="#chatbox-waitquery">Chatbox.WaitQuery</a></li>
+<li><a class="reference internal" href="#chatbox-answerquery">Chatbox.AnswerQuery</a></li>
+<li><a class="reference internal" href="#chatbox-getbuttonquery">Chatbox.GetButtonQuery</a></li>
+<li><a class="reference internal" href="#chatbox-waitbuttonquery">Chatbox.WaitButtonQuery</a></li>
+<li><a class="reference internal" href="#chatbox-clickbuttonid">Chatbox.ClickButtonId</a></li>
+<li><a class="reference internal" href="#chatbox-clickbuttoncolor">Chatbox.ClickButtonColor</a></li>
+<li><a class="reference internal" href="#chatbox-gettitle">Chatbox.GetTitle</a></li>
+<li><a class="reference internal" href="#chatbox-getnotification">Chatbox.GetNotification</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bankscreen.html"
+                        title="previous chapter">BankScreen</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="combat.html"
+                        title="next chapter">Combat</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/chatbox.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="combat.html" title="Combat"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bankscreen.html" title="BankScreen"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SRL  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, SRL Group.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

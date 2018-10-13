@@ -1,69 +1,78 @@
+(*
+Misc
+=====
+The ``osr/misc.simba`` file contains various RS related funcions that doesn't fit elsewhere
+*)
+
+(*
+type ERSClickType
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: type ERSClickType = (ctNone, ctRed, ctYellow);
+*)
 type
-  EClickType = (ctNone, ctRed, ctYellow);
+  ERSClickType = (ctNone, ctRed, ctYellow);
 
-function TSRL.GetClickType(Area: TBox): EClickType;
-var
-  BMP: Int32;
-  TPA: TPointArray;
-  i, c, red, yellow: Integer;
-begin
-  Result := ctNone;
-  Area.LimitTo(GetClientBounds);
-  BMP := BitmapFromClient(Area);
+  
+(*
+Mouse.Click
+~~~~~~~~~~~~
+.. pascal:: function TMouse.Click(ClickType: ERSClickType): Boolean; overload;
 
-  try
-    if (FindColorsBitmap(BMP, TPA, 65536)) then
-    begin
-      red := 0;
-      yellow := 0;
+Leftclicks the mouse returns ``True`` if the click passed through as expected.
+Useful when expecting a red or yellow X after a click.
+*)
+function TMouse.Click(ClickType: ERSClickType): Boolean; overload;
 
-      for i := 0 to High(TPA) do
-      begin
-        c := FastGetPixel(BMP, Max(0, TPA[i].x-1), TPA[i].y);
-        if (c = 65535) then
-          Inc(Yellow)
-        else if (c = 255) then
-          Inc(Red);
-        c := FastGetPixel(BMP, Min(Area.Width-1, TPA[i].x+1), TPA[i].y);
-        if (c = 65535) then
-          Inc(Yellow)
-        else if (c = 255) then
-          Inc(Red);
-      end;
-
-      if (Red > 5) and (Red > Yellow) then
-        Result := ctRed;
-      if (Yellow > 5) and (Yellow > Red) then
-        Result := ctYellow;
-    end;
-  finally
-    FreeBitmap(BMP);
+  function FindColorEx(Color, Tolerance: Int32; Area: TBox): TPointArray;
+  begin
+    FindColorsTolerance(Result, Color, Area, Tolerance);
   end;
-end;
 
-function TMouse.Click(Target: EClickType): Boolean; overload;
 var
-  p: TPoint;
-  t: UInt64;
-  ct: EClickType;
+  B: TBox;
+  P: TPoint;
+  T: UInt64;
+  Red, Yellow: Int32;
+  TPA: TPointArray;
 begin
-  Result := False;
+  P := Self.GetPosition();
+  B := [P.X - 8, P.Y - 8, P.X + 8, P.Y + 8];
+  B.LimitTo(GetClientBounds());
 
   Self.Click(mouse_Left);
 
-  p := Self.GetPosition();
-  t := GetTickCount64() + Random(250, 300);
-
-  while (t > GetTickCount64()) do
+  T := GetTickCount + Random(250, 300);
+  while (T > GetTickCount()) do
   begin
-    ct := srl.GetClickType(Box(p.x - 8, p.y - 8, p.x + 8, p.y + 8));
-    if (ct <> ctNone) then
-      Exit(ct = Target);
+    Red := 0;
+    Yellow := 0;
 
-    Wait(Random(10, 25));
+    TPA := FindColorEx($000000, 5, B);
+
+    for P in FindColorEx($00FFFF, 5, B) do
+      if NearbyPointInArray(P, 1, TPA) then
+        Yellow += 1;
+
+    for P in FindColorEx($0000FF, 5, B) do
+      if NearbyPointInArray(P, 1, TPA) then
+        Red += 1;
+
+    if (Red >= 12) and (Red >= Yellow) and (ClickType = ctRed) then
+      Exit(True);
+    if (Yellow >= 12) and (Yellow >= Red) and (ClickType = ctYellow) then
+      Exit(True);
+
+    Wait(50);
   end;
 end;
 
+(*
+SRL.GetXPAtLevel
+~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetXPAtLevel(level:Int32): Int32;
+
+Given a level it returns the minimum XP needed for it.
+*)
 function TSRL.GetXPAtLevel(level:Int32): Int32;
 var
   total:Double;
@@ -74,6 +83,13 @@ begin
   Result := Floor(total / 4);
 end;
 
+(*
+SRL.GetLevelAtXP
+~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetLevelAtXP(XP:UInt32): Int32;
+
+Given some XP, it returns what level that is.
+*)
 function TSRL.GetLevelAtXP(XP:UInt32): Int32;
 var 
   total:Double;
@@ -85,6 +101,14 @@ begin
   end;
 end;
 
+(*
+SRL.GetItemAmount
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.GetItemAmount(Area: TBox): Int32;
+
+For use with items in like bankscreen, inventory, shops and so on to
+get the number of stacked items there are.
+*)
 function TSRL.GetItemAmount(Area: TBox): Int32;
 const
   TEXT_COLORS: TIntegerArray = [65535, 65278, 16777215, 8453888]; // Million = white | Billion = green etc.
@@ -97,9 +121,7 @@ begin
   for i := 0 to High(TEXT_COLORS) do
     if (System.FindColors(TPA, TEXT_COLORS[i], Area.X1, Area.Y1, Area.X2, Area.Y2)) then
     begin
-      b := GetTPABounds(TPA);
-      b.Expand(2);
-      b.LimitTo(GetClientBounds());
+      b := GetTPABounds(TPA).Expand(2, GetClientBounds());
 
       Text := StringReplace(GetTextAtEx(b, 0, 3, 3, TEXT_COLORS[i], 5, 'StatChars07'), 'O', '0', [rfReplaceAll]);
       Result := StrToIntDef(ExtractFromStr(Text, Numbers), 0);
@@ -112,4 +134,114 @@ begin
       Exit;
     end;
 end;
+
+(*
+SRL.FindDTMInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindDTMInTBA(DTM: Integer; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the DTM in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindDTMInTBA(DTM: Integer; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if FindDTM(DTM, pt.x, pt.y, Areas[i]) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+(*
+SRL.FindMaskInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindMaskInTBA(Mask: TMask; Tolerance, ContourTolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the mask in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindMaskInTBA(Mask: TMask; Tolerance, ContourTolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if (FindMaskTolerance(Mask, pt.x, pt.y, Areas[i], Tolerance, ContourTolerance)) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+(*
+SRL.FindBMPInTBA
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.FindBMPInTBA(BMP: TMufasaBitmap; Tolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the BMP in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+*)
+function TSRL.FindBMPInTBA(BMP: TMufasaBitmap; Tolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+var
+  i: Int32;
+  pt: TPoint;
+begin
+  for i:=0 to High(Areas) do
+    if (FindBitmapToleranceIn(BMP.GetIndex(), pt.x, pt.y, Areas[i], Tolerance)) then
+    begin
+      Result += i;
+      if Length(Result) = MaxToFind then 
+        Break;
+    end;
+end;
+
+
+
+(*
+SRL.AvgBrightness
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.AvgBrightness(B: TBox): Int32;
+
+Returns the average brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+*)
+function TSRL.AvgBrightness(B: TBox): Int32;
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP.FromClient(B);
+  Result := BMP.AvgBrightness();
+  BMP.Free();
+end;
+
+(*
+SRL.PeakBrightness
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TSRL.PeakBrightness(B: TBox): Int32;
+
+Returns the peak brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+*)
+function TSRL.PeakBrightness(B: TBox): Int32;
+var
+  BMP: TMufasaBitmap;
+begin
+  BMP.FromClient(B);
+  Result := BMP.PeakBrightness();
+  BMP.Free();
+end;
+
+
 

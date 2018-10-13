@@ -1,0 +1,733 @@
+(*
+Antiban
+=======
+Experimental Antiban, Breaksystem, and fatigue/energy system.
+Could contain some issues, and for that reason breaking changes may happen.
+
+Other methods worth mentioning in this file:
+
+.. code-block:: pascal
+
+  procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; WaitMean:Double=3500);
+  procedure TSRL.MouseOffClient(Direction: Byte);
+  procedure TSRL.MouseOffClient(); overload;
+  function  TSRL.DismissRandom(): Boolean;
+
+
+Functions of TAntiban:
+
+.. code-block:: pascal
+
+  function  TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
+  function  TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
+  function  TAntiban.Copy(): TAntiban; constref;
+
+  procedure TAntiban.SetupBiometrics();
+  function  TAntiban.TimeRunning(): Int64; constref;
+  function  TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
+  procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
+
+  function  TAntiban.AddTask(Task: TAntibanTask): Boolean;
+  function  TAntiban.AddBreak(Task: TBreakTask): Boolean;
+  function  TAntiban.RestartAntiban(): Boolean;
+
+  function  TAntiban.DoBreak(out BreakID: Int32): Boolean;
+  function  TAntiban.DoBreak(): Boolean; overload;
+  function  TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
+
+  function  TAntiban.HasSleep(): Boolean;
+  function  TAntiban.GetSleepId(): Int32;
+  function  TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
+  function  TAntiban.BreaksPast(Timespan: Double): Int64;
+  function  TAntiban.EnergyLevel(): Double;
+  procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.667);
+
+
+Builtin antiban tasks that can be used directly with TAntiban:
+
+.. code-block:: pascal
+
+  procedure TAntiban.LoseFocus();
+  procedure TAntiban.HoverPlayers();
+  procedure TAntiban.CheckSkill();
+  procedure TAntiban.RandomCompass();
+  procedure TAntiban.RandomCompassNESW();
+  procedure TAntiban.CheckStats();
+  procedure TAntiban.OpenRandomTab();
+  procedure TAntiban.VeryShortBreak();
+  procedure TAntiban.FiveMinBreak();
+  procedure TAntiban.DoMiscStuff();
+
+You can easily create your own tasks like the above in your script that does
+whatever. For a deeper look skip to the last lines of this file.
+
+
+**Example of how such a method would look:**
+
+.. pascal::
+  procedure TAntiban.HoverTotalLevel();
+  begin
+    Stats.HoverSkill(Random(SKILL_TOTAL), srl.GaussRand(3000,300));
+  end;
+  
+  
+** Example of usage in script **
+
+.. pascal::
+  var 
+    Antiban: TAntiban;
+    
+  begin
+    Antiban.Init(SKILL_MINING);
+                    //which method,            how often,     normal time variation
+    Antiban.AddTask([@Antiban.HoverTotalLevel, ONE_MINUTE*7,  0.33]);
+    Antiban.AddTask([@Antiban.HoverPlayers,    ONE_MINUTE*9,  0.33]);
+    Antiban.AddTask([@Antiban.CheckSkill,      ONE_MINUTE*13, 0.33]);
+    
+    // and inside the script loop you do the following
+    // which will look for antibans that are ready to be executed, and then execute them.
+    Antiban.DoAntiban();
+  end;
+*)
+
+type
+  PAntibanTask = ^TAntibanTask;
+  TAntibanTask = record
+    Method: procedure of object;
+    Interval: Double;
+    StdVar: Double;
+    NextAtTime: Double;
+  end;
+
+  PBreakTask = ^TBreakTask;
+  TBreakTask = record
+    Interval: Double;
+    Length: Double;
+    LogoutChance: Double;
+    StdVar: Double;
+    NextAtTime, PrevAtTime: Double;
+  end;
+
+  TAntiban = record
+    ActiveSkills: TIntArray;
+    Tasks: array of TAntibanTask;
+    Breaks: array of TBreakTask;
+
+    HistorySize: Int32;
+    TasksDone: TStringArray;
+
+    BioHash, Endurance, Patience: Double;
+  end;
+
+
+{$ifndef codeinsight}
+procedure TSRL.LoseFocus();
+begin
+  srl.MouseOffClient();
+  //this is just a stub - use rsclient for this funcionallity
+end;
+
+procedure TSRL.SetFocus();
+begin
+  //this is just a stub - use rsclient for this funcionallity
+end;
+{$endif}
+
+procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; waitMean:Double=3500);
+var
+  arr: TOptionArray;
+  TPA: TPointarray;
+  wt: Double;
+  oldPos, pt: TPoint;
+begin
+  oldPos := mouse.GetPosition();
+
+  for 0 to Trunc(srl.TruncatedGauss(0,3.5)) do
+  begin
+    TPA := Minimap.GetDots([MMDotPlayer]);
+    FilterPointsDist(TPA,0,24, MM2MS.MMCX, MM2MS.MMCY);
+    if Length(TPA) = 0 then Exit;
+
+    pt := TPA[Random(0,High(TPA))];
+    pt := srl.RandomPoint(Minimap.VecToMsRect(Vec3(pt.x,pt.y,2)));
+    
+    if not MainScreen.GetBounds.Contains(pt) then
+      Continue;
+
+    Mouse.Move(pt);
+    WaitEx(70,10);
+    if (Random()*100 <= OptionChance) and (MainScreen.IsUpText('level')) then
+    begin
+      ChooseOption.Open();
+      if (Random(2) = 0) then
+      begin
+        arr := ChooseOption.GetOptions();
+        if (arr <> []) then
+        begin
+          WaitEx(220,30);
+          Mouse.Move(arr[Random(0,High(arr))].Bounds);
+        end;
+      end;
+      WaitEx(waitMean,waitMean*0.08);
+      ChooseOption.Close();
+    end else
+    begin
+      wt := GetTickCount + srl.GaussRand(waitMean,waitMean*0.08);
+      while (GetTickCount < wt) and (MainScreen.IsUpText('level')) do Wait(50);
+      WaitEx(70,10);
+    end;
+  end;
+
+  if Random(4) <> 0 then
+    Mouse.Move(oldPos.Random(0,80,False));
+end;
+
+procedure TSRL.MouseOffClient(direction: Byte);
+var
+  W,H: Int32;
+  pt: TPoint;
+begin
+  GetClientDimensions(W, H);
+  pt := Mouse.GetPosition();
+  if (pt.X < 0) or (pt.X > W) or (pt.Y < 0) or (pt.Y > H) then
+    Exit();
+  if (direction >= 4) then
+    direction := Random(0,3);
+  case direction of
+    0: Mouse.Move(Box(-300, -300, W, 0)); // top
+    1: Mouse.Move(Box(0, H, W, H+300));   // bottom
+    2: Mouse.Move(Box(-300, 0, 0, H));    // left
+    3: Mouse.Move(Box(W, 0, W+300, H));   // right
+  end;
+end;
+
+
+procedure TSRL.MouseOffClient(); overload;
+begin
+  MouseOffClient(Trunc(srl.TruncatedGauss(0,4.1)));
+end;
+
+// experimental
+function TSRL.DismissRandom(): Boolean;
+var
+  i: Int32;
+  textAt: TPoint;
+  TPA, Dots: TPointarray;
+  msText: TMSTextArray := MainScreen.GetText(clYellow);
+  name: String := Chatbox.GetDisplayName();
+begin
+  for i:=0 to High(msText) do
+    if(name in msText[i].Text) then
+    begin
+      textAt := msText[i].Bounds.Middle + Point(0,10);
+      break;
+    end;
+
+  if (textAt = Point(0,0)) then
+    Exit;
+
+  Dots := Minimap.GetDots([MMDotNPC]);
+  for i:=0 to High(Dots) do
+    TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
+
+  TPA.Sort(textAt);
+  for i:=0 to High(TPA) do
+  begin
+    if Distance(TPA[i], Mainscreen.GetMiddle()) > 80 then
+      Break;
+
+    Mouse.Move(TPA[i],5);
+    WaitEx(60,30);
+    if not MainScreen.IsUpText('Talk-to') then
+      Continue;
+
+    if ChooseOption.Select('Dismiss') then
+    begin
+      WaitEx(670,40);
+      while minimap.isPlayerMoving() do Wait(40);
+      Exit(True);
+    end;
+  end;
+end;
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// TAntiban setup and such
+
+{
+  Basic setup procedures
+  What skills do we care about, and alterantively how long should the log be (mainly for debugging)
+}
+function TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
+var i: Int32;
+begin
+  Self.ActiveSkills := Skills;
+  Self.HistorySize := LogSize;
+  Self.BioHash   := Random();
+  Self.Endurance := Cos(Self.BioHash*PI/2);
+  Self.Patience  := Sin(Self.BioHash*PI/1);
+  Self.SetupBiometrics();
+end;
+
+function TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
+begin
+  Self.Init([Skill], LogSize);
+end;
+
+{
+  Deep copy of the antiban structure
+}
+function TAntiban.Copy(): TAntiban; constref;
+begin
+  Result := Self;
+  Result.ActiveSkills := System.Copy(Self.ActiveSkills);
+  Result.Tasks        := System.Copy(Self.Tasks);
+  Result.Breaks       := System.Copy(Self.Breaks);
+  Result.TasksDone    := System.Copy(Self.TasksDone);
+end;
+
+{
+  Sets up two variables Patience and an Endurance, based on your characters
+  nickname. These two factors are used within Energy calculation to make it
+  unique to you.
+
+  Patience (Energy gained from a break will..):
+    High:  Drop of more slowly, but drops harder near the end (2-4 hours, see Endurance).
+    Low:   Drop of faster, but gradually drop less of near the end.
+
+  Endurance:
+    - Energy from a break last 2-4 hours, depending on endurance (0..1).
+    High: You generally lasts longer before dropping off. Max endurance means
+          the bot can run for a full 24 hours before energy is depleted.
+    Low:  You generally drop off faster. Min endurance means the bot can
+          only run for 16 hours before energy is depleted.
+}
+procedure TAntiban.SetupBiometrics();
+var
+  h,i:UInt32;
+  k: string;
+begin
+  if Players.FCurrent > High(Players.FPlayers) then
+    Exit;
+
+  k := Players.GetCurrent^.LoginName;
+  h := $811C9DC5;
+  for i:=1 to Length(k) do
+    h := (h * $1000193) xor Ord(k[i]);
+
+  Self.BioHash   := h / $FFFFFFFF;
+  Self.Endurance := Cos(Self.BioHash*PI/2);
+  Self.Patience  := Sin(Self.BioHash*PI/1);
+end;
+
+{
+  A 64bit timer for runtime, so that we can do long proggies without hickups
+}
+function TAntiban.TimeRunning(): Int64; constref;
+begin
+  Result := GetTickCount() - SRL.StartTime;
+end;
+
+{
+  Returns the time running at the given time of day.
+}
+function TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
+var
+  stv, res: TDateTime;
+begin
+  res := (Date() + StrToTime(TimeOfDay)) - Now();
+  if (res < 0) then res += 1;
+  Result := Self.TimeRunning() + Trunc(res * 86400 * 1000);
+  Result += Trunc(srl.GaussRand(0, StrToTime(StVar) * 86400 * 1000));
+  Result := Max(0, Result);
+end;
+
+
+{
+  Debugs the latest antiban task done, and stores it in the logg.
+}
+procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
+var
+  text: String;
+begin
+  text := '['+FormatDateTime('hh:mm:ss', Now())+']' + s;
+  if soDebugAntiban in srl.Options then
+    WriteLn(text);
+
+  if AddToList then
+  begin
+    Self.TasksDone += text;
+    if Length(Self.TasksDone) > Self.HistorySize then
+      Self.TasksDone.Del(0);
+  end;
+end;
+
+
+{
+  Used to add an antiban task.
+
+                            The task            How often     Variation (0..1)
+  Example: Antiban.AddTask([@Antiban.LoseFocus, FIVE_MINUTES, 0.25]);
+}
+function TAntiban.AddTask(Task: TAntibanTask): Boolean;
+begin
+  with Task do
+  begin
+    if StdVar = 0 then StdVar := 0.25;
+    NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+  end;
+  Self.Tasks += Task;
+end;
+
+{
+  Used to add an antiban break.
+
+  Example:             Run every   Lasts for?     Logout chance   Variation (0..1)
+     Antiban.AddBreak([ONE_HOUR,   FIVE_MINUTES,  0.05,           0.25]);
+
+  Note:
+    Breaks should always be added in the order most often to least often, but
+    where a sleep kind of break is always the last addition.
+}
+function TAntiban.AddBreak(Task: TBreakTask): Boolean;
+begin
+  with Task do
+  begin
+    if StdVar = 0 then StdVar := 0.1;
+    NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+  end;
+  Self.Breaks += Task;
+end;
+
+{
+  Internally used to reset all antiban timers to a random start
+  time after a break
+}
+function TAntiban.RestartAntiban(): Boolean;
+var i: Int32;
+begin
+  for i:=0 to High(Self.Tasks) do
+    with Self.Tasks[i] do
+      NextAtTime := Self.TimeRunning() + Random() * Interval;
+end;
+
+{
+  Call this method to do a break. If one of those has pased it's time,
+  then it will be executed, and the method will return `True`.
+
+  Returns the id of the break executed.
+}
+function TAntiban.DoBreak(out BreakID: Int32): Boolean;
+var
+  i, j, PauseStart: Int32;
+  procedure OffsetBreaks(UpTo, Length: Int32);
+  begin
+    for j:=0 to UpTo do
+      Self.Breaks[j].NextAtTime += Length;
+  end;
+begin
+  BreakID := -1;
+  for i:=High(Self.Breaks) downto 0 do
+    if Self.TimeRunning() > Self.Breaks[i].NextAtTime then
+      with Self.Breaks[i] do
+      begin
+        NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+
+        PauseStart := Self.TimeRunning();
+        Self.TakeBreak(Self.Breaks[i]);
+        OffsetBreaks(i, Self.TimeRunning() - PauseStart);
+
+        PrevAtTime := Self.TimeRunning();
+        Self.RestartAntiban();
+        BreakID := i;
+        Exit(True);
+      end;
+end;
+
+function TAntiban.DoBreak(): Boolean; overload;
+var _: Int32;
+begin
+  Result := Self.DoBreak(_);
+end;
+
+{
+  Call this method to do an antiban (or a break if `CheckBreaks` is set).
+  If one of those has pased it's time, then it will be executed, and the
+  method will return `True`
+}
+function TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
+var i: Int32;
+begin
+  // check for antiban
+  for i:=0 to High(Self.Tasks) do
+    if Self.TimeRunning() > Self.Tasks[i].NextAtTime then
+      with Self.Tasks[i] do
+      begin
+        Method();
+        NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+        Result := True;
+        i := -1;
+      end;
+
+  // check for breaks
+  if CheckBreaks then
+    Result := Self.DoBreak();
+end;
+
+
+{
+  Check if the antiban has a `sleep` break added.
+  Note: Sleep is defined by being 5+ hours, and is the the last added break.
+}
+function TAntiban.HasSleep(): Boolean;
+var zZz: Int32;
+begin
+  zZz := High(Self.Breaks);
+  Result := (zZz >= 0) and ((Self.Breaks[zZz].Length) > 5*ONE_HOUR);
+end;
+
+{
+  Returns the ID of the sleep break, if there is one, otherwise -1.
+  Note: Sleep is defined by being 5+ hours, and is the the last added break.
+}
+function TAntiban.GetSleepId(): Int32;
+var zZz: Int32;
+begin
+  Result := -1;
+  zZz := High(Self.Breaks);
+  if (zZz >= 0) and ((Self.Breaks[zZz].Length) > 5*ONE_HOUR) then
+    Result := zZz;
+end;
+
+{
+  Internally used to compute Energy
+  - It checks how long it was since last break, returns the value in milliseconds
+}
+function TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
+var i: Int32;
+begin
+  for i:=0 to High(Self.Breaks) do
+    if (Self.Breaks[i].Length >= LongerThan) and (Self.Breaks[i].PrevAtTime >= Result) then
+      Result := Trunc(Self.Breaks[i].PrevAtTime);
+  Result := Self.TimeRunning() - Result;
+end;
+
+
+{
+  Internally used to compute Energy
+  - The method gathers the sum/length of pauses the past `Timespan`.
+  It only counts one of each type of pauses, so if you have a 5 min break that
+  runs every 10 minutes, it will only count the last executed one no matter timespan.
+}
+function TAntiban.BreaksPast(Timespan: Double): Int64;
+var
+  XHoursAgo: Double := Self.TimeRunning() - Timespan;
+  active, started: Double;
+  i: Int32;
+begin
+  Active := Min(Timespan, Self.TimeRunning());
+  for i:=0 to High(Self.Breaks) do
+    if Self.Breaks[i].PrevAtTime >= XHoursAgo then
+    begin
+      if Self.Breaks[i].PrevAtTime = 0 then
+        Continue;
+      started := Max(XHoursAgo, Self.Breaks[i].PrevAtTime - Self.Breaks[i].Length);
+      Active -= Self.Breaks[i].PrevAtTime - started;
+    end;
+
+  Result := Round(Min(Timespan, Timespan - Active));
+end;
+
+{
+  Returns the current energy of your character, based on recent breaks, and runtime.
+  You should start with near 100% energy, can be a little less.
+
+  This method does expect your bot to have a sleep break (5+ hours), otherwise it
+  wont be worth a lot.
+}
+function TAntiban.EnergyLevel(): Double;
+var
+  zz: Int32;
+  t,eLeftFromSleep, eLeftFromBreak, eBreakValue: Double;
+  PastX: Double;
+begin
+  PastX := (2+(2*Self.Endurance)) * ONE_HOUR;
+  eLeftFromBreak := Max(0,Min(1,1-Power((Self.TimeSinceBreak() / (18*ONE_HOUR)), 1/3)));
+  eBreakValue    := Power(Self.BreaksPast(PastX) / (PastX), 1/3);
+  Result         := Max(0,Min(1,(eLeftFromBreak + eBreakValue) / (2.1 - (0.5*Self.Patience))));
+
+  if Self.HasSleep() then // if we have a sleep
+  begin
+    zz := High(Self.Breaks);
+    t := Self.TimeRunning() - Trunc(Self.Breaks[zz].PrevAtTime);
+    eLeftFromSleep := Max(0,Min(1,t / ((16*ONE_HOUR) + (8*ONE_HOUR*Self.Endurance))));
+    eLeftFromSleep := Power(1-eLeftFromSleep, 1/4);
+    Result := eLeftFromSleep * Result;
+  end;
+  Result := 100 * Result;
+end;
+
+// Energy based wait, if energy is 100% then wait length is 0.
+// It scales exponentially by default (Exp = 0.667):
+//   97% energy = 2%  of the length
+//   75% energy = 17% of the length
+//   50% energy = 37% of the length
+//   25% energy = 60% of the length
+//   10% energy = 78% of the length
+//   5%  energy = 86% of the length
+procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.667);
+begin
+  Wait(Trunc(t * (1-Power(Max(0.0001, Self.EnergyLevel()/100), Exp))));
+end;
+
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Various predefined tasks you can use as antiban.
+//
+// You can also create your own tasks in your script and pass that to
+// Antiban.AddTask, just follow the same structure as these methods bellow.
+//
+
+procedure TAntiban.LoseFocus();
+begin
+  DebugNote('[RND] Losing focus');
+  SRL.LoseFocus();
+  WaitEx(15000, 2000);
+  SRL.SetFocus();
+  Players.GetCurrent()^.Login();
+end;
+
+procedure TAntiban.HoverPlayers();
+begin
+  DebugNote('[RND] Hovering players');
+  srl.HoverRandomPlayer(25);
+end;
+
+procedure TAntiban.CheckSkill();
+var
+  Skill:Int32;
+begin
+  DebugNote('[RND] Check Skill Stats');
+  if Length(ActiveSkills) > 0 then
+  begin
+    Skill := Self.ActiveSkills[Random(Length(Self.ActiveSkills))];
+    Stats.HoverSkill(Skill, srl.GaussRand(2500,300), Random(3)=0);
+  end;
+end;
+
+procedure TAntiban.RandomCompass();
+begin
+  DebugNote('[RND] Rotate Compass');
+  Minimap.RandomCompass(-180,180, Random(5)=0);
+end;
+
+procedure TAntiban.RandomCompassNESW();
+begin
+  DebugNote('[RND] Rotate Compass [N,E,S,W]');
+  Minimap.SetCompassAngle([0,270,180,90][Random(4)]+Random(-10,10), Random(5)=0);
+end;
+
+procedure TAntiban.CheckStats();
+begin
+  DebugNote('[RND] Look at Stats');
+  Stats.Open();
+  if Random(4)=0 then
+    Stats.HoverSkill(Random(SKILL_TOTAL), srl.GaussRand(3000,300))
+  else
+    WaitEx(3000,300);
+  if Random(2) = 0 then
+    Inventory.Open();
+end;
+
+procedure TAntiban.OpenRandomTab();
+begin
+  DebugNote('[RND] Open Random Tab');
+  Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
+  WaitEx(1600,100);
+  if Random(4) = 0 then Inventory.Open()
+  else if Random(4) = 0 then Stats.Open();
+end;
+
+procedure TAntiban.VeryShortBreak();
+begin
+  DebugNote('[RND] Taking a breather');
+  if(Random(2)=0) then SRL.LoseFocus();
+  WaitEx(30000,5000);
+  SRL.SetFocus();
+  Players.GetCurrent()^.Login();
+  Wait(60,600, wdLeft);
+  if Random(4) = 0 then Self.CheckSkill();
+end;
+
+procedure TAntiban.FiveMinBreak();
+begin
+  Self.TakeBreak([0, FIVE_MINUTES, 0.50, 0.50]);
+end;
+
+procedure TAntiban.DoMiscStuff();
+begin
+  DebugNote('[RND] Doing misc stuff');
+  for 0 to Random(2) do
+  begin
+    if Random(3) = 0 then
+      Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
+
+    WaitEx(1500,200);
+    if(Random(8) = 0) then
+    begin
+      if(Random(2) = 0) then SRL.LoseFocus();
+      WaitEx(40000,4500);
+      SRL.SetFocus();
+    end;
+
+    if(Random(3) = 0) then
+    begin
+      Self.CheckStats();
+      WaitEx(2000,200);
+    end;
+  end;
+end;
+
+
+{
+  Internally used to take a break:
+  - It pauses for the time specified in the Task +/- Task.StdVar
+  - Can log out if LogoutChance is hit (0..1), and if rsclient is used an equal
+    test will be computed for it with the same chance as `LogoutChance` for losing focus.
+}
+procedure TAntiban.TakeBreak(Task: TBreakTask);
+var
+  len: Int64;
+begin
+  len := Round(srl.GaussRand(Task.Length, Task.Length * Task.StdVar));
+
+  Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(len, Time_Formal_Long));
+  if(Random() < Task.LogoutChance) then Logout.ClickLogout();
+  if(Random() < Task.LogoutChance) then SRL.LoseFocus();
+
+  while(len > 0) do
+  begin
+    Wait(Trunc(Min(ONE_MINUTE*5, len)));
+    len -= Min(ONE_MINUTE*5, len);
+    Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left', False);
+  end;
+
+  SRL.SetFocus();
+  Players.GetCurrent()^.Login();
+  Wait(60,600, wdLeft);
+  if Random(2)=0 then Self.CheckSkill();
+end;
+
+function TAntiban.TimeUntilBreak(Break: TBreakTask; Format: TTimeFormat): String;
+begin
+  if (Break.NextAtTime - TimeRunning() <= 0) then
+    Result := 'Now'
+  else
+    Result := srl.MsToTime(Round(Break.NextAtTime - TimeRunning()), Format);
+end;
+
+

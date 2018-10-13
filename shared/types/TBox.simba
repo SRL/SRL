@@ -1,14 +1,28 @@
+(*
+TBox
+=========
+TBox related methods
+*)
+
 function Box(X1,Y1,X2,Y2: Int32): TBox;
 begin
   Result := [X1, Y1, X2, Y2];
 end;
 
-function Box(mid:TPoint; xr,yr:Int32): TBox; overload;
+function Box(mid:TPoint; xr,yr: Int32): TBox; overload;
 begin
   Result := [mid.x-xr, mid.y-yr, mid.x+xr, mid.y+yr];
 end;
 
-procedure TBox.GetDimensions(out w, h: integer); constref;
+function TBox.ToRectangle(): TRectangle; constref;
+begin
+  Result.Top   := [Self.X1, Self.Y1];
+  Result.Right := [Self.X2, Self.Y1];
+  Result.Btm   := [Self.X2, Self.Y2];
+  Result.Left  := [Self.X1, Self.Y2];
+end;
+
+procedure TBox.GetDimensions(out w, h: Int32); constref;
 begin
   w := Self.X2 - Self.X1 + 1;
   h := Self.Y2 - Self.Y1 + 1;
@@ -34,55 +48,66 @@ begin
   Result := Point((Self.X2 + Self.X1) div 2, (Self.Y2 + Self.Y1) div 2);
 end;
 
-procedure TBox.Expand(SizeMod: Int32);
+function TBox.Expand(SizeMod: Int32): TBox; constref;
 begin
-  Self.X1 -= SizeMod;
-  Self.Y1 -= SizeMod;
-  Self.X2 += SizeMod;
-  Self.Y2 += SizeMod;
+  Result.X1 := Self.X1 - SizeMod;
+  Result.Y1 := Self.Y1 - SizeMod;
+  Result.X2 := Self.X2 + SizeMod;
+  Result.Y2 := Self.Y2 + SizeMod;
 end;
 
-procedure TBox.Expand(WidMod,HeiMod: Int32); overload;
+function TBox.Expand(WidMod,HeiMod: Int32): TBox; constref; overload;
 begin
-  Self.X1 -= WidMod;
-  Self.Y1 -= HeiMod;
-  Self.X2 += WidMod;
-  Self.Y2 += HeiMod;
+  Result.X1 := Self.X1 - WidMod;
+  Result.Y1 := Self.Y1 - HeiMod;
+  Result.X2 := Self.X2 + WidMod;
+  Result.Y2 := Self.Y2 + HeiMod;
 end;
 
-procedure TBox.Expand(SizeMod: Int32; MaxBounds: TBox); overload;
+function TBox.Expand(SizeMod: Int32; MaxBounds: TBox): TBox; constref; overload;
 begin
-  Self.X1 -= SizeMod;
-  Self.Y1 -= SizeMod;
-  Self.X2 += SizeMod;
-  Self.Y2 += SizeMod;
-
-  Self.LimitTo(MaxBounds);
+  Result.X1 := Self.X1 - SizeMod;
+  Result.Y1 := Self.Y1 - SizeMod;
+  Result.X2 := Self.X2 + SizeMod;
+  Result.Y2 := Self.Y2 + SizeMod;
+  
+  Result.LimitTo(MaxBounds);
 end;
 
-function TBox.Combine(b: TBox): TBox; constref;
+function TBox.Combine(Other: TBox): TBox; constref;
 begin
-  Result.X1 := Min(Min(Self.X1, b.X2), Min(b.X1, Self.X2));
-  Result.Y1 := Min(Min(Self.Y1, b.Y2), Min(b.Y1, Self.Y2));
-  Result.X2 := Max(Max(Self.X1, b.X2), Max(b.X1, Self.X2));
-  Result.Y2 := Max(Max(Self.Y1, b.Y2), Max(b.Y1, Self.Y2));
+  Result.X1 := Min(Min(Self.X1, Other.X2), Min(Other.X1, Self.X2));
+  Result.Y1 := Min(Min(Self.Y1, Other.Y2), Min(Other.Y1, Self.Y2));
+  Result.X2 := Max(Max(Self.X1, Other.X2), Max(Other.X1, Self.X2));
+  Result.Y2 := Max(Max(Self.Y1, Other.Y2), Max(Other.Y1, Self.Y2));
 end;
 
-function TBox.Overlap(b: TBox): Boolean; constref;
+function TBox.Overlap(Other: TBox): Boolean; constref;
 begin
-  Result := (Self.X1 <= b.X2) and (Self.X2 >= b.X1) and 
-            (Self.Y1 <= b.Y2) and (Self.Y2 >= b.Y1);
+  Result := (Self.X1 <= Other.X2) and (Self.X2 >= Other.X1) and 
+            (Self.Y1 <= Other.Y2) and (Self.Y2 >= Other.Y1);
 end;
 
-function TBox.Contains(other: TBox): Boolean; constref;
+function TBox.Contains(Other: TPoint): Boolean; constref;
 begin
-  Result := InRange(other.x1, self.x1,self.x2) and
-            InRange(other.x2, self.x1,self.x2) and
-            InRange(other.y1, self.y1,self.y2) and
-            InRange(other.y2, self.y1,self.y2);
-end; 
+  Result := InRange(Other.x, self.x1,self.x2) and
+            InRange(Other.y, self.y1,self.y2);
+end;
 
-procedure TBox.Offset(pt:TPoint);
+function TBox.Contains(Other: TBox): Boolean; constref; overload;
+begin
+  Result := InRange(Other.x1, self.x1,self.x2) and
+            InRange(Other.x2, self.x1,self.x2) and
+            InRange(Other.y1, self.y1,self.y2) and
+            InRange(Other.y2, self.y1,self.y2);
+end;
+
+function TBox.Contains(Other: TRectangle): Boolean; constref; overload;
+begin
+  Result := Self.Contains(Other.Top) and Self.Contains(Other.Left) and Self.Contains(Other.Btm) and Self.Contains(Other.Right);
+end;
+
+procedure TBox.Offset(pt: TPoint);
 begin
   self.x1 += pt.x;
   self.y1 += pt.y;
@@ -90,13 +115,12 @@ begin
   self.y2 += pt.y;
 end;
 
-function TBox.OffsetEx(pt:TPoint): TBox; constref;
+function TBox.OffsetFunc(pt: TPoint): TBox; constref;
 begin
-  Result    := self;
-  Result.x1 += pt.x;
-  Result.y1 += pt.y;
-  Result.x2 += pt.x;
-  Result.y2 += pt.y;
+  Result.x1 := self.x1 + pt.x;
+  Result.y1 := self.y1 + pt.y;
+  Result.x2 := self.x2 + pt.x;
+  Result.y2 := self.y2 + pt.y;
 end;
 
 procedure TBox.Normalize();
@@ -180,4 +204,70 @@ begin
   Result[1] := [Self.X1, Self.Y2 - Size, Self.X2, Self.Y2];
   Result[2] := [Self.X1, Result[0].Y2 + 1, Self.X1 + Size, Result[1].Y1 - 1];
   Result[3] := [Self.X2 - Size, Result[0].Y2 + 1, Self.X2, Result[1].Y1 - 1];
+end;
+
+(*
+TBox.NearestEdge
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TBox.NearestEdge(P: TPoint): TPoint; constref;
+
+Returns the closest edge point to the TPoint `P`.
+
+.. note:: by slacky
+*)
+function TBox.NearestEdge(P: TPoint): TPoint; constref;
+begin
+  Result := P;
+
+  if Self.Contains(Result) then
+  begin
+    if Min(Abs(Self.Y1 - P.Y), Abs(P.Y - Self.Y2)) > Min(Abs(Self.X1 - P.X), Abs(P.X - Self.X2)) then
+    begin
+      Result.X := Self.X1;
+      if (P.X - Self.X1 > Self.X2 - P.X) then
+        Result.X := Self.X2;
+    end else
+     begin
+      Result.Y := Self.Y1;
+      if (P.Y - Self.Y1 > Self.Y2 - P.Y) then
+        Result.Y := Self.Y2;
+    end;
+  end else
+  begin
+    if (Result.X < Self.X1) then Result.X := Self.X1;
+    if (Result.X > Self.X2) then Result.X := Self.X2;
+    if (Result.Y < Self.Y1) then Result.Y := Self.Y1;
+    if (Result.Y > Self.Y2) then Result.Y := Self.Y2;
+  end;
+end;
+
+(*
+TBox.Intersect
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TBox.Intersect(P: TPoint): TPoint; constref;
+
+Returns the point on the edge where point `P` intersects with the edge when crossing to the mean of the box.
+*)
+function TBox.Intersect(P: TPoint): TPoint; constref;
+var m,i: TPoint;
+begin
+  Result := P;
+  m := Self.Middle;
+  if srl.LinesIntersect(p,m, Point(X1,Y1), Point(X2,Y1), i) then Result := i
+  if srl.LinesIntersect(p,m, Point(X2,Y1), Point(X2,Y2), i) then Result := i
+  if srl.LinesIntersect(p,m, Point(X2,Y2), Point(X1,Y2), i) then Result := i
+  if srl.LinesIntersect(p,m, Point(X1,Y2), Point(X1,Y1), i) then Result := i;
+end;
+
+
+operator + (Left, Right: TBox): TBox;
+begin
+  Result.X1 := Min(Min(Left.X1, Right.X2), Min(Right.X1, Left.X2));
+  Result.Y1 := Min(Min(Left.Y1, Right.Y2), Min(Right.Y1, Left.Y2));
+  Result.X2 := Max(Max(Left.X1, Right.X2), Max(Right.X1, Left.X2));
+  Result.Y2 := Max(Max(Left.Y1, Right.Y2), Max(Right.Y1, Left.Y2));
 end;

@@ -1,3 +1,9 @@
+(*
+T2DPointArray
+=============
+T2DPointArray related methods
+*)
+
 //--| Type helpers |----------------------------------------------------------->
 //----------------------------------------------------------------------------->
 procedure T2DPointArray.Append(const Value: TPointArray);
@@ -151,13 +157,13 @@ begin
   Result := True;      
 end;
 
-function T2DPointArray.Merge(): TPointArray;
+function T2DPointArray.Merge(): TPointArray; constref;
 begin
   Result := MergeATPA(self);    
 end;
 
 
-procedure T2DPointArray.FilterSize(MinLen:Int32; KeepIf:TComparator=__LT__);
+procedure T2DPointArray.FilterSize(MinLen:Int32; KeepIf:EComparator=__LT__);
 var
   tmp:T2DPointArray;
   TPA:TPointArray;
@@ -195,12 +201,12 @@ begin
   self := tmp;
 end;
 
-procedure T2DPointArray.SortByMiddle(From: TPoint); overload;
+procedure T2DPointArray.SortByMiddle(From: TPoint);
 begin
   SortATPAFromMidPoint(Self, From);
 end;
 
-procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0); overload;
+procedure T2DPointArray.SortByIndex(From: TPoint; Index:Int32=0);
 var
   i: Int32;
   weight: TIntegerArray;
@@ -215,6 +221,11 @@ begin
   QuickATPASort(weight, self, 0, High(self), True);
 end;
 
+procedure T2DPointArray.SortBySize(Size:Int32=0; ClosestFirst: Boolean=False);
+begin
+  SortATPAFromSize(Self, Size, ClosestFirst);
+end;
+
 
 //--| Type helpers (extended) |------------------------------------------------>
 //----------------------------------------------------------------------------->
@@ -225,4 +236,30 @@ begin
   SetLength(Result, Length(self));
   for i:=0 to High(Self) do
     Result[i] := MiddleTPA(Self[i]);
+end;
+
+function T2DPointArray.ToTBA(): TBoxArray; constref;
+var i:Int32;
+begin
+  SetLength(Result, Length(self));
+  for i:=0 to High(Self) do
+    Result[i] := GetTPABounds(Self[i]);
+end;
+
+function T2DPointArray.Smallest(): TPointArray; constref;
+var
+  TPA: TPointArray;
+begin
+  for TPA in Self do
+    if (Length(TPA) < Length(Result)) then
+      Result := TPA;
+end;
+
+function T2DPointArray.Biggest(): TPointArray; constref;
+var
+  TPA: TPointArray;
+begin
+  for TPA in Self do
+    if (Length(TPA) > Length(Result)) then
+      Result := TPA;
 end;

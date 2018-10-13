@@ -1,0 +1,223 @@
+(*
+RSInterfaceBase
+================
+Specializes the generic TInterfaceBase towards Oldschool Runescape MainScreen.
+Used to find interfaces on the go, versus the static coordinates based ones.
+
+All new interfaces that exits on the mainscreen should inherit from this base. 
+*)
+type
+  TRSInterfaceBase = record(TInterfaceBase)
+    FTitles: TStringArray;
+    FCaseInsensitive: Boolean;
+    TitleBounds: TBox;
+    ItemBounds: TBox;
+    CloseButton: TBox;
+  end;
+
+(*
+TRSInterfaceBase.AppendTitle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSInterfaceBase.AppendTitle(Title: String);
+
+Adds another alternative title to search for in the interface.
+*)
+procedure TRSInterfaceBase.AppendTitle(Title: String);
+begin
+  Self.FTitles += Title;
+end;
+
+(*
+TRSInterfaceBase.CaseInsensitive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSInterfaceBase.CaseInsensitive(CS: Boolean);
+
+Sets if the Title search should be case sensitive or not.
+*)
+procedure TRSInterfaceBase.CaseInsensitive(CS: Boolean);
+begin
+  Self.FCaseInsensitive := CS;
+end;
+
+(*
+TRSInterfaceBase.__Find
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.__Find(): Boolean;
+
+Used to locate the bounds of the interface, and finally verifies it by
+checking if the title matches.
+
+Note: This method should not be called in scripts as it may be subject to change.
+*)
+function TRSInterfaceBase.__Find(): Boolean;
+var
+  i: Int32;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  ifaceTitle: String;
+  Bounds: TBox;
+  OCR_TITLE:  TCompareRules = [2070783,1,True,65];
+begin
+  srl.FindColors(TPA, CTS2(3424329,10), MainScreen.GetBounds());
+  ATPA := TPA.Cluster(1,3);
+  SortATPAFromSize(ATPA, 0, False);
+
+  if (Length(ATPA) >= 2) then
+  begin
+    Self.TitleBounds := ATPA[1].Bounds();
+    Self.ItemBounds  := ATPA[0].Bounds();
+
+    Self.FBounds := Self.ItemBounds.Combine(Self.TitleBounds).Expand(6); 
+
+    with Self.FBounds do
+      Self.CloseButton := Box(X2-27, Y1+7, X2-7, Y1+27);
+    
+    Bounds := Self.TitleBounds;
+    Bounds.y1 += 4; // SimpleOCR is highly sensitive
+
+    ifaceTitle := OCR.Recognize(Bounds, OCR_TITLE, UpFont, Self.TitleBounds.Width div 2);
+    for i:=0 to High(Self.FTitles) do
+    begin
+      if Self.FCaseInsensitive then
+      begin
+        Result := Lowercase(Self.FTitles[i]) in Lowercase(ifaceTitle);
+        if Result then Exit(True);
+      end else
+      begin
+        Result := Self.FTitles[i] in ifaceTitle;
+        if Result then Exit(True);
+      end;
+    end;
+  end;
+end;
+
+(*
+TRSInterfaceBase.IsUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSInterfaceBase.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+   function TRSInterfaceBase.IsUpText(Text: String; WaitTime: UInt32 = 350): Boolean; overload;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.IsUptext
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+var
+  TimeOut: UInt64;
+  Text: String;
+  i: Int32;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    Text := Self.GetUpText();
+    for i:=0 to High(SubStrs) do
+      if (SubStrs[i] = '') or (SubStrs[i] in Text) then
+        Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
+function TRSInterfaceBase.IsUpText(Text: String; WaitTime: UInt32 = 350): Boolean; overload;
+var
+  TimeOut: UInt64;
+begin
+  Result := False;
+  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+
+  while (TimeOut >= GetTickCount64()) do
+  begin
+    if (Text in Self.GetUpText()) then
+      Exit(True);
+
+    Wait(Random(35, 75));
+  end;
+end;
+
+(*
+TRSInterfaceBase.GetUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.GetUpText(): String;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.GetUpText
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.GetUpText(): String;
+const
+  OCR_RULES_UPTEXT: TCompareRules = [-1, 85, True, 85];
+var
+  client: T2DIntArray;
+  bmp: Int32;
+begin
+  bmp := BitmapFromClient(mainscreen.UpTextArea);
+  FastReplaceColor(bmp, 2070783, 3424329);
+  client := BitmapToMatrix(bmp);
+  Result := OCR.RecognizeEx(client, OCR_RULES_UPTEXT, UpFont);
+  FreeBitmap(bmp);
+end;
+
+
+(*
+TRSInterfaceBase.Debug
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed. If RetImage is ``True``
+the image will not be debugged, but instead returned, otherwise the resul is ``nil``
+
+This applies to any interface that inherits from TRSInterfaceBase
+*)
+function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
+begin
+  Result.FromClient();
+  Result.DrawBox(Self.FBounds,     False, $FFFFFF);
+  Result.DrawBox(Self.ItemBounds,  False, $00FFFF);
+  Result.DrawBox(Self.TitleBounds, False, $00FFFF);
+  Result.DrawBox(Self.CloseButton, False, $00FFFF);
+
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
+end;
+
+(*
+TRSInterfaceBase.Close
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInterfaceBase.Close(): Boolean;
+
+Closes the interface, returns ``True`` on success
+*)
+function TRSInterfaceBase.Close(): Boolean;
+var
+  t: UInt64;
+begin
+  if (not Self.__Find()) then
+    Exit(True);
+
+  if (srl.CloseInterfacesWithEscape) then
+  begin
+    Keyboard.PressKey(VK_ESCAPE);
+    t := GetTickCount() + Random(4000, 5000);
+    while (t > GetTickCount()) do
+    begin
+      if (not Self.__Find()) then
+        Exit(True);
+      Wait(60);
+    end;
+    srl.ToggleCloseInterfacesWithEscape(False);
+  end;
+
+  Mouse.Click(Self.CloseButton, mouse_left);
+  t := GetTickCount() + Random(4000, 5000);
+  while (t > GetTickCount()) do
+    if (not Self.__Find()) then
+      Exit(True);
+end;

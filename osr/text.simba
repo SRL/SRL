@@ -1,4 +1,11 @@
-{$loadlib SimpleOCR}
+(*
+Text
+=============
+Text related methods aimed towards OSRS
+*)
+
+{$loadlib libsimpleocr}
+
 var 
   OCR: TSimpleOCR;
   SmallFont, UpFont, NPCFont, StatFont: TFontSet;

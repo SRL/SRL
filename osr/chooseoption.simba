@@ -1,8 +1,8 @@
 (*
 ChooseOption
-=======
-The ChooseOption file holds functions and procedures that are related 
-to the runescape ChooseOption-menu
+============
+The ChooseOption file holds functions and procedures that are related to the
+ingame context menu.
 *)
 
 type
@@ -10,46 +10,48 @@ type
     Str: String;
     Bounds: TBox;
   end;
-  TOptionArray = Array of TOption;
+  TOptionArray = array of TOption;
 
 (*
 type TRSChooseOption
-~~~~~~~~~~~~~~~
-The type that holds functions and properties of the Runescape ChooseOption-menu.
+~~~~~~~~~~~~~~~~~~~~
+The type that holds functions and properties of the context menu.
 *)
 type
-  TRSChooseOption = record 
-    Bounds:TBox;
+  TRSChooseOption = record
+    Bounds: TBox;
+    MouseSpeed: Int32;
     {$IFNDEF CODEINSIGHT}
-    BoxBitmap: Int32;
-    BoxBitmap_Width:Int32;
-    BoxBitmap_Height:Int32;
+    BoxBitmap: PtrInt;
+    BoxBitmap_Width: Int32;
+    BoxBitmap_Height: Int32;
     {$ENDIF}
   end;
 
 (*
-var inventory
-~~~~~~~~~~~
-Variable that stores functions and properties of the Runescape ChooseOption-menu.
+var ChooseOption
+~~~~~~~~~~~~~~~~
+Variable that stores functions and properties of the context menu.
 *)
 var
   ChooseOption: TRSChooseOption;
 
 {$IFNDEF CODEINSIGHT}
-procedure TRSChooseOption.__setup();
+procedure TRSChooseOption.__Setup();
 begin
   BoxBitmap := BitmapFromString(20, 18, 'meJxzD4l1pwAxkAsGj15Mv+DyGp' +
         'ogXBmyemL04lEzgHqxhgPxehkwwoEkN9NCLwMRcYRHL5rvSNVLPBhAvWQjAO6IcGE=');
   GetBitmapSize(BoxBitmap, BoxBitmap_Width, BoxBitmap_Height);
+  MouseSpeed := Random(8,10);
 end;
 
-procedure TRSChooseOption.__free(); 
+procedure TRSChooseOption.__Free();
 begin 
   FreeBitmap(BoxBitmap); 
 end;
 
 //Finds the optionbox using a simple bitmap (works very well).
-function TRSChooseOption.__find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
+function TRSChooseOption.__Find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
 var 
   t,adapt: UInt64;
 begin
@@ -73,7 +75,7 @@ end;
 
 (*
 ChooseOption.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Open(): Boolean;
@@ -91,7 +93,7 @@ end;
 
 (*
 ChooseOption.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Open(Box:TBox): Boolean; overload;
@@ -109,7 +111,7 @@ end;
 
 (*
 ChooseOption.IsOpen
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.IsOpen(): Boolean;
@@ -126,7 +128,7 @@ end;
 
 (*
 ChooseOption.IsClosed
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.IsClosed(): Boolean;
@@ -148,7 +150,7 @@ end;
 
 (*
 ChooseOption.Find
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Find(): Boolean;
@@ -176,8 +178,7 @@ begin
     ATPA := ClusterTPAEx(TPA,1,1);
     SortATPAFromFirstPoint(ATPA, pt);
     
-    Self.Bounds := GetTPABounds(ATPA[0]);
-    Self.Bounds.Expand(1);
+    Self.Bounds := GetTPABounds(ATPA[0]).Expand(1);
     Self.Bounds.LimitTo(B);
   end;
 end;
@@ -226,58 +227,106 @@ begin
         tmp.Free();
       end;
       B.Offset(Point(x1, y1));
-      Result[i].bounds := B;
+      Result[i].Bounds := B;
     end;
     menu.Free();
   end;
 end;
 
 (*
-ChooseOption.Select
-~~~~~~~~~~~~~~~~~~~~~~~~
+ChooseOption.SelectID
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+  function TRSChooseOption.SelectID(ID: Int32; MouseAction: Int32=mouse_left; CloseIt: Boolean=True): Boolean;
 
-By default it will click the given option, if not found the menu is closed.
-Returns true if the select-action was performed.
-- moves the mouse to the first match of the given options `SubStrings`.
-- left-clicks it `mouseAction:Int32=mouse_left;`
-- if it's not found option-menu will be closed AClose `AClose:Boolean=True;`
-- search can be case-insensitive `CaseSensitive:Boolean=True`
-  
+By default it will click the given option `ID`, if it's not there the menu will be closed.
+Returns True if the select-action was performed.
+
+Slows down the mouse movement for more realistic sliding through the lines of text.
+
 .. note:: by slacky
 *)
-function TRSChooseOption.Select(SubStrings:TStringArray; mouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+function TRSChooseOption.SelectID(ID: Int32; MouseAction:Int32=mouse_left; CloseIt:Boolean=True): Boolean;
 var
+  Mouse2: TMouse;
+  avg: TBox;
   choices: TOptionArray;
-  i,j,L:Int32;
-  waitOffset:Int64;
+  r,l: Int32;
+  didRnd: Boolean;
 begin
-  choices := Self.GetOptions(); //this is a lil' slow
-  L := Length(Choices);
-  if L = 0 then
+  choices := Self.GetOptions(); // open and return options.
+
+  L := Length(choices);
+  if L <= 0 then
     Exit(False);
+  
+  Mouse2 := Mouse;
+  Mouse2.Speed := Self.MouseSpeed;
+
+  if InRange(ID,0,L-1) then
+  begin
+    repeat
+      if Random() > 0.667 then
+      begin
+        r := Round(srl.SkewedRand(r+6,r+0,High(choices)));
+        if r < ID then
+        begin
+          Mouse2.Move(choices[r].Bounds, False, rndSkewed);
+          Wait(250,900, wdLeft);
+          didRnd := True;
+        end;
+      end;
+    until (Random() > 0.10) or (r >= ID);
+
+    if (not didRnd) then
+    begin
+      avg := choices[Max(0,Min(L-1,srl.NormalRange(ID-2, ID+2)))].Bounds;
+      Mouse2.Move(avg,False,rndSkewed);
+      WaitEx(80,20);
+      with choices[ID].Bounds do with Mouse2.GetPosition() do
+        avg := [Max(X-10,X1), Y1, Min(X+10,X2), Y2];
+      Mouse2.Move(avg,False,rndSkewed);
+    end;
+
+    Mouse2.Click(choices[ID].Bounds, MouseAction);
+    if self.IsClosed() then
+      Exit(True);
+  end;
+  
+  WaitEx(360,70); // don't want inhumane reactions when the option isn't found
+  if CloseIt then
+    Self.Close();
+end;
+
+(*
+ChooseOption.Select
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+  function TRSChooseOption.Select(Option: String; MouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
+  
+Same as SelectID, except that this will look for the option by it's text, rather than by id.
+*)
+function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; CloseIt:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
+var
+  i,j,l: Int32;
+  choices: TOptionArray;
+begin
+  choices := Self.GetOptions();
+
+  L := Length(Choices);
+  if L = 0 then Exit(False);
 
   for i:=0 to L-1 do
     for j:=0 to High(SubStrings) do
-      case CaseSensitive of
-        True:
-          if Pos(SubStrings[j],choices[i].str) <> 0 then
-          begin
-            Mouse.Click(choices[i].bounds, mouseAction);
-            Exit(self.IsClosed());
-          end;
-        False:
-          if Pos(Lowercase(SubStrings[j]),Lowercase(Choices[i].str)) <> 0 then
-          begin
-            Mouse.Click(choices[i].bounds, mouseAction);
-            Exit(self.IsClosed());
-          end;
-      end;
-
-  Wait(Random(200,340)); //Wait so we actually see that the option aint here.
-  if AClose then
+      if (CaseSensitive and (SubStrings[j] in Choices[i].Str)) or
+         ((not CaseSensitive) and (Lowercase(SubStrings[j]) in Lowercase(Choices[i].Str))) then
+        Exit(Self.SelectID(i, mouseAction, CloseIt));
+  
+  WaitEx(360,70); // don't want inhumane reactions when the option isn't found
+  if CloseIt then
     Self.Close();
 end;
 
@@ -287,13 +336,48 @@ begin
 end;
 
 (*
-ChooseOption.Close
+ChooseOption.MissSelect
 ~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss: Int32=5): Boolean;
+  function TRSChooseOption.MissSelect(Option, MissOpt: String; ChanceOfMiss: Int32=5): Boolean;
+
+For example, click Inspect when you meant to click Drop. By default there's a 5% chance of misclick,
+it will automatically click the right one after a missclick.
+*)
+function TRSChooseOption.MissSelect(Option, MissOpt: TStringArray; ChanceOfMiss: Int32=5): Boolean;
+var
+  i,j,l: Int32;
+  choices: TOptionArray;
+  P: TPoint;
+begin
+  P := Mouse.GetPosition();
+  while (Random(100) < ChanceOfMiss) do
+  begin
+    Self.Select(MissOpt);
+    Wait(35,800, wdLeft);
+    Self.IsClosed(srl.NormalRange(900,1300));
+    Mouse.Move(P.Random(3,3, True));
+  end;
+
+  Result := Self.Select(Option);
+end;
+
+function TRSChooseOption.MissSelect(Option, MissOpt: String; ChanceOfMiss: Int32=5): Boolean; overload;
+begin
+  Result := Self.MissSelect([Option], [MissOpt], ChanceOfMiss);
+end;
+
+
+(*
+ChooseOption.Close
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 
-Closes the optionbox by dragging the mouse away from it, if that 
+Closes the option menu by dragging the mouse away from it, if that 
 failed it clicks the "Close"-option.
 
 .. note:: by slacky
@@ -301,10 +385,11 @@ failed it clicks the "Close"-option.
 function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 var
   B:TBox;
-  pt,dest:TPoint;
-  dir:PPoint;
-
-  procedure TrackMovment(a:Pointer; b:TShiftState; x,y:Int32); static;
+  pt:TPoint;
+  dir: record R,T: Double; end;
+  OldHook: TMouseMovedEvent;
+  
+  procedure TrackMovment(Sender: Pointer; X,Y: Int32); static;
   var p:TPoint;
   begin
     if not ChooseOption.__find(p,0) then
@@ -314,30 +399,31 @@ begin
   if not self.IsOpen(tryTime) then
     Exit(True);
 
-  mouse.SetOnMouseMove(Pointer(@TrackMovment));
+  OldHook := @mouse.OnMoved;
+  Mouse.OnMoved := Pointer(@TrackMovment);
   with self.Bounds do B := [x1,y1-BoxBitmap_Height,x2,y2];
 
-  pt := mouse.GetPosition();
+  pt := Mouse.GetPosition();
   dir := [Abs(pt.x - B.x1), Pi];
   if dir.R > Abs(pt.y - B.y1) then dir := [Abs(pt.y - B.y1), -(Pi/2)];
   if dir.R > Abs(pt.x - B.x2) then dir := [Abs(pt.x - B.x2), 0];
   if dir.R > Abs(pt.y - B.y2) then dir := [Abs(pt.y - B.y2), (Pi/2)];
-
+  
   dir.T := (dir.T-Pi/3) + Random()*((dir.T+Pi/3) - (dir.T-Pi/3));
-  dest := [pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T))];
   try
-    mouse.Move(dest);
+    Mouse.Move(pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T)));
     self.Select(['Cancel']);
     Result := self.IsClosed();
   except
     Result := self.IsClosed();
   end;
-  mouse.SetOnMouseMove(nil);
+  
+  Mouse.OnMoved := @OldHook;
 end;
 
 begin
-  ChooseOption.__setup();
-  AddOnTerminate(@ChooseOption.__free);
+  ChooseOption.__Setup();
+  AddOnTerminate(@ChooseOption.__Free);
 end;
 
 

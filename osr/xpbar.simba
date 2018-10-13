@@ -1,6 +1,10 @@
+(*
+XPBar
+======
+XPBar related methods
+*)
 type
-  TXPBar = record
-    FBounds: TBox;
+  TXPBar = record(TInterfaceBase)
     FTextArea: TBox;
 
     FButtonBounds: TBox;
@@ -21,6 +25,13 @@ begin
   FButtonRadius := 9;
 end;
 
+(*
+XPBar.IsOpen
+~~~~~~~~~~~~
+.. pascal:: function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
+
+Attempts to open the XP-bar, returns ``True`` on success.
+*)
 function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
 const
   COL_INNER_BORDER = 4543066;
@@ -38,6 +49,13 @@ begin
   until (GetTickCount64() >= t);
 end;
 
+(*
+XPBar.Toggle
+~~~~~~~~~~~~
+.. pascal:: function TXPBar.Toggle(Enable: Boolean): Boolean;
+
+Toggles ON/OFF the XP-bar.
+*)
 function TXPBar.Toggle(Enable: Boolean): Boolean;
 begin
   if (Enable) and (not Self.isOpen()) then

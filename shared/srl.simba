@@ -1,83 +1,87 @@
 type
-  ESRLOption = (srlDebug, srlDebugTimeStamp);
-  ESRLOptions = set of ESRLOption;
+  ESRLOption = (soDebug, soDebugAntiban, soDebugTimeStamp, soActivateClient);
+  ESRLOptionSet = set of ESRLOption;
+
   EDebugType = (dtHeader, dtFooter, dtFatal, dtNone);
+
+const
+  SRL_DEFAULT_OPTIONS = [soDebug, soDebugAntiban, soDebugTimeStamp];
 
 type
   TSRL = record
-    _DebugLevel: Integer;
-
+    Options: ESRLOptionSet;
+    DebugLevel: Int32;
     StartTime: UInt64;
     DefaultClientBounds: TBox;
 
-    Debugging: Boolean;
-    DebugTimeStamp: Boolean;
-
+    OnSetup: procedure;
     OnLoginPlayer: procedure();
     OnLoginResponse: function(Response: String): Boolean;
-
+    OnFatalMessage: procedure(Message: String);
     CloseInterfacesWithEscape: Boolean;
- end;
+
+    GAUSS_CUTOFF: Double;
+  end;
 
 var
   srl: TSRL;
 
-procedure TSRL.WriteLn(Str: String; const debugType: EDebugType);
+procedure TSRL.WriteLn(constref Message: String; DebugType: EDebugType = dtNone); overload;
 
-  function TimeRunning(ms: UInt64): String;
+  function TimeRunning: String;
+  const
+    HOURS_PER_DAY = 24;
+    HOURS_PER_WEEK = 168;
   var
-    _, hour, minute, second: Integer;
+    Year, Month, Week, Day, Hour, Minute, Second: Int32;
   begin
-    ConvertTime64(ms, _, _, _, _, hour, minute, second);
-    Result := Format('[%.2d:%.2d:%.2d]', [hour,minute,second]);
+    ConvertTime64(GetTickCount() - Self.StartTime, Year, Month, Week, Day, Hour, Minute, Second);
+
+    Result := Format('[%.2d:%.2d:%.2d]', [Hour + (Day * HOURS_PER_DAY) + (Week * HOURS_PER_WEEK), Minute, Second]);
   end;
 
-var s, Typ: String;
+var
+  Prefix: String;
 begin
-  if (not Debugging) then
-    Exit;
-
-  if (Length(Str) > 0) then
+  if (soDebug in Options) or (DebugType = dtFatal) then // Allow fatal messages to passthrough
   begin
-    if (DebugTimeStamp) then
-      s := TimeRunning(Self.StartTime);
+    if (soDebugTimeStamp in Options) then
+      Prefix := TimeRunning() + ':';
 
-    if (debugType = dtFatal) then
-      Typ := ' [FATAL]:';
+    case DebugType of
+      dtFatal:
+        Prefix += '[FATAL]:';
+      dtFooter:
+        Self.DebugLevel -= 1;
+    end;
 
-    if (debugType = dtFooter) and (_DebugLevel > 0) then
-      Dec(_DebugLevel);
+    System.WriteLn(Format('%s %s%s', [Prefix, '-' * Self.DebugLevel, Message]));
 
-    s += StringOfChar('-', _DebugLevel * 2) + Typ + ' ';
+    case DebugType of
+      dtHeader:
+        Self.DebugLevel += 1;
+      dtFatal:
+        begin
+          if (@Self.OnFatalMessage <> nil) then
+            Self.OnFatalMessage(Message);
 
-    if (debugType = dtHeader) then
-      Inc(_DebugLevel);
-
-    _Write(s + Str);
+          TerminateScript();
+        end;
+    end;
   end;
-
-  _WriteLn();
-
-  if (debugType = dtFatal) then
-    TerminateScript;
 end;
 
-procedure TSRL.WriteLn(Str: String); overload;
-begin
-  Self.WriteLn(Str, dtNone);
-end;
-
-function TSRL.WriteLn(Str: String; AResult: Variant; Footer: String = ''): Variant; overload;
+function TSRL.WriteLn(constref Message: String; AResult: Variant; Footer: String = ''): Variant; overload;
 begin
   Result := AResult;
-  Self.WriteLn(Str);
+  Self.WriteLn(Message);
   if (Footer <> '') then
     Self.WriteLn(Footer, dtFooter);
 end;
 
-procedure TSRL.WriteFmt(Str: String; Args: TVariantArray; debugType: EDebugType = dtNone);
+procedure TSRL.WriteFmt(constref Message: String; Args: TVariantArray; DebugType: EDebugType = dtNone);
 begin
-  Self.WriteLn(Format(Str, Args), debugType);
+  Self.WriteLn(Format(Message, Args), debugType);
 end;
 
 procedure TSRL.ToggleCloseInterfacesWithEscape(Enable: Boolean);
@@ -85,18 +89,21 @@ begin
   Self.CloseInterfacesWithEscape := Enable;
 end;
 
-procedure TSRL.Setup(Options: ESRLOptions = [srlDebug]);
+procedure TSRL.Setup(AOptions: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
-  _DebugLevel := 1;
-  DebugTimeStamp := False;
-  Debugging := False;
+  if (@Self.OnSetup <> nil) then
+    Self.OnSetup();
 
-  StartTime := GetTickCount64;
+  Self.Options := AOptions;
+  if (Self.StartTime = 0) then
+    Self.StartTime := GetTickCount();
+end;
 
-  if (srlDebugTimeStamp in Options) then
-    DebugTimeStamp := True;
-  if (srlDebug in Options) then
-    Debugging := True;
+begin
+  srl.DebugLevel := 0;
+  srl.StartTime := GetTickCount();
+  srl.Options := SRL_DEFAULT_OPTIONS;
+  srl.GAUSS_CUTOFF := 4.0;
 end;
 
 

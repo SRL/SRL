@@ -1,19 +1,19 @@
 (*
 Inventory
-=======
-The inventory file holds functions and procedures that are related 
-to the runescape inventory
+=========
+The inventory file holds functions and procedures that are related to the runescape inventory
 *)
 
 (*
 type TRSInventory
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 The type that holds functions and properties of the Runescape inventory gametab.
 *)
 type 
   TRSInventory = record(TInterfaceBase)
     FSlots: TBoxArray;
     LowSlot, HighSlot: Byte;
+    ShiftDrop: Boolean;
   end;
 
 {==| Table of Contents |=======================
@@ -28,28 +28,46 @@ type
  function TRSInventory.GetUsedSlots(): TIntegerArray;
  procedure TRSInventory.DropItems(Slots:TIntegerArray = DROP_PATTERN_REGULAR);
  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
- function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
- function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
- function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray; overload;
+ function TRSInventory.FindMask(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+ function TRSInventory.FindDTM(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; 
+ function TRSInventory.FindBMP(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 28): TIntegerArray;
  function TRSInventory.Count(): Byte;
  function TRSInventory.GetActiveSlot(): Int8;
  function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 }
 
 (*
-var inventory
-~~~~~~~~~~~
+var Inventory
+~~~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape inventory gametab.
 *)
 var 
   Inventory: TRSInventory;
 
+  
+(*
+Drop patterns
+~~~~~~~~~~~~~
+Column wise  and "reversed" column wise (S-style):
+
+``DROP_PATTERN_REGULAR``, ``DROP_PATTERN_REGULAR_R``
+
+
+Column wise snake-style patterns and "reversed" version:
+
+``DROP_PATTERN_SNAKE``, ``DROP_PATTERN_SNAKE_R``
+
+
+By row, from to-left, down to bottom right, it's reverse starts in top-right down to bottom right.
+
+``DROP_PATTERN_TOPDOWN``, ``DROP_PATTERN_TOPDOWN_R``
+*)
 const
-    //Column wise (Z-style) and "reversed" column wise (S-style)
+    //Column wise and "reversed" column wise - normal pattern
     DROP_PATTERN_REGULAR   = [0..27];
     DROP_PATTERN_REGULAR_R = [3,2,1,0, 7,6,5,4, 11,10,9,8, 15,14,13,12, 19,18,17,16, 23,22,21,20, 27,26,25,24];
 
-    //Column wise (zigzag-style) and "reversed" version
+    //Column wise snake and "reversed" version
     DROP_PATTERN_SNAKE   = [0,1,2,3, 7,6,5,4, 8,9,10,11, 15,14,13,12, 16,17,18,19, 23,22,21,20, 24,25,26,27];
     DROP_PATTERN_SNAKE_R = [3,2,1,0, 4,5,6,7, 11,10,9,8, 12,13,14,15, 19,18,17,16, 20,21,22,23, 27,26,25,24];
 
@@ -94,24 +112,55 @@ begin
 end;
 {$ENDIF}
 
+(*
+Inventory.ErrorPattern
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
 
-//given a pattern an a upper limit of "errors", it will swap around some values and return a "errorized" drop-pattern
-function TRSInventory.ErrorPattern(Pattern: TIntegerArray=DROP_PATTERN_REGULAR; MaxErrors:Int32=5): TIntegerArray;
-var i,j,h,errors:Integer;
+  function TRSInventory.ErrorPattern(Pattern: TIntArray=DROP_PATTERN_REGULAR; ErrorChance:Int32=5): TIntegerArray;
+
+Given a pattern and an upper limit of errors in percent, it will swap around some values and return a "errorized" drop-pattern
+
+**Example:**
+
+.. code-block:: pascal
+
+   Inventory.DropItems(Inventory.ErrorPattern(DROP_PATTERN_REGULAR, 10));
+*)
+function TRSInventory.ErrorPattern(Pattern: TIntArray=DROP_PATTERN_REGULAR; ErrorChance:Int32=5): TIntegerArray;
+var i,j,h,k,tmp: Int32;
 begin
   Result := Copy(Pattern);
   h := High(Pattern);
-  errors := Trunc(srl.TruncatedGauss(0,MaxErrors));
-  for i:=1 to Errors do
+  i := 1;
+  while i < h do
   begin
-    j := RandomRange(1,h);
-    Swap(Result[j], Result[j-1]);
+    if Random(100) < ErrorChance then
+    begin
+      case Random(0,2) of
+        0:begin
+            tmp := Result[i];
+            for j:=i+1 to h do Result[j-1] := Result[j];
+            Result[h] := tmp;
+          end;
+        1:begin
+            Swap(Result[i+1],Result[i]);
+          end;
+        2:begin
+            tmp := Result[i];
+            k := Random(i+1,h);
+            for j:=i+1 to k do Result[j-1] := Result[j];
+            Result[k] := tmp;
+          end;
+      end;
+    end;
+    Inc(i);
   end;
 end;
 
 (*
 Inventory.Open
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.Open(): Boolean;
@@ -210,7 +259,7 @@ Inventory.IsFull
 
   function TRSInventory.IsFull(): Boolean;
 
-Returns True if the inventory can't hold anymore items
+Returns ``True`` if the inventory can't hold anymore items
 
 .. note:: by slacky
 *)
@@ -297,6 +346,87 @@ begin
 end;
 
 (*
+Inventory.Count
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Count: Int32;
+
+Returns the number of used slots
+*)
+function TRSInventory.Count: Int32; overload
+begin
+  Result := Length(Self.GetUsedSlots());
+end;
+
+(*
+Inventory.DropItem
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSInventory.DropItem(Slot: Int32; UpText:TStringArray=[]): Boolean;
+
+Drops the given item.
+*)
+function TRSInventory.DropItem(Slot: Int32; UpText:TStringArray=[]): Boolean;
+var
+  idx,swt: Int32;
+  RealeaseShift, ShiftAlreadyDown: Boolean;
+label
+  START;
+begin
+  if not(self.Open()) then
+    Exit();
+
+  IsKeyDown(VK_SHIFT); // clear cache
+
+  ShiftAlreadyDown := IsKeyDown(VK_SHIFT);
+  RealeaseShift    := not ShiftAlreadyDown;
+
+  START:
+
+  if shiftDrop and (not ShiftAlreadyDown) then
+  begin
+    Keyboard.KeyDown(VK_SHIFT);
+    WaitEx(110,10);
+  end;
+
+  if self.IsSlotValid(Slot) and self.IsSlotUsed(Slot, False) then
+  begin
+    Mouse.Move(self.FSlots[Slot]);
+
+    if (UpText <> []) then
+    begin
+      swt := GetTimeRunning() + 50;
+      Wait(0,250,wdLeft);                //for uptext to refresh, and antiban
+      Wait(Max(1,swt-GetTimeRunning())); //we need min 50ms tho
+      if not mainscreen.IsUpText(UpText) then
+        Exit(False);
+    end;
+
+    if (not ShiftDrop) then
+      Result := ChooseOption.MissSelect('Drop', 'Examine')
+    else
+    begin
+      Mouse.Click(mouse_Left);
+      Result := (self.GetActiveSlot() = -1);
+      if (not Result) then
+      begin
+        Self.MouseSlot(self.GetActiveSlot(), mouse_Left);
+        ShiftAlreadyDown := False;
+        goto START;
+      end;
+    end;
+
+    Wait(0,250,wdLeft);
+  end;
+
+  if ShiftDrop and (RealeaseShift) then
+  begin
+    WaitEx(120,10);
+    Keyboard.KeyUp(VK_SHIFT);
+  end;
+end;
+
+(*
 Inventory.DropItems
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -308,7 +438,8 @@ jump randomly all over the inventory dropping items, you give it a ordered drop-
 
 .. note:: by slacky
 
-Examples:
+**Examples:**
+
 .. code-block:: pascal
 
     // drops all items in a "snake order" / "Z"-order
@@ -325,19 +456,21 @@ begin
   if not(self.Open()) then
     Exit();
 
+  if ShiftDrop then
+  begin
+    Keyboard.KeyDown(VK_SHIFT);
+    WaitEx(110,10);
+  end;
+
   for idx in Slots do
-    if self.IsSlotValid(idx) and self.IsSlotUsed(idx, False) then
-    begin
-      Mouse.Move(self.FSlots[idx]);
-      if (UpText <> []) then
-      begin
-        Wait(Random(70,100)); //for uptext to refresh
-        if not mainscreen.IsUpText(UpText) then
-          Continue;
-      end;
-      ChooseOption.Select(['Drop']);
-      Wait(Random(103,219));
-    end;
+    if Self.DropItem(idx, UpText) then
+      Wait(10,400,wdLeft);
+
+  if ShiftDrop then
+  begin
+    WaitEx(120,10);
+    Keyboard.KeyUp(VK_SHIFT);
+  end;
 end;
 
 
@@ -346,137 +479,117 @@ Inventory.DropItemsExcept
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+  procedure TRSInventory.DropItemsExcept(ignoreSlots:TIntegerArray; Slots:TIntegerArray = DROP_PATTERN_REGULAR);
 
-Drops all the given items ``dropPattern`` except for the items in ``ignoreSolots``
+Drops all the given items ``Slots`` except for the items in ``IgnoreSolots``
 
 .. note:: by slacky
 *)
-procedure TRSInventory.DropItemsExcept(IgnoreSlots:TIntegerArray; dropPattern:TIntegerArray = DROP_PATTERN_REGULAR);
+procedure TRSInventory.DropItemsExcept(IgnoreSlots:TIntegerArray; Slots:TIntegerArray = DROP_PATTERN_REGULAR);
 var
   i,j: Int32;
   ptrn: TIntegerArray;
 begin
   SetLength(ptrn, 28);
-  for i:=0 to High(dropPattern) do
-    if not(InIntArray(ignoreSlots,dropPattern[i])) then
-      ptrn[inc(j)-1] := dropPattern[i];
+  for i:=0 to High(Slots) do
+    if not(InIntArray(ignoreSlots,Slots[i])) then
+      ptrn[inc(j)-1] := Slots[i];
 
   SetLength(ptrn, j);
   Self.DropItems(ptrn);
 end;
 
 (*
-Inventory.FindItem
+Inventory.FindXXXX
 ~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+.. pascal::
+  function TRSInventory.FindMask(Mask: TMask; Tolerance, ContourTolerance:Int32 = 30; MaxToFind:Byte = 0): TIntArray;
+  function TRSInventory.FindDTM(DTM: Integer; MaxToFind:Byte = 0): TIntArray; overload;
+  function TRSInventory.FindBMP(BMP: Integer; Tolerance:Int32; MaxToFind:Byte = 0): TIntArray; overload;
 
-  function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
+Find the slots with the given item defined by a `TMask`, `DTM`, or `BMP`.
+The last parameter ``MaxToFind`` defines how many you want us to find, by default
+it will look for all, but can be used to only search for 1 item if that's all you need.
 
-Find the slots of the given item defined by a TMask
+**Example:**
 
-Examples:
-.. code-block:: pascal
-
-    itemArr := Inventory.FindItem(myMask);
-    if itemArr = [] then
-      WriteLn('Not found');
+.. pascal::
+   items := Inventory.FindMask(myMask);
+   if itemArr = [] then
+     WriteLn('Not found')
+   else
+     WriteLn('Found in slots: ', items);
 *)
-function TRSInventory.FindItem(Mask: TMask; Tolerance:Int32 = 30; ContourTolerance:Int32 = 30; MaxToFind:Byte = 28): TIntegerArray;
-var
-  i,j: Int32;
-  p: TPoint;
+function TRSInventory.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32=30; MaxToFind: Byte=0): TIntArray;
 begin
-  SetLength(Result, MaxToFind);
-  for i := Self.LowSlot to Self.HighSlot do
-    if (FindMaskTolerance(Mask, p.x, p.y, Self.GetSlotBox(i), Tolerance, ContourTolerance)) then
-    begin
-      Result[inc(j)-1] := i;
-      if (j = MaxToFind) then
-        Break;
-    end;
-  SetLength(Result, j);
+  if self.Open() then
+    Result := srl.FindMaskInTBA(Mask, Tolerance, ContourTolerance, Self.FSlots, MaxToFind);
 end;
 
-(*
-Inventory.FindItem
-~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
-
-Find the slots of the given item defined my a DTM
-
-Examples:
-.. code-block:: pascal
-
-    itemArr := Inventory.FindItem(myDTM);
-    if itemArr = [] then
-      WriteLn('Not found');
-*)
-function TRSInventory.FindItem(DTM: Integer; MaxToFind:Byte = 28): TIntegerArray; overload;
-var
-  i,j: Int32;
-  pt: TPoint;
+function TRSInventory.FindDTM(DTM: Integer; MaxToFind: Byte=0): TIntArray;
 begin
-  SetLength(Result, MaxToFind);
-  for i:=Self.LowSlot to Self.HighSlot do
-    if FindDTM(DTM, pt.x, pt.y, Self.GetSlotBox(i)) then
-    begin
-      Result[inc(j)-1] := i;
-      if (j = MaxToFind) then
-        Break;
-    end;
-  SetLength(Result, j);
+  if self.Open() then
+    Result := srl.FindDTMInTBA(DTM, Self.FSlots, MaxToFind);
 end;
 
-(*
-Inventory.FindItem
-~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
-
-  function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
-
-Find the slots of the given item defined by a bitmap
-
-_Note: Last parameter is not defaulted to avoid an overload limitation in lape (DTM is also Integer)._
-
-Examples:
-.. code-block:: pascal
-
-    itemArr := Inventory.FindItem(bmp, 40, 28);
-    if itemArr = [] then
-      WriteLn('Not found');
-*)
-function TRSInventory.FindItem(BMP: Integer; Tolerance:Int32; MaxToFind:Byte): TIntegerArray; overload;
-var
-  i,j: Int32;
-  pt: TPoint;
+function TRSInventory.FindBMP(BMP: Integer; Tolerance: Int32; MaxToFind: Byte=0): TIntArray;
 begin
-  SetLength(Result, MaxToFind);
-  for i := Self.LowSlot to Self.HighSlot do
-    if (FindBitmapToleranceIn(BMP, pt.x, pt.y, Self.GetSlotBox(i), Tolerance)) then
-    begin
-      Result[inc(j)-1] := i;
-      if (j = MaxToFind) then
-        Break;
-    end;
-  SetLength(Result, j);
+  if self.Open() then
+    Result := srl.FindBMPInTBA(GetMufasaBitmap(BMP), Tolerance, Self.FSlots, MaxToFind);
 end;
 
 (*
 Inventory.Count
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSInventory.Count(): Byte;
+  function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32; overload;
+  function TRSInventory.Count(DTM: Integer): Int32; overload;
+  function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
 
-Returns the number of used slots
+Counts the number of slots containing this item
 *)
-function TRSInventory.Count(): Byte;
+function TRSInventory.Count(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Int32; overload;
 begin
-  Result := Length(Self.GetUsedSlots());
+  Result := Length(Self.FindMask(Mask,Tolerance,ContourTolerance,28));
 end;
+
+function TRSInventory.Count(DTM: Integer): Int32; overload;
+begin
+  Result := Length(Self.FindDTM(DTM));
+end;
+
+function TRSInventory.Count(BMP: Integer; Tolerance:Int32): Int32; overload;
+begin
+  Result := Length(Self.FindBMP(BMP,Tolerance,28));
+end;
+
+(*
+Inventory.Contains
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Contains(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Boolean;
+  function TRSInventory.Contains(DTM: Integer): Boolean; overload;
+  function TRSInventory.Contains(BMP: Integer; Tolerance:Int32): Boolean; overload;
+
+Returns true if the inventory contains the given item
+*)
+function TRSInventory.Contains(Mask: TMask; Tolerance, ContourTolerance:Int32=30): Boolean;
+begin
+  Result := Length(Self.FindMask(Mask,Tolerance,ContourTolerance,1)) <> 0;
+end;
+
+function TRSInventory.Contains(DTM: Integer): Boolean; overload;
+begin
+  Result := Length(Self.FindDTM(DTM,1)) <> 0;
+end;
+
+function TRSInventory.Contains(BMP: Integer; Tolerance:Int32): Boolean; overload;
+begin
+  Result := Length(Self.FindBMP(BMP,Tolerance,1)) <> 0;
+end;
+
 
 (*
 Inventory.GetActiveSlot
@@ -485,13 +598,15 @@ Inventory.GetActiveSlot
 
   function TRSInventory.GetActiveSlot(): Int8;
 
-Returns the index to the current active slot, returns `-1` if none.
+Returns the index to the current active slot, returns ``-1`` if none.
 *)
 function TRSInventory.GetActiveSlot(): Int8;
 var
   i: Integer;
   b: TBox;
 begin
+  if not(self.Open()) then Exit();
+
   Result := -1;
   for i := 0 to High(Self.FSlots) do
   begin
@@ -501,46 +616,105 @@ begin
   end;
 end;
 
+
+(*
+Inventory.Use
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.Use(Slot: Int32): Boolean;
+
+RS correct alias for ``Inventory.ActivateSlot``.
+*)
+function TRSInventory.Use(Slot: Int32): Boolean;
+begin
+  Result := Self.ActivateSlot(Slot);
+end;
+
+function TRSInventory.IsSlotActivated(Slot: Int32; Time: Int32 = 0): Boolean;
+var
+  T: UInt64 := GetTickCount() + Time;
+begin
+  repeat
+    if Self.GetActiveSlot() = Slot then
+      Exit(True);
+
+    if Time > 0 then
+      Wait(50);
+  until (GetTickCount() >= T);
+end;
+
 (*
 Inventory.ActivateSlot
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 
-Activates (Presses) the given slot, however if `Slot` is `-1` then it will disable the current active slot.
+Activates (Presses) the given slot, however if ``Slot`` is ``-1`` then it will disable the current active slot.
 *)
 function TRSInventory.ActivateSlot(Slot: Int32): Boolean;
 var
   i: Int32;
-  procedure DeActivate(Slot: Int32);
-  begin
-    if (Slot > -1) then
-    begin
-      Inventory.MouseSlot(Slot, mouse_Left);
-      Wait(Random(200, 300));
-    end;
-  end;
 begin
-  Result := True;
-
-  // DeActivate whatever is activated
-  if (Slot = -1) and (Self.GetActiveSlot() <> -1) then
+  if (Slot = -1) then
   begin
-    DeActivate(Self.GetActiveSlot());
-    Exit;
+    Slot := Self.GetActiveSlot();
+    if Slot > -1 then
+      Inventory.MouseSlot(Slot, MOUSE_LEFT);
+
+    Result := not Self.IsSlotActivated(Slot, 500);
+  end else
+  begin
+    if Self.GetActiveSlot() >= 0 then
+    begin
+      if Self.GetActiveSlot() = Slot then
+        Exit(True);
+
+      Self.MouseSlot(Self.GetActiveSlot(), MOUSE_LEFT);
+    end;
+
+    Self.MouseSlot(Slot);
+
+    if Mainscreen.IsUptext('Use ') then
+      Mouse.Click(MOUSE_LEFT)
+    else
+      ChooseOption.Select('Use');
+
+    Result := Self.IsSlotActivated(Slot, 500);
   end;
-
-  i := Self.GetActiveSlot();
-  if (Slot = i) then
-    Exit;
-
-  if (i > -1) then
-    DeActivate(i);
-
-  Inventory.MouseSlot(Slot);
-  Result := ChooseOption.Select(['Use']);
 end;
+
+
+(*
+Inventory.WaitCount
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSInventory.WaitCount(Amount: Int32; Time: Int32; Compare: TComparator = __EQ__): Boolean;
+
+Waits for intentory amount to meet expected size. By default it waits till it's equal
+to given Amount, but can wait till it's not equal, less than or greater than.
+*)
+function TRSInventory.WaitCount(Amount: Int32; Time: Int32; Compare: EComparator = __EQ__): Boolean;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + Time;
+
+  while (T > GetTickCount()) do
+  begin
+    case Compare of
+      __LT__: if (Self.Count() < Amount) then Exit(True);
+      __GT__: if (Self.Count() > Amount) then Exit(True);
+      __EQ__: if (Self.Count() = Amount) then Exit(True);
+      __NE__: if (Self.Count() <> Amount) then Exit(True);
+    end;
+
+    Wait(Random(30, 60));
+  end;
+end;
+
 
 begin
   Inventory.__Setup();

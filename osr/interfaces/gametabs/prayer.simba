@@ -3,7 +3,6 @@ Prayer
 =======
 The file holds functions and procedures that are related to the prayer gametab
 *)
-
 type 
   TRSPrayer = record(TInterfaceBase)
     FSlots: TBoxArray;
@@ -24,6 +23,8 @@ type
 var Prayer
 ~~~~~~~~~~~
 Variable that stores functions and properties of the Runescape prayer gametab.
+
+Prayers follow the same name as ingame,`only prefixed with ``PRAY_`` so for example: ``PRAY_THICK_SKIN`` or ``PRAY_ULTIMATE_STRENGTH``
 *)
 var 
   Prayer: TRSPrayer;
@@ -80,8 +81,8 @@ end;
 
 procedure TRSPrayer.Debug();
 var
-  BMP:TMufasaBitmap;
-  i:Int32;
+  BMP: TMufasaBitmap;
+  i: Int32;
 begin
   BMP := GetMufasaBitmap( BitmapFromClient(SRL.DefaultClientBounds) );
   BMP.DrawBoxes(Self.FSlots, False, $0000FF);
@@ -127,19 +128,17 @@ end;
 
 
 (*
-Prayer.GetPrayerBound
+Prayer.GetPrayerBox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.GetPrayerBound(prayer: EPrayerType): TBox;
+  function TRSPrayer.GetPrayerBox(Prayer: EPrayerType): TBox;
 
 Returns the bounding box covering the given prayer.
-
-.. note:: by slacky
 *)
-function TRSPrayer.GetPrayerBound(prayer: EPrayerType): TBox;
+function TRSPrayer.GetPrayerBox(Prayer: EPrayerType): TBox;
 begin
-  Result := Self.FSlots[prayer];
+  Result := Self.FSlots[Prayer];
 end;
 
 (*
@@ -147,18 +146,16 @@ Prayer.CanActivate
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.CanActivate(prayer: EPrayerType): Boolean;
+  function TRSPrayer.CanActivate(Prayer: EPrayerType): Boolean;
 
 Returns True if you can activete the prayer..
-
-.. note:: by slacky
 *)
-function TRSPrayer.CanActivate(prayer: EPrayerType): Boolean;
+function TRSPrayer.CanActivate(Prayer: EPrayerType): Boolean;
 var 
   bmp: TMufasaBitmap;
 begin
   if not(self.Open()) then Exit(False);
-  bmp.FromClient(self.GetPrayerBound(prayer));
+  bmp.FromClient(self.GetPrayerBox(Prayer));
   Result := bmp.PeakBrightness() > 35;
   bmp.Free();
 end;
@@ -168,16 +165,14 @@ Prayer.IsActivated
 ~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.IsActivated(prayer: EPrayerType): Boolean;
+  function TRSPrayer.IsActivated(Prayer: EPrayerType): Boolean;
 
 Returns True if the spell is activated
-
-.. note:: by slacky
 *)
-function TRSPrayer.IsActivated(prayer: EPrayerType): Boolean;
+function TRSPrayer.IsActivated(Prayer: EPrayerType): Boolean;
 begin
   if not(self.Open()) then Exit(False);
-  Result := CountColorTolerance(7185335, self.GetPrayerBound(prayer), 10) > 50;
+  Result := CountColorTolerance(7185335, self.GetPrayerBox(Prayer), 10) > 50;
 end;
 
 
@@ -186,18 +181,16 @@ Prayer.MouseOver
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSPrayer.MouseOver(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
+  function TRSPrayer.MouseOver(Prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Moves the mouse over the given prayer.
-
-.. note:: by slacky
 *)
-function TRSPrayer.MouseOver(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
+function TRSPrayer.MouseOver(Prayer: EPrayerType; Rng: ERandomStyle=rndGauss): Boolean;
 begin
   if not(self.Open()) then Exit();
   
   Result := True;
-  Mouse.Move(Self.FSlots[prayer], False, Rng);
+  Mouse.Move(Self.FSlots[Prayer], False, Rng);
 end;
 
 
@@ -209,14 +202,12 @@ Prayer.Toggle
   function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 
 Click's it if it can be activated.
-
-.. note:: by slacky
 *)
-function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
+function TRSPrayer.Toggle(Prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
 begin
-  Result := self.CanActivate(prayer);
+  Result := self.CanActivate(Prayer);
   if Result then
-    Mouse.Click(Self.FSlots[prayer], mouse_left, False, Rng);
+    Mouse.Click(Self.FSlots[Prayer], mouse_left, False, Rng);
 end;
 
 

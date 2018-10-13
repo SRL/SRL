@@ -4,7 +4,7 @@ Players
 
 This file holds functions and procedures that manage and handle an array of players.
 
- * Ouputs a global variable 'players' that all players should be added to (see below).
+ * Stores a global variable ``players`` that all players should be added to (see below).
 
 .. code-block:: pascal
 
@@ -13,20 +13,18 @@ This file holds functions and procedures that manage and handle an array of play
       with Players.New()^ do
       begin
         LoginName := 'username';
-        Password := 'password';
-        BankPin := 'pin';
-
-        isActive := True;
+        Password  := 'password';
+        BankPin   := 'pin';
+        isActive  := True;
       end;
 
       with Players.New()^ do
       begin
         LoginName := 'username2';
-        Password := 'password2';
-        BankPin := 'pin2';
-
-        isActive := True;
-        World := 2; // This player will be logged into world 2
+        Password  := 'password2';
+        BankPin   := 'pin2';
+        isActive  := True;
+        World     := 2; // This player will be logged into world 2
       end;
     end;
 *)
@@ -286,6 +284,7 @@ begin
   Self.SetCount(c + 1);
 
   Result := @Self.FPlayers[c];
+  Result^.WorldFilter := DEFAULT_WORLD_FILTER;
 end;
 
 (*

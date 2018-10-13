@@ -1,0 +1,334 @@
+(*
+Smithing screen
+===============
+For interacting with the smithing interface.
+
+PS: You are expected to find and open the interface yourself.
+*)
+
+type
+  TRSSmithingScreen = record(TRSInterfaceBase)
+    ItemBoxes: TBoxArray;
+    ItemBoxesIcon: TBoxArray;
+    ItemBoxesNames: TBoxArray;
+    ItemBoxesBars: TBoxArray;
+  end;
+
+var
+  SmithingScreen: TRSSmithingScreen;
+
+const
+  SMITH_ALL = -1;
+
+(*
+.. pascal:: var SmithingScreen: TRSSmithingScreen;
+
+.. pascal:: const SMITH_ALL = -1;
+*)
+
+
+(*
+SmithingScreen.__Setup
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSSmithingScreen.__Setup();
+
+Every interface needs some internal setup procedure..
+*)
+procedure TRSSmithingScreen.__Setup();
+begin
+  Self.FName   := 'Deposit Box';
+  Self.FStatic := True;
+  Self.FTitles := ['What would', 'you like', 'to make?']; //uptext can cover it
+end;
+
+(*
+SmithingScreen.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the interface - automatically.
+*)
+function TRSSmithingScreen.__Prepare(): Boolean;
+var
+  Body: TBox;
+  i: Int32;
+begin
+  if not Self.__Find() then
+    Exit(False);
+
+  if Self.ItemBoxes <> [] then // we already have the bounds
+    Exit(True);
+
+  with Self.ItemBounds do Body := [X1+4, Y1+1, X2-4, Y2-3];
+  Self.ItemBoxes := Body.PartitionEx(5,6, -0,-0);
+
+  Self.ItemBoxesIcon  := Copy(Self.ItemBoxes);
+  Self.ItemBoxesNames := Copy(Self.ItemBoxes);
+  Self.ItemBoxesBars  := Copy(Self.ItemBoxes);
+  for i:=0 to High(Self.ItemBoxes) do
+  begin
+    // icon
+    Self.ItemBoxesIcon[i].x1 += 6;
+    Self.ItemBoxesIcon[i].x2 := Self.ItemBoxesIcon[i].x1 + 31;
+    Self.ItemBoxesIcon[i].y2 := Self.ItemBoxesIcon[i].y1 + 31;
+
+    // name
+    Self.ItemBoxesNames[i].y1 += 31;
+    Self.ItemBoxesNames[i].y2 := Self.ItemBoxesNames[i].y1 + 12;
+
+    // bars
+    Self.ItemBoxesBars[i].y1 := Self.ItemBoxesNames[i].y2;
+    Self.ItemBoxesBars[i].y2 := Self.ItemBoxesBars[i].y1 + 11;
+  end;
+
+  Result := True;
+end;
+
+(*
+SmithingScreen.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed.
+*)
+function TRSSmithingScreen.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+var
+  i, c: Integer;
+begin
+  if not Self.__Prepare() then Exit();
+
+  Result := Inherited(True);
+  for i:=0 to High(Self.ItemBoxes) do
+  begin
+    Result.DrawBox(Self.ItemBoxes[i],      False, $0000FF);
+    Result.DrawBox(Self.ItemBoxesIcon[i],  False, $FF7700);
+    Result.DrawBox(Self.ItemBoxesNames[i], False, $FF00FF);
+    Result.DrawBox(Self.ItemBoxesBars[i],  False, $FF00FF);
+  end;
+
+  if RetImage then Exit();
+  Result.Debug();
+  Result.Free();
+  Result := nil;
+end;
+
+(*
+SmithingScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+*)
+function TRSSmithingScreen.IsOpen(): Boolean;
+begin
+  Result := Self.__Prepare();
+end;
+
+(*
+SmithingScreen.Find????
+~~~~~~~~~~~~~~~~~~~
+.. pascal:: 
+  function TRSSmithingScreen.FindDTM(DTM: Integer): Int32;
+  function TRSSmithingScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+  function TRSSmithingScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+  
+Returns the index of the given DTM, BMP or Mask, otherwise ``-1`` if it's not found.
+*)
+function TRSSmithingScreen.FindDTM(DTM: Integer): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindDTMInTBA(DTM, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;
+
+function TRSSmithingScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindBMPInTBA(BMP, Tolerance, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;
+
+function TRSSmithingScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+var A: TIntArray;
+begin
+  if self.IsOpen() then
+  begin
+    A := srl.FindMaskInTBA(Mask, Tolerance, ContourTolerance, Self.ItemBoxesIcon, 1);
+    if A = [] then
+      Result := -1
+    else
+      Result := A[0];
+  end;
+end;  
+
+(*
+SmithingScreen.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
+
+Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
+*)
+function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+  
+  Result := True;
+  Mouse.Move(Self.ItemBoxesIcon[Slot]);
+end;
+
+(*
+SmithingScreen.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.ItemName(Slot: Int32): String;
+
+Returns the name of the item in the given slot. Returns empty string on failure.
+*)
+function TRSSmithingScreen.ItemName(Slot: Int32): String;
+begin
+  if (not Self.IsOpen()) then
+    Exit('');
+
+  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $FFFFFF,0, StatChars07);
+  if Result <> '' then Exit();
+  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $000000,0, StatChars07);
+end;
+
+(*
+SmithingScreen.BarCount
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.BarCount(Slot: Int32): Int32;
+
+Returns the number of bars needed to smith the given item. Returns ``-1`` if it fails.
+*)
+function TRSSmithingScreen.BarCount(Slot: Int32): Int32;
+var
+  TmpRes: String;
+begin
+  if (not Self.IsOpen()) then
+    Exit(-1);
+
+  TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, $00FF00,0, StatChars07);
+  if TmpRes = '' then
+   TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, 2070783,0, StatChars07);
+
+  Result := StrToIntDef(ExtractFromStr(TmpRes, Numbers), -1);
+end;
+
+(*
+SmithingScreen.CanSmith
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.CanSmith(Slot: Int32): Boolean;
+
+Returns ``True`` if the item in the given slot can be made. Detected by checking
+the color of the item name is white and that the bar-count is green.
+*)
+function TRSSmithingScreen.CanSmith(Slot: Int32): Boolean;
+begin
+  if (not Self.IsOpen()) then
+    Exit(False);
+
+  Result := (CountColor($FFFFFF, self.ItemBoxesNames[Slot]) > 10) and
+            (CountColor($00FF00, self.ItemBoxesBars[Slot])  > 10);
+end;
+
+(*
+SmithingScreen.Find
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.Find(Name: String; PartialMatch: Boolean = True): Int32; ;
+
+Returns the slot of the first item matching the given name. Returns ``-1`` if not found.
+*)
+function TRSSmithingScreen.Find(Name: String; PartialMatch: Boolean = True): Int32;
+var
+  NameAtSlot: String;
+begin
+  if (not Self.IsOpen()) then
+    Exit(-1);
+
+  for Result:=0 to High(Self.ItemBoxesNames) do
+  begin
+    NameAtSlot := Self.ItemName(Result);
+    if (Name = NameAtSlot) or (PartialMatch and (Name in NameAtSlot)) then
+      Exit(Result);
+  end;
+  Result := -1;
+end;
+
+(*
+SmithingScreen.Smith
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal::
+   function TRSSmithingScreen.Smith(Slot, Amount:Int32; Name:String=''): Boolean;
+
+Attempts to smith the item in the given slot. Amount can be any value, while
+``-1`` or ``SMITH_ALL`` will cause it to smith as many as possible of those items.
+*)
+function TRSSmithingScreen.Smith(Slot, Amount: Int32; Name: String=''): Boolean;
+var
+  b:TBox;
+const
+  TEXT_AREA:TBox = [200,393,450,412];
+begin
+  if (not Self.IsOpen()) or
+     (not InRange(Slot, 0, High(Self.ItemBoxesIcon))) or
+     ((Name <> '') and not (Name in Self.ItemName(Slot))) or
+     (not Self.CanSmith(Slot)) then
+    Exit(False);
+
+  b := Self.ItemBoxesIcon[Slot];
+  if CountColor($010000, b) = 0 then
+    Exit(False); // no such item
+
+  mouse.Move(b);
+  Wait(40,450, wdLeft);
+
+  if (amount = 1) then
+  begin
+    Mouse.Click(mouse_left);
+    Exit(True);
+  end else
+  begin
+    ChooseOption.Open();
+    Wait(0,170, wdLeft);
+
+    if amount = SMITH_ALL then
+      Result := ChooseOption.MissSelect('Smith All', 'Examine')
+    else if ChooseOption.Select(['Smith '+ToString(amount)+' '],,False) then  // space after amount so it can't find "2" in 28
+      Result := True
+    else if ChooseOption.MissSelect('Smith X', 'Examine', 1) then
+      Result := Chatbox.AnswerQuery('Enter amount', ToString(amount), 6000);
+  end;
+end;
+
+(*
+SmithingScreen.Close
+~~~~~~~~~~~~~~~~
+.. pascal:: function TRSSmithingScreen.Close(): Boolean;
+
+Closes the interface.
+*)
+function TRSSmithingScreen.Close(): Boolean; override;
+begin
+  Result := inherited;
+end;
+
+
+
+
+begin
+  SmithingScreen.__Setup();
+end;
