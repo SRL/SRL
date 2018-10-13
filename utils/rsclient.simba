@@ -238,7 +238,7 @@ begin
   RSClient.SetFocus();
 end;
 
-procedure TSRL.SetupForClient(Launcher: String; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
+procedure TSRL.SetupForClient(Launcher: String = ''; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
 begin
   if (not RSClient.Setup(Launcher)) then
     Self.WriteLn('Failed to setup RSClient', dtFatal);

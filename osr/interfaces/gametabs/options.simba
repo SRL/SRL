@@ -213,61 +213,160 @@ end;
 
 (*
 Options.GetZoom
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 .. pascal:: function TRSOptions.GetZoom(): Int32;
 
-Returns the mainscreen zoom
+Returns the mainscreen zoom level 0..100.
 *)
-function TRSOptions.GetZoom(): Int32;
+function TRSOptions.GetZoom: Int32;
 var
-  TPA:TPointArray;
-  p: TPoint;
-  range:TBox = [610,268,705,278];
+  Area: TBox;
+  TPA: TPointArray;
 begin
-  if not(self.SetCurrentTab(optDisplay)) then
+  Area := [608, 268, 704, 277];
+
+  if (not Self.SetCurrentTab(optDisplay)) then
     Exit(-1);
-  if not(FindColorsTolerance(TPA, 2200868, range, 35)) then
+  if (not FindColors(TPA, 2106152, Area.Expand(10))) then
     Exit(-1);
-  p := MiddleTPA(TPA);
-  Result := Round((p.x - range.x1)*100/93);
+
+  Result := Round((TPA.Mean().X - Area.X1) * 100 / (Area.Width - 1));
 end;
 
 (*
 Options.SetZoom
-~~~~~~~~~~~~~~~~
-.. pascal:: function TRSOptions.SetZoom(APosition: Byte): Boolean;
+~~~~~~~~~~~~~~~
+.. pascal:: procedure TRSOptions.SetZoom(Level: Int32);
 
-Sets the zoom of the mainscreen. 0 = Zoomed out, 100 = Zoomed in.
+Sets the mainscreen zoom level by scrolling, accurate to within 3 levels.
 *)
-function TRSOptions.SetZoom(APosition: Byte): Boolean;
+procedure TRSOptions.SetZoom(Level: Int32);
 var
-  r: Integer;
+  Delta, Scrolls: Int32;
 begin
-  if (not Self.Open()) then
+  if not (Level in [0..100]) then
+    srl.WriteLn('TRSOptions.SetZoom: Zoom level out of range, expected `0..100`', dtFatal);
+
+  Delta := Options.GetZoom() - Level;
+
+  while Abs(Delta) > 3 do
+  begin
+    if (not Mouse.GetPosition().InBox(MainScreen.GetBounds())) then
+      Mouse.Move(MainScreen.GetBounds());
+
+    if Abs(Delta) <= Random(6, 12) then
+      Scrolls := 1
+    else
+      Scrolls := Random(1, 4);
+
+    Mouse.Scroll(Scrolls, Delta > 0);
+
+    Delta := Options.GetZoom() - Level;
+  end;
+end;
+
+(*
+type ERSZoomNotch
+~~~~~~~~~~~~~~~~~
+  Zoom level notches.
+
+  ZOOM_LEVEL_0 = Zoomed out fully.
+  ZOOM_LEVEL_50 = Default.
+  ZOOM_LEVEL_100 = Zoomed in fully.
+*)
+type
+  ERSZoomNotch = (ZOOM_NOTCH_UNKNOWN, ZOOM_NOTCH_0, ZOOM_NOTCH_25, ZOOM_NOTCH_50, ZOOM_NOTCH_75, ZOOM_NOTCH_100);
+
+const
+  ZOOM_NOTCH_DEFAULT = ZOOM_NOTCH_50;
+
+(*
+Options.GetZoomNotch
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.GetZoomNotch: ERSZoomNotch;
+
+Returns the current zoom notch. ZOOM_NOTCH_UNKNOWN if not either 0,25,50,75,100.
+*)
+function TRSOptions.GetZoomNotch: ERSZoomNotch;
+begin
+  case Self.GetZoom() of
+    100: Result := ZOOM_NOTCH_100;
+    75:  Result := ZOOM_NOTCH_75;
+    50:  Result := ZOOM_NOTCH_50;
+    20:  Result := ZOOM_NOTCH_25;
+    0:   Result := ZOOM_NOTCH_0;
+  end;
+end;
+
+(*
+Options.SetZoomNotch
+~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch; Randomness: Int32 = 0): Boolean;
+
+Moves the zoom bar slider to the `Notch` position.
+`Randomness` is the random +- we add to the coord of the notch position.
+*)
+function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch; Randomness: Int32 = 0): Boolean;
+
+  function GetNotchPoint(Notch: ERSZoomNotch): TPoint;
+  begin
+    case Notch of
+      ZOOM_NOTCH_0: Result := [604, 273];
+      ZOOM_NOTCH_25: Result := [628, 273];
+      ZOOM_NOTCH_50: Result := [657, 273];
+      ZOOM_NOTCH_75: Result := [681, 273];
+      ZOOM_NOTCH_100: Result := [707, 273];
+    end;
+
+    Result.Y += Random(-3, 3);
+  end;
+
+var
+  Bounds: TBox;
+  TPA: TPointArray;
+  T: UInt64;
+  P: TPoint;
+begin
+  Bounds := [608, 268, 704, 277];
+
+  if (Self.GetZoomNotch() = Notch) then
+    Exit(True);
+
+  if (not Self.SetCurrentTab(optDisplay)) then
+    Exit(False);
+  if (not FindColors(TPA, 2106152, Bounds.Expand(10))) then
     Exit(False);
 
-  // Disabled mouse wheel
-  if (GetColor(573, 272) = 200) then
-    Mouse.Click(Point(573, 272), 8, mouse_Left);
-
-  while (Self.IsOpen()) and (not InRange(GetZoom(), APosition-2, APosition+2)) do
+  if Distance(GetNotchPoint(Notch), TPA.Mean()) <= 10 then
   begin
-    r := Abs(GetZoom() - APosition);
-    if (r < Random(12, 15)) then
-      r := Random(1, 2)
-    else
-      r := Random(3, 6);
+    Wait(0, 2500, wdLeft);
 
-    if (GetZoom() < APosition) then
-      Mouse.Scroll(Mainscreen.GetBounds(), r, False)
-    else
-      Mouse.Scroll(Mainscreen.GetBounds(), r, True);
+    P := [Random(Bounds.X1, Bounds.X2), Random(Bounds.Y1, Bounds.Y2)];
+    while Distance(P, TPA.Mean()) <= 10 do
+      P := [Random(Bounds.X1, Bounds.X2), Random(Bounds.Y1, Bounds.Y2)];
 
-    Wait(Random(10, 100));
+    Mouse.Click(P, MOUSE_LEFT);
   end;
-  if APosition in [0,100] then //can't have it +/-2 for these two
-    Mouse.Scroll(Mainscreen.GetBounds(), Random(3,4), APosition = 0);
-  Result := True;
+
+  P := GetNotchPoint(Notch);
+  if Randomness > 0 then
+    P.X += Random(-Randomness, Randomness);
+
+  Mouse.Click(P, MOUSE_LEFT);
+
+  if Randomness = 0 then
+  begin
+    T := GetTickCount() + 1500;
+
+    while (T > GetTickCount()) do
+    begin
+      if Self.GetZoomNotch() = Notch then
+        Exit(True);
+
+      Wait(50, 100);
+    end;
+  end else
+    Exit(True);
 end;
 
 (*
