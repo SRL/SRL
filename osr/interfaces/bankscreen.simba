@@ -34,7 +34,8 @@ var
 const
    WITHDRAW_ALL = -1;
    WITHDRAW_ALL_BUT_ONE = -2;
-
+   // Correct the misspelling in EBankLocation above, while maintaining compatibility
+   blDraynor = blDrynor;
 
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
