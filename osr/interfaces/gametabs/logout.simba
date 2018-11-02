@@ -51,7 +51,7 @@ begin
     FStatic := True;
     FBounds := [550,206,733,464];
 
-    btnLogout  := [575,405,708,431];
+    btnLogout  := [575,420,708,445];
 
     WorldSwitcher.FTab := PRSLogout(@Self);
   end;
