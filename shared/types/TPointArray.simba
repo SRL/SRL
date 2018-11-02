@@ -329,6 +329,11 @@ begin
   QuickTPASort(Weight, self, 0, Hi, not reverse);
 end;
 
+procedure TPointArray.SortCircle(Center: TPoint; StartDegree: Int32; ClockWise: Boolean);
+begin
+  SortCircleWise(Self, Center.X, Center.Y, StartDegree, True, ClockWise);
+end;
+
 (*
 TPointArray.Bounds
 ~~~~~~~~~~~~~~~~~~~
@@ -566,7 +571,7 @@ TPointArray.Rotate
 Returns a copy where all points are rotated around MidX, MidY.
 Same as Simba's `RotatePoints`.
 *)
-function TPointArray.Rotate(AngleRad, MidX, MidY: Double): TPointArray;
+function TPointArray.Rotate(AngleRad, MidX, MidY: Double): TPointArray; constref;
 begin
   Result := RotatePoints(Self, AngleRad, MidX, MidY);
 end;
@@ -987,14 +992,18 @@ begin
   end;
 end;
 
+procedure TPointArray.Shorten(Distance: Int32);
+begin
+  RAaSTPA(Self, Distance);
+end;
+
 function RandomTPA(n:Int32; B:TBox): TPointArray;
 var i:Int32;
 begin
   SetLength(Result, n);
   for i:=0 to n-1 do
     Result[i] := Point(Random(B.x1,B.x2), Random(B.y1,B.y2));
-end;   
-
+end;
 
 // -------------------------------------------------------------------------------------
 // Legacy methods (should be removed at some point, don't use them)

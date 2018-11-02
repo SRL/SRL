@@ -64,7 +64,8 @@ type
     CompassInfo: TMMCompassInfo;
     OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
     MaskBMP: Int32;
-    MaskPoly: TPointArray;
+    MaskEdge: TPointArray;
+    MaskTPA: record Inner, Outer: TPointArray; end;
     Center: TPoint;
  end;
 
@@ -134,33 +135,39 @@ begin
       TextBox := [552, 146, 573, 159];
     end;
 
-    Self.MaskPoly := [
-      [638,9], [654,10], [669,14], [683,21], [695,31], [705,43], [712,57],
-      [713,73], [711,89], [707,105], [697,118], [683,127], [669,136], [659,148],
-      [645,157], [629,155], [620,142], [608,132], [594,123], [581,115], [574,101],
-      [571,85], [570,69], [574,54], [583,40], [593,28], [606,19], [622,12]
+    Self.MaskEdge := [
+      [638, 9], [654, 10], [669, 14], [683, 21], [695, 31], [705, 43], [712, 57],
+      [713, 73], [711, 89], [707, 105], [697, 118], [683, 127], [669, 136], [659, 148],
+      [645, 157], [629, 155], [620, 142], [608, 132], [594, 123], [581, 115], [574, 101],
+      [571, 85], [570, 69], [574, 54], [583, 40], [593, 28], [606, 19], [622, 12]
     ];
 
     MaskBMP := BitmapFromString(147, 149, 'meJzt2kF22zAUxVDvf9NtM2lO' +
-        'YleSJZEgUtwVfD0MONHj8XP82kRf91/bTnMF/WU/07heFRxhZq8KX' +
-        'sf2ekbvsTq6zz56obXQNc6gN4PR819F7wegJ78TveU89NL3oxcdjh' +
-        '54LHrdIehR56GXvg09JINe/Sp6PxK9/Xn0cjy6wNvowdZC1ziK3ml' +
-        'FdJN99ELrostsobdZHd3nBXoSE7rVJ3oJH7rYB3oDq6p5Vc2ral5V' +
-        '8yqcVNW8quZVNa+qeRVOqmpeVfOqmlfhpKrmVTipqnkVTqpqXlXzK' +
-        'pxU1bwKJ1U1r8JJFU6qal6FkyqcVNW8CidVOKnCSVXNq3BShZOqml' +
-        'ThpApn1AMnVTipwkkVTqpwUoWTKpxU4aQKJ1U4qcJJFU6qcFL9umD' +
-        '0+Io+J0cVTqpwUoWTKpxU4aQeT+iLsu+5WuEUCidVOKnCSRVOqnBS' +
-        'L8PVbnH/qla4xRVOaiNc7Za1Xa1wyyqc1G642i3oSLXCLahwUgfD1' +
-        'W4px6sVbilvhavdIt6tVrhFnAhXO9y5aoXDnQ5XO9CVarWjXK9Wu/' +
-        'nuqla4yW4MV7tp7q1WuzlGVKvdaOOqlW+QCclqd7uZ1Wp3l/nVync' +
-        'RmOwvegMfuth39B6ro/vsoOdZEd3kKHqntdA13kYPxqMLnEcvR6K3' +
-        'vwE94Wz03neit5yHXnoIetSx6HWHowe+H73oPPTSd6K3BNCTX0XvR' +
-        '6K3P49ebgl0hPfQa62FrnEUvdOK6Cb76IXWRZfZQm+zOrrPa/QqDn' +
-        'Sl7+g9TOhWn+glfOhiH+gNrKrmVTWvqkkVTqpwXlWTKpxU4byq5lU' +
-        '1tZJ5VU2qcF5V++M31594lA==');
+              'YleSJZEgUtwVfD0MONHj8XP82kRf91/bTnMF/WU/07heFRxhZq8KX' +
+              'sf2ekbvsTq6zz56obXQNc6gN4PR819F7wegJ78TveU89NL3oxcdjh' +
+              '54LHrdIehR56GXvg09JINe/Sp6PxK9/Xn0cjy6wNvowdZC1ziK3ml' +
+              'FdJN99ELrostsobdZHd3nBXoSE7rVJ3oJH7rYB3oDq6p5Vc2ral5V' +
+              '8yqcVNW8quZVNa+qeRVOqmpeVfOqmlfhpKrmVTipqnkVTqpqXlXzK' +
+              'pxU1bwKJ1U1r8JJFU6qal6FkyqcVNW8CidVOKnCSVXNq3BShZOqml' +
+              'ThpApn1AMnVTipwkkVTqpwUoWTKpxU4aQKJ1U4qcJJFU6qcFL9umD' +
+              '0+Io+J0cVTqpwUoWTKpxU4aQeT+iLsu+5WuEUCidVOKnCSRVOqnBS' +
+              'L8PVbnH/qla4xRVOaiNc7Za1Xa1wyyqc1G642i3oSLXCLahwUgfD1' +
+              'W4px6sVbilvhavdIt6tVrhFnAhXO9y5aoXDnQ5XO9CVarWjXK9Wu/' +
+              'nuqla4yW4MV7tp7q1WuzlGVKvdaOOqlW+QCclqd7uZ1Wp3l/nVync' +
+              'RmOwvegMfuth39B6ro/vsoOdZEd3kKHqntdA13kYPxqMLnEcvR6K3' +
+              'vwE94Wz03neit5yHXnoIetSx6HWHowe+H73oPPTSd6K3BNCTX0XvR' +
+              '6K3P49ebgl0hPfQa62FrnEUvdOK6Cb76IXWRZfZQm+zOrrPa/QqDn' +
+              'Sl7+g9TOhWn+glfOhiH+gNrKrmVTWvqkkVTqpwXlWTKpxU4byq5lU' +
+              '1tZJ5VU2qcF5V++M31594lA==');
 
     SetBitmapName(Self.MaskBMP, 'Minimap mask');
     SetTransparentColor(Self.MaskBMP, $FFFFFF);
+
+    FindColorsBitmap(Self.MaskBMP, Self.MaskTPA.Outer, 0);
+    FindColorsBitmap(Self.MaskBMP, Self.MaskTPA.Inner, $FFFFFF);
+
+    OffsetTPA(Self.MaskTPA.Outer, [Self.FBounds.X1, Self.FBounds.Y1]);
+    OffsetTPA(Self.MaskTPA.Inner, [Self.FBounds.X1, Self.FBounds.Y1]);
   end;
 
   AddOnTerminate(@Self.__Free);
@@ -979,7 +986,7 @@ Returns ``True`` if the given point is within the minimap.
 *)
 function TRSMinimap.isPointOn(P: TPoint): Boolean;
 begin
-  Result := srl.PointInPoly(P, Self.MaskPoly);
+  Result := srl.PointInPoly(P, Self.MaskEdge);
 end;
 
 (*
@@ -990,12 +997,8 @@ Minimap.FilterPoints
 Filters the TPA so that no points are outside the minimap circle.
 *)
 procedure TRSMinimap.FilterPoints(var TPA: TPointArray);
-var
-  i: Int32;
 begin
-  for i := High(TPA) downto 0 do
-    if (not srl.PointInPoly(TPA[i], Self.MaskPoly)) then
-      Delete(TPA, i, 1);
+  TPA := ClearTPAFromTPA(TPA, Self.MaskTPA.Outer);
 end;
 
 (*

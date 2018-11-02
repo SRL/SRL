@@ -299,3 +299,17 @@ begin
   if (hits > best) then
     Result := cur;
 end;
+
+function TIntegerArray.UniqueCount: Int32;
+var
+  Arr: TIntegerArray;
+begin
+  Arr := Copy(Self);
+  ClearSameIntegers(Arr);
+  Result := Length(Arr);
+end;
+
+procedure TIntegerArray.ClearDuplicates;
+begin
+  ClearSameIntegers(Self);
+end;
