@@ -11,7 +11,7 @@ uses
 {$i simbaplugin.inc}
 
 type
-  PPoint = ^TPoint;
+  TASyncMouse = packed record Destination: TPoint; Moving: Boolean; end;
 
 type
   TTarget = record
@@ -19,21 +19,21 @@ type
 
     GetTargetDim:   procedure(Target: Pointer; var w, h: Int32); stdcall;
     GetTargetPos:   procedure(Target: Pointer; var top, left: Int32); stdcall;
-    GetColor:       function(Target: Pointer; x, y: Int32): Int32; stdcall;
-    ReturnData:     function(Target: Pointer; xs, ys, Width, Height: Int32): Pointer; stdcall;
+    GetColor:       function(Target: Pointer; X, Y: Int32): Int32; stdcall;
+    ReturnData:     function(Target: Pointer; X, Y, Width, Height: Int32): Pointer; stdcall;
     FreeReturnData: procedure(Target: Pointer); stdcall;
 
-    GetMousePos:       procedure(Target: Pointer; var x, y: Int32); stdcall;
-    MoveMouse:         procedure(Target: Pointer; x, y: Int32); stdcall;
-    ScrollMouse:       procedure(Target: Pointer; x, y: Int32; Lines: Int32); stdcall;
-    HoldMouse:         procedure(Target: Pointer; x, y: Int32; Left: Boolean); stdcall;
-    ReleaseMouse:      procedure(Target: Pointer; x, y: Int32; Left: Boolean); stdcall;
-    IsMouseButtonHeld: function(Target: Pointer; Left: boolean) : Boolean; stdcall;
+    GetMousePos:       procedure(Target: Pointer; var X, Y: Int32); stdcall;
+    MoveMouse:         procedure(Target: Pointer; X, Y: Int32); stdcall;
+    ScrollMouse:       procedure(Target: Pointer; X, Y: Int32; Lines: Int32); stdcall;
+    HoldMouse:         procedure(Target: Pointer; X, Y: Int32; Left: Boolean); stdcall;
+    ReleaseMouse:      procedure(Target: Pointer; X, Y: Int32; Left: Boolean); stdcall;
+    IsMouseButtonHeld: function(Target: Pointer; Left: Boolean) : Boolean; stdcall;
 
     SendString: procedure(Target: Pointer; Str: PChar; KeyWait, KeyModWait: Int32); stdcall;
-    HoldKey:    procedure(Target: Pointer; key: Int32); stdcall;
-    ReleaseKey: procedure(Target: Pointer; key: Int32); stdcall;
-    IsKeyHeld:  function (Target: Pointer; key: Int32): Boolean; stdcall;
+    HoldKey:    procedure(Target: Pointer; Key: Int32); stdcall;
+    ReleaseKey: procedure(Target: Pointer; Key: Int32); stdcall;
+    IsKeyHeld:  function (Target: Pointer; Key: Int32): Boolean; stdcall;
     GetKeyCode: function (Target: Pointer; C: Char): Int32; stdcall;
   end;
 
@@ -44,7 +44,7 @@ type
 
     procedure Execute; override;
   public
-    FDestination: PPoint;
+    FMouse: ^TASyncMouse;
     FGravity: Double;
     FWind: Double;
     FMinWait: Double;
@@ -56,7 +56,7 @@ type
   end;
 
 // BenLand100's WindMouse
-// Return false if FDestination changes while moving.
+// Returns false if mouse destination changes.
 function TWindMouseThread.WindMouse(xs, ys, xe, ye, gravity, wind, minWait, maxWait, maxStep, targetArea, accuracy: Double): Boolean;
 var
   veloX, veloY, windX, windY, veloMag, dist, randomDist, step: Double;
@@ -73,7 +73,7 @@ begin
 
   while True do
   begin
-    if (FDestination^.X <> xe) or (FDestination^.Y <> ye) then
+    if (FMouse^.Destination.X <> xe) or (FMouse^.Destination.Y <> ye) then
       Exit(False); // go again!
 
     dist := Hypot(xs - xe, ys - ye);
@@ -131,23 +131,24 @@ var
   From: TPoint;
 begin
   repeat
-    if (FDestination^.X = $FFFFFF) and (FDestination^.Y = $FFFFFF) then
+    if (FMouse^.Destination.X = $FFFFFF) or (FMouse^.Destination.Y = $FFFFFF) then
       Break;
 
     FClient.GetMousePos(FClient.Target, From.X, From.Y);
-  until WindMouse(From.X, From.Y, FDestination^.X, FDestination^.Y, FGravity, FWind, FMinWait, FMaxWait, FMaxStep, FTargetArea, FAccuracy);
+  until WindMouse({%H-}From.X, {%H-}From.Y, FMouse^.Destination.X, FMouse^.Destination.Y, FGravity, FWind, FMinWait, FMaxWait, FMaxStep, FTargetArea, FAccuracy);
 
-  FDestination^.X := $FFFFFF;
-  FDestination^.Y := $FFFFFF;
+  FMouse^.Moving := False;
 end;
 
 procedure Lape_ASyncMouse_WindMouse(const Params: PParamArray); cdecl;
 begin
+  TASyncMouse(Params^[0]^).Moving := True;
+
   with TWindMouseThread.Create(True) do
   begin
     FreeOnTerminate := True;
 
-    FDestination := PPoint(Params^[0]);
+    FMouse := Params^[0];
     FClient := TTarget(Params^[1]^);
     FGravity := PDouble(Params^[2])^;
     FWind := PDouble(Params^[3])^;
@@ -162,7 +163,7 @@ begin
 end;
 
 begin
-  addGlobalType('record X, Y: Int32; end;', 'TASyncMouse');
+  addGlobalType('packed record Destination: TPoint; Moving: Boolean; end;', 'TASyncMouse');
   addGlobalFunc('procedure TASyncMouse.WindMouse(Target: TTarget_Exported; Gravity, Wind, MinWait, WaxWait, MaxStep, TargetArea, Accuracy: Double); native;', @Lape_ASyncMouse_WindMouse);
   addCode('procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1);'                                                                 + LineEnding +
           'var'                                                                                                                                    + LineEnding +
@@ -170,36 +171,26 @@ begin
           'begin'                                                                                                                                  + LineEnding +
           '  Speed := (Random(Mouse.Speed) / 2.0 + Mouse.Speed) / 10.0;'                                                                           + LineEnding +
           ''                                                                                                                                       + LineEnding +
-          '  Self := Destination;'                                                                                                                 + LineEnding +
+          '  Self.Destination := Destination;'                                                                                                     + LineEnding +
           '  Self.WindMouse(ExportKeyMouseTarget(), Mouse.Gravity, Mouse.Wind, 10.0 / Speed, 15.0 / Speed, 10.0 * Speed, 10.0 * Speed, Accuracy);' + LineEnding +
-          'end;'                                                                                                                                   + LineEnding +
-          ''                                                                                                                                       + LineEnding +
-          'function TASyncMouse.Moving: Boolean;'                                                                                                  + LineEnding +
-          'begin'                                                                                                                                  + LineEnding +
-          '  Result := Self <> [$FFFFFF, $FFFFFF];'                                                                                                + LineEnding +
           'end;'                                                                                                                                   + LineEnding +
           ''                                                                                                                                       + LineEnding +
           'procedure TASyncMouse.Stop;'                                                                                                            + LineEnding +
           'begin'                                                                                                                                  + LineEnding +
-          '  Self := [$FFFFFF, $FFFFFF];'                                                                                                          + LineEnding +
+          '  Self.Destination := [$FFFFFF, $FFFFFF];'                                                                                              + LineEnding +
           'end;'                                                                                                                                   + LineEnding +
           ''                                                                                                                                       + LineEnding +
-          'procedure TASyncMouse.ChangeDestination(Destination: TPoint);'                                                                          + LineEnding +
+          'procedure TASyncMouse.OnTerminate;'                                                                                                     + LineEnding +
           'begin'                                                                                                                                  + LineEnding +
-          '  if Self <> [$FFFFFF, $FFFFFF] then'                                                                                                   + LineEnding +
-          '    Self := Destination;'                                                                                                               + LineEnding +
+          '  while Self.Moving do'                                                                                                                 + LineEnding +
+          '    Wait(50);'                                                                                                                          + LineEnding +
           'end;'                                                                                                                                   + LineEnding +
           ''                                                                                                                                       + LineEnding +
           'var'                                                                                                                                    + LineEnding +
-          '  ASyncMouse: TASyncMouse = [$FFFFFF, $FFFFFF];'                                                                                        + LineEnding +
-          ''                                                                                                                                       + LineEnding +
-          'procedure __ASyncMouse_Terminate;'                                                                                                      + LineEnding +
-          'begin'                                                                                                                                  + LineEnding +
-          '  while ASyncMouse.Moving() do Wait(100);'                                                                                              + LineEnding +
-          'end;'                                                                                                                                   + LineEnding +
+          '  ASyncMouse: TASyncMouse;'                                                                                                             + LineEnding +
           ''                                                                                                                                       + LineEnding +
           'begin'                                                                                                                                  + LineEnding +
-          '  AddOnTerminateAlways(@__ASyncMouse_Terminate);'                                                                                       + LineEnding +
+          '  AddOnTerminateAlways(@ASyncMouse.OnTerminate);'                                                                                       + LineEnding +
           'end;'                                                                                                                                   + LineEnding
          );
 end.
