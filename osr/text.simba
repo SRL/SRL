@@ -4,7 +4,11 @@ Text
 Text related methods aimed towards OSRS
 *)
 
-{$loadlib SimpleOCR}
+{$IFDEF SIMBAMAJOR1200}
+  {$loadlib SimpleOCR}
+{$ELSE}
+  {$loadlib libSimpleOCR}
+{$ENDIF}
 
 var 
   OCR: TSimpleOCR;
