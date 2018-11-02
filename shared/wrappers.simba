@@ -797,8 +797,12 @@ procedure SetTarget(Handle: PtrUInt; Free: Boolean = True); overload;
 begin
   if Free then
     FreeTarget(0);
-
+	
+  {$IFDEF SIMBAMAJOR1300}
   Client.GetIOManager().SetTarget(Handle);
+  {$ELSE}
+  Client.GetIOManager().SetTarget2(Handle);
+  {$ENDIF}
 end;
 
 {$ifndecl GetTickCount64}

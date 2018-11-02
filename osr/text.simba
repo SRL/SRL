@@ -4,7 +4,7 @@ Text
 Text related methods aimed towards OSRS
 *)
 
-{$loadlib libsimpleocr}
+{$loadlib SimpleOCR}
 
 var 
   OCR: TSimpleOCR;
