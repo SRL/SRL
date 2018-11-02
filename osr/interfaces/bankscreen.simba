@@ -34,7 +34,8 @@ var
 const
    WITHDRAW_ALL = -1;
    WITHDRAW_ALL_BUT_ONE = -2;
-
+   // Correct the misspelling in EBankLocation above, while maintaining compatibility
+   blDraynor = blDrynor;
 
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
@@ -801,7 +802,7 @@ function TRSPinScreen._Find(): Boolean;
 var
   P: TPoint;
 begin
-  Result := srl.FindText(P, 'Bank of RuneScape', 'UpChars07_s', 255, 0, Box(21, 30, 151, 50));
+  Result := srl.FindText(P, 'Bank of Gielinor', 'UpChars07_s', 255, 0, Box(21, 30, 151, 50));
 end;
 
 function TRSPinScreen.IsOpen(WaitTime: UInt32 = 0): Boolean;
