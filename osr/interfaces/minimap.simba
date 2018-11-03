@@ -64,7 +64,7 @@ type
     CompassInfo: TMMCompassInfo;
     OrbInfo: array[EMinimapOrb] of TMMOrbInfo;
     MaskBMP: Int32;
-    MaskEdge: TPointArray;
+    MaskPoly: TPointArray;
     MaskTPA: record Inner, Outer: TPointArray; end;
     Center: TPoint;
  end;
@@ -135,7 +135,7 @@ begin
       TextBox := [552, 146, 573, 159];
     end;
 
-    Self.MaskEdge := [
+    Self.MaskPoly := [
       [638, 9], [654, 10], [669, 14], [683, 21], [695, 31], [705, 43], [712, 57],
       [713, 73], [711, 89], [707, 105], [697, 118], [683, 127], [669, 136], [659, 148],
       [645, 157], [629, 155], [620, 142], [608, 132], [594, 123], [581, 115], [574, 101],
@@ -986,7 +986,7 @@ Returns ``True`` if the given point is within the minimap.
 *)
 function TRSMinimap.isPointOn(P: TPoint): Boolean;
 begin
-  Result := srl.PointInPoly(P, Self.MaskEdge);
+  Result := srl.PointInPoly(P, Self.MaskPoly);
 end;
 
 (*
