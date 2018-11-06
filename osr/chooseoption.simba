@@ -121,9 +121,8 @@ Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False`
 .. note:: by slacky
 *)
 function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
-var _:TPoint;
 begin
-  Result := self.__find(_, tryTime);
+  Result := self.Find(tryTime);
 end;
 
 (*
@@ -409,7 +408,13 @@ begin
   if dir.R > Abs(pt.x - B.x2) then dir := [Abs(pt.x - B.x2), 0];
   if dir.R > Abs(pt.y - B.y2) then dir := [Abs(pt.y - B.y2), (Pi/2)];
   
-  dir.T := (dir.T-Pi/3) + Random()*((dir.T+Pi/3) - (dir.T-Pi/3));
+  dir.T := (dir.T-Pi/3) + Random()*(2*Pi/3);
+  
+  //if option box is flush to the left of client and taller than 500px set move direction to the right
+  if (B.X1 < 15) and ((B.Y2 - B.Y1) > 500) then
+    dir.T := Random(Tan(-((B.Y2 - 20) - pt.Y) / (B.X2 - pt.x)),
+                    Tan(-((B.Y1 + 20) - pt.Y) / (B.X2 - pt.x)));
+                    
   try
     Mouse.Move(pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T)));
     self.Select(['Cancel']);
