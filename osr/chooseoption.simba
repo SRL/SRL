@@ -412,8 +412,8 @@ begin
   
   //if option box is flush to the left of client and taller than 500px set move direction to the right
   if (B.X1 < 15) and ((B.Y2 - B.Y1) > 500) then
-    dir.T := Random(Tan(-((B.Y2 - 20) - pt.Y) / (B.X2 - pt.x)),
-                    Tan(-((B.Y1 + 20) - pt.Y) / (B.X2 - pt.x)));
+    dir.T := Random(Arctan((B.Y1 - pt.Y) / ((B.X2 + 20) - pt.x)),
+                    Arctan((B.Y2 - pt.Y) / ((B.X2 + 20) - pt.x)));
                     
   try
     Mouse.Move(pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T)));
