@@ -87,7 +87,11 @@ begin
   inherited;
 end;
 
+{$IFDEF SIMBAMAJOR1200}
 procedure SendKeys(const s: string; keywait, keymodwait: Int32); override;
+{$ELSE}
+procedure SendKeys(s: string; keywait, keymodwait: Int32); override;
+{$ENDIF}
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
@@ -343,7 +347,11 @@ begin
   Result := inherited;
 end;
 
+{$IFDEF SIMBAMAJOR1200}
 function GetTextATPA(const ATPA: T2DPointArray; const maxvspacing: integer; const font: string): string; override;
+{$ELSE}
+function GetTextATPA(constref ATPA: T2DPointArray;  maxvspacing: integer; font: string): string; override;
+{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
@@ -351,15 +359,22 @@ begin
   Result := inherited;
 end;
 
+{$IFDEF SIMBAMAJOR1200}
 function GetTextAt(const atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; const font: string): string; override;
+{$ELSE}
+function GetTextAt(atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; font: string): string; override;
+{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
 
   Result := inherited;
 end;
-
+{$IFDEF SIMBAMAJOR1200}
 function GetTextAtEx(const xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; const font: string): string; override;
+{$ELSE}
+function GetTextAtEx(xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; font: string): string; override;
+{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();

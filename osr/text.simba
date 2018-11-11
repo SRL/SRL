@@ -7,7 +7,7 @@ Text related methods aimed towards OSRS
 {$IFDEF SIMBAMAJOR1200}
   {$loadlib SimpleOCR}
 {$ELSE}
-  {$loadlib libSimpleOCR}
+  {$loadlib libsimpleocr}
 {$ENDIF}
 
 var 
