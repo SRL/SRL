@@ -81,35 +81,62 @@ MainScreen.IsUpText
 
 .. code-block:: pascal
 
-    function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+    function TRSMainScreen.IsUpText(Strings: TStringArray; Timeout: Int32 = -1; Confirm: Int32 = 50): Boolean;
 
-Returns True if any of the strings in 'SubStrs' is in the uptext. Will search up to 'WaitTime'
-which by default is 260.
+Returns True if any of the strings are in the uptext, will search until `Timeout` is reached.
+
+ * `Confirm` by default will wait 50 milliseconds after uptext has been found and check if the uptext is still correct,
+    this is because RS uptext is delayed at least a frame.
+
+ * `Timeout` by default is -1 which will search for between 85 to 200 milliseconds.
 
 Example:
 
 .. code-block:: pascal
 
-    if (MainScreen.IsUpText(['Attack Chicken', 'ack Chicken'])) then
+    if MainScreen.IsUpText(['Attack', 'Chicken']) then
       Mouse.Click(mouse_Left);
 *)
-function TRSMainScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
-var
-  TimeOut: UInt64;
-  Text: String;
-  i: Int32;
-begin
-  Result := False;
-  TimeOut := GetTickCount64() + (WaitTime + Random(-20, 50));
+function TRSMainScreen.IsUpText(Strings: TStringArray; Timeout: Int32 = -1; Confirm: Int32 = 50): Boolean;
 
-  while (TimeOut >= GetTickCount64()) do
+  function IsUpText: Boolean;
+  var
+    Text: String := Self.GetUpText();
+    i: Int32;
   begin
-    Text := Self.GetUpText();
-    for i:=0 to High(SubStrs) do
-      if (SubStrs[i] = '') or (SubStrs[i] in Text) then
+    for i := 0 to High(Strings) do
+      if (Strings[i] = '') or (Strings[i] in Text) then
         Exit(True);
+  end;
 
-    Wait(Random(35, 75));
+var
+  T: UInt64;
+begin
+  if (Timeout = -1) then
+    T := GetTickCount() + Round(SRL.SkewedRand(100, 85, 200))
+  else
+    T := GetTickCount() + Timeout;
+
+  while (T > GetTickCount()) do
+  begin
+    if IsUpText() then
+    begin
+      if (Confirm > 0) then
+      begin
+        T := GetTickCount() + Confirm;
+        while (T > GetTickCount()) do
+        begin
+          if (not IsUpText()) then
+            Exit(False);
+
+          Wait(10);
+        end;
+      end;
+
+      Exit(True);
+    end;
+
+    Wait(20, 60, wdLeft);
   end;
 end;
 
