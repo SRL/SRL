@@ -21,7 +21,7 @@ type
     PID: UInt32;
     ForceSpawn: Boolean;
     ShowConsole: Boolean;
-    EnableDrawing: Boolean;
+    EnableDrawing: Boolean; // not used anymore.
     OnSpawn: TSmartSpawnEvent;
     OnFree: TSmartFreeEvent;
   end;
@@ -29,19 +29,6 @@ type
 procedure TSmartBase.SetDebug(Enable: Boolean);
 begin
   SmartSetDebug(Self.Target, Enable);
-
-  if Enable and (Image = nil) then
-  begin
-    Self.Image.Init(Client.getMBitmaps());
-
-    with Self.Image do
-    begin
-      SetName(Format('Smart[%d] Image', [Self.PID]));
-      SetSize(Width, Height);
-      SetPersistentMemory(SmartDebugArray(Self.Target), Self.Width, Self.Height);
-	    DrawClear($000000);
-    end;
-  end;
 end;
 
 procedure TSmartBase.SetEnabled(Enable: Boolean);
@@ -185,35 +172,28 @@ begin
       SmartFreeClient(Self.Target);
   end;
 
-  srl.WriteLn('[SMART]: No free clients');
+  SRL.WriteLn('[SMART]: No free clients');
 end;
 
 function TSmartBase.Reload(Delay: Int32 = 0): Boolean;
 var
-  Copy: TMufasaBitmap;
+  Force: Boolean := Self.ForceSpawn;
+  Copy: TMufasaBitmap := Self.Image.Copy();
 begin
-  if (Self.Image <> nil) then
-    Copy := Self.Image.Copy();
-
+  Self.ForceSpawn := True;
   Self.Free(True);
 
   if (Delay > 0) then
     Wait(Delay);
 
-  if Self.Init(True) then
-  begin
-    if (Copy <> nil)then
-    begin
-      if (Self.Image <> nil) then
-        Copy.DrawTransparent(0, 0, Self.Image);
+  Result := Self.Init();
+  if Result then
+    Copy.DrawTransparent(0, 0, Self.Image)
+  else
+    SRL.Writeln('[SMART]: Failed to reload');
 
-      Copy.Free();
-    end;
-
-    Exit(True);
-  end;
-
-  srl.Writeln('[SMART]: Failed to reload');
+  Self.ForceSpawn := Force;
+  Copy.Free();
 end;
 
 procedure TSmartBase.Free(Kill: Boolean); overload;
@@ -221,8 +201,8 @@ begin
   if (@OnFree <> nil) then
     OnFree();
 
-  if (Self.Image <> nil) then
-    Self.Image.Free();
+  Self.Image.Free();
+  Self.Image := nil;
 
   if (Self.Target > 0) then
   begin
@@ -233,7 +213,6 @@ begin
       SmartKillClient(Self.PID);
   end;
 
-  Self.Image := nil;
   Self.Target := 0;
   Self.PID := 0;
 end;
@@ -243,20 +222,32 @@ begin
   Self.Free(False);
 end;
 
-function TSmartBase.Init(Reloading: Boolean = False): Boolean;
+function TSmartBase.Init: Boolean;
 begin
   AddOnTerminate(@Self.Free);
 
-  if Reloading or Self.ForceSpawn or (not Self.PairToExisting()) then
+  if Self.ForceSpawn then
     Result := Self.CreateClient()
   else
-    Result := True; // paired
+  begin
+    Result := Self.PairToExisting();
+    if (not Result) then
+      Result := Self.CreateClient()
+  end;
 
   if Result then
   begin
-    if Self.EnableDrawing then
-      Self.SetDebug(True);
+    Self.Image.Init(Client.getMBitmaps());
 
+    with Self.Image do
+    begin
+      SetName(Format('Smart[%d] Image', [Self.PID]));
+      SetSize(Width, Height);
+      SetPersistentMemory(SmartDebugArray(Self.Target), Self.Width, Self.Height);
+      DrawClear($000000);
+    end;
+
+    Self.SetDebug(True);
     Self.SetEnabled(True);
   end;
 end;
