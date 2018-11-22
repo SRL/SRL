@@ -82,6 +82,7 @@ srl.FindColors
   function TSRL.FindColors(out TPA: TPointArray; Color: TCTSColor;  Area: TBox): UInt32; constref;
   function TSRL.FindColors(out TPA: TPointArray; Color: TCTS1Color; Area: TBox): UInt32; constref;
   function TSRL.FindColors(out TPA: TPointArray; Color: TCTS2Color; Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: array of TCTS2Color; Area: TBox): UInt32; constref;
 
 Searches for the given Color, returns the resulting points in the TPA.
 *)
@@ -98,6 +99,18 @@ end;
 function TSRL.FindColors(out TPA: TPointArray; Color: TCTS2Color; Area: TBox): UInt32; constref; overload;
 begin
   Result := _FindColors(TPA, Area, Color.Color, Color.Tolerance, 2, Color.HueMod, Color.SatMod);
+end;
+
+function TSRL.FindColors(out TPA: TPointArray; Colors: array of TCTS2Color; Area: TBox): UInt32; constref; overload;
+var
+  Temp: TPointArray;
+  i: Int32;
+begin
+  SetLength(TPA, 0);
+
+  for i := 0 to High(Colors) do
+    if _FindColors(Temp, Area, Colors[i].Color, Colors[i].Tolerance, 2, Colors[i].HueMod, Colors[i].SatMod) > 0 then
+      TPA := TPA + Temp;
 end;
 
 function TSRL.CountColor(Color: TCTSColor; Area: TBox): Int32; overload;
