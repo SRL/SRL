@@ -19,6 +19,6 @@ deploy:
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   keep-history: false
-  local-dir: docgen/build
+  local-dir: docgen/build/html
   on:
     branch: master
