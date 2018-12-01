@@ -9,11 +9,17 @@ All methods here are called with the bankscreen ``BankScreen`` variable.
     Writeln(BankScreen.IsOpen());
 *)
 type
-  EBankButton = (bbSwap, bbInsert, bbItem, bbNote, bbPlaceholder, bbSearch,
-                 bbDepositInv, bbDepositWorn, bbMenu, bbClose);
+  EBankButton = (BANK_BUTTON_REARRANGE_SWAP, BANK_BUTTON_REARRANGE_INSERT,
+                 BANK_BUTTON_WITHDRAW_ITEM, BANK_BUTTON_WITHDRAW_NOTE,
+                 BANK_BUTTON_QUANTITY_ONE, BANK_BUTTON_QUANTITY_FIVE, BANK_BUTTON_QUANTITY_TEN, BANK_BUTTON_QUANTITY_X, BANK_BUTTON_QUANTITY_ALL,
+                 BANK_BUTTON_PLACEHOLDER, BANK_BUTTON_SEARCH, BANK_BUTTON_DEPOSIT_INVENTORY, BANK_BUTTON_DEPOSIT_WORN,
+                 BANK_BUTTON_CLOSE);
+
   EBankLocation = (blYanille, blAlKharid, blLumbridge, blDrynor, blEdgeville,
                    blVarrockWest, blVarrockEast,
-                   blFaladorEast, blFaladorWest);
+                   blFaladorEast, blFaladorWest,
+                   blGrandExchange);
+
   EBankerColor = (bcBlue, bcGray);
 
   TRSBankScreen = record(TInterfaceBase)
@@ -37,12 +43,20 @@ const
    // Correct the misspelling in EBankLocation above, while maintaining compatibility
    blDraynor = blDrynor;
 
+   // backwards compatibility, will be removed eventually.
+   bbItem = BANK_BUTTON_WITHDRAW_ITEM;
+   bbNote = BANK_BUTTON_WITHDRAW_NOTE;
+
 {$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
-var 
-  slotBounds:TBox = [73, 83, 456, 298];
-  TextBtn:TBox = [0,0,75,21];
-  IconBtn:TBox = [0,0,35,35];
+
+  procedure SetButtonBounds(Button: EBankButton; X, Y, Width, Height: Int32);
+  begin
+    FButtons[Button] := [X, Y, X + Width, Y + Height];
+  end;
+
+var
+  SlotBounds: TBox = [73, 83, 456, 298];
 begin
   with Self do
   begin
@@ -50,24 +64,30 @@ begin
     SetName('Bankscreen');
     SetStatic(True);
 
-    FSlots := slotBounds.Partition(6,8);
-    FSlots.ModifySide('x2',-16);
-    FSlots.ModifySide('y2',-4);
+    FSlots := SlotBounds.Partition(6, 8);
+    FSlots.ModifySide('x2', -16);
+    FSlots.ModifySide('y2', -4);
 
     with Self.GetBounds() do
     begin
-      FButtons[bbSwap]   := TextBtn.OffsetFunc([X1+5,  Y2-26]);
-      FButtons[bbInsert] := TextBtn.OffsetFunc([X1+81, Y2-26]);
-      FButtons[bbItem]   := TextBtn.OffsetFunc([X1+164, Y2-26]);
-      FButtons[bbNote]   := TextBtn.OffsetFunc([X1+240, Y2-26]);
+      SetButtonBounds(BANK_BUTTON_REARRANGE_SWAP,   X1 + 5,  Y2 - 26, 49, 21);
+      SetButtonBounds(BANK_BUTTON_REARRANGE_INSERT, X1 + 55, Y2 - 26, 49, 21);
 
-      FButtons[bbPlaceholder] := IconBtn.OffsetFunc([X2-164, Y2-41]);
-      FButtons[bbSearch]      := IconBtn.OffsetFunc([X2-121, Y2-41]);
-      FButtons[bbDepositInv]  := IconBtn.OffsetFunc([X2-78, Y2-41]);
-      FButtons[bbDepositWorn] := IconBtn.OffsetFunc([X2-42, Y2-41]);
+      SetButtonBounds(BANK_BUTTON_WITHDRAW_ITEM, X1 + 105, Y2 - 26, 49, 21);
+      SetButtonBounds(BANK_BUTTON_WITHDRAW_NOTE, X1 + 155, Y2 - 26, 49, 21);
 
-      FButtons[bbMenu]  := Box(X2-36, Y1+42, X2-12, Y1+66);
-      FButtons[bbClose] := Box(X2-27, Y1+7,  X2-7,  Y1+27);
+      SetButtonBounds(BANK_BUTTON_QUANTITY_ONE,  X1 + 205, Y2 - 26, 24, 21);
+      SetButtonBounds(BANK_BUTTON_QUANTITY_FIVE, X1 + 230, Y2 - 26, 24, 21);
+      SetButtonBounds(BANK_BUTTON_QUANTITY_TEN,  X1 + 255, Y2 - 26, 24, 21);
+      SetButtonBounds(BANK_BUTTON_QUANTITY_X,    X1 + 280, Y2 - 26, 24, 21);
+      SetButtonBounds(BANK_BUTTON_QUANTITY_ALL,  X1 + 305, Y2 - 26, 24, 21);
+
+      SetButtonBounds(BANK_BUTTON_PLACEHOLDER,       X1 + 331, Y2 - 41, 35, 35);
+      SetButtonBounds(BANK_BUTTON_SEARCH,            X1 + 370, Y2 - 41, 35, 35);
+      SetButtonBounds(BANK_BUTTON_DEPOSIT_INVENTORY, X1 + 409, Y2 - 41, 35, 35);
+      SetButtonBounds(BANK_BUTTON_DEPOSIT_WORN,      X1 + 446, Y2 - 41, 35, 35);
+
+      SetButtonBounds(BANK_BUTTON_CLOSE, X2 - 27, Y1 + 7, X2 - 7, Y1 + 27);
     end;
   end;
 end;
@@ -206,7 +226,50 @@ begin
   end;
 end;
 
-function TRSBankScreen._OpenYanille: Boolean;
+(*
+BankScreen.OpenBank_GE
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSBankScreen.OpenBank_GE: Boolean;
+
+Opens the bank at the grand exchange. Uses `ge_bank.aca` colors.
+
+*)
+function TRSBankScreen.Open_GE: Boolean;
+
+  function Open(TPA: TPointArray): Boolean;
+  begin
+    TPA.Sort(TPA.Mean);
+    TPA[0] := TPA[Round(SRL.TruncatedGauss(0, High(TPA)))];
+
+    if Self.OpenAt(TPA[0]) then
+      Exit(True);
+  end;
+
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  P: TPoint;
+begin
+  if SRL.FindColors(TPA, CTS2(6710894, 15, 0.15, 0.07), MainScreen.GetBounds()) > 0 then
+  begin
+    ATPA := TPA.Cluster(3);
+    ATPA.FilterSize(15, __GT__);
+
+    TPA := GrandExchange.GetNPCs()[0];
+    TPA.Sort(MainScreen.GetMiddle());
+
+    for P in TPA do
+    begin
+      ATPA.SortByMiddle(P);
+
+      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 3 then
+        if Open(ATPA[0]) then
+          Exit(True);
+    end;
+  end;
+end;
+
+function TRSBankScreen.Open_Yanille: Boolean;
 const
   colMiddle: TCTS2Color = [5660003, 10, 0.63, 0.79]; // grey
   colEdge: TCTS2Color = [277329, 10, 0.07, 2.23]; // brown
@@ -315,11 +378,10 @@ end;
 
 (*
 BankScreen.Open
-~~~~~~~~~~~~~~~~
-.. pascal::
-   function TRSBankScreen.Open(Loc: EBankLocation; Tries: Int32 = 3): Boolean;
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSBankScreen.Open(Loc: EBankLocation; Tries: Int32 = 3): Boolean;
 
-Opens the bankscreen at the selected bank location.
+Attempts to open the bank at the selected bank location.
 *)
 function TRSBankScreen.Open(Loc: EBankLocation; Tries: Int32 = 3): Boolean;
 begin
@@ -329,15 +391,16 @@ begin
       Exit(True);
 
     case Loc of
-      blYanille:     Result := Self._OpenYanille();
-      blLumbridge:   Result := Self._MagicalBankerFinder([607067,  10, 0.47, 0.28], bcBlue, [0,-30]);
-      blAlKharid:    Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]);
-      blDrynor:      Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]);
-      blEdgeville:   Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [30, 0]);
-      blVarrockWest: Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]);
-      blVarrockEast: Result := Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]);
-      blFaladorEast: Result := Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]);
-      blFaladorWest: Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [0, 40]);
+      blGrandExchange: Result := Self.Open_GE();
+      blYanille:       Result := Self.Open_Yanille();
+      blLumbridge:     Result := Self._MagicalBankerFinder([607067,  10, 0.47, 0.28], bcBlue, [0,-30]);
+      blAlKharid:      Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]);
+      blDrynor:        Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]);
+      blEdgeville:     Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [30, 0]);
+      blVarrockWest:   Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcBlue, [30, 0]);
+      blVarrockEast:   Result := Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcBlue, [0, 40]);
+      blFaladorEast:   Result := Self._MagicalBankerFinder([2171173, 10, 0.00, 0.50], bcGray, [0, 40]);
+      blFaladorWest:   Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [0, 40]);
     end;
 
     if Result then
@@ -374,7 +437,7 @@ begin
     srl.ToggleCloseInterfacesWithEscape(False);
   end;
 
-  Self.ClickButton(bbClose);
+  Self.ClickButton(BANK_BUTTON_CLOSE);
   t := GetTickCount() + Random(4000, 5000);
   while (t > GetTickCount()) do
   begin
@@ -551,7 +614,7 @@ begin
   if (Inventory.Count = 0) then
     Exit(True);
   
-  Result := Self.ClickButton(bbDepositInv);
+  Result := Self.ClickButton(BANK_BUTTON_DEPOSIT_INVENTORY);
 end;
 
 (*
@@ -640,11 +703,12 @@ BankScreen.RearrangeMode
 
   function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
 
-Changes the way items are moved around, valid options are ``bbSwap`` and ``bbInsert``.
+Changes the way items are moved around.
+``Mode`` can be either ``BANK_BUTTON_REARRANGE_SWAP`` or ``BANK_BUTTON_REARRANGE_INSERT``.
 *)
 function TRSBankScreen.RearrangeMode(mode:EBankButton): Boolean;
 begin
-  if not(mode in [bbSwap,bbInsert]) then
+  if not(mode in [BANK_BUTTON_REARRANGE_SWAP, BANK_BUTTON_REARRANGE_INSERT]) then
     RaiseException('Invalid rearrange mode: '+ToString(mode));
 
   Result := self.IsToggled(mode) or Self.ClickButton(mode);
@@ -658,11 +722,12 @@ BankScreen.WithdrawAs
 
   function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
 
-Changes the way items are withdrawn. Valid options are ``bbItem`` and ``bbNote``
+Changes the way items are withdrawn.
+`Mode`` can be either ``BANK_BUTTON_WITHDRAW_ITEM`` and ``BANK_BUTTON_WITHDRAW_NOTE``.
 *)
 function TRSBankScreen.WithdrawAs(mode:EBankButton): Boolean;
 begin
-  if not(mode in [bbItem,bbNote]) then
+  if not(mode in [BANK_BUTTON_WITHDRAW_ITEM, BANK_BUTTON_WITHDRAW_NOTE]) then
     RaiseException('Invalid withdraw mode: '+ToString(mode));
 
   Result := self.IsToggled(mode) or Self.ClickButton(mode);
@@ -671,7 +736,7 @@ end;
 
 (*
 BankScreen.Search
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSBankScreen.Search(item:String): Boolean;
@@ -684,17 +749,25 @@ const
 begin
   if (not Self.IsOpen()) then
     Exit(False);
-  if not(self.IsToggled(bbSearch) or Self.ClickButton(bbSearch)) then
+  if not(self.IsToggled(BANK_BUTTON_SEARCH) or Self.ClickButton(BANK_BUTTON_SEARCH)) then
     Exit(False);
   Result := self._ExpectText('Show items',TEXT_AREA,UpFont,FontSetting(0,2));
 
   keyboard.Send(item,VK_RETURN);
 end;
 
+function TRSBankScreen.SetQuantity(Quantity: EBankButton): Boolean;
+begin
+  if not (Quantity in [BANK_BUTTON_QUANTITY_ONE..BANK_BUTTON_QUANTITY_ALL]) then
+    RaiseException('Invalid quantity: ' + ToString(Quantity));
+
+  Result := self.IsToggled(Quantity) or Self.ClickButton(Quantity);
+end;
+
 
 (*
 BankScreen.Withdraw
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
   function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
@@ -723,7 +796,7 @@ Extra vaild constants for ``amount`` are:
     
 .. note:: by slacky
 *)
-function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; withdrawMode:EBankButton=bbItem): Boolean;
+function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; WithdrawMode: EBankButton = BANK_BUTTON_WITHDRAW_ITEM; Quantity: EBankButton = BANK_BUTTON_QUANTITY_ONE): Boolean;
 var
   b:TBox;
 const
@@ -735,7 +808,9 @@ begin
   if (not self.ItemIn(slot)) then
     Exit(False);
 
-  self.WithdrawAs(withdrawMode);
+  self.WithdrawAs(WithdrawMode);
+  self.SetQuantity(Quantity);
+
   Wait(90,170);
   mouse.Move(b);
   Wait(90,170);

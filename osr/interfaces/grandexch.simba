@@ -1003,6 +1003,119 @@ begin
 end;
 
 (*
+GrandExchange.GetNPCs
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.GetNPCs: T2DPointArray;
+
+Returns the GE npc mainscreen positions. Finds NPC dots on the minimap then
+MM2MS with a offset.
+
+*)
+function TRSGrandExch.GetNPCs: T2DPointArray;
+var
+  P: TPoint;
+  L, S: Int32;
+  TPA: TPointArray;
+begin
+  Result := [[], []];
+
+  if SRL.FindColors(TPA, CTS1(714213, 50), Minimap.GetBounds()) > 0 then
+    Minimap.FilterPoints(TPA);
+
+  if Length(TPA) > 0 then
+  begin
+    TPA := TPA.Cluster(5).Biggest();
+    TPA.MinAreaRectEx(L, S);
+
+    if (Abs(L - 15) <= 3) and (Abs(S - 15) <= 3) then
+    begin
+      P := TPA.Mean();
+
+      // Bankers
+      Result[0] := [Point(P.X + 6, P.Y - 2),
+                    Point(P.X + 6, P.Y + 2),
+                    Point(P.X - 6, P.Y - 2),
+                    Point(P.X - 6, P.Y + 2)
+                   ];
+
+      Result[0] := Result[0].Rotate(Minimap.GetCompassAngle(False), P.X, P.Y);
+      Result[0] := Minimap.ArrToMs(Result[0]);
+
+      // Clerks
+      Result[1] := [Point(P.X + 2, P.Y + 6),
+                    Point(P.X - 2, P.Y + 6),
+                    Point(P.X + 2, P.Y - 6),
+                    Point(P.X - 2, P.Y - 6)
+                   ];
+
+      Result[1] := Result[1].Rotate(Minimap.GetCompassAngle(False), P.X, P.Y);
+      Result[1] := Minimap.ArrToMs(Result[1]);
+    end;
+  end;
+end;
+
+(*
+GrandExchange.Open
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Open: Boolean;
+
+Opens the grand exchange. Uses `ge_clerk.aca` colors.
+
+*)
+function TRSGrandExch.Open: Boolean;
+
+  function Open(TPA: TPointArray): Boolean;
+  var
+    T: UInt64;
+  begin
+    TPA.Sort(TPA.Mean);
+    TPA[0] := TPA[Round(SRL.TruncatedGauss(0, High(TPA)))];
+
+    Mouse.Move(TPA[0]);
+
+    if MainScreen.IsUpText(['Grand', 'Exchange', 'Clerk']) then
+    begin
+      if ChooseOption.Open() and ChooseOption.Select('Exchange Grand') then
+      begin
+        Minimap.WaitFlag();
+
+        T := GetTickCount() + Random(3500, 4000);
+        while (T > GetTickCount()) do
+        begin
+          if Self.IsOpen() then
+            Exit(True);
+
+          Wait(Random(50, 100));
+        end;
+      end;
+    end;
+  end;
+
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  P: TPoint;
+begin
+  if SRL.FindColors(TPA, CTS2(4796464, 13, 0.76, 1.00), MainScreen.GetBounds()) > 0 then
+  begin
+    ATPA := TPA.Cluster(3);
+    ATPA.FilterSize(15, __GT__);
+
+    TPA := Self.GetNPCs()[1];
+    TPA.Sort(MainScreen.GetMiddle());
+
+    for P in TPA do
+    begin
+      ATPA.SortByMiddle(P);
+
+      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 3 then
+        if Open(ATPA[0]) then
+          Exit(True);
+    end;
+  end;
+end;
+
+(*
 GrandExchange.Debug
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSGrandExch.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
