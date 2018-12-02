@@ -1,0 +1,346 @@
+procedure TMouse.Move(P: TPoint); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+procedure TMouse.Hold(Button: Int32); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  RSClient.SetFocus();
+
+  inherited();
+end;
+
+procedure TMouse.Release(Button: Int32); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+procedure TMouse.Scroll(Scrolls: Int32; Down: Boolean); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+procedure TKeyboard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+procedure TKeyboard.KeyDown(const Key: Integer); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+procedure TKeyboard.KeyUp(const Key: Integer); override;
+begin
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
+end;
+
+{$IFDEF RSCLIENT_RETARGET}
+function GetColor(x,y: Integer): Int32; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function GetColors(const Coords : TPointArray) : TIntegerArray; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColor(var x, y: Integer; color, x1, y1, x2, y2: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColorTolerance(var x, y: Integer; color, x1, y1, x2, y2, tol: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColors(var TPA: TPointArray; Color, x1, y1, x2, y2: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function CountColor(Color, xs, ys, xe, ye: Integer): Integer; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function CountColorTolerance(Color, xs, ys, xe, ye, Tolerance: Integer): Integer; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColorsTolerance(var Points: TPointArray; Color, xs, ys, xe, ye, Tolerance: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColorSpiral(var x, y: Integer; color, xs, ys, xe, ye: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColorSpiralTolerance(var x, y: Integer; color, xs, ys, xe, ye,Tol: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColorsSpiralTolerance(x, y: Integer; var Points: TPointArray; color, xs, ys, xe, ye: Integer; Tolerance: Integer) : Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColoredArea(var x, y: Integer; color, xs, ys, xe, ye: Integer; MinArea: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindColoredAreaTolerance(var x, y: Integer; Color, xs, ys, xe, ye, MinArea, tol: Integer): Boolean;  override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function BitmapFromClient(const xs, ys, xe, ye: Integer): Integer; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmap(Bitmap: Integer; var x, y: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmapIn(bitmap: Integer; var x, y: Integer;  xs, ys, xe, ye: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmapToleranceIn(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; tolerance: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmapSpiral(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+
+  Result := inherited;
+end;
+
+function FindBitmapsSpiralTolerance(Bitmap: Integer; x, y: Integer; var Points : TPointArray; xs, ys, xe, ye,tolerance: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmapSpiralTolerance(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye,tolerance : Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindMaskTolerance(const mask: TMask; var x, y: Integer; xs,ys, xe, ye: Integer; Tolerance, ContourTolerance: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindBitmapMaskTolerance(mask: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; Tolerance, ContourTolerance: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; tolerance: Integer; Range: Integer; AllowPartialAccuracy: Boolean; var accuracy: Extended): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTM(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTMs(DTM: Integer; var p: TPointArray; xs, ys, xe, ye: Integer): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTMsRotatedAlternating(DTM: Integer; var Points: TPointArray; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function FindDTMsRotatedSE(DTM: Integer; var Points: TPointArray; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray): Boolean; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function GetTextATPA(constref ATPA: T2DPointArray;  maxvspacing: integer; font: string): string; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function GetTextAt(atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; font: string): string; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+
+function GetTextAtEx(xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; font: string): string; override;
+begin
+  if RSClient.RequireUpdate() then
+    RSClient.Update();
+
+  Result := inherited;
+end;
+{$ENDIF}
