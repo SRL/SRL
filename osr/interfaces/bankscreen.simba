@@ -87,7 +87,7 @@ begin
       SetButtonBounds(BANK_BUTTON_DEPOSIT_INVENTORY, X1 + 409, Y2 - 41, 35, 35);
       SetButtonBounds(BANK_BUTTON_DEPOSIT_WORN,      X1 + 446, Y2 - 41, 35, 35);
 
-      SetButtonBounds(BANK_BUTTON_CLOSE, X2 - 27, Y1 + 7, X2 - 7, Y1 + 27);
+      SetButtonBounds(BANK_BUTTON_CLOSE, X2 - 27, Y1 + 7, 20, 20);
     end;
   end;
 end;
