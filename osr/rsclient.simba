@@ -9,7 +9,7 @@
 
 var
   RS_CLIENT_TITLES: TStringArray = []; // unused.
-  RS_CLIENT_CANVAS_CLASSES: TStringArray = ['sun-awt-X11-XCanvasPeer', 'SunAwtCanvas'];
+  RS_CLIENT_CANVAS_CLASSES: TStringArray = ['sun-awt-X11-XCanvasPeer', 'SunAwtCanvas', 'net-runelite-client-RuneLite'];
 
 type
   TRSClient = record
