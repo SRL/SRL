@@ -214,10 +214,19 @@ Internally used to to get the text as an integer at the given coordinates.
 *)
 function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                      WSplit:Int32=3; HSplit:Int32=2): Int32;
-var tmp:String;
+var
+  Text: String;
+  T: UInt64 := GetTickCount + 1000;
 begin
-  tmp := Self.RecognizeStr(B,Color,Font,Tol,WSplit,HSplit);
-  Result := StrToIntDef(ExtractFromStr(tmp, NUMBERS), -1);
+  while (T > GetTickCount()) do
+  begin
+    Text := Self.RecognizeStr(B, Color, Font, Tol, WSplit, HSplit);
+    Result := StrToIntDef(ExtractFromStr(Text, NUMBERS), -1);
+    if (Result <> -1) then
+      Exit;
+
+    Wait(50, 100);
+  end;
 end;
 
 (*
@@ -374,8 +383,9 @@ var
   TPA:TPointArray;
   ATPA:T2DPointArray;
   B:TBox;
+  T: UInt64 := GetTickCount + 1000;
 begin
-  if FAdjButtons = [] then
+  while (T > GetTickCount()) and (FAdjButtons = []) do
   begin
     FindColorsTolerance(TPA, 5990257, FAdjBounds[0], 30);
     ATPA := ClusterTPA(TPA, 5);
@@ -395,6 +405,9 @@ begin
         FAdjButtons.Append(B);
     end;
   end;
+
+  if FAdjButtons = [] then
+    RaiseException('Failed to load buttons');
 
   Result := FAdjButtons;
 end;
@@ -466,7 +479,7 @@ begin
       begin
         B := GetTPABounds(ATPA[i]);
         str := self.RecognizeStr(B, 0, 'SmallChars07');
-        if (Exact and (str = name)) or ((not Exact) and (Pos(name,str) > 0)) then
+        if (Exact and (str = name)) or ((not Exact) and (Pos(LowerCase(name),LowerCase(str)) > 0)) then
         begin
           Mouse.Click(B, mouse_left);
           Exit(True);
@@ -601,7 +614,9 @@ GrandExchange.Offer.Price
 Returns the price it's set up to buy or sell at.
 *)
 function TGrandExchOffer.Price(): Int32;
-var iface:EGEInterface;
+var
+  iface:EGEInterface;
+  T: UInt64 := GetTickCount() + 2000;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
@@ -691,11 +706,14 @@ begin
   if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etBuy) then
     Exit(False);
 
-  if Pos('What would you', Chatbox.GetQuery()) = 0 then
+  if (not Chatbox.AnswerQuery('What would you', Name, Random(3000, 3500), False)) then
   begin
     Mouse.Click(FMiscBoxes[1], mouse_left);
+    if (not Chatbox.AnswerQuery('What would you', Name, Random(3000, 3500), False)) then
+      Exit(False);
   end;
-  Result := Chatbox.AnswerQuery('What would you', Name, 2500, False);
+
+  Exit(True);
 end;
 
 (*
@@ -711,7 +729,6 @@ begin
     Exit(False);
 
   Result := Inventory.IsSlotUsed(InvIndex);
-  WriteLn(Result);
   if Result then
     Inventory.MouseSlot(InvIndex, mouse_Left);
 end;
@@ -952,6 +969,17 @@ begin
   Result.Sum     := self.Sum(Slot);
 end;
 
+function TRSGrandExch.FindOffer(Name: String): Int32;
+var
+  Offer: Int32;
+begin
+  for Offer := 0 to High(GrandExchange.ExchTables) do
+    if SameText(Self.ItemName(Offer), Name) then
+      Exit(Offer);
+
+  Exit(-1);
+end;
+
 (*
 GrandExchange.PlaceOffer
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1099,7 +1127,7 @@ begin
   if SRL.FindColors(TPA, CTS2(4796464, 13, 0.76, 1.00), MainScreen.GetBounds()) > 0 then
   begin
     ATPA := TPA.Cluster(3);
-    ATPA.FilterSize(15, __GT__);
+    ATPA.FilterSize(2, __GT__);
 
     TPA := Self.GetNPCs()[1];
     TPA.Sort(MainScreen.GetMiddle());
@@ -1108,7 +1136,7 @@ begin
     begin
       ATPA.SortByMiddle(P);
 
-      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 3 then
+      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 4.5 then
         if Open(ATPA[0]) then
           Exit(True);
     end;
