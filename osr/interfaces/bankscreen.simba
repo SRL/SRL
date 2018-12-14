@@ -94,16 +94,25 @@ end;
 {$ENDIF}
 
 
-function TRSBankScreen._ExpectText(txt:String; B:TBox; font:TFontSet; cfg:TCompareRules; maxWait:Int32=6000): Boolean;
+function TRSBankScreen._ExpectText(Text: String; Time: Int32 = 6000): Boolean;
 var
-  t:UInt64;
+  TPA: TPointArray;
+  B: TBox;
+  T: UInt64 := GetTickCount() + Time;
 begin
-  t := GetTickCount() + maxWait;
-  while GetTickCount() < t do
-    if Pos(txt, ocr.Recognize(B, cfg, font)) <> 0 then
-      Exit(True)
-    else
-      Wait(20);
+  while (T > GetTickCount()) do
+  begin
+    if FindColors(TPA, 0, Chatbox.GetBounds()) then
+    begin
+      B := GetTPABounds(TPA);
+      B := B.Expand(2);
+
+      if Text in OCR.Recognize(B, FontSetting(0), UpFont) then
+        Exit(True);
+    end;
+
+    Wait(0, 1000, wdLeft);
+  end;
 end;
 
 
@@ -751,7 +760,7 @@ begin
     Exit(False);
   if not(self.IsToggled(BANK_BUTTON_SEARCH) or Self.ClickButton(BANK_BUTTON_SEARCH)) then
     Exit(False);
-  Result := self._ExpectText('Show items',TEXT_AREA,UpFont,FontSetting(0,2));
+  Result := self._ExpectText('Show items');
 
   keyboard.Send(item,VK_RETURN);
 end;
@@ -836,7 +845,7 @@ begin
       Result := True
 
     else if ChooseOption.Select(['Withdraw-X']) and
-       self._ExpectText('Enter amount',TEXT_AREA,UpFont,FontSetting(0,2)) then
+       self._ExpectText('Enter amount') then
     begin
       keyboard.Send(ToString(amount),VK_RETURN);
 
