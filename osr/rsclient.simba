@@ -98,6 +98,8 @@ begin
 
   if (Launcher <> '') then
   begin
+    SRL.WriteLn('RSClient not found, launching...');
+
     {$IFDEF WINDOWS}
     Files := FindFile('C:\Program Files (x86)\Java\', 'java.exe') +
              FindFile('C:\Program Files\Java\', 'java.exe');
@@ -107,7 +109,12 @@ begin
     {$ENDIF}
 
     Process.Init(nil);
-    Process.SetCommandLine(Format('"%s" -jar "%s"', [Java, Launcher]));
+
+    if ExtractFileExt(Launcher) = '.jar' then
+      Process.SetCommandLine(Format('"%s" -jar "%s"', [Java, Launcher]))
+    else
+      Process.SetCommandLine(Launcher);
+
     Process.Execute();
     Process.Free();
 
