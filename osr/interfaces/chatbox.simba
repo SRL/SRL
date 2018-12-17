@@ -18,10 +18,11 @@ type
     FTabs: TBoxArray;
   end;
 
-  TChatOption = record
+  TRSChatOption = record
     Text: String;
-    b: TBox;
+    Bounds: TBox;
   end;
+  TRSChatOptionArray = array of TRSChatOption;
 
 (*
 var Chatbox
@@ -220,34 +221,56 @@ end;
 (*
 Chatbox.GetOptions
 ~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
+.. pascal:: function TRSChatbox.GetOptions(Colors: TIntegerArray = [$000000, $FFFFFF]): TRSChatOptionArray;
 
-Returns all the options found in teh chatbox area
+Returns all the options found in the chatbox area.
+Even works for reading conversations.
 *)
-function TRSChatbox.GetOptions(TextColors: TIntegerArray = [clBlack, clWhite]): array of TChatOption;
+function TRSChatbox.GetOptions(Colors: TIntegerArray = [$000000, $FFFFFF]): TRSChatOptionArray;
+
+  function GetFirstCharacter(TPA: TPointArray): TBox;
+  var
+    ATPA: T2DPointArray;
+  begin
+    ATPA := TPA.Cluster(1, 100);
+    SortATPAFromFirstPointX(ATPA, [0, 0]);
+    Result := GetTPABounds(ATPA[0]);
+  end;
+
 var
   TPA: TPointArray;
   ATPA: T2DPointArray;
-  i, color: Integer;
-  b: TBox;
-  s: String;
+  Color: Int32;
+  B: TBox;
 begin
-  SetLength(ATPA, Length(TextColors));
-  for i := 0 to High(ATPA) do
-    FindColors(ATPA[i], TextColors[i], Self.FBounds);
-  TPA := MergeATPA(ATPA);
-
-  if (Length(TPA) < 10) then
-    Exit;
-
-  for TPA in ClusterTPAEx(TPA, 15, 1) do
+  for Color in Colors do
   begin
-    b := GetTPABounds(TPA).Expand(1);
-    for color in TextColors do
+    SRL.FindColors(TPA, CTS0(Color), Chatbox.GetBounds);
+
+    for TPA in FindTPARows(TPA) do
+      if Length(TPA) > 20 then
+        ATPA += TPA;
+  end;
+
+  TPA := ATPA.Merge();
+  ATPA := TPA.Cluster(100, 5);
+  SortATPAFromFirstPointY(ATPA, [0, 0]);
+
+  for TPA in ATPA do
+  begin
+    B := TPA.Bounds().Expand(5);
+
+    for Color in Colors do
     begin
-      s := OCR.Recognize(b, TCompareRules([color]), NPCFont);
-      if (s <> '') then
-        Result += TChatOption([s, GetTPABounds(TPA)]);
+      if SRL.FindColors(TPA, CTS0(Color), B) > 0 then
+      begin
+        B := GetFirstCharacter(TPA);
+        B.Y1 -= 1;
+        B.Y2 += 6;
+        B.X2 := TPA.Bounds().X2;
+
+        Result := Result + TRSChatOption([OCR.Recognize(B, TCompareRules([0]), NPCFont), B]);
+      end;
     end;
   end;
 end;
@@ -255,7 +278,7 @@ end;
 function TRSChatbox.FindOption(Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
   i: Int32;
-  Options: array of TChatOption;
+  Options: TRSChatOptionArray;
 begin
   Options := Self.GetOptions(TextColors);
 
@@ -275,7 +298,7 @@ Clicks the preferred option by text. If the option cant be found it will return 
 *)
 function TRSChatbox.ClickOption(const Text: TStringArray; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
-  option: TChatOption;
+  option: TRSChatOption;
 begin
   Result := False;
   
@@ -283,7 +306,7 @@ begin
   begin
     if (IsArrInStr(Text, option.Text)) then
     begin
-      Mouse.Click(option.b, mouse_Left);
+      Mouse.Click(option.Bounds, mouse_Left);
       Exit(True);
     end;
   end;
@@ -350,7 +373,7 @@ Seems to be a function that should have been named something like `ContinueToOpt
 *)
 function TRSChatbox.ChatToOption(Option: TStringArray; ClickOption: Boolean; TextColors: TIntegerArray = [clBlack, clWhite]): Boolean;
 var
-  opt: TChatOption;
+  opt: TRSChatOption;
   t: UInt64;
   b: Boolean = False;
 begin
@@ -362,7 +385,7 @@ begin
       if (IsArrInStr(Option, opt.Text)) then
       begin
         if (ClickOption) then
-          Mouse.Click(opt.b, mouse_Left);
+          Mouse.Click(opt.Bounds, mouse_Left);
         Exit(True);
       end;
     end;

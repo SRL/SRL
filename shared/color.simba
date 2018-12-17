@@ -25,7 +25,7 @@ CTS0, CTS1, CTS2
   
 Used for declaring colors using the different CTS settings.
 *)
-function CTS0(Color, Tolerance: Int32): TCTSColor;
+function CTS0(Color: Int32; Tolerance: Int32 = 0): TCTSColor;
 begin
   Result := [Color, Tolerance];
 end;
