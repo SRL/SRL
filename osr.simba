@@ -40,11 +40,11 @@ end;
 {$include_once osr/player.simba}
 {$include_once osr/players.simba}
 {$include_once osr/interfaces/rsInterfaceBase.simba}
-{$include_once osr/interfaces/bankscreen.simba}
 {$include_once osr/interfaces/depositbox.simba}
 {$include_once osr/interfaces/smithingscreen.simba}
 {$include_once osr/interfaces/shops.simba}
 {$include_once osr/interfaces/grandexch.simba}
+{$include_once osr/interfaces/bankscreen.simba}
 {$include_once osr/MM2MS.simba}
 {$include_once osr/antiban.simba}
 

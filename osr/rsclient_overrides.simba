@@ -1,16 +1,17 @@
-// Simba's windows implemention uses GetPixel which isn't reliable on some targets.
-function GetColor(X, Y: Int32): Int32; override;
+procedure TMouse.Move(P: TPoint); override;
 begin
-  try
-    with Client.GetIOManager().ReturnData(X, Y, 1, 1) do
-      Result := RGBtoColor(Ptr^.R, Ptr^.G, Ptr^.B);
-  except
-    Result := -1;
-  end;
+  {$IFDEF RSCLIENT_RETARGET}
+  if RSClient.RequireUpdate() then
+    RSClient.RequireUpdate();
+  {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
+  RSClient.SetFocus();
+  {$ENDIF}
+
+  inherited();
 end;
 
-{$IFDEF RSCLIENT_AUTOFOCUS}
-procedure MoveMouse(x, y: Integer); override;
+procedure TMouse.Hold(Button: Int32); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
@@ -18,101 +19,73 @@ begin
   {$ENDIF}
   RSClient.SetFocus();
 
-  inherited;
+  inherited();
 end;
 
-procedure ScrollMouse(x,y : Integer; Clicks : Integer); override;
+procedure TMouse.Release(Button: Int32); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
-    RSClient.Update();
+    RSClient.RequireUpdate();
   {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
   RSClient.SetFocus();
+  {$ENDIF}
 
-  inherited;
+  inherited();
 end;
 
-procedure HoldMouse(x, y: Integer; clickType: Integer); override;
+procedure TMouse.Scroll(Scrolls: Int32; Down: Boolean); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
-    RSClient.Update();
+    RSClient.RequireUpdate();
   {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
   RSClient.SetFocus();
+  {$ENDIF}
 
-  inherited;
+  inherited();
 end;
 
-procedure ReleaseMouse(x, y: Integer; clickType: Integer); override;
+procedure TKeyboard.Send(const Text: String; const KeyWait, KeyModWait, KeyPressWait: UInt32); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
-    RSClient.Update();
+    RSClient.RequireUpdate();
   {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
   RSClient.SetFocus();
+  {$ENDIF}
 
-  inherited;
+  inherited();
 end;
 
-procedure ClickMouse(x, y: Integer; clickType: Integer); override;
+procedure TKeyboard.KeyDown(const Key: Integer); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
-    RSClient.Update();
+    RSClient.RequireUpdate();
   {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
   RSClient.SetFocus();
+  {$ENDIF}
 
-  inherited;
+  inherited();
 end;
 
-procedure KeyDown(key: Word); override;
+procedure TKeyboard.KeyUp(const Key: Integer); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
   if RSClient.RequireUpdate() then
-    RSClient.Update();
+    RSClient.RequireUpdate();
   {$ENDIF}
+  {$IFDEF RSCLIENT_AUTOFOCUS}
   RSClient.SetFocus();
-
-  inherited;
-end;
-
-procedure KeyUp(key: Word); override;
-begin
-  {$IFDEF RSCLIENT_RETARGET}
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
   {$ENDIF}
-  RSClient.SetFocus();
 
-  inherited;
+  inherited();
 end;
-
-{$IFDEF SIMBAMAJOR1200}
-procedure SendKeys(const s: string; keywait, keymodwait: Int32); override;
-{$ELSE}
-procedure SendKeys(s: string; keywait, keymodwait: Int32); override;
-{$ENDIF}
-begin
-  {$IFDEF RSCLIENT_RETARGET}
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-  {$ENDIF}
-  RSClient.SetFocus();
-
-  inherited;
-end;
-
-procedure PressKey(key: Word); override;
-begin
-  {$IFDEF RSCLIENT_RETARGET}
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-  {$ENDIF}
-  RSClient.SetFocus();
-
-  inherited;
-end;
-{$ENDIF}
 
 {$IFDEF RSCLIENT_RETARGET}
 function GetColor(x,y: Integer): Int32; override;
@@ -347,11 +320,7 @@ begin
   Result := inherited;
 end;
 
-{$IFDEF SIMBAMAJOR1200}
-function GetTextATPA(const ATPA: T2DPointArray; const maxvspacing: integer; const font: string): string; override;
-{$ELSE}
 function GetTextATPA(constref ATPA: T2DPointArray;  maxvspacing: integer; font: string): string; override;
-{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
@@ -359,22 +328,15 @@ begin
   Result := inherited;
 end;
 
-{$IFDEF SIMBAMAJOR1200}
-function GetTextAt(const atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; const font: string): string; override;
-{$ELSE}
 function GetTextAt(atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; font: string): string; override;
-{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();
 
   Result := inherited;
 end;
-{$IFDEF SIMBAMAJOR1200}
-function GetTextAtEx(const xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; const font: string): string; override;
-{$ELSE}
+
 function GetTextAtEx(xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; font: string): string; override;
-{$ENDIF}
 begin
   if RSClient.RequireUpdate() then
     RSClient.Update();

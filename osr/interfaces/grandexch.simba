@@ -214,10 +214,19 @@ Internally used to to get the text as an integer at the given coordinates.
 *)
 function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                      WSplit:Int32=3; HSplit:Int32=2): Int32;
-var tmp:String;
+var
+  Text: String;
+  T: UInt64 := GetTickCount + 1000;
 begin
-  tmp := Self.RecognizeStr(B,Color,Font,Tol,WSplit,HSplit);
-  Result := StrToIntDef(ExtractFromStr(tmp, NUMBERS), -1);
+  while (T > GetTickCount()) do
+  begin
+    Text := Self.RecognizeStr(B, Color, Font, Tol, WSplit, HSplit);
+    Result := StrToIntDef(ExtractFromStr(Text, NUMBERS), -1);
+    if (Result <> -1) then
+      Exit;
+
+    Wait(50, 100);
+  end;
 end;
 
 (*
@@ -374,8 +383,9 @@ var
   TPA:TPointArray;
   ATPA:T2DPointArray;
   B:TBox;
+  T: UInt64 := GetTickCount + 1000;
 begin
-  if FAdjButtons = [] then
+  while (T > GetTickCount()) and (FAdjButtons = []) do
   begin
     FindColorsTolerance(TPA, 5990257, FAdjBounds[0], 30);
     ATPA := ClusterTPA(TPA, 5);
@@ -395,6 +405,9 @@ begin
         FAdjButtons.Append(B);
     end;
   end;
+
+  if FAdjButtons = [] then
+    RaiseException('Failed to load buttons');
 
   Result := FAdjButtons;
 end;
@@ -466,7 +479,7 @@ begin
       begin
         B := GetTPABounds(ATPA[i]);
         str := self.RecognizeStr(B, 0, 'SmallChars07');
-        if (Exact and (str = name)) or ((not Exact) and (Pos(name,str) > 0)) then
+        if (Exact and (str = name)) or ((not Exact) and (Pos(LowerCase(name),LowerCase(str)) > 0)) then
         begin
           Mouse.Click(B, mouse_left);
           Exit(True);
@@ -601,7 +614,9 @@ GrandExchange.Offer.Price
 Returns the price it's set up to buy or sell at.
 *)
 function TGrandExchOffer.Price(): Int32;
-var iface:EGEInterface;
+var
+  iface:EGEInterface;
+  T: UInt64 := GetTickCount() + 2000;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
@@ -691,11 +706,14 @@ begin
   if (Self.CurrentInterface() <> geSetupOffer) or (Self.ExchangeType <> etBuy) then
     Exit(False);
 
-  if Pos('What would you', Chatbox.GetQuery()) = 0 then
+  if (not Chatbox.AnswerQuery('What would you', Name, Random(3000, 3500), False)) then
   begin
     Mouse.Click(FMiscBoxes[1], mouse_left);
+    if (not Chatbox.AnswerQuery('What would you', Name, Random(3000, 3500), False)) then
+      Exit(False);
   end;
-  Result := Chatbox.AnswerQuery('What would you', Name, 2500, False);
+
+  Exit(True);
 end;
 
 (*
@@ -711,7 +729,6 @@ begin
     Exit(False);
 
   Result := Inventory.IsSlotUsed(InvIndex);
-  WriteLn(Result);
   if Result then
     Inventory.MouseSlot(InvIndex, mouse_Left);
 end;
@@ -952,6 +969,17 @@ begin
   Result.Sum     := self.Sum(Slot);
 end;
 
+function TRSGrandExch.FindOffer(Name: String): Int32;
+var
+  Offer: Int32;
+begin
+  for Offer := 0 to High(GrandExchange.ExchTables) do
+    if SameText(Self.ItemName(Offer), Name) then
+      Exit(Offer);
+
+  Exit(-1);
+end;
+
 (*
 GrandExchange.PlaceOffer
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -999,6 +1027,119 @@ begin
   begin
     Mouse.Click(ExchTables[slot], mouse_left);
     Result := self.IsOpen(geOfferStatus, 2500);
+  end;
+end;
+
+(*
+GrandExchange.GetNPCs
+~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.GetNPCs: T2DPointArray;
+
+Returns the GE npc mainscreen positions. Finds NPC dots on the minimap then
+MM2MS with a offset.
+
+*)
+function TRSGrandExch.GetNPCs: T2DPointArray;
+var
+  P: TPoint;
+  L, S: Int32;
+  TPA: TPointArray;
+begin
+  Result := [[], []];
+
+  if SRL.FindColors(TPA, CTS1(714213, 50), Minimap.GetBounds()) > 0 then
+    Minimap.FilterPoints(TPA);
+
+  if Length(TPA) > 0 then
+  begin
+    TPA := TPA.Cluster(5).Biggest();
+    TPA.MinAreaRectEx(L, S);
+
+    if (Abs(L - 15) <= 3) and (Abs(S - 15) <= 3) then
+    begin
+      P := TPA.Mean();
+
+      // Bankers
+      Result[0] := [Point(P.X + 6, P.Y - 2),
+                    Point(P.X + 6, P.Y + 2),
+                    Point(P.X - 6, P.Y - 2),
+                    Point(P.X - 6, P.Y + 2)
+                   ];
+
+      Result[0] := Result[0].Rotate(Minimap.GetCompassAngle(False), P.X, P.Y);
+      Result[0] := Minimap.ArrToMs(Result[0]);
+
+      // Clerks
+      Result[1] := [Point(P.X + 2, P.Y + 6),
+                    Point(P.X - 2, P.Y + 6),
+                    Point(P.X + 2, P.Y - 6),
+                    Point(P.X - 2, P.Y - 6)
+                   ];
+
+      Result[1] := Result[1].Rotate(Minimap.GetCompassAngle(False), P.X, P.Y);
+      Result[1] := Minimap.ArrToMs(Result[1]);
+    end;
+  end;
+end;
+
+(*
+GrandExchange.Open
+~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.Open: Boolean;
+
+Opens the grand exchange. Uses `ge_clerk.aca` colors.
+
+*)
+function TRSGrandExch.Open: Boolean;
+
+  function Open(TPA: TPointArray): Boolean;
+  var
+    T: UInt64;
+  begin
+    TPA.Sort(TPA.Mean);
+    TPA[0] := TPA[Round(SRL.TruncatedGauss(0, High(TPA)))];
+
+    Mouse.Move(TPA[0]);
+
+    if MainScreen.IsUpText(['Grand', 'Exchange', 'Clerk']) then
+    begin
+      if ChooseOption.Open() and ChooseOption.Select('Exchange Grand') then
+      begin
+        Minimap.WaitFlag();
+
+        T := GetTickCount() + Random(3500, 4000);
+        while (T > GetTickCount()) do
+        begin
+          if Self.IsOpen() then
+            Exit(True);
+
+          Wait(Random(50, 100));
+        end;
+      end;
+    end;
+  end;
+
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  P: TPoint;
+begin
+  if SRL.FindColors(TPA, CTS2(4796464, 13, 0.76, 1.00), MainScreen.GetBounds()) > 0 then
+  begin
+    ATPA := TPA.Cluster(3);
+    ATPA.FilterSize(2, __GT__);
+
+    TPA := Self.GetNPCs()[1];
+    TPA.Sort(MainScreen.GetMiddle());
+
+    for P in TPA do
+    begin
+      ATPA.SortByMiddle(P);
+
+      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 4.5 then
+        if Open(ATPA[0]) then
+          Exit(True);
+    end;
   end;
 end;
 

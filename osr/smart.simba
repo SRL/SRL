@@ -4,7 +4,7 @@ type
     {$IFDEF CODEINSIGHT}Image:TMufasaBitmap;{$ENDIF}
   end;
 
-function TOSRSSmart.SetSpawmParameters(var Params: TSmartParameters): Boolean;
+function TOSRSSmart.SetSpawnParameters(var Params: TSmartParameters): Boolean;
 begin
   Params.Root := 'http://oldschool2a.runescape.com/';
   Params.Param := #0;
@@ -18,6 +18,6 @@ var
 begin
   Smart.Width := 765;
   Smart.Height := 503;
-  Smart.OnSpawn := @Smart.SetSpawmParameters;
+  Smart.OnSpawn := @Smart.SetSpawnParameters;
 end;
 

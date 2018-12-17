@@ -12,7 +12,7 @@ type
   end;
 
 var
-  SimbaMethods: TSimbaMethods;
+  {%H-}SimbaMethods: TSimbaMethods;
 
   SimbaImports: record
     Functions: array of record Header: String; Method: Pointer; end;

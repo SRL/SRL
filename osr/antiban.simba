@@ -96,6 +96,7 @@ type
     Method: procedure of object;
     Interval: Double;
     StdVar: Double;
+    Condition: function: Boolean of object;
     NextAtTime: Double;
   end;
 
@@ -112,7 +113,7 @@ type
     ActiveSkills: TIntArray;
     Tasks: array of TAntibanTask;
     Breaks: array of TBreakTask;
-
+    TotalBreakTime: UInt64;
     HistorySize: Int32;
     TasksDone: TStringArray;
 
@@ -324,9 +325,14 @@ end;
 {
   A 64bit timer for runtime, so that we can do long proggies without hickups
 }
-function TAntiban.TimeRunning(): Int64; constref;
+function TAntiban.TimeRunning: Int64; constref;
 begin
   Result := GetTickCount() - SRL.StartTime;
+end;
+
+function TAntiban.TimeRunningWithoutBreaks: Int64; constref;
+begin
+  Result := Self.TimeRunning() - Self.TotalBreakTime;
 end;
 
 {
@@ -395,7 +401,7 @@ begin
   with Task do
   begin
     if StdVar = 0 then StdVar := 0.1;
-    NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+    NextAtTime := Self.TimeRunning() + Abs(srl.GaussRand(Interval, Interval * StdVar));
   end;
   Self.Breaks += Task;
 end;
@@ -432,7 +438,7 @@ begin
     if Self.TimeRunning() > Self.Breaks[i].NextAtTime then
       with Self.Breaks[i] do
       begin
-        NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
+        NextAtTime := Self.TimeRunning() + Abs(srl.GaussRand(Interval, Interval * StdVar));
 
         PauseStart := Self.TimeRunning();
         Self.TakeBreak(Self.Breaks[i]);
@@ -464,6 +470,9 @@ begin
     if Self.TimeRunning() > Self.Tasks[i].NextAtTime then
       with Self.Tasks[i] do
       begin
+        if (@Condition <> nil) and (not Condition()) then
+          Continue;
+
         Method();
         NextAtTime := Self.TimeRunning() + srl.GaussRand(Interval, Interval * StdVar);
         Result := True;
@@ -701,19 +710,19 @@ end;
 }
 procedure TAntiban.TakeBreak(Task: TBreakTask);
 var
-  len: Int64;
+  Time: Int64;
 begin
-  len := Round(srl.GaussRand(Task.Length, Task.Length * Task.StdVar));
-
-  Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(len, Time_Formal_Long));
+  Time := Abs(Round(srl.GaussRand(Task.Length, Task.Length * Task.StdVar)));
+  Self.TotalBreakTime := Self.TotalBreakTime + Time;
+  Self.DebugNote('[BREAK] Pausing for '+ srl.MsToTime(Time, Time_Formal_Long));
   if(Random() < Task.LogoutChance) then Logout.ClickLogout();
   if(Random() < Task.LogoutChance) then SRL.LoseFocus();
 
-  while(len > 0) do
+  while (Time > 0) do
   begin
-    Wait(Trunc(Min(ONE_MINUTE*5, len)));
-    len -= Min(ONE_MINUTE*5, len);
-    Self.DebugNote('[BREAK] '+ srl.MsToTime(len, Time_Formal_Long)+' left', False);
+    Wait(Trunc(Min(ONE_MINUTE*5, Time)));
+    Time -= Min(ONE_MINUTE*5, Time);
+    Self.DebugNote('[BREAK] '+ srl.MsToTime(Time, Time_Formal_Long)+' left', False);
   end;
 
   SRL.SetFocus();
@@ -722,7 +731,7 @@ begin
   if Random(2)=0 then Self.CheckSkill();
 end;
 
-function TAntiban.TimeUntilBreak(Break: TBreakTask; Format: TTimeFormat): String;
+function TAntiban.TimeUntilBreak(Break: TBreakTask; Format: TTimeFormat = TIME_BARE): String;
 begin
   if (Break.NextAtTime - TimeRunning() <= 0) then
     Result := 'Now'

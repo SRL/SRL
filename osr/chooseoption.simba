@@ -46,29 +46,8 @@ begin
 end;
 
 procedure TRSChooseOption.__Free();
-begin 
-  FreeBitmap(BoxBitmap); 
-end;
-
-//Finds the optionbox using a simple bitmap (works very well).
-function TRSChooseOption.__Find(var Pos:TPoint; tryTime:Int32=-1): Boolean;
-var 
-  t,adapt: UInt64;
 begin
-  if tryTime < 0 then
-    tryTime := Random(1500,2500);
-
-  t := GetTickCount() + tryTime;
-  repeat
-    Result := FindBitmap(BoxBitmap, pos.x, pos.y);
-    if Result then
-    begin
-      pos.y += BoxBitmap_Height;
-      Exit;
-    end;
-    Inc(adapt,2);
-    Wait(Min(adapt,70));
-  until (GetTickCount() >= t);
+  FreeBitmap(BoxBitmap);
 end;
 {$ENDIF}
 
@@ -121,9 +100,8 @@ Checks if the menu is open, it repeats the check for a +/-2 sec if it's ``False`
 .. note:: by slacky
 *)
 function TRSChooseOption.IsOpen(tryTime:Int32=-1): Boolean;
-var _:TPoint;
 begin
-  Result := self.__find(_, tryTime);
+  Result := self.Find(tryTime);
 end;
 
 (*
@@ -160,27 +138,41 @@ Returns True if it's found.
 
 .. note:: by slacky
 *)
-function TRSChooseOption.Find(tryTime:Int32=-1): Boolean;
+function TRSChooseOption.Find(WaitTime: Int32 = -1): Boolean;
 var
-  pt: TPoint;
-  B:TBox;
+  P: TPoint;
   TPA:TPointArray;
   ATPA:T2DPointArray;
+  T: UInt64;
+  B:TBox := GetClientBounds();
 begin
   Self.Bounds := [0,0,0,0];
-  Result := Self.__find(pt, tryTime);
-  if Result then
-  begin
-    B := GetClientBounds();
-    if not FindColors(TPA, 0, pt.x,pt.y,B.x2,B.y2) then
-      RaiseException('It''s impossible');
 
-    ATPA := ClusterTPAEx(TPA,1,1);
-    SortATPAFromFirstPoint(ATPA, pt);
-    
-    Self.Bounds := GetTPABounds(ATPA[0]).Expand(1);
-    Self.Bounds.LimitTo(B);
-  end;
+  if WaitTime < 0 then
+    T := GetTickCount() + Random(1500, 2500)
+  else
+    T := GetTickCount() + WaitTime;
+
+  repeat
+    if FindBitmap(Self.BoxBitmap, P.X, P.Y) then
+    begin
+      P.Y += BoxBitmap_Height;
+
+      if FindColors(TPA, 0, P.X, P.Y, B.X2, B.Y2) then
+      begin
+        ATPA := ClusterTPAEx(TPA, 1, 1);
+        SortATPAFromFirstPoint(ATPA, P);
+
+        Self.Bounds := GetTPABounds(ATPA[0]).Expand(1);
+        Self.Bounds.LimitTo(B);
+
+        Exit(True);
+      end;
+    end;
+
+    if (WaitTime <> 0) then
+      Wait(10, 100, wdLeft);
+  until (GetTickCount() >= T);
 end;
 
 (*
@@ -202,7 +194,7 @@ var
 begin
   if not(self.Find(0)) then
     self.Open();
-  
+
   with self.Bounds do
   begin
     if (x1=x2) or (y1=y2) then
@@ -260,7 +252,7 @@ begin
   L := Length(choices);
   if L <= 0 then
     Exit(False);
-  
+
   Mouse2 := Mouse;
   Mouse2.Speed := Self.MouseSpeed;
 
@@ -293,7 +285,7 @@ begin
     if self.IsClosed() then
       Exit(True);
   end;
-  
+
   WaitEx(360,70); // don't want inhumane reactions when the option isn't found
   if CloseIt then
     Self.Close();
@@ -306,7 +298,7 @@ ChooseOption.Select
 
   function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
   function TRSChooseOption.Select(Option: String; MouseAction:Int32=mouse_left; AClose:Boolean=True; CaseSensitive:Boolean=True): Boolean;
-  
+
 Same as SelectID, except that this will look for the option by it's text, rather than by id.
 *)
 function TRSChooseOption.Select(SubStrings: TStringArray; MouseAction:Int32=mouse_left; CloseIt:Boolean=True; CaseSensitive:Boolean=True): Boolean; overload;
@@ -324,7 +316,7 @@ begin
       if (CaseSensitive and (SubStrings[j] in Choices[i].Str)) or
          ((not CaseSensitive) and (Lowercase(SubStrings[j]) in Lowercase(Choices[i].Str))) then
         Exit(Self.SelectID(i, mouseAction, CloseIt));
-  
+
   WaitEx(360,70); // don't want inhumane reactions when the option isn't found
   if CloseIt then
     Self.Close();
@@ -377,7 +369,7 @@ ChooseOption.Close
 
   function TRSChooseOption.Close(tryTime:Int32=-1): Boolean;
 
-Closes the option menu by dragging the mouse away from it, if that 
+Closes the option menu by dragging the mouse away from it, if that
 failed it clicks the "Close"-option.
 
 .. note:: by slacky
@@ -388,11 +380,10 @@ var
   pt:TPoint;
   dir: record R,T: Double; end;
   OldHook: TMouseMovedEvent;
-  
+
   procedure TrackMovment(Sender: Pointer; X,Y: Int32); static;
-  var p:TPoint;
   begin
-    if not ChooseOption.__find(p,0) then
+    if not ChooseOption.Find(0) then
       RaiseException('Finally');
   end;
 begin
@@ -408,8 +399,14 @@ begin
   if dir.R > Abs(pt.y - B.y1) then dir := [Abs(pt.y - B.y1), -(Pi/2)];
   if dir.R > Abs(pt.x - B.x2) then dir := [Abs(pt.x - B.x2), 0];
   if dir.R > Abs(pt.y - B.y2) then dir := [Abs(pt.y - B.y2), (Pi/2)];
-  
-  dir.T := (dir.T-Pi/3) + Random()*((dir.T+Pi/3) - (dir.T-Pi/3));
+
+  dir.T := (dir.T-Pi/3) + Random()*(2*Pi/3);
+
+  //if option box is flush to the left of client and taller than 500px set move direction to the right
+  if (B.X1 < 15) and ((B.Y2 - B.Y1) > 500) then
+    dir.T := Random(Arctan((B.Y1 - pt.Y) / ((B.X2 + 20) - pt.x)),
+                    Arctan((B.Y2 - pt.Y) / ((B.X2 + 20) - pt.x)));
+
   try
     Mouse.Move(pt.x+Round(300*Cos(dir.T)), pt.y+Round(300*Sin(dir.T)));
     self.Select(['Cancel']);
@@ -417,7 +414,7 @@ begin
   except
     Result := self.IsClosed();
   end;
-  
+
   Mouse.OnMoved := @OldHook;
 end;
 

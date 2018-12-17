@@ -1,0 +1,189 @@
+{$IFNDECL TOSWindow}
+  {$i srl/utils/rsclient.simba}
+{$ELSE}
+
+{$DEFINE RSCLIENT_AUTOFOCUS} // Automatic gain focus on mouse and key input.
+{$IFDEF WINDOWS}
+  {$DEFINE RSCLIENT_RETARGET} // Automatic retarget the client if RS changes handles.
+{$ENDIF}
+
+var
+  RS_CLIENT_TITLES: TStringArray = []; // unused.
+  RS_CLIENT_CANVAS_CLASSES: TStringArray = ['sun-awt-X11-XCanvasPeer', 'SunAwtCanvas', 'net-runelite-client-RuneLite'];
+
+type
+  TRSClient = record
+    FWindow: TOSWindow;
+    FChild: TOSWindow;
+    FSimba: TOSWindow;
+    FUpdating: Boolean;
+  end;
+
+var
+  RSClient: TRSClient;
+
+function TRSClient.IsRS(Handle: TOSWindow): Boolean;
+begin
+  Self.FUpdating := True;
+
+  try
+    SetTarget(Handle);
+
+    try
+      if SRL.IsClientReady() then
+      begin
+        SRL.WriteLn('[RSCLIENT]: Target set to ' + IntToStr(Handle));
+
+        Exit(True);
+      end;
+    except
+      // Out of bounds
+    end;
+  finally
+    Self.FUpdating := False;
+  end;
+end;
+
+function TRSClient.HasFocus: Boolean;
+begin
+  Result := GetActiveWindow() = FWindow;
+end;
+
+function TRSClient.Find: Boolean;
+var
+  Windows: TOSWindowArray := GetVisibleWindows();
+  Name: String;
+  Window: TOSWindow;
+begin
+  for Name in RS_CLIENT_CANVAS_CLASSES do
+    for Window in Windows.GetByClass(Name) do
+    begin
+      Self := [Window.GetRootWindow(), Window];
+      if Self.IsRS(Window) then
+        Exit(True);
+    end;
+
+  Self := [];
+end;
+
+function TRSClient.RequireUpdate: Boolean;
+begin
+  Result := (not FChild.IsVaild());
+end;
+
+procedure TRSClient.Update;
+var
+  T: UInt64 := GetTickCount + 1000;
+begin
+  while (T > GetTickCount()) do
+  begin
+    if Self.Find() then
+      Exit;
+
+    Wait(50);
+  end;
+
+  SRL.WriteLn('[RSCLIENT]: Failed to find', dtFatal);
+end;
+
+function TRSClient.Setup(Launcher: String = ''): Boolean;
+var
+  Files: TStringArray;
+  Process: TProcess;
+  T: UInt64;
+  Java: String := 'java';
+begin
+  if Self.Find() then
+    Exit(True);
+
+  if (Launcher <> '') then
+  begin
+    SRL.WriteLn('RSClient not found, launching...');
+
+    {$IFDEF WINDOWS}
+    Files := FindFile('C:\Program Files (x86)\Java\', 'java.exe') +
+             FindFile('C:\Program Files\Java\', 'java.exe');
+
+    if Length(Files) > 0 then
+      Java := Files[0];
+    {$ENDIF}
+
+    Process.Init(nil);
+
+    if ExtractFileExt(Launcher) = '.jar' then
+      Process.SetCommandLine(Format('"%s" -jar "%s"', [Java, Launcher]))
+    else
+      Process.SetCommandLine(Launcher);
+
+    Process.Execute();
+    Process.Free();
+
+    T := GetTickCount() + (5 * 60000);
+    while (T > GetTickCount()) do
+    begin
+      if Self.Find() then
+        Exit(True);
+
+      Wait(1000);
+    end;
+  end;
+end;
+
+procedure TRSClient.SetFocus;
+begin
+  Self.FWindow.Activate();
+end;
+
+procedure TRSClient.LoseFocus;
+var
+  P: TPoint;
+  Bounds: record
+    Desktop, Client: TBox;
+  end;
+begin
+  if (not FSimba.IsVaild()) and (not GetVisibleWindows().GetByTitle('Simba -', FSimba)) then
+    SRL.WriteLn('[RSCLIENT]: Simba not found! Cannot lose focus.', dtFatal);
+
+  Bounds.Client := Self.FWindow.GetBounds();
+  Bounds.Desktop := GetDesktopWindow().GetBounds();
+
+  repeat
+    P := [Random(Bounds.Desktop.X1, Bounds.Desktop.X2), Random(Bounds.Desktop.Y1, Bounds.Desktop.Y2)];
+  until (not P.InBox(Bounds.Client));
+
+  P.X -= Bounds.Client.X1;
+  P.Y -= Bounds.Client.Y1;
+
+  Mouse.Move(P);
+
+  if (not FSimba.Activate()) then
+    SRL.WriteLn('[RSCLIENT]: Failed to activate Simba');
+end;
+
+procedure TRSClient.Close;
+begin
+  Self.FWindow.Kill();
+  Self := [];
+end;
+
+procedure TSRL.LoseFocus(); override;
+begin
+  RSClient.LoseFocus();
+end;
+
+procedure TSRL.SetFocus(); override;
+begin
+  RSClient.SetFocus();
+end;
+
+procedure TSRL.SetupForClient(Launcher: String = ''; Options: ESRLOptionSet = SRL_DEFAULT_OPTIONS);
+begin
+  if (not RSClient.Setup(Launcher)) then
+    Self.WriteLn('Failed to setup RSClient', dtFatal);
+
+  Self.Setup(Options);
+end;
+
+{$i rsclient_overrides.simba}
+
+{$ENDIF}

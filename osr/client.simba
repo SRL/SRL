@@ -18,9 +18,16 @@ Returns ``True`` if the client state equals any of the ``States```
 function TSRL.IsClientState(States: ERSClientStateSet): Boolean; overload;
 
   function FindText(Text: String; B: TBox;  Color: Int32 = $FFFFFF; Font: String = 'StatChars07'): Boolean;
+  var
+    Search: String;
   begin
-    if IsTargetValid() and (GetTextAtEx(B.X1, B.Y1, B.X2, B.Y2, 1, 3, 3, Color, 0, Font) = Text) then
-      Exit(True);
+    if IsTargetValid() then
+    begin
+      Search := GetTextAtEx(B.X1, B.Y1, B.X2, B.Y2, 1, 3, 3, Color, 0, Font);
+      Search := StringReplace(Search, 'I', 'l', [rfReplaceAll]); // `I` and `l` glyph are equal. We're searching for `l` so valid fix.
+      if (Search = Text) then
+        Exit(True);
+    end;
   end
 
 begin

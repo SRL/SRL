@@ -584,7 +584,7 @@ begin
     for i:=0 to High(Buttons) do
     begin
       Mouse.Move(Buttons[i]);
-      Result := MainScreen.IsUpText(uptext);
+      Result := (UpText = '') or MainScreen.IsUpText(UpText);
       if Result then
       begin
         Wait(60,120);

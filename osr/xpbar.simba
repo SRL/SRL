@@ -4,107 +4,165 @@ XPBar
 XPBar related methods
 *)
 type
-  TXPBar = record(TInterfaceBase)
-    FTextArea: TBox;
-
-    FButtonBounds: TBox;
-    FButtonMiddle: TPoint;
-    FButtonRadius: Integer;
- end;
+  TRSXPBar = record(TInterfaceBase)
+    Button: TCircle;
+  end;
 
 var
-  XPBar: TXPBar;
+  XPBar: TRSXPBar;
 
-procedure TXPBar._Setup;
+(*
+XPBar.Find
+~~~~~~~~~~
+.. pascal:: function TRSXPBar.Find: Boolean;
+
+Searches for the XP bar in the top right of the mainscreen.
+If found the bounds will be updated and `True` will be returned.
+*)
+function TRSXPBar.Find: Boolean;
+const
+  COLOR_BORDER_INNER = 4543066; // inner border so cluster cannot fail.
+  INTERFACE_HEIGHTS = [27, 36];
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  B: TBox;
 begin
-  FBounds := [396, 7, 512, 33];
-  FTextArea := [402, 9, 512, 28];
+  B := [365, 0, 515, 55]; // top right MS
 
-  FButtonBounds := [517, 21, 542, 47];
-  FButtonMiddle := MiddleBox(FButtonBounds);
-  FButtonRadius := 9;
+  if FindColors(TPA, COLOR_BORDER_INNER, B) then
+    for TPA in TPA.Cluster(1) do
+    begin
+      B := TPA.Bounds();
+
+      if B.Height() in [INTERFACE_HEIGHTS[0], INTERFACE_HEIGHTS[1]] then
+      begin
+        Self.SetBounds(B.Expand(1));
+
+        Exit(True);
+      end;
+    end;
 end;
 
 (*
 XPBar.IsOpen
 ~~~~~~~~~~~~
-.. pascal:: function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
+.. pascal:: function TRSXPBar.IsOpen: Boolean;
 
-Attempts to open the XP-bar, returns ``True`` on success.
+Returns true is the XPBar is open.
 *)
-function TXPBar.IsOpen(WaitTime: UInt32 = 0): Boolean;
-const
-  COL_INNER_BORDER = 4543066;
-var
-  TPA: TPointArray;
-  t: UInt64;
+function TRSXPBar.IsOpen: Boolean; overload;
 begin
-  t := GetTickCount64() + WaitTime;
-  repeat
-    if (FindColors(TPA, COL_INNER_BORDER, Self.FBounds)) and
-       (GetTPABounds(TPA) = Self.FBounds) then
-         Exit(True);
-    if (WaitTime > 0) then
-      Wait(Random(50, 100));
-  until (GetTickCount64() >= t);
+  Result := Self.Find();
+end;
+
+(*
+XPBar.IsOpen (overload)
+~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSXPBar.IsOpen(Time: Int32): Boolean;
+
+Waits up to `Time` for the XP bar to be open.
+*)
+function TRSXPBar.IsOpen(Time: Int32): Boolean; overload;
+var
+  T: UInt64 := GetTickCount() + Time;
+begin
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsOpen() then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
+end;
+
+(*
+XPBar.Find
+~~~~~~~~~~
+.. pascal:: function TRSXPBar.IsClosed(Time: Int32): Boolean;
+
+Waits up to `Time` for the XP bar to be closed.
+*)
+function TRSXPBar.IsClosed(Time: Int32): Boolean;
+var
+  T: UInt64 := GetTickCount() + Time;
+begin
+  while (T > GetTickCount()) do
+  begin
+    if not Self.IsOpen() then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
 end;
 
 (*
 XPBar.Toggle
 ~~~~~~~~~~~~
-.. pascal:: function TXPBar.Toggle(Enable: Boolean): Boolean;
+.. code-block:: pascal function TRSXPBar.Toggle(Enable: Boolean): Boolean;
 
-Toggles ON/OFF the XP-bar.
+Opens or closes the XP bar.
 *)
-function TXPBar.Toggle(Enable: Boolean): Boolean;
+function TRSXPBar.Toggle(Enable: Boolean): Boolean;
 begin
-  if (Enable) and (not Self.isOpen()) then
+  Result := True;
+
+  if (Self.IsOpen() <> Enable) then
   begin
-    Mouse.Click(FButtonMiddle, FButtonRadius, mouse_Left);
-    Result := Self.isOpen(Random(2800, 3200));
-  end else
-  if (not Enable) and (Self.isOpen()) then
-  begin
-    Mouse.Click(FButtonMiddle, FButtonRadius, mouse_Left);
-    Result := True;
+    Mouse.Click(Self.Button.Mean, Self.Button.Radius, MOUSE_LEFT);
+
+    if Enable then
+      Result := Self.IsOpen(Random(3000, 3500))
+    else
+      Result := Self.IsClosed(Random(3000, 3500));
   end;
 end;
 
 (*
 XPBar.Read
 ~~~~~~~~~~
-.. code-block:: pascal
+.. code-block:: pascal function TRSXPBar.Read: Int32;
 
-  function TXPBar.Read: Integer;
-
-Opens the XPBar if needed and returns the current total.
+Opens the XP bar if needed and returns the current total.
 *)
-function TXPBar.Read: Integer;
-const
-  COL_TEXT = 16777215;
+function TRSXPBar.Read: Int32;
+
+  function GetFont(TPA: TPointArray): String;
+  begin
+    case TPA.Bounds().Height of
+      10: Exit('UpChars07_s');
+      11: Exit('SmallChars07');
+       8: Exit('StatChars07');
+      else
+        SRL.WriteLn('Unknown XP bar font', dtFatal);
+    end;
+  end;
+
 var
   TPA: TPointArray;
-  t: UInt64;
+  Text: String;
+  T: UInt64 := GetTickCount() + 7500;
 begin
-  t := GetTickCount64() + 8000;
-  while (not Self.isOpen()) and (t > GetTickCount64()) do
-    if (Self.Toggle(True)) then
-      Break;
+  while (T > GetTickCount()) do
+  begin
+    if Self.Toggle(True) then
+    begin
+      if FindColors(TPA, $FFFFFF, Self.GetBounds()) then
+      begin
+        Text := SRL.GetTextFromTPA(TPA, 1, 1, 1, GetFont(TPA));
+        Result := StrToInt(ExtractFromStr(Text, Numbers));
+        Exit;
+      end else
+        SRL.WriteLn('Failed to find text in XP bar');
+    end else
+      SRL.WriteLn('Failed to open XP bar');
 
-  if (not Self.isOpen()) then
-    Exit(-1); // not open
-  if (not FindColors(TPA, COL_TEXT, FTextArea)) then
-    Exit(-2); // no color
-
-  case GetTPABounds(TPA).Height of // Support all font sizes!
-    10: Result := StrToIntDef(ExtractFromStr(srl.GetTextFromTPA(TPA, 1, 1, 10, 'UpChars07_s'), Numbers), -1);
-    11: Result := StrToIntDef(ExtractFromStr(srl.GetTextFromTPA(TPA, 1, 1, 10, 'SmallChars07'), Numbers), -1);
-    8: Result := StrToIntDef(ExtractFromStr(srl.GetTextFromTPA(TPA, 1, 1, 10, 'StatChars07'), Numbers), -1);
-  else
-    Exit(-3); // unknown font
+    Wait(100);
   end;
+
+  Exit(-1);
 end;
 
 begin
-  XPBar._Setup;
+  XPBar.Button := [529, 34, 10];
 end;

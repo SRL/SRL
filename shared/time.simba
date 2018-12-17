@@ -168,8 +168,7 @@ Example:
 *)
 procedure TTimeMarker.Start();
 begin
-  if (Self.FStartTime = 0) then
-    Self.FPrevMark := GetTickCount(); // used for adding time after a pause
+  Self.FPrevMark := GetTickCount(); // used for adding time after a pause
 
   if (not Self.FPaused) and (Self.FStartTime = 0) then
   begin
