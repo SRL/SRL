@@ -166,8 +166,8 @@ var
   x,y,t: Int64;
   px:TRGB32;
 begin
-  if Area.X2 < 0 then Area.X2 := self.GetWidth()-Area.X2;
-  if Area.Y2 < 0 then Area.Y2 := self.GetHeight()-Area.Y2;
+  if Area.X2 < 0 then Area.X2 := self.GetWidth() + Area.X2;
+  if Area.Y2 < 0 then Area.Y2 := self.GetHeight() + Area.Y2;
 
   for y:=Area.Y1 to Area.Y2 do
     for x:=Area.X1 to Area.X2 do
