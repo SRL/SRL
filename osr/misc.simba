@@ -222,7 +222,7 @@ var
   BMP: TMufasaBitmap;
 begin
   BMP.FromClient(B);
-  Result := BMP.AvgBrightness();
+  Result := BMP.AvgBrightness([0,0,B.X2-B.X1,B.Y2-B.Y1]);
   BMP.Free();
 end;
 
@@ -239,7 +239,7 @@ var
   BMP: TMufasaBitmap;
 begin
   BMP.FromClient(B);
-  Result := BMP.PeakBrightness();
+  Result := BMP.PeakBrightness([0,0,B.X2-B.X1,B.Y2-B.Y1]);
   BMP.Free();
 end;
 
