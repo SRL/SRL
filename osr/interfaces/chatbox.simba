@@ -269,7 +269,7 @@ begin
         B.Y2 += 6;
         B.X2 := TPA.Bounds().X2;
 
-        Result := Result + TRSChatOption([OCR.Recognize(B, TCompareRules([0]), NPCFont), B]);
+        Result := Result + TRSChatOption([OCR.Recognize(B, FontSetting(Color), NPCFont), B]);
       end;
     end;
   end;

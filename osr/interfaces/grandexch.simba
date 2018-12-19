@@ -1143,6 +1143,20 @@ begin
   end;
 end;
 
+function TRSGrandExch.Close: Boolean;
+begin
+  if Self.IsOpen(geOverview) then
+  begin
+    Self.Click(ebClose);
+
+    // Inventory is delayed a bit
+    while SRL.GetPixelShift(Inventory.GetBounds(), Random(200, 400)) > 0 do
+      Wait(0, 1000, wdLeft);
+  end;
+
+  Result := not Self.IsOpen();
+end;
+
 (*
 GrandExchange.Debug
 ~~~~~~~~~~~~~~~~~~~~~~~~
