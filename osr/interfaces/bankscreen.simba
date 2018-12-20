@@ -94,27 +94,42 @@ end;
 {$ENDIF}
 
 
-function TRSBankScreen._ExpectText(Text: String; Time: Int32 = 6000): Boolean;
+function TRSBankScreen._ExpectText(Text: String; Color: Int32 = $000000; Exact: Boolean = False; Time: Int32 = 6000): Boolean;
 var
   TPA: TPointArray;
   B: TBox;
   T: UInt64 := GetTickCount() + Time;
 begin
-  while (T > GetTickCount()) do
-  begin
-    if FindColors(TPA, 0, Chatbox.GetBounds()) then
+  repeat
+    if FindColors(TPA, Color, Chatbox.GetBounds()) then
     begin
       B := GetTPABounds(TPA);
       B := B.Expand(2);
 
-      if Text in OCR.Recognize(B, FontSetting(0), UpFont) then
-        Exit(True);
+      case Exact of
+        True:
+          if Text = OCR.Recognize(B, FontSetting(Color), UpFont) then
+            Exit(True);
+
+        False:
+          if Text in OCR.Recognize(B, FontSetting(Color), UpFont) then
+            Exit(True);
+      end;
     end;
 
     Wait(0, 1000, wdLeft);
-  end;
+  until (GetTickCount() >= T);
 end;
 
+function TRSBankScreen.GetTitle(Color: Int32): String;
+var
+  B: TBox;
+begin
+  B := Self.GetBounds();
+  B.Y2 := B.Y1 + 35;
+
+  Result := GetTextAtEx(B, 1, 3, 3, Color, 0, 'UpChars07');
+end;
 
 function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
 var
@@ -747,22 +762,36 @@ end;
 BankScreen.Search
 ~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
-
-  function TRSBankScreen.Search(item:String): Boolean;
+   function TRSBankScreen.Search(Item: String): Boolean;
 
 Search for an item using the search option in the bank.
 *)
-function TRSBankScreen.Search(item:String): Boolean;
-const
-  TEXT_AREA:TBox = [70,394,450,412];
+function TRSBankScreen.Search(Item: String): Boolean;
+var
+  T: UInt64;
 begin
   if (not Self.IsOpen()) then
     Exit(False);
-  if not(self.IsToggled(BANK_BUTTON_SEARCH) or Self.ClickButton(BANK_BUTTON_SEARCH)) then
-    Exit(False);
-  Result := self._ExpectText('Show items');
 
-  keyboard.Send(item,VK_RETURN);
+  if (not Self._ExpectText('Show items', $000000, False, 0)) and
+     (not Self.ClickButton(BANK_BUTTON_SEARCH)) then
+    Exit(False);
+
+  if Self._ExpectText('Show items') then
+  begin
+    while (not Self._ExpectText('*', $800000, True, 0)) do
+      Keyboard.PressKey(VK_BACK);
+    Keyboard.Send(Item);
+
+    T := GetTickCount() + Random(2500, 3000);
+    while (T > GetTickCount()) do
+    begin
+      if Self.GetTitle($0000FF) = Item then
+        Exit(True);
+
+      Wait(0, 1000, wdLeft);
+    end;
+  end;
 end;
 
 function TRSBankScreen.SetQuantity(Quantity: EBankButton): Boolean;
@@ -772,7 +801,6 @@ begin
 
   Result := self.IsToggled(Quantity) or Self.ClickButton(Quantity);
 end;
-
 
 (*
 BankScreen.Withdraw
@@ -805,53 +833,54 @@ Extra vaild constants for ``amount`` are:
     
 .. note:: by slacky
 *)
-function TRSBankScreen.Withdraw(slot, amount:Int32; upText:TStringArray=[]; WithdrawMode: EBankButton = BANK_BUTTON_WITHDRAW_ITEM; Quantity: EBankButton = BANK_BUTTON_QUANTITY_ONE): Boolean;
-var
-  b:TBox;
-const
-  TEXT_AREA:TBox = [200,393,450,412];
+function TRSBankScreen.Withdraw(Box: TBox; Amount: Int32; UpText: TStringArray = []; WithdrawMode: EBankButton = BANK_BUTTON_WITHDRAW_ITEM; Quantity: EBankButton = BANK_BUTTON_QUANTITY_ONE): Boolean; overload;
 begin
   if (not Self.IsOpen()) then
     Exit(False);
-  b := self.GetSlotBox(slot);
-  if (not self.ItemIn(slot)) then
+  if (CountColor($010000, Box) = 0) then
     Exit(False);
 
-  self.WithdrawAs(WithdrawMode);
-  self.SetQuantity(Quantity);
+  Self.WithdrawAs(WithdrawMode);
+  Self.SetQuantity(Quantity);
 
-  Wait(90,170);
-  mouse.Move(b);
-  Wait(90,170);
+  Wait(90, 170);
+  Mouse.Move(Box);
+  Wait(90, 170);
 
-  if (upText <> []) and not(BankScreen.IsUptext(upText)) then
+  if (UpText <> []) and (not BankScreen.IsUpText(UpText)) then
     Exit(False);
 
-  if (amount = 1) then
+  if (Amount = 1) then
   begin
-    Mouse.Click(mouse_left);
+    Mouse.Click(MOUSE_LEFT);
+
     Exit(True);
   end else
   begin
     ChooseOption.Open();
 
-    if amount = WITHDRAW_ALL then
+    if Amount = WITHDRAW_ALL then
       Result := ChooseOption.Select(['Withdraw-All'])
 
-    else if amount = WITHDRAW_ALL_BUT_ONE then
+    else if Amount = WITHDRAW_ALL_BUT_ONE then
       Result := ChooseOption.Select(['Withdraw-All-but'])
 
-    else if ChooseOption.Select(['Withdraw-'+ToString(amount)+' '],,False) then  // space after amount so it can't find "2" in 28
+    else if ChooseOption.Select(['Withdraw-'+ToString(Amount)+' '],,False) then  // space after amount so it can't find "2" in 28
       Result := True
 
     else if ChooseOption.Select(['Withdraw-X']) and
        self._ExpectText('Enter amount') then
     begin
-      keyboard.Send(ToString(amount),VK_RETURN);
+      Keyboard.Send(ToString(Amount),VK_RETURN);
 
       Result := True;
     end;
   end;
+end;
+
+function TRSBankScreen.Withdraw(Slot: Int32; Amount: Int32; UpText: TStringArray = []; WithdrawMode: EBankButton = BANK_BUTTON_WITHDRAW_ITEM; Quantity: EBankButton = BANK_BUTTON_QUANTITY_ONE): Boolean; overload;
+begin
+  Result := Self.Withdraw(Self.GetSlotBox(Slot), Amount, UpText, WithdrawMode, Quantity);
 end;
 
 
