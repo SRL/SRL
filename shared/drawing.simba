@@ -688,7 +688,7 @@ end;
 
 procedure TMufasaBitmap.DrawText(txt: String; pt: TPoint; Color: TColor); overload;
 begin
-  Self.DrawText(txt, 'StatChars', pt, True, Color);
+  Self.DrawText(txt, 'StatChars07', pt, True, Color);
 end;
 
 (*
