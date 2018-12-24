@@ -220,38 +220,43 @@ begin
   for i:=0 to High(msText) do
     if(name in msText[i].Text) then
     begin
-      textAt := msText[i].Bounds.Middle + Point(0,10);
+      textAt := msText[i].Bounds.Middle + Point(0,20);
+
+      if (textAt = Point(0,0)) then
+        Exit;
+
+      Mouse.Move(textAt,5);
+      WaitEx(60,30);
+      if not MainScreen.IsUpText('Talk-to') then
+        Continue;
+
+      if ChooseOption.Select('Dismiss') then
+      begin
+        WaitEx(670,40);
+        while minimap.isPlayerMoving() do Wait(40);
+        Exit(True);
+      end;
       break;
     end;
 
-  if (textAt = Point(0,0)) then
-    Exit;
+//  Dots := Minimap.GetDots([MMDotNPC]);
+//  for i:=0 to High(Dots) do
+//    TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
+//
+//  Dots := Minimap.GetDots([MMDotPlayer]);
+//  for i:=0 to High(Dots) do
+//    TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
 
-  Dots := Minimap.GetDots([MMDotNPC]);
-  for i:=0 to High(Dots) do
-    TPA += Minimap.VecToMs(Vec3(Dots[i].x, Dots[i].y, 2));
+//  TPA.Sort(textAt);
+//  for i:=0 to High(TPA) do
+//  begin
+//    if Distance(TPA[i], Mainscreen.GetMiddle()) > 80 then
+//      Break;
 
-  TPA.Sort(textAt);
-  for i:=0 to High(TPA) do
-  begin
-    if Distance(TPA[i], Mainscreen.GetMiddle()) > 80 then
-      Break;
+    //textAt.Y := textAt.Y + 10;
 
-    Mouse.Move(TPA[i],5);
-    WaitEx(60,30);
-    if not MainScreen.IsUpText('Talk-to') then
-      Continue;
-
-    if ChooseOption.Select('Dismiss') then
-    begin
-      WaitEx(670,40);
-      while minimap.isPlayerMoving() do Wait(40);
-      Exit(True);
-    end;
-  end;
+//  end;
 end;
-
-
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // TAntiban setup and such
