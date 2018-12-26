@@ -660,7 +660,7 @@ Example:
 
 .. code-block:: pascal
 
-    image.DrawClippedText('hello world!', point(55, 55), 'StatChars', true, clLime);
+    image.DrawClippedText('hello world!', point(55, 55), 'StatChars07', true, clLime);
 *)
 procedure TMufasaBitmap.DrawClippedText(txt: string; pt: TPoint; font: string; shadow: boolean; color: TColor);
 var
@@ -688,7 +688,7 @@ end;
 
 procedure TMufasaBitmap.DrawText(txt: String; pt: TPoint; Color: TColor); overload;
 begin
-  Self.DrawText(txt, 'StatChars', pt, True, Color);
+  Self.DrawText(txt, 'StatChars07', pt, True, Color);
 end;
 
 (*
@@ -710,7 +710,7 @@ Example:
 
 .. code-block:: pascal
 
-    image.drawTextArray(['hello', 'world'], [point(50, 50), point(100, 111)], bigchars, false, clBlue);
+    image.drawTextArray(['hello', 'world'], [point(50, 50), point(100, 111)], 'SmallChars07', false, clBlue);
 
 *)
 procedure TMufasaBitmap.DrawTextArray(txtArr: TStringArray; pts: TPointArray; font: string; shadow: boolean; color: TColor);
@@ -747,7 +747,7 @@ Draws text onto the TMufasaBitmap, each index in the txtArr is put on a differen
 
 .. code-block:: pascal
 
-    image.drawTextLines(['olly', 'is', 'the', 'best', ':D'], point(2, 2), statChars, false, clRed);
+    image.drawTextLines(['olly', 'is', 'the', 'best', ':D'], point(2, 2), 'StatChars07', false, clRed);
 
 *)
 procedure TMufasaBitmap.DrawTextLines(txtArr: TStringArray; pnt: TPoint; font: string; shadow: boolean; color: TColor);
