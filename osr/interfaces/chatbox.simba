@@ -218,6 +218,22 @@ begin
   end;
 end;
 
+function TRSChatbox.FindNPCChat(Text: String): Boolean;
+var
+  BMP, X, Y: Int32;
+begin
+  BMP := BitmapFromText(Text, 'CharsNPC07');
+
+  try
+    SetTransparentColor(BMP, $FFFFFF);
+    InvertBitmap(BMP);
+
+    Result := FindBitmapIn(BMP, X, Y, Self.GetBounds());
+  finally
+    FreeBitmap(BMP);
+  end;
+end;
+
 (*
 Chatbox.GetOptions
 ~~~~~~~~~~~~~~~~~~~
