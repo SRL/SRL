@@ -232,8 +232,10 @@ function TRSChatbox.GetOptions(Colors: TIntegerArray = [$000000, $FFFFFF]): TRSC
   var
     ATPA: T2DPointArray;
   begin
-    ATPA := TPA.Cluster(1, 100);
-    SortATPAFromFirstPointX(ATPA, [0, 0]);
+    ATPA := TPA.Cluster(1);
+    with TPA.Bounds() do
+      SortATPAFromMidPoint(ATPA, Point(X1, Y1 + (Height() div 2)));
+
     Result := GetTPABounds(ATPA[0]);
   end;
 
@@ -248,7 +250,7 @@ begin
     SRL.FindColors(TPA, CTS0(Color), Chatbox.GetBounds);
 
     for TPA in FindTPARows(TPA) do
-      if Length(TPA) > 20 then
+      if (Length(TPA) >= 5) and (Length(TPA) * 2.5 >= Length(TPA.Invert())) then
         ATPA += TPA;
   end;
 
