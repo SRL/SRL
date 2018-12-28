@@ -166,6 +166,11 @@ begin
   Self := [];
 end;
 
+function TRSClient.PID: UInt32;
+begin
+  Result := Self.FChild.GetPID();
+end;
+
 procedure TSRL.LoseFocus(); override;
 begin
   RSClient.LoseFocus();
