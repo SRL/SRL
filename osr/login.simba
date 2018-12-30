@@ -19,6 +19,7 @@ type
     ExistingUserBox: TBox;
     TryAgainBox: TBox;
     WarningBox: TBox;
+    BackBox: TBox;
  end;
 
 var
@@ -56,6 +57,7 @@ begin
     ExistingUserBox := [390, 272, 529, 307];
     TryAgainBox := [315, 260, 449, 292];
     WarningBox := [234, 305, 367, 337];
+    BackBox := [315, 310, 449, 342];
   end;
 end;
 {$ENDIF}
@@ -88,6 +90,13 @@ begin
   Result := srl.FindText(P, 'Continue', 'UpChars07_s', COL_LOGIN_WHITE, 1, Self.WarningBox);
 end;
 
+function TRSLoginScreen.IsDisabledOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Back', 'UpChars07_s', COL_LOGIN_WHITE, 1, Self.BackBox);
+end;
+
 function TRSLoginScreen.Open: Boolean;
 var
   T: UInt64;
@@ -106,9 +115,11 @@ begin
         Mouse.Click(Self.WarningBox, mouse_Left);
       if Self.IsInvaildDetailsOpen() then
         Mouse.Click(Self.TryAgainBox, mouse_Left);
+      if Self.IsDisabledOpen() then
+        Mouse.Click(Self.BackBox, mouse_Left);
     end;
 
-    if Self.IsOpen() and (not Self.IsWelcomeOpen()) and (not Self.IsInvaildDetailsOpen()) and (not Self.IsWarningOpen()) then
+    if Self.IsOpen() and (not Self.IsWelcomeOpen()) and (not Self.IsInvaildDetailsOpen()) and (not Self.IsWarningOpen() and (not Self.IsDisabledOpen)) then
       Exit(True);
 
     Wait(Random(50, 100));
