@@ -26,11 +26,12 @@ begin
                 ['Invalid username or password.', 5, 0],
                 ['Please enter your username/email address.', 5, 0],
                 ['Error connecting to server.', 20, 10000],
-                ['Your account is already logged in', 5, 60000],
+                ['Your account has not logged out', 5, 60000],
                 ['Login server offline.', 20, 60000],
                 ['Connection timed out.', 20, 30000],
                 ['Login limit exceeded', 20, 30000],
-                ['This world is full', 20, 15000]
+                ['This world is full', 20, 15000],
+                ['Your account has been disabled', 1, 0]
                ];
 
   if (@srl.OnLoginResponse <> nil) and srl.OnLoginResponse(Response) then
