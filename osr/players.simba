@@ -198,7 +198,6 @@ var
 begin
   srl.Writeln('TPlayerArray.SwitchTo: Switching current player to: ' + IntToStr(Index));
 
-  Self.GetCurrent()^.isActive := False;
   Self.SetCurrent(Index);
 
   curr := Self.GetCurrent()^;
@@ -231,11 +230,20 @@ Example:
 *)
 function TPlayerArray.Next: Boolean;
 var
-  i: UInt32;
+  i, next: UInt32;
 begin
+  next := FCurrent;
   for i := 0 to Self.GetCount() - 1 do
-    if (i <> FCurrent) and (Self.FPlayers[i].isActive) then
-      Exit(Self.SwitchTo(i));
+  begin
+    next += 1;
+    Writeln(next);
+    if (next >= Self.GetCount()) then next := 0;
+    if Self.FPlayers[next].isActive then
+    begin
+      Result := Self.SwitchTo(next);
+      if not Result then Continue else Exit(True);
+    end;
+  end;
 
   srl.Writeln('TPlayerArray.Next: No active players to switch to', dtFatal);
 end;
