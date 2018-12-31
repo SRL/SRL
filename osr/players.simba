@@ -236,7 +236,6 @@ begin
   for i := 0 to Self.GetCount() - 1 do
   begin
     next += 1;
-    Writeln(next);
     if (next >= Self.GetCount()) then next := 0;
     if Self.FPlayers[next].isActive then
     begin
