@@ -37,7 +37,7 @@ The main buttons buttons
 (*
 type EAdjustButton
 ~~~~~~~~~~~~~~~~~~
-.. pascal:: 
+.. pascal::
    EAdjustButton = (
      abDecQuant, abQuantInc, abDecPrice, abIncPrice,
      abIncQuant1, abIncQuant10, abIncQuant100, abIncQuant1K, abEnterQuantity,
@@ -76,7 +76,7 @@ type
 (*
 type TExchangeInfo
 ~~~~~~~~~~~~~~~~~~
-.. pascal:: 
+.. pascal::
    TExchangeInfo = record
      Item: String;
      Typ: EExchType;
@@ -143,8 +143,8 @@ The variable used to interact with the grand exchange interface.
     GrandExchange.Offer.SellItem(4);      // item at inventory slot = 4
     GrandExchange.Offer.SetPrice(1000);   // 1000 each
     GrandExchange.Offer.SetQuantity(5);   // 5 of these items
-    GrandExchange.Offer.Confirm(); 
-  end;  
+    GrandExchange.Offer.Confirm();
+  end;
 *)
 var
   GrandExchange: TRSGrandExch;
@@ -180,7 +180,7 @@ end;
 (*
 GrandExchange.RecognizeStr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: 
+.. pascal::
    function TGrandExchStub.RecognizeStr(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                         WSplit:Int32=3; HSplit:Int32=2): String;
 
@@ -206,7 +206,7 @@ end;
 (*
 GrandExchange.RecognizeInt
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: 
+.. pascal::
    function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
                                         WSplit:Int32=3; HSplit:Int32=2): Int32;
 
@@ -216,11 +216,12 @@ function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32
                                      WSplit:Int32=3; HSplit:Int32=2): Int32;
 var
   Text: String;
-  T: UInt64 := GetTickCount + 1000;
+  T: UInt64 := GetTickCount + 2500;
 begin
   while (T > GetTickCount()) do
   begin
     Text := Self.RecognizeStr(B, Color, Font, Tol, WSplit, HSplit);
+    Text := StringReplace(Text, 'O', '0', [rfReplaceAll]);
     Result := StrToIntDef(ExtractFromStr(Text, NUMBERS), -1);
     if (Result <> -1) then
       Exit;
@@ -304,7 +305,7 @@ Clicks one of the many exchange buttons.
 
 **Example**
 
-.. pascal:: 
+.. pascal::
   GrandExchange.Offer.Click(ebAbort); // abort the offer
   GrandExchange.Click(ebCollect);     // collect items / money
 *)
@@ -421,7 +422,7 @@ Click one of the adjustment buttons see [type-EAdjustButton]_
 
 **Example**
 
-.. pascal:: 
+.. pascal::
    GrandExchange.Offer.Click(abIncPrice5Prc, 2); //click `+5%`, 2 times.
 *)
 procedure TGrandExchOffer.Click(Button: EAdjustButton; Times: Int32=1); overload;
@@ -438,13 +439,52 @@ end;
 (*
 GrandExchange.Offer.Confirm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: procedure TGrandExchOffer.Confirm();
+.. pascal:: function TGrandExchOffer.Confirm: Boolean;
 
 Press that bigass confirm button.
 *)
-procedure TGrandExchOffer.Confirm();
+function TGrandExchOffer.Confirm: Boolean; overload;
 begin
-  Mouse.Click(self.FConfimButton, mouse_left);
+  Mouse.Click(Self.FConfimButton, MOUSE_LEFT);
+
+  if GrandExchange.IsOpen(geOverview, Random(2500, 3000)) then
+    Exit(True);
+
+  SRL.WriteLn('Failed to confirm offer (not at GE overview');
+end;
+
+function TGrandExchOffer.Confirm(PriceConfirm, QuantityConfirm: Int32): Boolean; overload;
+var
+  T: UInt64;
+begin
+  if (PriceConfirm > -1) then
+  begin
+    T := GetTickCount() + Random(2500, 3000);
+    while (T > GetTickCount()) and (Self.Price() <> PriceConfirm) do
+      Wait(0, 1000, wdLeft);
+
+    if (Self.Price() <> PriceConfirm) then
+      Exit(False);
+  end;
+
+  if (QuantityConfirm > -1) then
+  begin
+    T := GetTickCount() + Random(2500, 3000);
+    while (T > GetTickCount()) and (Self.Quantity() <> QuantityConfirm) do
+      Wait(0, 1000, wdLeft);
+
+    if (Self.Quantity() <> QuantityConfirm) then
+      Exit(False);
+  end;
+
+  SRL.WriteLn(Format('Placing a offer for %d of %s at %d each', [Self.Quantity(), Self.ItemName(), Self.Price()]));
+
+  if Self.Confirm() then
+  begin
+    SRL.WriteLn('Offer placed');
+
+    Exit(True);
+  end;
 end;
 
 (*
@@ -616,7 +656,6 @@ Returns the price it's set up to buy or sell at.
 function TGrandExchOffer.Price(): Int32;
 var
   iface:EGEInterface;
-  T: UInt64 := GetTickCount() + 2000;
 begin
   iface := self.CurrentInterface();
   if iface = geSetupOffer then
@@ -758,7 +797,7 @@ GrandExchange.Offer.Debug
 Debug the Offer-interface. Important for maintenace purposes.
 *)
 function TGrandExchOffer.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
-var 
+var
   i:Int32;
 begin
   Result := inherited(True);
@@ -776,9 +815,9 @@ begin
   for i:=0 to High(FButtons) do
     if i <> ord(ebCollect) then
       Result.DrawBox(FButtons[i], False, $0000FF);
-  
+
   if RetImage then Exit();
-  
+
   Result.Debug();
   Result.Free();
   Result := nil;
@@ -956,7 +995,7 @@ GrandExchange.Info
 ~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSGrandExch.Info(Slot: Int32): TExchangeInfo;
 
-Returns all the data related to the offer at the given slot. 
+Returns all the data related to the offer at the given slot.
 You get the type of the offer, and it's state, progress, name and price. The Sum filed will be ``-1``
 *)
 function TRSGrandExch.Info(Slot: Int32): TExchangeInfo;
@@ -969,13 +1008,27 @@ begin
   Result.Sum     := self.Sum(Slot);
 end;
 
-function TRSGrandExch.FindOffer(Name: String): Int32;
+function TRSGrandExch.FindOffer(Name: String): Int32; overload;
 var
   Offer: Int32;
 begin
   for Offer := 0 to High(GrandExchange.ExchTables) do
     if SameText(Self.ItemName(Offer), Name) then
       Exit(Offer);
+
+  Exit(-1);
+end;
+
+function TRSGrandExch.FindOffer(Names: TStringArray): Int32; overload;
+var
+  i: Int32;
+begin
+  for i := 0 to High(Names) do
+  begin
+    Result := Self.FindOffer(Names[i]);
+    if (Result > -1) then
+      Exit;
+  end;
 
   Exit(-1);
 end;
@@ -1184,7 +1237,7 @@ begin
       begin
         Result.DrawBox(OffsetToTable(i, FOfferButtons[ord(etSell)]), False, $0077FF);
         Result.DrawBox(OffsetToTable(i, FOfferButtons[ord(etBuy)]),  False, $00FFFF);
-      end 
+      end
       else for j:=1 to High(FExchBoxes) do
         Result.DrawBox(OffsetToTable(i, FExchBoxes[j]),False,$00FFFF);
     end;
@@ -1193,10 +1246,10 @@ begin
   begin
     Result := self.offer.Debug(True);
   end;
-  
+
   if RetImage then
     Exit();
-    
+
   Result.Debug();
   Result.Free();
   Result := nil;

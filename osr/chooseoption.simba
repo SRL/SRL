@@ -248,7 +248,6 @@ var
   didRnd: Boolean;
 begin
   choices := Self.GetOptions(); // open and return options.
-
   L := Length(choices);
   if L <= 0 then
     Exit(False);
@@ -422,5 +421,3 @@ begin
   ChooseOption.__Setup();
   AddOnTerminate(@ChooseOption.__Free);
 end;
-
-

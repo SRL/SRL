@@ -49,7 +49,7 @@ begin
     if i >= 0 then Self.Del(i);
     Exit;
   end;
-  
+
   lst := Self.FindAll(Value);
   for i:=High(lst) downto 0 do
     Self.Del(lst[i]);
@@ -73,7 +73,7 @@ begin
     SetLength(Self, Length(Arr) + L);
     MemMove(Arr[0],Self[L],Length(Arr)*SizeOf(Integer));
   end;
-end; 
+end;
 
 function TIntegerArray.Find(const Value: Integer): Integer; constref;
 begin
@@ -157,14 +157,14 @@ begin
     MemMove(self[0], result[0], Length(self)*SizeOf(self[0]));
   if Length(Other) > 0 then
     MemMove(Other[0], result[Length(Self)], Length(Other)*SizeOf(Other[0]));
-end;   
+end;
 
 
 function TIntegerArray.Equals(Other:TIntegerArray): Boolean; constref;
 begin
   if (Length(Self) <> Length(Other)) then Exit(False);
   if (Length(Self) = 0) then Exit(True);
-  Result := CompareMem(Self[0], Other[0], Length(Self)*SizeOf(self[0]));     
+  Result := CompareMem(Self[0], Other[0], Length(Self)*SizeOf(self[0]));
 end;
 
 
@@ -278,26 +278,29 @@ var
   i,hits,best: Int32;
   cur: Int32;
 begin
-  arr := self.Sorted();
-  cur := self[0];
-  hits := 1;
-  best := 0;
-  for i:=1 to High(self) do
+  if Length(Self) > 0 then
   begin
-    if (self[i] <> cur) then
+    arr := self.Sorted();
+    cur := self[0];
+    hits := 1;
+    best := 0;
+    for i:=1 to High(self) do
     begin
-      if (hits > best) then
+      if (self[i] <> cur) then
       begin
-        best := hits;
-        Result := cur;
+        if (hits > best) then
+        begin
+          best := hits;
+          Result := cur;
+        end;
+        hits := 0;
+        cur := self[I];
       end;
-      hits := 0;
-      cur := self[I];
+      Inc(hits);
     end;
-    Inc(hits);
+    if (hits > best) then
+      Result := cur;
   end;
-  if (hits > best) then
-    Result := cur;
 end;
 
 function TIntegerArray.UniqueCount: Int32;
