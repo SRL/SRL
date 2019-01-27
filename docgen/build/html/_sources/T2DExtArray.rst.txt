@@ -1,4 +1,0 @@
-
-T2DExtendedArray
-================
-T2DExtendedArray related methods

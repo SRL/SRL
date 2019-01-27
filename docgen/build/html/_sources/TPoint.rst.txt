@@ -1,4 +1,0 @@
-
-TPoint
-=============
-TPoint related methods

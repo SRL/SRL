@@ -1,4 +1,0 @@
-
-TExtendedArray
-==============
-TExtendedArray related methods

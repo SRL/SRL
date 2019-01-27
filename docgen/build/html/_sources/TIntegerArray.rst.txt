@@ -1,4 +1,0 @@
-
-TIntegerArray
-=============
-TIntegerArray related methods

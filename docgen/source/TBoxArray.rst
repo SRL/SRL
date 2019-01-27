@@ -1,6 +1,0 @@
-
-TBoxArray
-=========
-TBoxArray related methods
-
-  As found in SRL-6, placed here for lack of a better spot to put.

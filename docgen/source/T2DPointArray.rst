@@ -1,4 +1,0 @@
-
-T2DPointArray
-=============
-T2DPointArray related methods

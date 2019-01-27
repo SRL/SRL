@@ -1,4 +1,0 @@
-
-TBoolArray
-==========
-TBoolArray related methods
