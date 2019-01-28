@@ -111,6 +111,8 @@ begin
   for i := 0 to High(Colors) do
     if _FindColors(Temp, Area, Colors[i].Color, Colors[i].Tolerance, 2, Colors[i].HueMod, Colors[i].SatMod) > 0 then
       TPA := TPA + Temp;
+
+  Result := Length(TPA);
 end;
 
 function TSRL.CountColor(Color: TCTSColor; Area: TBox): Int32; overload;
