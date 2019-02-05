@@ -466,7 +466,7 @@ Changes the state of the button for "Shift Drop" to the given state.
 *)
 function TRSOptions.ToggleShiftDrop(enable:Boolean; tryTime:Int32=2000): Boolean;
 begin
-  Result := self.__toggleButton([624,299,659,334], optControls, enable, tryTime);
+  Result := self.__toggleButton([595,299,630,334], optControls, enable, tryTime);
 end;
 
 
