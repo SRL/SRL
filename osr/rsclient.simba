@@ -3,9 +3,7 @@
 {$ELSE}
 
 {$DEFINE RSCLIENT_AUTOFOCUS} // Automatic gain focus on mouse and key input.
-{$IFDEF WINDOWS}
-  {$DEFINE RSCLIENT_RETARGET} // Automatic retarget the client if RS changes handles.
-{$ENDIF}
+{$DEFINE RSCLIENT_RETARGET} // Automatic retarget the client if RS changes handles.
 
 var
   RS_CLIENT_TITLES: TStringArray = []; // unused.
@@ -73,17 +71,21 @@ end;
 
 procedure TRSClient.Update;
 var
-  T: UInt64 := GetTickCount + 1000;
+  T: UInt64 := GetTickCount + 5000;
 begin
   while (T > GetTickCount()) do
   begin
-    if Self.Find() then
-      Exit;
+    try
+      if Self.Find() then
+        Exit;
+    except
+      SRL.WriteLn('[RSCLIENT]: Exception while updating');
+    end;
 
-    Wait(50);
+    Wait(500);
   end;
 
-  SRL.WriteLn('[RSCLIENT]: Failed to find', dtFatal);
+  SRL.WriteLn('[RSCLIENT]: Failed to update', dtFatal);
 end;
 
 function TRSClient.Setup(Launcher: String = ''): Boolean;
