@@ -1141,6 +1141,7 @@ GrandExchange.Open
 .. pascal:: function TRSGrandExch.Open: Boolean;
 
 Opens the grand exchange. Uses `ge_clerk.aca` colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.
 
 *)
 function TRSGrandExch.Open: Boolean;
@@ -1190,6 +1191,57 @@ begin
       ATPA.SortByMiddle(P);
 
       if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 4.5 then
+        if Open(ATPA[0]) then
+          Exit(True);
+    end;
+  end;
+end;
+
+(*
+TRSGrandExch.OpenBank
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSGrandExch.OpenBank: Boolean;
+
+Opens the bank at the grand exchange. Uses `ge_bank.aca` colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.
+
+*)
+function TRSGrandExch.OpenBank: Boolean;
+
+  function Open(TPA: TPointArray): Boolean;
+  begin
+    TPA.Sort(TPA.Mean());
+    TPA[0] := TPA[Round(SRL.TruncatedGauss(0, High(TPA)))];
+
+    Mouse.Move(TPA[0]);
+
+    if MainScreen.IsUpText('Bank') and ChooseOption.Open() and ChooseOption.Select('Bank Banker') then
+    begin
+      Minimap.WaitFlag();
+
+      if BankScreen.IsOpen(Random(3500, 4000)) then
+        Exit(True);
+    end;
+  end;
+
+var
+  ATPA: T2DPointArray;
+  TPA: TPointArray;
+  P: TPoint;
+begin
+  if SRL.FindColors(TPA, CTS2(6710894, 15, 0.15, 0.07), MainScreen.GetBounds()) > 0 then
+  begin
+    ATPA := TPA.Cluster(3);
+    ATPA.FilterSize(15, __GT__);
+
+    TPA := Self.GetNPCs()[0];
+    TPA.Sort(MainScreen.GetMiddle());
+
+    for P in TPA do
+    begin
+      ATPA.SortByMiddle(P);
+
+      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 3 then
         if Open(ATPA[0]) then
           Exit(True);
     end;

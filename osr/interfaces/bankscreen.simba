@@ -4,10 +4,15 @@ BankScreen
 This file stores all methods that are used in the bankscreen-iterface.
 All methods here are called with the bankscreen ``BankScreen`` variable.
 
+* To open the grand exchange use `GrandExchange.OpenBank()` from grandexch.simba.
+  (GE isn't referenced in this file to keep the include clean of fowarding)
+
 .. code-block:: pascal
 
     Writeln(BankScreen.IsOpen());
+
 *)
+
 type
   EBankButton = (BANK_BUTTON_REARRANGE_SWAP, BANK_BUTTON_REARRANGE_INSERT,
                  BANK_BUTTON_WITHDRAW_ITEM, BANK_BUTTON_WITHDRAW_NOTE,
@@ -17,8 +22,7 @@ type
 
   EBankLocation = (blYanille, blAlKharid, blLumbridge, blDrynor, blEdgeville,
                    blVarrockWest, blVarrockEast,
-                   blFaladorEast, blFaladorWest,
-                   blGrandExchange);
+                   blFaladorEast, blFaladorWest);
 
   EBankerColor = (bcBlue, bcGray);
 
@@ -47,7 +51,6 @@ const
    bbItem = BANK_BUTTON_WITHDRAW_ITEM;
    bbNote = BANK_BUTTON_WITHDRAW_NOTE;
 
-{$IFNDEF CodeInsight}
 procedure TRSBankScreen.__Setup();
 
   procedure SetButtonBounds(Button: EBankButton; X, Y, Width, Height: Int32);
@@ -91,8 +94,6 @@ begin
     end;
   end;
 end;
-{$ENDIF}
-
 
 function TRSBankScreen._ExpectText(Text: String; Color: Int32 = $000000; Exact: Boolean = False; Time: Int32 = 6000): Boolean;
 var
@@ -250,49 +251,6 @@ begin
   end;
 end;
 
-(*
-BankScreen.OpenBank_GE
-~~~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSBankScreen.OpenBank_GE: Boolean;
-
-Opens the bank at the grand exchange. Uses `ge_bank.aca` colors.
-
-*)
-function TRSBankScreen.Open_GE: Boolean;
-
-  function Open(TPA: TPointArray): Boolean;
-  begin
-    TPA.Sort(TPA.Mean);
-    TPA[0] := TPA[Round(SRL.TruncatedGauss(0, High(TPA)))];
-
-    if Self.OpenAt(TPA[0]) then
-      Exit(True);
-  end;
-
-var
-  ATPA: T2DPointArray;
-  TPA: TPointArray;
-  P: TPoint;
-begin
-  if SRL.FindColors(TPA, CTS2(6710894, 15, 0.15, 0.07), MainScreen.GetBounds()) > 0 then
-  begin
-    ATPA := TPA.Cluster(3);
-    ATPA.FilterSize(15, __GT__);
-
-    TPA := GrandExchange.GetNPCs()[0];
-    TPA.Sort(MainScreen.GetMiddle());
-
-    for P in TPA do
-    begin
-      ATPA.SortByMiddle(P);
-
-      if MainScreen.PointToMM(P).Distance(MainScreen.PointToMM(ATPA[0].Mean)) <= 3 then
-        if Open(ATPA[0]) then
-          Exit(True);
-    end;
-  end;
-end;
-
 function TRSBankScreen.Open_Yanille: Boolean;
 const
   colMiddle: TCTS2Color = [5660003, 10, 0.63, 0.79]; // grey
@@ -415,7 +373,6 @@ begin
       Exit(True);
 
     case Loc of
-      blGrandExchange: Result := Self.Open_GE();
       blYanille:       Result := Self.Open_Yanille();
       blLumbridge:     Result := Self._MagicalBankerFinder([607067,  10, 0.47, 0.28], bcBlue, [0,-30]);
       blAlKharid:      Result := Self._MagicalBankerFinder([4144964, 10, 0.47, 0.28], bcGray, [-30, 0]);
