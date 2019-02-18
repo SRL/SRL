@@ -128,7 +128,7 @@ begin
   B := Self.GetBounds();
   B.Y2 := B.Y1 + 35;
 
-  Result := GetTextAtEx(B, 1, 3, 3, Color, 0, 'UpChars07');
+  Result := GetTextAtEx(B, 1, 3, 3, Color, 0, 'UpChars07_s');
 end;
 
 function TRSBankScreen.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
