@@ -1,3 +1,19 @@
+{$DEFINE RSCLIENT_FIND_BODY :=
+  try
+    if RSClient.RequireUpdate() then
+      RSClient.Update();
+
+    Result := inherited();
+  except
+    if (not RSClient.IsUpdating()) then
+    begin
+      SRL.WriteLn('[RSCLIENT]: Supressing exception: ' + GetExceptionMessage());
+      if RSClient.RequireUpdate() then
+        RSClient.Update();
+    end;
+  end;
+}
+
 procedure TMouse.Move(P: TPoint); override;
 begin
   {$IFDEF RSCLIENT_RETARGET}
@@ -90,257 +106,161 @@ end;
 {$IFDEF RSCLIENT_RETARGET}
 function GetColor(x,y: Integer): Int32; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function GetColors(const Coords : TPointArray) : TIntegerArray; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColor(var x, y: Integer; color, x1, y1, x2, y2: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColorTolerance(var x, y: Integer; color, x1, y1, x2, y2, tol: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColors(var TPA: TPointArray; Color, x1, y1, x2, y2: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function CountColor(Color, xs, ys, xe, ye: Integer): Integer; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function CountColorTolerance(Color, xs, ys, xe, ye, Tolerance: Integer): Integer; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColorsTolerance(var Points: TPointArray; Color, xs, ys, xe, ye, Tolerance: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColorSpiral(var x, y: Integer; color, xs, ys, xe, ye: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColorSpiralTolerance(var x, y: Integer; color, xs, ys, xe, ye,Tol: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColorsSpiralTolerance(x, y: Integer; var Points: TPointArray; color, xs, ys, xe, ye: Integer; Tolerance: Integer) : Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColoredArea(var x, y: Integer; color, xs, ys, xe, ye: Integer; MinArea: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindColoredAreaTolerance(var x, y: Integer; Color, xs, ys, xe, ye, MinArea, tol: Integer): Boolean;  override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function BitmapFromClient(const xs, ys, xe, ye: Integer): Integer; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmap(Bitmap: Integer; var x, y: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
-function FindBitmapIn(bitmap: Integer; var x, y: Integer;  xs, ys, xe, ye: Integer): Boolean; override;
+function FindBitmapIn(bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmapToleranceIn(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; tolerance: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmapSpiral(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.RequireUpdate();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmapsSpiralTolerance(Bitmap: Integer; x, y: Integer; var Points : TPointArray; xs, ys, xe, ye,tolerance: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmapSpiralTolerance(Bitmap: Integer; var x, y: Integer; xs, ys, xe, ye,tolerance : Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindMaskTolerance(const mask: TMask; var x, y: Integer; xs,ys, xe, ye: Integer; Tolerance, ContourTolerance: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindBitmapMaskTolerance(mask: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; Tolerance, ContourTolerance: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDeformedBitmapToleranceIn(bitmap: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; tolerance: Integer; Range: Integer; AllowPartialAccuracy: Boolean; var accuracy: Extended): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTM(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTMs(DTM: Integer; var p: TPointArray; xs, ys, xe, ye: Integer): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTMRotatedAlternating(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTMRotatedSE(DTM: Integer; var x, y: Integer; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: Extended): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTMsRotatedAlternating(DTM: Integer; var Points: TPointArray; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function FindDTMsRotatedSE(DTM: Integer; var Points: TPointArray; xs, ys, xe, ye: Integer; sAngle, eAngle, aStep: Extended; var aFound: T2DExtendedArray): Boolean; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function GetTextATPA(const ATPA: T2DPointArray; const maxvspacing: integer; const font: string): string; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function GetTextAt(const atX, atY, minvspacing, maxvspacing, hspacing, color, tol, len: integer; const font: string): string; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 
 function GetTextAtEx(const xs,ys,xe,ye, minvspacing, maxvspacing, hspacing, color, tol: integer; const font: string): string; override;
 begin
-  if RSClient.RequireUpdate() then
-    RSClient.Update();
-
-  Result := inherited;
+  {$macro RSCLIENT_FIND_BODY}
 end;
 {$ENDIF}

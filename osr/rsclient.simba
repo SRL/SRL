@@ -75,12 +75,8 @@ var
 begin
   while (T > GetTickCount()) do
   begin
-    try
-      if Self.Find() then
-        Exit;
-    except
-      SRL.WriteLn('[RSCLIENT]: Exception while updating');
-    end;
+    if Self.Find() then
+      Exit;
 
     Wait(500);
   end;
@@ -171,6 +167,11 @@ end;
 function TRSClient.PID: UInt32;
 begin
   Result := Self.FChild.GetPID();
+end;
+
+function TRSClient.IsUpdating: Boolean;
+begin
+  Result := FUpdating;
 end;
 
 procedure TSRL.LoseFocus(); override;
