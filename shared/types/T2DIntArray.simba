@@ -67,15 +67,12 @@ begin
 end;
 
 procedure T2DIntArray.Extend(Arr:T2DIntArray);
-var L:Int32;
+var
+  i: Int32;
 begin
-  if Length(arr) > 0 then
-  begin
-    L := Length(Self);
-    SetLength(Self, Length(Arr) + L);
-    MemMove(Arr[0], Self[L], Length(Arr)*SizeOf(arr[0]));
-  end;
-end; 
+  for i := 0 to High(Arr) do
+    Self := Self + Copy(Arr[i]);
+end;
 
 function T2DIntArray.Find(const Value: TIntegerArray): Integer; constref;
 begin
