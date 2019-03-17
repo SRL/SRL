@@ -15,6 +15,7 @@ The type that holds functions and properties of the Runescape options interface.
 type 
   TRSOptions = record(TInterfaceBase)
     FTabs: TBoxArray;
+    FZoomSliderBox: TBox;
   end;
 
 {==| Table of Contents |=======================
@@ -57,12 +58,13 @@ type
 {$IFNDEF CODEINSIGHT}
 procedure TRSOptions.__setup();
 begin
-  self.FBounds := [550,206,733,464];
+  Self.FBounds := [550,206,733,464];
   
   with Self do
   begin
     FName := 'Options';
     FStatic := True;
+    FZoomSliderBox := [608, 268, 704, 277];
   end;
 
   //the four tabs (Display, Audio, Chat, Controls)
@@ -182,7 +184,7 @@ end;
 
 (*
 Options.SetBrightness
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 .. pascal:: function TRSOptions.SetBrightness(level: Int32; tryTime:Int32=2000): Boolean;
 
 Sets the mainscreen brightness
@@ -212,60 +214,6 @@ begin
 end;
 
 (*
-Options.GetZoom
-~~~~~~~~~~~~~~~
-.. pascal:: function TRSOptions.GetZoom(): Int32;
-
-Returns the mainscreen zoom level 0..100.
-*)
-function TRSOptions.GetZoom: Int32;
-var
-  Area: TBox;
-  TPA: TPointArray;
-begin
-  Area := [608, 268, 704, 277];
-
-  if (not Self.SetCurrentTab(optDisplay)) then
-    Exit(-1);
-  if (not FindColors(TPA, 2106152, Area.Expand(10))) then
-    Exit(-1);
-
-  Result := Round((TPA.Mean().X - Area.X1) * 100 / (Area.Width - 1));
-end;
-
-(*
-Options.SetZoom
-~~~~~~~~~~~~~~~
-.. pascal:: procedure TRSOptions.SetZoom(Level: Int32);
-
-Sets the mainscreen zoom level by scrolling, accurate to within 3 levels.
-*)
-procedure TRSOptions.SetZoom(Level: Int32);
-var
-  Delta, Scrolls: Int32;
-begin
-  if not (Level in [0..100]) then
-    srl.WriteLn('TRSOptions.SetZoom: Zoom level out of range, expected `0..100`', dtFatal);
-
-  Delta := Options.GetZoom() - Level;
-
-  while Abs(Delta) > 3 do
-  begin
-    if (not Mouse.GetPosition().InBox(MainScreen.GetBounds())) then
-      Mouse.Move(MainScreen.GetBounds());
-
-    if Abs(Delta) <= Random(6, 12) then
-      Scrolls := 1
-    else
-      Scrolls := Random(1, 4);
-
-    Mouse.Scroll(Scrolls, Delta > 0);
-
-    Delta := Options.GetZoom() - Level;
-  end;
-end;
-
-(*
 type ERSZoomNotch
 ~~~~~~~~~~~~~~~~~
   Zoom level notches.
@@ -279,6 +227,91 @@ type
 
 const
   ZOOM_NOTCH_DEFAULT = ZOOM_NOTCH_50;
+
+(*
+Options.FindZoomSlider
+~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.FindZoomSlider(out P: TPoint): Boolean;
+
+Returns the middle of the green zoom slider.
+*)
+function TRSOptions.FindZoomSlider(out P: TPoint): Boolean;
+var
+  TPA: TPointArray;
+begin
+  if Self.SetCurrentTab(optDisplay) and (SRL.FindColors(TPA, CTS0(2106152), FZoomSliderBox.Expand(10)) > 0) then
+  begin
+    P := TPA.Mean();
+
+    Exit(True);
+  end;
+end;
+
+(*
+Options.GetZoom
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.GetZoom: Int32;
+
+Returns the current zoom level in 0..100 range. -1 if not found.
+*)
+function TRSOptions.GetZoom: Int32;
+var
+  Slider: TPoint;
+begin
+  if (not Self.FindZoomSlider(Slider)) then
+    Exit(-1);
+
+  Result := Round((Slider.X - FZoomSliderBox.X1) * 100 / (FZoomSliderBox.Width - 1));
+end;
+
+(*
+Options.SetZoom
+~~~~~~~~~~~~~~~
+.. pascal:: function TRSOptions.SetZoom(Level: Int32): Boolean;
+
+Sets the current zoom level by using the slider. 0..100 range.
+*)
+function TRSOptions.SetZoom(Level: Int32): Boolean;
+var
+  Destination, Slider, P: TPoint;
+  T: UInt64;
+begin
+  if (not Self.SetCurrentTab(optDisplay)) or (not Self.FindZoomSlider(Slider)) then
+    Exit(False);
+
+  Destination.X := FZoomSliderBox.X1 + Round((Level * (Options.FZoomSliderBox.Width - 1) / 100));
+  Destination.Y := Random(FZoomSliderBox.Y1, FZoomSliderBox.Y1);
+
+  // Normalize our level. The bar only 96 pixels wide
+  Level := Round((Destination.X - FZoomSliderBox.X1) * 100 / (FZoomSliderBox.Width - 1));
+  if (Self.GetZoom() = Level) then
+    Exit(True);
+
+  Destination.X := Destination.X + 1;
+
+  // Cant click on the slider, move out of the way.
+  if Distance(Destination, Slider) <= 10 then
+  begin
+    P := [Random(FZoomSliderBox.X1, FZoomSliderBox.X2), Random(FZoomSliderBox.Y1, FZoomSliderBox.Y2)];
+    while Distance(P, Destination) <= 10 do
+      P := [Random(FZoomSliderBox.X1, FZoomSliderBox.X2), Random(FZoomSliderBox.Y1, FZoomSliderBox.Y2)];
+
+    Mouse.Click(P, MOUSE_LEFT);
+
+    Wait(0, 2000, wdLeft);
+  end;
+
+  Mouse.Click(Destination, MOUSE_LEFT);
+
+  T := GetTickCount() + 1000;
+  while (T > GetTickCount()) do
+  begin
+    if (Self.GetZoom() = Level) then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
+end;
 
 (*
 Options.GetZoomNotch
@@ -301,72 +334,19 @@ end;
 (*
 Options.SetZoomNotch
 ~~~~~~~~~~~~~~~~~~~~
-.. pascal:: function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch; Randomness: Int32 = 0): Boolean;
+.. pascal:: function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch): Boolean;
 
-Moves the zoom bar slider to the `Notch` position.
-`Randomness` is the random +- we add to the coord of the notch position.
+Moves the zoom slider to the `Notch` position.
 *)
-function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch; Randomness: Int32 = 0): Boolean;
-
-  function GetNotchPoint(Notch: ERSZoomNotch): TPoint;
-  begin
-    case Notch of
-      ZOOM_NOTCH_0: Result := [604, 273];
-      ZOOM_NOTCH_25: Result := [628, 273];
-      ZOOM_NOTCH_50: Result := [657, 273];
-      ZOOM_NOTCH_75: Result := [681, 273];
-      ZOOM_NOTCH_100: Result := [707, 273];
-    end;
-
-    Result.Y += Random(-3, 3);
-  end;
-
-var
-  Bounds: TBox;
-  TPA: TPointArray;
-  T: UInt64;
-  P: TPoint;
+function TRSOptions.SetZoomNotch(Notch: ERSZoomNotch): Boolean;
 begin
-  Bounds := [608, 268, 704, 277];
-
-  if (Self.GetZoomNotch() = Notch) then
-    Exit(True);
-
-  if (not Self.SetCurrentTab(optDisplay)) then
-    Exit(False);
-  if (not FindColors(TPA, 2106152, Bounds.Expand(10))) then
-    Exit(False);
-
-  if Distance(GetNotchPoint(Notch), TPA.Mean()) <= 10 then
-  begin
-    Wait(0, 2500, wdLeft);
-
-    P := [Random(Bounds.X1, Bounds.X2), Random(Bounds.Y1, Bounds.Y2)];
-    while Distance(P, TPA.Mean()) <= 10 do
-      P := [Random(Bounds.X1, Bounds.X2), Random(Bounds.Y1, Bounds.Y2)];
-
-    Mouse.Click(P, MOUSE_LEFT);
+  case Notch of
+    ZOOM_NOTCH_100: Result := Self.SetZoom(100);
+    ZOOM_NOTCH_75:  Result := Self.SetZoom(75);
+    ZOOM_NOTCH_50:  Result := Self.SetZoom(50);
+    ZOOM_NOTCH_25:  Result := Self.SetZoom(20);
+    ZOOM_NOTCH_0:   Result := Self.SetZoom(0);
   end;
-
-  P := GetNotchPoint(Notch);
-  if Randomness > 0 then
-    P.X += Random(-Randomness, Randomness);
-
-  Mouse.Click(P, MOUSE_LEFT);
-
-  if Randomness = 0 then
-  begin
-    T := GetTickCount() + 1500;
-
-    while (T > GetTickCount()) do
-    begin
-      if Self.GetZoomNotch() = Notch then
-        Exit(True);
-
-      Wait(50, 100);
-    end;
-  end else
-    Exit(True);
 end;
 
 (*

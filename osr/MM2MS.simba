@@ -72,7 +72,7 @@ begin
       513, 335,     // ms size
       259, 172,     // ms center
       642, 84,      // mm center
-      0.47, 3.5,    // scale min, scale max
+      0.436843666601926, 3.39, // scale min, scale max
       0.0,          // current zoom
       12            // zoom Y offset (imperfect)
     ];
@@ -114,15 +114,15 @@ MM2MS.Project
 ~~~~~~~~~~~~~
 .. pascal:: function TMinimapToMS.Project(Coords: Vector3Array; Rotation: Vector3): TPointArray;
 
-Projects the given coordinates ``coords`` and applys the given ``Rotation`` vector to the projection.
+Projects the given coordinates ``coo rds`` and applys the given ``Rotation`` vector to the projection.
 *)
 function TMinimapToMS.Project(Coords: Vector3Array; Rotation: Vector3): TPointArray;
 var
   vec: Vector3;
   viewMatrix, projMatrix, worldMatrix,transMatrix: TMatrix4;
 begin           //low angle test  [0,-28.5,13]
-  viewMatrix := TMatrix4.LookAtRH([0,-21,  53], [0,0,1.3], Vector3_UnitY);
-  projMatrix := TMatrix4.PerspectiveFovRH(Sqrt(2), 765/503, 0.01, 1.0);
+  viewMatrix := TMatrix4.LookAtRH([0, -19.3754622167442, 49.6649320817087], [0, 0, 0.448477682564408], Vector3_UnitY);
+  projMatrix := TMatrix4.PerspectiveFovRH(Sqrt(2), 765 / 503, 0.01, 1.0);
 
   worldMatrix := TMatrix4.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix_Identity;
   transMatrix := worldMatrix * viewMatrix * projMatrix;
@@ -150,10 +150,122 @@ begin
   Result := Project(Arr, Vec3(0, 0, PI*2 - Roll));
 end;
 
+procedure TMinimapToMS.SetZoomLevel(Level: Int32);
+
+  procedure SetScale(Z, Y: Double);
+  begin
+    Self.ZOOM := Z;
+    Self.YSHIFT := Y;
+  end;
+
+begin
+  case Level of
+    0: SetScale(0.0000, 28.0000);
+    1: SetScale(0.0025, 28.0000);
+    2: SetScale(0.0065, 28.0000);
+    3: SetScale(0.0100, 28.0000);
+    4: SetScale(0.0130, 28.0000);
+    5: SetScale(0.0165, 28.0000);
+    6: SetScale(0.0205, 28.0000);
+    7: SetScale(0.0235, 28.0000);
+    8: SetScale(0.0280, 28.0000);
+    9: SetScale(0.0310, 23.7500);
+    10: SetScale(0.0350, 20.0000);
+    11: SetScale(0.0390, 20.2500);
+    12: SetScale(0.0430, 17.2500);
+    14: SetScale(0.0465, 17.7500);
+    15: SetScale(0.0515, 17.5000);
+    16: SetScale(0.0555, 16.2500);
+    17: SetScale(0.0605, 18.2500);
+    18: SetScale(0.0645, 14.5000);
+    19: SetScale(0.0690, 15.0000);
+    20: SetScale(0.0740, 18.2500);
+    21: SetScale(0.0785, 16.0000);
+    22: SetScale(0.0835, 14.0000);
+    23: SetScale(0.0885, 16.0000);
+    24: SetScale(0.0935, 19.2500);
+    25: SetScale(0.0990, 18.5000);
+    26: SetScale(0.1045, 19.5000);
+    27: SetScale(0.1095, 17.0000);
+    28: SetScale(0.1150, 18.0000);
+    29: SetScale(0.1205, 16.7500);
+    30: SetScale(0.1260, 16.0000);
+    31: SetScale(0.1325, 18.0000);
+    32: SetScale(0.1385, 21.2500);
+    33: SetScale(0.1455, 20.7500);
+    34: SetScale(0.1505, 17.7500);
+    35: SetScale(0.1585, 18.2500);
+    36: SetScale(0.1635, 18.2500);
+    38: SetScale(0.1705, 18.7500);
+    39: SetScale(0.1775, 19.5000);
+    40: SetScale(0.1845, 19.5000);
+    41: SetScale(0.1925, 20.7500);
+    42: SetScale(0.1995, 20.7500);
+    43: SetScale(0.2055, 21.7500);
+    44: SetScale(0.2145, 18.5000);
+    45: SetScale(0.2215, 20.0000);
+    46: SetScale(0.2305, 19.7500);
+    47: SetScale(0.2365, 19.7500);
+    48: SetScale(0.2465, 20.7500);
+    49: SetScale(0.2545, 20.7500);
+    50: SetScale(0.2635, 21.5000);
+    51: SetScale(0.2725, 22.2500);
+    52: SetScale(0.2825, 22.0000);
+    53: SetScale(0.2905, 20.5000);
+    54: SetScale(0.3005, 20.7500);
+    55: SetScale(0.3105, 21.5000);
+    56: SetScale(0.3195, 23.5000);
+    57: SetScale(0.3285, 22.5000);
+    58: SetScale(0.3405, 22.7500);
+    59: SetScale(0.3555, 22.0000);
+    60: SetScale(0.3615, 22.5000);
+    61: SetScale(0.3705, 22.0000);
+    62: SetScale(0.3825, 22.2500);
+    64: SetScale(0.3945, 22.7500);
+    65: SetScale(0.4065, 23.0000);
+    66: SetScale(0.4185, 22.7500);
+    67: SetScale(0.4305, 24.5000);
+    68: SetScale(0.4425, 23.2500);
+    69: SetScale(0.4575, 23.5000);
+    70: SetScale(0.4695, 24.2500);
+    71: SetScale(0.4815, 24.2500);
+    72: SetScale(0.4965, 23.5000);
+    73: SetScale(0.5115, 24.5000);
+    74: SetScale(0.5265, 24.7500);
+    75: SetScale(0.5385, 24.5000);
+    76: SetScale(0.5535, 25.5000);
+    77: SetScale(0.5685, 25.5000);
+    78: SetScale(0.5835, 24.7500);
+    79: SetScale(0.5985, 25.0000);
+    80: SetScale(0.6165, 25.0000);
+    81: SetScale(0.6315, 25.5000);
+    82: SetScale(0.6495, 26.2500);
+    83: SetScale(0.6645, 27.2500);
+    84: SetScale(0.6825, 26.0000);
+    85: SetScale(0.7035, 26.2500);
+    86: SetScale(0.7215, 27.0000);
+    88: SetScale(0.7395, 26.7500);
+    89: SetScale(0.7575, 27.2500);
+    90: SetScale(0.7815, 27.0000);
+    91: SetScale(0.7995, 27.5000);
+    92: SetScale(0.8175, 26.5000);
+    93: SetScale(0.8355, 27.2500);
+    94: SetScale(0.8595, 28.5000);
+    95: SetScale(0.8835, 27.7500);
+    96: SetScale(0.9015, 27.7500);
+    97: SetScale(0.9255, 28.7500);
+    98: SetScale(0.9495, 29.0000);
+    99: SetScale(0.9735, 28.2500);
+    100: SetScale(1.000, 28.2500);
+    else
+      raise 'Zoom level ' + IntToStr(Level) + ' not supported';
+  end;
+end;
+
 (*
 MM2MS.SetZoom
 ~~~~~~~~~~~~~
-.. pascal:: procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch);
+.. pascal:: procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch); overload;
 
 Changes the zoom level MM2MS operates at.
 
@@ -161,20 +273,34 @@ Changes the zoom level MM2MS operates at.
   MM2MS.SetZoom(Options.GetZoomNotch());
 
 *)
-procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch);
+procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch); overload;
 begin
-  if (Notch = ZOOM_NOTCH_UNKNOWN) then
-    srl.WriteLn('MM2MS only works at a fixed zoom notch!', dtFatal);
-
   case Notch of
-    ZOOM_NOTCH_0:   Self.ZOOM := 0.000;
-    ZOOM_NOTCH_25:  Self.ZOOM := 0.075;
-    ZOOM_NOTCH_50:  Self.ZOOM := 0.275;
-    ZOOM_NOTCH_75:  Self.ZOOM := 0.555;
-    ZOOM_NOTCH_100: Self.ZOOM := 1.000;
+    ZOOM_NOTCH_0:   Self.SetZoomLevel(0);
+    ZOOM_NOTCH_25:  Self.SetZoomLevel(25);
+    ZOOM_NOTCH_50:  Self.SetZoomLevel(50);
+    ZOOM_NOTCH_75:  Self.SetZoomLevel(75);
+    ZOOM_NOTCH_100: Self.SetZoomLevel(100);
+    else
+      SRL.WriteLn('Unknown zoom notch', dtFatal);
   end;
 end;
 
+(*
+MM2MS.SetZoom
+~~~~~~~~~~~~~
+.. pascal:: procedure TMinimapToMS.SetZoom; overload;
+
+Sets up MM2MS for the current zoom level in game.
+
+.. pascal::
+  MM2MS.SetZoom();
+
+*)
+procedure TMinimapToMS.SetZoom; overload;
+begin
+  Self.SetZoomLevel(Options.GetZoom());
+end;
 
 {$IFNDEF CODEINSIGHT}
 begin
