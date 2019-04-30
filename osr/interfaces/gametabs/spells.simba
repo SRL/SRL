@@ -119,7 +119,7 @@ type
 {$IFNDEF CODEINSIGHT}
 procedure TRSSpells.__Setup();
 var 
-  SlotBounds:TBox = [559,220,726,459];
+  SlotBounds:TBox = [548,206,735,442];
 begin
   with Self do
   begin
