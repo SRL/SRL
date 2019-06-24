@@ -28,6 +28,7 @@ begin
                 ['Error connecting to server.', 20, 10000],
                 ['Your account has not logged out', 5, 60000],
                 ['Login server offline.', 20, 60000],
+                ['Error loading your profile.', 20, 60000],
                 ['Connection timed out.', 20, 30000],
                 ['Login limit exceeded', 20, 30000],
                 ['This world is full', 20, 15000],
