@@ -1,5 +1,60 @@
 library libasyncmouse;
 
+(*
+ASyncMouse
+==========
+
+ASyncMouse is a plugin which moves the mouse on another thread so your script
+can update the mouse destination while the mouse is actively moving.
+
+The following methods are defined:
+
+.. pascal::
+
+  procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1);
+  procedure TASyncMouse.ChangeDestination(Destination: TPoint);
+  procedure TASyncMouse.Stop;
+  function TASyncMouse.IsMoving: Boolean;
+
+**Example :**
+
+.. pascal::
+  {$I SRL/OSR.simba}
+  {$I SRL/utils/asyncmouse.simba}
+
+  function FindMyObject(out Position: TPoint): Boolean;
+  begin
+    // Your object finder ..
+  end;
+
+  var
+    Position: TPoint;
+
+  begin
+    if FindMyObject(Position) then
+    begin
+      ASyncMouse.Move(Position);
+
+      while ASyncMouse.IsMoving() do
+      begin
+        if FindMyObject(Position) then
+          ASyncMouse.ChangeDestination(Position);
+
+        Wait(50);
+      end;
+    end;
+  end.
+
+* *Accuracy* parameter in *ASyncMouse.Move* is maximum distance to the destination where the
+  mouse movement is considered finished. By default it's *1* which means the mouse wont
+  stop moving until the exact destination has been reached.
+
+* ASyncMouse uses the current variables (Speed, Wind, Gravity) from SRL's *Mouse* variable.
+
+* Mouse movement can be stopped at anytime with *ASyncMouse.Stop*
+
+*)
+
 {$mode objfpc}{$H+}
 
 uses
@@ -7,21 +62,9 @@ uses
   cmem, cthreads,
   {$ENDIF}
   classes, sysutils,
-  libasyncmouse.asyncmouse, libasyncmouse.threadpool;
+  libasyncmouse.asyncmouse;
 
 {$i simbaplugin.inc}
-
-procedure OnAttach(Data: Pointer); cdecl;
-begin
-  SimbaThreadPool := TSimbaThreadPool.Create();
-end;
-
-procedure OnDetach; cdecl;
-begin
-  SimbaThreadPool.Free();
-end;
-
-exports OnAttach, OnDetach;
 
 type
   PPoint = ^TPoint;
@@ -59,10 +102,9 @@ end;
 begin
   addGlobalType('type Pointer', 'TASyncMouse');
 
-  addGlobalFunc('function TASyncMouse.Create(constref MoveMouse, GetMousePosition): TASyncMouse; static; native;', @Lape_ASyncMouse_Create);
-  addGlobalFunc('procedure TASyncMouse.Free; native;', @Lape_ASyncMouse_Free);
-  addGlobalFunc('procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1); overload; native;', nil); // Helper for Simba's code completion
-  addGlobalFunc('procedure TASyncMouse.Move(Destination: TPoint; Gravity, Wind, MinWait, WaxWait, MaxStep, TargetArea, Accuracy: Double); overload; native;', @Lape_ASyncMouse_Move);
+  addGlobalFunc('function TASyncMouse.__Create(constref MoveMouse, GetMousePosition): TASyncMouse; static; native;', @Lape_ASyncMouse_Create);
+  addGlobalFunc('procedure TASyncMouse.__Free; native;', @Lape_ASyncMouse_Free);
+  addGlobalFunc('procedure TASyncMouse.__Move(Destination: TPoint; Gravity, Wind, MinWait, WaxWait, MaxStep, TargetArea, Accuracy: Double); native;', @Lape_ASyncMouse_Move);
   addGlobalFunc('procedure TASyncMouse.ChangeDestination(Destination: TPoint); native;', @Lape_ASyncMouse_ChangeDestination);
   addGlobalFunc('procedure TASyncMouse.Stop; native;', @Lape_ASyncMouse_Stop);
   addGlobalFunc('function TASyncMouse.IsMoving: Boolean; native;', @Lape_ASyncMouse_IsMoving);
@@ -77,21 +119,21 @@ begin
           '  GetMousePos(X, Y);'                                                                                                   + LineEnding +
           'end;'                                                                                                                   + LineEnding +
           ''                                                                                                                       + LineEnding +
-          'procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1); override;'                                       + LineEnding +
+          'procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1);'                                                 + LineEnding +
           'var'                                                                                                                    + LineEnding +
           '  Speed: Double := (Random(Mouse.Speed) / 2.0 + Mouse.Speed) / 10.0;'                                                   + LineEnding +
           'begin'                                                                                                                  + LineEnding +
-          '  Self.Move(Destination, Mouse.Gravity, Mouse.Wind, 10.0 / Speed, 15.0 / Speed, 10.0 * Speed, 10.0 * Speed, Accuracy);' + LineEnding +
+          '  Self.__Move(Destination, Mouse.Gravity, Mouse.Wind, 10.0 / Speed, 15.0 / Speed, 10.0 * Speed, 10.0 * Speed, Accuracy);' + LineEnding +
           'end;'                                                                                                                   + LineEnding +
           ''                                                                                                                       + LineEnding +
           'var'                                                                                                                    + LineEnding +
-          '  ASyncMouse: TASyncMouse := TASyncMouse.Create('                                                                       + LineEnding +
+          '  ASyncMouse: TASyncMouse := TASyncMouse.__Create('                                                                       + LineEnding +
           '                               Natify(@TASyncMouse.__MoveMouse),'                                                       + LineEnding +
           '                               Natify(@TASyncMouse.__GetMousePosition)'                                                 + LineEnding +
           '                             );'                                                                                        + LineEnding +
           ''                                                                                                                       + LineEnding +
           'begin'                                                                                                                  + LineEnding +
-          '  AddOnTerminateAlways(@ASyncMouse.Free);'                                                                              + LineEnding +
+          '  AddOnTerminateAlways(@ASyncMouse.__Free);'                                                                              + LineEnding +
           'end;'                                                                                                                   + LineEnding
          );
 end.

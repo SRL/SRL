@@ -8,7 +8,7 @@ import os, sys
 
 DOCNAME         = 'SRL'
 IGNORE_FOLDERS  = ['.git']
-FILE_EXTENSIONS = ['.pas','.inc','.simba'] 
+FILE_EXTENSIONS = ['.pas','.inc','.simba','.lpr'] 
 SHORT_RST       = [('.. code-block:: pascal\n\n', '.. pascal::')]
 
 commentregex = re.compile('\(\*.+?\*\)', re.DOTALL)

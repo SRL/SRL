@@ -83,6 +83,9 @@
     <CodeGeneration>
       <RelocatableUnit Value="True"/>
       <TargetCPU Value="i386"/>
+      <Optimizations>
+        <OptimizationLevel Value="3"/>
+      </Optimizations>
     </CodeGeneration>
     <Linking>
       <Debugging>

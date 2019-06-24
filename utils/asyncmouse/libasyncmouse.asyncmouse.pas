@@ -5,16 +5,16 @@ unit libasyncmouse.asyncmouse;
 interface
 
 uses
-  classes, sysutils,
-  libasyncmouse.threadpool;
+  classes, sysutils, syncobjs;
 
 type
   TASyncMouse_MoveMouse = procedure(X, Y: Int32);
   TASyncMouse_GetMousePosition = procedure(var X, Y: Int32);
 
   PASyncMouse = ^TASyncMouse;
-  TASyncMouse = class
+  TASyncMouse = class(TThread)
   protected
+    FEvent: TSimpleEvent;
     FMoveMouse: TASyncMouse_MoveMouse;
     FGetMousePosition: TASyncMouse_GetMousePosition;
     FPosition: TPoint;
@@ -28,7 +28,7 @@ type
     FAccuracy: Double;
     FMoving: Boolean;
 
-    procedure Execute;
+    procedure Execute; override;
   public
     procedure Move(Destination: TPoint; Gravity, Wind, MinWait, MaxWait, MaxStep, TargetArea, Accuracy: Double);
 
@@ -66,7 +66,7 @@ procedure TASyncMouse.Execute;
     while Moving do
     begin
       Dist := Hypot(Position.X - Destination.X, Position.Y - Destination.Y);
-      if (Dist <= accuracy) then
+      if (Dist <= Accuracy) then
         Break;
 
       wind := Min(Wind, Dist);
@@ -113,18 +113,30 @@ procedure TASyncMouse.Execute;
       Sleep(Round((MaxWait - MinWait) * (Dist / Step) + MinWait));
     end;
 
-    if (accuracy = 1) then
-      FMoveMouse(Destination.X, Destination.Y);
+    if Moving then
+    begin
+      if (Accuracy = 1) then
+        FMoveMouse(Destination.X, Destination.Y);
 
-    Moving := False;
+      Moving := False;
+    end;
   end;
 
 begin
-  WindMouse(FMoving, FPosition, FDestination, FGravity, FWind, FMinWait, FMaxWait, FMaxStep, FTargetArea, FAccuracy);
+  while (not Terminated) do
+  begin
+    if FEvent.WaitFor(1000) = wrSignaled then
+      WindMouse(FMoving, FPosition, FDestination, FGravity, FWind, FMinWait, FMaxWait, FMaxStep, FTargetArea, FAccuracy);
+
+    FEvent.ResetEvent();
+  end;
 end;
 
 procedure TASyncMouse.Move(Destination: TPoint; Gravity, Wind, MinWait, MaxWait, MaxStep, TargetArea, Accuracy: Double);
 begin
+  while FMoving do
+    Sleep(1);
+
   FGetMousePosition(FPosition.X, FPosition.Y);
   FDestination := Destination;
   FGravity := Gravity;
@@ -136,19 +148,24 @@ begin
   FAccuracy := Accuracy;
   FMoving := True;
 
-  SimbaThreadPool.Run(@Self.Execute);
+  FEvent.SetEvent();
 end;
 
 constructor TASyncMouse.Create(MoveMouse, GetMousePosition: Pointer);
 begin
+  inherited Create(False);
+
   FMoveMouse := TASyncMouse_MoveMouse(MoveMouse);
   FGetMousePosition := TASyncMouse_GetMousePosition(GetMousePosition);
+  FEvent := TSimpleEvent.Create();
 end;
 
 destructor TASyncMouse.Destroy;
 begin
-  while FMoving do
-    Sleep(1);
+  Terminate();
+  WaitFor();
+
+  FEvent.Free();
 
   inherited Destroy();
 end;
