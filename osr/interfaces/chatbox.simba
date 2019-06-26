@@ -166,11 +166,13 @@ var
 begin
   //match each word separately to avoid any future whitespace-issues.
   Result := (srl.FindText(tpa[0], 'Click',   'CharsNPC07', self.FBounds) and
-             srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
+             // srl.FindText(tpa[1], 'here',    'CharsNPC07', self.FBounds) and
              srl.FindText(tpa[2], 'continue','CharsNPC07', self.FBounds));
+
   if Result then
   begin
     tpa[2].y += 15;
+
     mouse.Click(GetTPABounds(tpa), mouse_Left);
     if SpamClick then
       for 5 to Round(srl.TruncatedGauss(0,14)) do
