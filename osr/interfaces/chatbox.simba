@@ -163,22 +163,18 @@ Returns ``True`` if the text was found.
 function TRSChatbox.ClickContinue(SpamClick: Boolean = False): Boolean;
 var
   tpa: array [0..2] of TPoint;
-  colorBlue, colorWhite: Integer;
 begin
   // match each word separately to avoid any future whitespace-issues
   // use color to stop matching strings that occur in npc chats (IE 'here', t'here', 'continue')
 
-  colorBlue  := CTS2(16711680, 1, 0.01, 0.01).Color; // unhighlighted "Click continue" text
-  colorWhite := CTS2(16777215, 1, 0.01, 0.01).Color; //   highlighted "Click continue" text
-
   Result := (
-    srl.FindText(tpa[0], 'Click',   'CharsNPC07', colorBlue,  1, self.FBounds) and
-    srl.FindText(tpa[1], 'here',    'CharsNPC07', colorBlue,  1, self.FBounds) and
-    srl.FindText(tpa[2], 'continue','CharsNPC07', colorBlue,  1, self.FBounds)
+    srl.FindText(tpa[0], 'Click',   'CharsNPC07', 16711680, 1, self.FBounds) and // blue text
+    srl.FindText(tpa[1], 'here',    'CharsNPC07', 16711680, 1, self.FBounds) and
+    srl.FindText(tpa[2], 'continue','CharsNPC07', 16711680, 1, self.FBounds)
   ) or (
-    srl.FindText(tpa[0], 'Click',   'CharsNPC07', colorWhite, 1, self.FBounds) and
-    srl.FindText(tpa[1], 'here',    'CharsNPC07', colorWhite, 1, self.FBounds) and
-    srl.FindText(tpa[2], 'continue','CharsNPC07', colorWhite, 1, self.FBounds)
+    srl.FindText(tpa[0], 'Click',   'CharsNPC07', 16777215, 1, self.FBounds) and  // white text
+    srl.FindText(tpa[1], 'here',    'CharsNPC07', 16777215, 1, self.FBounds) and
+    srl.FindText(tpa[2], 'continue','CharsNPC07', 16777215, 1, self.FBounds)
   );
 
   if Result then
