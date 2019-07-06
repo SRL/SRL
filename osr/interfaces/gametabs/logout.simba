@@ -140,6 +140,30 @@ begin
 end;
 
 (*
+Logout.WorldSwitcher.GetCurrentWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSLogoutWS.GetCurrentWorld: Int32;
+
+Reads and returns the current world.
+*)
+function TRSLogoutWS.GetCurrentWorld: Int32;
+const
+  CURRENT_WORLD_COLOR = $1F98FF;
+  CURRENT_WORLD_BOUNDS: TBox = [555, 206, 714, 226];
+var
+  Numbers: TExtendedArray;
+begin
+  Result := -1;
+
+  if FTab^.Open() then
+  begin
+    Numbers := OCR.SimpleRecognize(CURRENT_WORLD_BOUNDS, CURRENT_WORLD_COLOR, UpFont).ExtractNumbers();
+    if Length(Numbers) > 0 then
+      Result := Round(Numbers[0]);
+  end;
+end;
+
+(*
 Logout.WorldSwitcher.isOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
@@ -148,24 +172,22 @@ Logout.WorldSwitcher.isOpen
 
 Returns if the in-game worldswitcher is open
 *)
-function TRSLogoutWS.isOpen(WaitTime: Integer = 0): Boolean;
-var
-  t: UInt64;
-  p: TPoint;
+function TRSLogoutWS.IsOpen: Boolean; overload;
 begin
-  if (not FTab^.Open()) then
-    Exit(False);
+  Result := Self.GetCurrentWorld() > 0;
+end;
 
-  if (WaitTime = 0) then
-    Exit(srl.FindText(p, 'Current world', 'UpChars07_s', FTab^.GetBounds()));
-
-  t := GetTickCount64() + WaitTime;
-  repeat
-    if (srl.FindText(p, 'Current world', 'UpChars07_s', FTab^.GetBounds())) then
+function TRSLogoutWS.IsOpen(WaitTime: Int32): Boolean; overload;
+var
+  T: UInt64 := GetTickCount() + WaitTime;
+begin
+  while (T > GetTickCount()) do
+  begin
+    if Self.GetCurrentWorld() > 0 then
       Exit(True);
 
-    Wait(Random(50, 100));
-  until (GetTickCount64() >= t);
+    Wait(50);
+  end;
 end;
 
 (*
@@ -178,14 +200,15 @@ Logout.WorldSwitcher.Open
 Opens the in-game worldswitcher
 *)
 function TRSLogoutWS.Open: Boolean;
+const
+  WORLD_SWITCHER_BUTTON: TBox = [573, 372, 708, 396];
 begin
-  if (not FTab^.Open()) then
-    Exit(False);
-  if (Self.isOpen()) then
+  if Self.IsOpen() then
     Exit(True);
 
-  Mouse.Click(Box(575, 348, 708, 373), mouse_Left);
-  Result := Self.isOpen(Random(4000, 5000));
+  Mouse.Click(WORLD_SWITCHER_BUTTON, MOUSE_LEFT);
+  if Self.IsOpen(Random(2500, 3000)) then
+    Exit(True);
 end;
 
 (*
@@ -214,156 +237,103 @@ begin
 end;
 
 (*
-Logout.WorldSwitcher.VisibleWorlds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+Logout.WorldSwitcher.ClickWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSLogoutWS.ClickWorld(World, WorldColor: Int32): Boolean;
 
-  function TRSLogoutWS.VisibleWorlds(out Worlds: TIntegerArray; out Boxes: TBoxArray): Boolean;
-
-Returns the VisibleWorlds and their bounds
+Attempts to click a world [Using a simple bitmap search].
 *)
-function TRSLogoutWS.VisibleWorlds(out Worlds: TIntegerArray; out Boxes: TBoxArray): Boolean;
+function TRSLogoutWS.ClickWorld(World, WorldColor: Int32): Boolean;
 const
-  WORLD_BOX: TBox = [563, 228, 587, 450]; // box where the world numbers are
-  WORLD_COLORS = [14737632, 61680, 8355711]; // (P2P) (F2P) (Skill worlds)
+  WORLD_WIDTH = 145;
+  WORLD_HEIGHT = 12;
+  WORLD_FONT = 'SmallChars07';
 var
-  TPA: TPointArray;
-  ATPA: T2DPointArray;
-  b: TBox;
-  i, j: Integer;
-  Text: String;
+  BMP: TMufasaBitmap;
+  B: TBox;
 begin
-  if (not FindColors(TPA, 0, WORLD_BOX)) then
-    Exit(False);
+  BMP := GetMufasaBitmap(BitmapFromText(ToString(World), WORLD_FONT));
+  BMP.ReplaceColor($FFFFFF, WorldColor);
 
-  ATPA := ClusterTPAEx(TPA, 20, 2); // Get bounds of each world number
-  for i := 0 to High(ATPA) do
+  Result := FindBitmapIn(BMP.GetIndex(), B.X1, B.Y1, Self.FTab^.GetBounds().Expand(1));
+  if Result then
   begin
-    b := GetTPABounds(ATPA[i]).Expand(2);
+    B.X2 := B.X1 + WORLD_WIDTH;
+    B.Y2 := B.Y1 + WORLD_HEIGHT;
 
-    for j:=0 to High(WORLD_COLORS) do
-    begin
-      Text := GetTextAtEx(b, 0, 3, 0, WORLD_COLORS[j], 0, 'SmallChars07');
-      if (Text <> '') then
-      begin
-        Worlds := Worlds + StrToIntDef(Text, -1);
-        Boxes := Boxes + Box(b.X1 - 15, b.Y1, b.X2 + 130, b.Y2);
-        Continue;
-      end;
-    end;
+    Mouse.Click(B, MOUSE_LEFT);
   end;
 
-  Result := Length(Worlds) > 0;
+  BMP.Free();
 end;
 
 (*
-Logout.WorldSwitcher.CurrentWorld
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+Logout.WorldSwitcher.Scroll
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. pascal:: function TRSLogoutWS.Scroll(Down: Boolean): Boolean;
 
-  function TRSLogoutWS.CurrentWorld: Integer;
-
-Returns the world we are currently in
+    Returns true if world-switcher was scrolled [By checking for pixelshift].
 *)
-function TRSLogoutWS.CurrentWorld: Integer;
+function TRSLogoutWS.Scroll(Down: Boolean): Boolean;
 var
-  t: UInt64;
-  Text: String;
+  B: TBox;
+  Colors: TIntegerArray;
 begin
-  if (not Self.Open()) then
-    Exit(-1);
+  B := Self.FTab^.GetBounds();
+  B := B.Expand(-15, -35); // Scrollable area
 
-  t := GetTickCount64() + Random(3000, 4000);
-  while (t > GetTickCount64()) do
-  begin
-    Text := GetTextAtEx(Box(556, 206, 714, 226), 0, 3, 3, 2070783, 0, 'UpChars07_s');
-    if (Pos('Current world', Text) > 0) then
-      Exit(StrToIntDef(ExtractFromStr(Text, Numbers), -1));
-    Wait(Random(50, 100));
-  end;
+  Colors := GetColors(TPAFromBox(B));
 
-  // Didnt find anything
-  Result := -1;
+  Mouse.Scroll(B, Random(1, 2), Down);
+  if not Colors.Equals(GetColors(TPAFromBox(B))) then
+    Exit(True);
 end;
 
 (*
 Logout.WorldSwitcher.SwitchTo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code-block:: pascal
+.. pascal:: function TRSLogoutWS.SwitchTo(World: Int32): Boolean;
 
-  function TRSLogoutWS.SwitchTo(World: Integer): Boolean;
+Uses the in-game world switcher to switch to `World`. Returns true if succesfully
+switched [By reading current world].
 
-Hops to the given world
+**Example**
+
+.. pascal::
+  if Logout.WorldSwitcher.SwitchTo(302) then
+    WriteLn('Switched to world 302');
 *)
-function TRSLogoutWS.SwitchTo(World: Integer): Boolean;
+function TRSLogoutWS.SwitchTo(World: Int32): Boolean;
+const
+  COLOR_MEMBERS_WORLD = $00F0F0;
+  COLOR_FREE_WORLD = $E0E0E0;
 
-  // 302 to 2
-  function ShortWorld(wo: Integer): Integer;
-  var
-    s: String;
+  function WorldSwitch(Direction: Boolean): Boolean;
   begin
-    s := IntToStr(wo);
-    if (Length(s) = 3) then
-    begin
-      s := Copy(s, 2, 2);
-      if (s[1] = '0') then
-        s := s[Length(s)];
-    end;
-    Exit(StrToInt(s));
+    repeat
+      if Self.ClickWorld(World, COLOR_MEMBERS_WORLD) or
+         Self.ClickWorld(World, COLOR_FREE_WORLD) then
+      begin
+        Chatbox.ClickOption(['Yes.'], Random(1500, 2000));
+        if SRL.IsClientLoading(Random(1500, 2000)) then
+          SRL.WaitClientLoading();
+
+        Exit(True);
+      end;
+
+      Wait(0, 800, wdLeft);
+    until not Self.Scroll(Direction);
   end;
 
-  procedure ScrollList(var Down: Boolean);
-  begin
-    if (Down) and (GetColor(731, 416) = 65536) then
-      Down := False;
-    if (not Down) and (GetColor(731, 245) = 65536) then
-      Down := True;
-
-    Mouse.Scroll(Box(722, 246, 735, 415), Random(3, 5), Down);
-  end;
-
-  function ClickWorld(Self:TRSLogoutWS; World: Integer): Boolean;
-  var
-    i: Integer;
-    t: UInt64;
-    Down: Boolean;
-    Worlds: TIntegerArray;
-    Boxes: TBoxArray;
-  begin
-    Down := Random(2) = 0;
-
-    t := GetTickCount64() + Random(13000, 15000);
-    while (t > GetTickCount64()) do
-    begin
-      SetLength(Worlds, 0);
-      SetLength(Boxes, 0);
-
-      if (Self.VisibleWorlds(Worlds, Boxes)) then
-        for i := 0 to High(Worlds) do
-          if (Worlds[i] = World) then
-          begin
-            Mouse.Click(Boxes[i], mouse_Left);
-            Exit(True);
-          end;
-
-      ScrollList(Down);
-      Wait(Random(90, 350));
-    end;
-  end;
-
+var
+  Direction: Boolean;
 begin
   if (not Self.Open()) then
     Exit(False);
-  if (CurrentWorld = World) then
-    Exit(True);
-  if (not ClickWorld(Self, ShortWorld(World))) then
-    Exit(False);
 
-  Chatbox.ClickOption(['Yes. In', 'Yes.'], Random(2000, 2500));
-  if (srl.isClientLoading(Random(1500, 2000))) then
-    srl.WaitClientLoading();
-
-  Result := srl.isLoggedIn();
+  Direction := SRL.Dice(50);
+  if WorldSwitch(Direction) or WorldSwitch(not Direction) then
+    Result := Self.GetCurrentWorld() = World;
 end;
 
 begin

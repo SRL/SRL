@@ -73,7 +73,19 @@ begin
     if Pos(txt, ocr.Recognize(B, setting, font)) <> 0 then
       Exit(True);
   end;
-end; 
+end;
+
+function TSimpleOCR.SimpleRecognize(B: TBox; Color: Int32; Font: TFontSet; Expand: Int32 = 2): String;
+var
+  TPA: TPointArray;
+begin
+  if SRL.FindColors(TPA, CTS0(Color), B) > 0 then
+  begin
+    Self.SetFont(Font);
+
+    Result := Self.Recognize(TPA.Bounds().Expand(Expand), TCompareRules([Color]));
+  end;
+end;
 
 begin
   SmallFont.Load(FontPath+'SmallChars07'); 

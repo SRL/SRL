@@ -70,6 +70,8 @@ function TSmartBase.CreateClient: Boolean;
 
 var
   Files: TStringArray;
+  i: Int32;
+  Drive: String;
 begin
   {$IFDEF WINDOWS}
   if Self.JavaPath = '' then
@@ -83,15 +85,14 @@ begin
                FindJava('E:\Program Files\Java\');
       {$ENDIF}
     {$ELSE}
-      {$IFDEF CPU32}
-      Files := FindFile('C:\Program Files (x86)\Java\', 'java.exe') +
-               FindFile('E:\Program Files (x86)\Java\', 'java.exe');
-      {$ELSE}
-      Files := FindFile('C:\Program Files\Java\', 'java.exe') +
-               FindFile('E:\Program Files\Java\', 'java.exe');
-      {$ENDIF}
-    {$ENDIF}
-
+      for i := Ord('A') to Ord('Z') do
+      begin
+        Drive := Char(i) + ':\';
+        if DirectoryExists(Drive) then
+          Files := Files + FindFile(Drive + 'Program Files (x86)\Java\', 'java.exe') +
+                           FindFile(Drive + 'Program Files\Java\', 'java.exe');
+      end;
+  {$ENDIF}
     if Length(Files) > 0  then
       Self.JavaPath := Files[0];
   end;

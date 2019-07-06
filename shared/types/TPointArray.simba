@@ -197,6 +197,11 @@ begin
   Result.y := y / Length(Self);
 end;
 
+function TPointArray.Median: TPoint;
+begin
+  Result := MedianTPA(Self);
+end;
+
 (*
 TPointArray.Sort
 ~~~~~~~~~~~~~~~~~~~

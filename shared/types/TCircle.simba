@@ -15,9 +15,11 @@ TCircle.ToTPA
 
 Returns a full TPA of the circles circumference
 *)
-function TCircle.ToTPA(): TPointArray; constref;
+function TCircle.ToTPA(Fill: Boolean = False): TPointArray; constref;
 begin
   Result := TPAFromCircle(Self.X, Self.Y, Self.Radius);
+  if Fill then
+    FillEllipse(Result);
 end;
 
 (*
@@ -139,7 +141,7 @@ end;
 
 (*
 TCircle.Expand
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 .. code-block:: pascal
 
     function TCircle.Expand(Inc: Int32): TCircle; constref;
@@ -151,3 +153,11 @@ begin
   Result := Self;
   Result.Radius += Incr;
 end;
+
+function TCircle.PointAtDegrees(Degrees: Double): TPoint; constref;
+begin
+  Result.X := Round(Self.Radius * Cos(Radians(Degrees) - PI/2)) + Self.X;
+  Result.Y := Round(Self.Radius * Sin(Radians(Degrees) - PI/2)) + Self.Y;
+end;
+
+
