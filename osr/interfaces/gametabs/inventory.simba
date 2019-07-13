@@ -76,7 +76,7 @@ const
     DROP_PATTERN_TOPDOWN_R: TIntegerArray = [3,7,11,15,19,23,27, 2,6,10,14,18,22,26, 1,5,9,13,17,21,25,  0,4,8,12,16,20,24];
 
     //Spiral pattern: Starts in slot 0(top left corner of invy) and circles in a clockwise spiral
-    DROP_PATTERN_SPIRAL   = [0,1,2,3, 7,11,15,19,23, 27,26,25,24, 20,16,12,8,4, 5, 6,10,14,18,22, 21,17,13,9]; 
+    DROP_PATTERN_SPIRAL: TIntegerArray   = [0,1,2,3, 7,11,15,19,23, 27,26,25,24, 20,16,12,8,4, 5, 6,10,14,18,22, 21,17,13,9]; 
 
 {$IFNDEF CODEINSIGHT}
 procedure TRSInventory.__Setup();
