@@ -20,6 +20,7 @@ type
     TryAgainBox: TBox;
     WarningBox: TBox;
     BackBox: TBox;
+    OkBox: TBox;
  end;
 
 var
@@ -58,6 +59,7 @@ begin
     TryAgainBox := [315, 260, 449, 292];
     WarningBox := [234, 305, 367, 337];
     BackBox := [315, 310, 449, 342];
+    OkBox := [215, 285, 449, 317];
   end;
 end;
 {$ENDIF}
@@ -97,6 +99,13 @@ begin
   Result := srl.FindText(P, 'Back', 'UpChars07_s', COL_LOGIN_WHITE, 1, Self.BackBox);
 end;
 
+function TRSLoginScreen.IsDisconnectedOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Ok', 'UpChars07_s', COL_LOGIN_WHITE, 1, Self.OkBox);
+end;
+
 function TRSLoginScreen.Open: Boolean;
 var
   T: UInt64;
@@ -117,9 +126,14 @@ begin
         Mouse.Click(Self.TryAgainBox, mouse_Left);
       if Self.IsDisabledOpen() then
         Mouse.Click(Self.BackBox, mouse_Left);
+      if Self.IsDisconnectedOpen() then
+        Mouse.Click(Self.OkBox, mouse_Left);
     end;
 
-    if Self.IsOpen() and (not Self.IsWelcomeOpen()) and (not Self.IsInvaildDetailsOpen()) and (not Self.IsWarningOpen() and (not Self.IsDisabledOpen)) then
+    if Self.IsOpen() and
+      (not Self.IsWelcomeOpen()) and (not Self.IsInvaildDetailsOpen()) and
+      (not Self.IsWarningOpen() and (not Self.IsDisabledOpen)) and
+      (not Self.IsDisconnectedOpen()) then
       Exit(True);
 
     Wait(Random(50, 100));
