@@ -13,6 +13,7 @@ type
   PRSLogout = ^TRSLogout;
   TRSLogoutWS = record
     FTab: PRSLogout;
+    FScrollBar: TBox;
   end;
 
 (*
@@ -54,6 +55,7 @@ begin
     btnLogout  := [575,420,708,445];
 
     WorldSwitcher.FTab := PRSLogout(@Self);
+    WorldSwitcher.FScrollBar := [722, 257, 735, 416];
   end;
 end;
 {$ENDIF}
@@ -163,14 +165,30 @@ begin
   end;
 end;
 
+function TRSLogoutWS.IsCurrentWorld(World: Int32; WaitTime: Int32): Boolean; overload;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + WaitTime;
+  while (T > GetTickCount()) do
+  begin
+    if Self.GetCurrentWorld() = World then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
+end;
+
 (*
 Logout.WorldSwitcher.isOpen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: pascal
 
-  function TRSLogoutWS.isOpen(WaitTime: Integer = 0): Boolean;
+  function TRSLogoutWS.isOpen: Boolean;
+  function TRSLogoutWS.IsOpen(WaitTime: Int32): Boolean; overload;
 
-Returns if the in-game worldswitcher is open
+Returns if the in-game worldswitcher is open. Optional overload to wait
+up to `WaitTime` for worldswitcher to be open.
 *)
 function TRSLogoutWS.IsOpen: Boolean; overload;
 begin
@@ -243,28 +261,31 @@ Logout.WorldSwitcher.ClickWorld
 
 Attempts to click a world [Using a simple bitmap search].
 *)
-function TRSLogoutWS.ClickWorld(World, WorldColor: Int32): Boolean;
+function TRSLogoutWS.ClickWorld(World: Int32): Boolean;
 const
   WORLD_WIDTH = 145;
   WORLD_HEIGHT = 12;
   WORLD_FONT = 'SmallChars07';
+  WORLD_COLORS: TIntegerArray = [$00F0F0, $E0E0E0]; // Members, Free
 var
+  Color: Int32;
   BMP: TMufasaBitmap;
   B: TBox;
 begin
-  BMP := GetMufasaBitmap(BitmapFromText(ToString(World), WORLD_FONT));
-  BMP.ReplaceColor($FFFFFF, WorldColor);
+  for Color in WORLD_COLORS do
+  try
+    BMP := GetMufasaBitmap(BitmapFromText(ToString(World), WORLD_FONT));
+    BMP.ReplaceColor($FFFFFF, Color);
 
-  Result := FindBitmapIn(BMP.GetIndex(), B.X1, B.Y1, Self.FTab^.GetBounds().Expand(1));
-  if Result then
-  begin
-    B.X2 := B.X1 + WORLD_WIDTH;
-    B.Y2 := B.Y1 + WORLD_HEIGHT;
+    if FindBitmapIn(BMP.GetIndex(), B.X1, B.Y1, Self.FTab^.GetBounds().Expand(1)) then
+    begin
+      Mouse.Click(Box(B.X1, B.Y1, B.X1 + WORLD_WIDTH, B.Y1 + WORLD_HEIGHT), MOUSE_LEFT);
 
-    Mouse.Click(B, MOUSE_LEFT);
+      Exit(True);
+    end;
+  finally
+    BMP.Free();
   end;
-
-  BMP.Free();
 end;
 
 (*
@@ -275,18 +296,29 @@ Logout.WorldSwitcher.Scroll
     Returns true if world-switcher was scrolled [By checking for pixelshift].
 *)
 function TRSLogoutWS.Scroll(Down: Boolean): Boolean;
+
+  function Screenshot: TIntegerArray;
+  begin
+    Result := GetColors(TPAFromBox(Self.FTab^.GetBounds()));
+  end;
+
 var
-  B: TBox;
   Colors: TIntegerArray;
 begin
-  B := Self.FTab^.GetBounds();
-  B := B.Expand(-15, -35); // Scrollable area
+  Colors := Screenshot();
 
-  Colors := GetColors(TPAFromBox(B));
+  for 1 to Random(2, 3) do
+  begin
+    Mouse.Scroll(FScrollBar, Random(1, 2), Down);
 
-  Mouse.Scroll(B, Random(1, 2), Down);
-  if not Colors.Equals(GetColors(TPAFromBox(B))) then
-    Exit(True);
+    if Random() < 0.70 then
+      Wait(50, 100, wdLeft)
+    else
+      Wait(50, 1000, wdLeft);
+
+    if not Screenshot().Equals(Colors) then
+      Exit(True);
+  end;
 end;
 
 (*
@@ -304,36 +336,38 @@ switched [By reading current world].
     WriteLn('Switched to world 302');
 *)
 function TRSLogoutWS.SwitchTo(World: Int32): Boolean;
-const
-  COLOR_MEMBERS_WORLD = $00F0F0;
-  COLOR_FREE_WORLD = $E0E0E0;
 
-  function WorldSwitch(Direction: Boolean): Boolean;
+  function Click(Direction: Boolean): Boolean;
   begin
     repeat
-      if Self.ClickWorld(World, COLOR_MEMBERS_WORLD) or
-         Self.ClickWorld(World, COLOR_FREE_WORLD) then
-      begin
-        Chatbox.ClickOption(['Yes.'], Random(1500, 2000));
-        if SRL.IsClientLoading(Random(1500, 2000)) then
-          SRL.WaitClientLoading();
-
+      if Self.ClickWorld(World) then
         Exit(True);
-      end;
-
-      Wait(0, 800, wdLeft);
-    until not Self.Scroll(Direction);
+    until (not Self.Scroll(Direction));
   end;
 
+
 var
-  Direction: Boolean;
+  Direction, Clicked: Boolean;
+  T: UInt64;
 begin
   if (not Self.Open()) then
     Exit(False);
 
   Direction := SRL.Dice(50);
-  if WorldSwitch(Direction) or WorldSwitch(not Direction) then
-    Result := Self.GetCurrentWorld() = World;
+
+  if Click(Direction) or Click(not Direction) then
+  begin
+    T := GetTickCount() + Round(SRL.TruncatedGauss(10000, 15000));
+    while (T > GetTickCount()) do
+    begin
+      if not Clicked then
+        Clicked := Chatbox.ClickOption(['Yes.'], Random(1500, 2000));
+      if Self.GetCurrentWorld() = World then
+        Exit(True);
+
+      Wait(100, 1000, wdLeft);
+    end;
+  end;
 end;
 
 begin
