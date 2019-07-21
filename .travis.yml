@@ -4,8 +4,12 @@ addons:
   apt:
     update: true
 
+if:
+  type = push
+
 install:
-  - sudo apt install python2.7 python-pip
+  - sudo apt install python3 python-pip
+  - sudo pip install docutils==0.14
   - sudo pip install sphinx sphinx_rtd_theme
 
 script:
