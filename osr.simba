@@ -45,6 +45,7 @@ end;
 {$include_once osr/interfaces/shops.simba}
 {$include_once osr/interfaces/bankscreen.simba}
 {$include_once osr/interfaces/grandexch.simba}
+{$include_once osr/interfaces/pinscreen.simba}
 {$include_once osr/MM2MS.simba}
 {$include_once osr/antiban.simba}
 
