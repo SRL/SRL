@@ -44,7 +44,7 @@ begin
     Exit(True);
 
   // LOBBY: `Never` in `Never tell anybody your password...`
-  if (csLobby in States) and FindText('Never', [141, 106, 172, 115], $00FFFF, 'SmallChars07') then
+  if (csLobby in States) and (GetColor(400, 400) = 0) then
     Exit(True);
 end;
 
