@@ -114,14 +114,12 @@ begin
     Exit(False);
   end;
 
+  {$IFDEF WINDOWS}
   if not Self.ShowConsole then
   begin
-    {$IFDEF WINDOWS}
     JavaPath := StringReplace(Self.JavaPath, 'java.exe', 'javaw.exe', [])
-    {$ELSE}
-    JavaPath := JavaPath + 'w';
-    {$ENDIF}
   end;
+  {$ENDIF}
 
   with Self.Parameters do
   begin
