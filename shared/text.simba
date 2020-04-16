@@ -82,7 +82,7 @@ begin
     TPA := TPAFromText(Text, Font);
     OffsetTPA(TPA, p);
 
-    Mouse.Move(GetTPABounds(TPA))
+    Mouse.Move(GetTPABounds(TPA));
     if (MouseAction <> mouse_Move) then
       Mouse.Click(mouseAction);
   end;
@@ -101,7 +101,7 @@ begin
     TPA := TPAFromText(Text, Font);
     OffsetTPA(TPA, p);
 
-    Mouse.Move(GetTPABounds(TPA))
+    Mouse.Move(GetTPABounds(TPA));
     if (MouseAction <> mouse_Move) then
       Mouse.Click(mouseAction);
   end;

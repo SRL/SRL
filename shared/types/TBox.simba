@@ -257,9 +257,9 @@ var m,i: TPoint;
 begin
   Result := P;
   m := Self.Middle;
-  if srl.LinesIntersect(p,m, Point(X1,Y1), Point(X2,Y1), i) then Result := i
-  if srl.LinesIntersect(p,m, Point(X2,Y1), Point(X2,Y2), i) then Result := i
-  if srl.LinesIntersect(p,m, Point(X2,Y2), Point(X1,Y2), i) then Result := i
+  if srl.LinesIntersect(p,m, Point(X1,Y1), Point(X2,Y1), i) then Result := i;
+  if srl.LinesIntersect(p,m, Point(X2,Y1), Point(X2,Y2), i) then Result := i;
+  if srl.LinesIntersect(p,m, Point(X2,Y2), Point(X1,Y2), i) then Result := i;
   if srl.LinesIntersect(p,m, Point(X1,Y2), Point(X1,Y1), i) then Result := i;
 end;
 

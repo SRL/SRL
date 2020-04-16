@@ -30,7 +30,6 @@ Copy client to bitmap.
 procedure TMufasaBitmap.FromClient(Area: TBox=[0,0,-1,-1]);
 var 
   W,H: Int32;
-  m: TMufasaBitmap;
 begin
   client.GetIOManager.GetDimensions(W,H);
   if Area = TBox([0,0,-1,-1]) then Area := [0,0,W-1,H-1];
@@ -416,7 +415,7 @@ begin
   Self.DrawTPA(TPA, color);
 end;
 
-function TMufasaBitmap.DrawCuboid(Top, Btm: TRectangle; color: Int32): Boolean;
+Procedure TMufasaBitmap.DrawCuboid(Top, Btm: TRectangle; color: Int32);
 begin
   Self.DrawRect([Top.Left, Top.Btm, Btm.Btm, Btm.Left], color);
   Self.DrawRect([Top.Top, Top.Right, Btm.Right, Btm.Top], color);

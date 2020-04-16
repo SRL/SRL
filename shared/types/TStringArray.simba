@@ -89,7 +89,7 @@ begin
   for i:=0 to High(Self) do
     if (Self[i] = Value) then
       Result += i;
-end
+end;
 
 function TStringArray.Reversed(): TStringArray;
 var
