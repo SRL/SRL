@@ -655,7 +655,7 @@ end;
 procedure TAntiban.OpenRandomTab();
 begin
   DebugNote('[RND] Open Random Tab');
-  Gametabs.Open(EGametab(Random(Gametabs.Tabs.Len)));
+  Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
   WaitEx(1600,100);
   if Random(4) = 0 then Inventory.Open()
   else if Random(4) = 0 then Stats.Open();
@@ -683,7 +683,7 @@ begin
   for 0 to Random(2) do
   begin
     if Random(3) = 0 then
-      Gametabs.Open(EGametab(Random(Gametabs.Tabs.Len)));
+      Gametabs.Open(EGametab(Random(High(Gametabs.Tabs))));
 
     WaitEx(1500,200);
     if(Random(8) = 0) then
