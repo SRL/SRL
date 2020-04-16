@@ -238,7 +238,7 @@ var
   begin
     best := srl.DistToLineEx(p, Rect.Top,  Rect.Left, Result);
     if (dist := srl.DistToLineEx(p, Rect.Left, Rect.Btm,  x)) < best then begin Result := x; Best := dist; end;
-    if (dist := srl.DistToLineEx(p, Rect.Btm,  Rect.Right,x)) < best then begin Result := x; Best := dist; end
+    if (dist := srl.DistToLineEx(p, Rect.Btm,  Rect.Right,x)) < best then begin Result := x; Best := dist; end;
     if (dist := srl.DistToLineEx(p, Rect.Right,Rect.Top,  x)) < best then begin Result := x; Best := dist; end;
   end;
 begin

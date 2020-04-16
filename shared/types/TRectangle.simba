@@ -116,9 +116,6 @@ TRectangle.Rotate
 Returns a rotated copy of the rectangle
 *)
 function TRectangle.Rotate(Angle: Double): TRectangle; constref;
-var
-  i,topI: Int32;
-  TPA: TPointArray;
 begin
   with Self.Mean() do
   begin
@@ -323,6 +320,6 @@ var
 begin
   Best := srl.DistToLineEx(P, Self.Top,  Self.Left, Result);
   if (dist := srl.DistToLineEx(P, Self.Left, Self.Btm,   X)) < Best then begin Result := X; Best := Dist; end;
-  if (dist := srl.DistToLineEx(P, Self.Btm,  Self.Right, X)) < Best then begin Result := X; Best := Dist; end
+  if (dist := srl.DistToLineEx(P, Self.Btm,  Self.Right, X)) < Best then begin Result := X; Best := Dist; end;
   if (dist := srl.DistToLineEx(P, Self.Right,Self.Top,   X)) < Best then begin Result := X; Best := Dist; end;
 end;

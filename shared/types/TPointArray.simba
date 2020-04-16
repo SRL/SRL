@@ -95,7 +95,7 @@ begin
       SetLength(Result, top+1);
       Result[Inc(top)-1] := i;
     end;
-end
+end;
 
 function TPointArray.Reversed(): TPointArray;
 var

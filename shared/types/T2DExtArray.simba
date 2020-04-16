@@ -92,7 +92,7 @@ begin
   for i:=0 to High(Self) do
     if Value.Equals(Self[i]) then
       Result += i;
-end
+end;
 
 function T2DExtArray.Reversed(): T2DExtArray;
 var

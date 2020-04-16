@@ -163,7 +163,9 @@ begin
     xs := xs + veloX;
     ys := ys + veloY;
     if (lastX <> Round(xs)) or (lastY <> Round(ys)) then
+    begin
       Self.SetPosition(Point(Round(xs), Round(ys)));
+    end;
     step := Hypot(xs - lastX, ys - lastY);
     Wait(Round((maxWait - minWait) * (step / maxStep) + minWait));
   end;
@@ -298,6 +300,9 @@ begin
   {$ENDIF}
   {$IFDEF WINDOWS}
     downInt := -1; upInt := 1;
+  {$ENDIF}
+  {$IFDEF DARWIN}
+    downInt := 1; upInt := -1;
   {$ENDIF}
   {$IFDEF SMART}
     downInt := 1; upInt := -1;
