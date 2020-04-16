@@ -1,0 +1,119 @@
+Welcome to SRLs documentation!
+===============================
+
+.. toctree::
+   :caption: OSR
+
+   chooseoption
+   text
+   MM2MS
+   players
+   antiban
+   client
+   worldswitcher
+   login
+   xpbar
+   misc
+
+-----------
+
+.. toctree::
+   :caption: OSR -> INTERFACES -> GAMETABS
+
+   combat
+   prayer
+   logout
+   stats
+   options
+   equipment
+   spells
+   inventory
+
+-----------
+
+.. toctree::
+   :caption: OSR -> INTERFACES
+
+   gametabs
+   mainscreen
+   bankscreen
+   chatbox
+   shops
+   minimap
+   rsInterfaceBase
+   depositbox
+   grandexch
+   smithingscreen
+   pinscreen
+
+-----------
+
+.. toctree::
+   :caption: SHARED
+
+   mouse
+   text(shared)
+   pixelshift
+   time
+   interfacebase
+   drawing
+   math
+   wrappers
+   keyboard
+   random
+   color
+
+-----------
+
+.. toctree::
+   :caption: SHARED -> TYPES
+
+   TBoxArray
+   TRectangle
+   T2DExtArray
+   TBox
+   TStringArray
+   TBoolArray
+   T2DPointArray
+   String
+   TPointArray
+   TExtendedArray
+   TPoint
+   Other
+   TIntegerArray
+   TCircle
+   T2DIntArray
+
+-----------
+
+.. toctree::
+   :caption: UTILS
+
+   slackdebug
+   slackab
+   misc(utils)
+   slacktree(utils)
+
+-----------
+
+.. toctree::
+   :caption: UTILS -> ASYNCMOUSE
+
+   libasyncmouse
+
+-----------
+
+.. toctree::
+   :caption: UTILS -> SLACKTREE
+
+   tree
+
+-----------
+
+
+
+Indices and tables
+==================
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

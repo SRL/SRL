@@ -1,0 +1,7 @@
+
+TBoolArray
+==========
+TBoolArray related methods
+
+
+------------

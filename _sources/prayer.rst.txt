@@ -1,0 +1,93 @@
+
+Prayer
+=======
+The file holds functions and procedures that are related to the prayer gametab
+
+
+------------
+
+var Prayer
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape prayer gametab.
+
+Prayers follow the same name as ingame,`only prefixed with ``PRAY_`` so for example: ``PRAY_THICK_SKIN`` or ``PRAY_ULTIMATE_STRENGTH``
+
+
+------------
+
+Prayer.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.Open(): Boolean;
+
+Opens the interface
+
+
+------------
+
+Prayer.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.IsOpen(maxWait:Int32=0): Boolean;
+
+Checks if the interface is already open.
+
+
+------------
+
+Prayer.GetPrayerBox
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.GetPrayerBox(Prayer: EPrayerType): TBox;
+
+Returns the bounding box covering the given prayer.
+
+
+------------
+
+Prayer.CanActivate
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.CanActivate(Prayer: EPrayerType): Boolean;
+
+Returns True if you can activete the prayer..
+
+
+------------
+
+Prayer.IsActivated
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.IsActivated(Prayer: EPrayerType): Boolean;
+
+Returns True if the spell is activated
+
+
+------------
+
+Prayer.MouseOver
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.MouseOver(Prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
+
+Moves the mouse over the given prayer.
+
+
+------------
+
+Prayer.Toggle
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSPrayer.Toggle(prayer: EPrayerType; Rng:ERandomStyle=rndGauss): Boolean;
+
+Click's it if it can be activated.
+
+
+------------

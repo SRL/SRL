@@ -1,0 +1,170 @@
+
+Shop Interface
+==============
+For interacting with various shop interfaces.
+They may not all work, but I think most should work. There's a good chance the 
+only thing lacking is that title of your shop interface, so if it doesn't work 
+add the shops title - or a subset of it by doing:
+
+.. code-block:: pascal
+
+ ShopScreen.AppendTitle('Wallmart');
+
+PS: You are expected to find and open the interface yourself.
+
+
+------------
+
+.. code-block:: pascal
+
+ var ShopScreen: TRSShopScreen;
+
+
+------------
+
+ShopScreen.__Setup
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSShopScreen.__Setup();
+
+Every interface needs some internal setup procedure..
+
+
+------------
+
+ShopScreen.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the interface - automatically.
+
+
+------------
+
+ShopScreen.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed.
+
+
+------------
+
+ShopScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+
+
+------------
+
+ShopScreen.Find????
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ 
+  function TRSBankScreen.FindDTM(DTM: Integer): Int32;
+  function TRSBankScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+  function TRSBankScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+  
+Returns the index of the given DTM, BMP or Mask, otherwise ``-1`` if it's not found.
+
+
+------------
+
+ShopScreen.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.MouseOver(Slot: Int32): Boolean;
+
+Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
+
+
+------------
+
+ShopScreen.IsEmpty
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.IsEmpty(Slot: Int32): Boolean;
+
+Returns ``True`` if the slot is empty
+
+
+------------
+
+ShopScreen.GetStackAmount
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.GetStackAmount(Slot: Int32): Int32;
+
+Returns the number of items stacked in the given slot. ``-1`` if failed.
+
+
+------------
+
+ShopScreen.ItemPrice
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.ItemPrice(Slot: Int32): Int32;
+
+Returns the price of the given item by id in the shop.
+
+
+------------
+
+ShopScreen.SellValue
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.SellValue(InventorySlot: Int32): Int32;
+
+Returns the value of the item in your inventory.
+
+
+------------
+
+ShopScreen.BuyItem
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.BuyItem(Slot, Amount: Int32): Boolean;
+
+Buy the item in the given shop slot.
+
+
+------------
+
+ShopScreen.SellItem
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.SellItem(InvSlot, Amount: Int32): Boolean;
+
+Sell the item in the given invetory slot.
+
+
+------------
+
+ShopScreen.Close
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSShopScreen.Close(): Boolean;
+
+Closes the interface.
+
+
+------------

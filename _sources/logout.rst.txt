@@ -1,0 +1,160 @@
+
+Logout
+=======
+The file holds functions and procedures that are in the logout-tab.
+
+
+------------
+
+type TRSLogoutWS
+~~~~~~~~~~~~~~~~
+Type that holds the methods for the in-game worldswitcher located on the logout tab
+
+
+------------
+
+type TRSLogout
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape logout-tab.
+
+
+------------
+
+var Logout
+~~~~~~~~~~
+Variable that stores functions and properties of the Runescape logout interface.
+
+
+------------
+
+Logout.Open
+~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.Open(): Boolean;
+
+Opens the interface
+
+
+------------
+
+Logout.IsOpen
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.IsOpen(Tab:ELogoutSubtab=lsTabNone; maxWait:Int32=0): Boolean;
+
+Checks if the interface is already open. Can also be used to check if a specific "subtab" is open.
+
+
+------------
+
+Logout.ClickLogout
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.ClickLogout(attemts:Int32=3; tryTime:Int32=20000): Boolean;
+
+Clicks the logout button, by default retires 3 times over 20 seconds.
+
+
+------------
+
+Logout.SwitchToWorld
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogout.SwitchToWorld(World: Integer): Boolean;
+
+Jumps to the given world.
+
+
+------------
+
+Logout.WorldSwitcher.GetCurrentWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSLogoutWS.GetCurrentWorld: Int32;
+
+Reads and returns the current world.
+
+
+------------
+
+Logout.WorldSwitcher.isOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogoutWS.isOpen: Boolean;
+  function TRSLogoutWS.IsOpen(WaitTime: Int32): Boolean; overload;
+
+Returns if the in-game worldswitcher is open. Optional overload to wait
+up to `WaitTime` for worldswitcher to be open.
+
+
+------------
+
+Logout.WorldSwitcher.Open
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogoutWS.Open: Boolean;
+
+Opens the in-game worldswitcher
+
+
+------------
+
+Logout.WorldSwitcher.Close
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSLogoutWS.Close: Boolean;
+
+Closes the worldswitcher (returns back to the logout button)
+
+
+------------
+
+Logout.WorldSwitcher.ClickWorld
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSLogoutWS.ClickWorld(World, WorldColor: Int32): Boolean;
+
+Attempts to click a world [Using a simple bitmap search].
+
+
+------------
+
+Logout.WorldSwitcher.Scroll
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSLogoutWS.Scroll(Down: Boolean): Boolean;
+
+    Returns true if world-switcher was scrolled [By checking for pixelshift].
+
+
+------------
+
+Logout.WorldSwitcher.SwitchTo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSLogoutWS.SwitchTo(World: Int32): Boolean;
+
+Uses the in-game world switcher to switch to `World`. Returns true if succesfully
+switched [By reading current world].
+
+**Example**
+
+.. code-block:: pascal
+
+
+  if Logout.WorldSwitcher.SwitchTo(302) then
+    WriteLn('Switched to world 302');
+
+
+------------

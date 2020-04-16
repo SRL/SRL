@@ -1,0 +1,119 @@
+
+Gametabs
+==========
+Gametabs is the core of every tab, like inventory, stats, and so on.
+This is also the file that includes every tab's code.
+
+.. code-block:: pascal
+
+   type EGametab = (
+     tabCombat,
+     tabStats,
+     tabQuests,
+     tabInventory,
+     tabEquipment,
+     tabPrayer,
+     tabMagic,
+     tabClan,
+     tabFriends,
+     tabIgnores,
+     tabLogout,
+     tabOptions,
+     tabEmotes,
+     tabMusic
+   );
+   
+   type TRSGametab = record
+     Tabs: TBoxArray;
+     Keybindings: TIntegerArray;
+     FKeysEnabled: Boolean;
+   end;
+
+
+------------
+
+var Gametabs
+~~~~~~~~~~~~
+Variable that stores functions and properties relating to gametabs.
+
+
+------------
+
+Gametab.ToggleFKeys
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSGametab.ToggleFKeys(const Enable: Boolean);
+
+Enables support for FKeys to open tabs.
+
+
+------------
+
+Gametab.GetBounds
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGametab.GetBounds(Tab: EGametab): TBox;
+
+Returns the bounds of the tab-button
+
+
+------------
+
+Gametab.PointToSlot
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGametab.PointToSlot(pt: TPoint): Int32;
+
+Returns the tab-id under the location ``pt``, value is returned as
+an integer, as it will return ``-1`` if it fails. To convert it to a 
+gametab is just a matter of casting it like ``EGameTab(theValue)``
+
+
+------------
+
+Gametab.IsOpen
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGametab.IsOpen(Tab:EGametab; MaxWait:Int32=0): Boolean;
+
+Checks if the given tab is open or now. By default it wont wait (expecting it to open).
+
+
+------------
+
+Gametab.Open
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGametab.Open(Tab: EGametab; Tries: Int32=2): Boolean;
+
+Opens the given gametab, by default it retries twice.
+
+
+------------
+
+Gametab.Open
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSGametab.Hover(Tab:EGametab; Condition:Boolean=True);
+
+Only moves the mouse over the given tab.
+
+
+------------
+
+Gametab.GetCurrent
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGametab.GetCurrent(): EGametab;
+
+Returns the current open tab.
+
+
+------------

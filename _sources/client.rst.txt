@@ -1,0 +1,110 @@
+
+client
+======
+Refers to the oldschool runescape client. Stores general methods checking the state of the client.
+
+
+------------
+
+srl.IsClientState
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientState(States: ERSClientStateSet): Boolean; overload;
+
+Returns ``True`` if the client state equals any of the ``States```
+
+
+------------
+
+srl.IsClientState
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientState(State: ERSClientState): Boolean; overload;
+
+Returns ``True`` if the clients state equals the ``State``
+
+
+------------
+
+srl.IsLoggedIn
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsLoggedIn: Boolean; overload;
+
+Returns ``True`` if a player is in game.
+
+
+------------
+
+srl.IsLoggedIn
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsLoggedIn(WaitTime: Int32): Boolean; overload;
+
+Overload that accepts a ``WaitTime`` parameter.
+
+
+------------
+
+srl.IsClientReady
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientReady: Boolean; overload;
+
+Returns true if the client is in a known state, this means either of the following are active:
+  - Logged in
+  - Login screen
+  - World switcher
+  - Lobby
+
+
+------------
+
+srl.IsClientReady
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientReady: Boolean; overload;
+
+Overload that accepts ``WaitTime`` parameter.
+
+
+------------
+
+srl.IsClientLoading
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientLoading: Boolean; overload;
+
+Returns ``True`` if the client is loading by checking for ``Loading - please wait`` in the top left.
+
+
+------------
+
+srl.IsClientLoading
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.IsClientLoading: Boolean; overload;
+
+Overload that accepts ``WaitTime`` parameter.
+
+
+------------
+
+srl.WaitClientLoading
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TSRL.WaitClientLoading;
+
+Waits forever until the client has finished loading.
+
+
+------------

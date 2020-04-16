@@ -1,0 +1,118 @@
+
+DepositBox
+==========
+For interacting with the depositbox.
+
+PS: You are expected to find and open the depositbox yourself.
+
+
+------------
+
+.. code-block:: pascal
+
+ var DepositBox: TRSDepositBox;
+
+.. code-block:: pascal
+
+ EDepositButton = (dbDepositInv, dbDepositWarnItems, dbDepositLoot, dbClose);
+
+.. code-block:: pascal
+
+ const DEPOSIT_ALL = -1;
+
+
+------------
+
+DepositBox.__Setup
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSDepositBox.__Setup();
+
+Every interface needs some internal setup procedure..
+
+
+------------
+
+DepositBox.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSDepositBox.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the depositbox - automatically.
+
+
+------------
+
+DepositBox.Debug
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSDepositBox.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+
+Debugs the bounds of the depositbox, mainly used when maintenance is needed.
+
+
+------------
+
+DepositBox.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSDepositBox.IsOpen(): Boolean;
+
+Checks if the depositbox is open.
+Internally also used to prepare the boundaries of the depositbox
+
+
+------------
+
+DepositBox.ClickButton
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TRSDepositBox.ClickButton(Button: EDepositButton): Boolean;
+
+Clicks the button. Available buttons are ``(dbDepositInv, dbDepositWarnItems, dbDepositLoot, dbClose)``.
+
+
+------------
+
+DepositBox.DepositItem
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TRSDepositBox.DepositItem(Slot, Amount:Int32; UpText:TStringArray=[]): Boolean;
+
+Attempts to deposit the item in the given slot. Amount can be any value, while
+``-1`` or ``DEPOSIT_ALL`` will cause it to deposit all of those items in that slot.
+
+
+------------
+
+DepositBox.DepositInventory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TRSDepositBox.DepositInventory(CloseAfter: Boolean = True): Boolean;
+
+Deposits your whole inventory, waits for all the items to disappear, and alteratively
+closes the interface. It returns ``True`` if all items was cleared from your inventory.
+
+
+------------
+
+DepositBox.Close
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSDepositBox.Close(): Boolean;
+
+Closes the interface.
+
+
+------------

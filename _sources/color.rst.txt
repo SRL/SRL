@@ -1,0 +1,205 @@
+
+Color
+======
+Color finding related methods
+
+
+------------
+
+CTS0, CTS1, CTS2
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  function CTS0(Color, Tolerance: Int32): TCTSColor;
+  function CTS1(Color, Tolerance: Int32): TCTS1Color;
+  function CTS2(Color, Tolerance: Int32; HueMod:Extended=0.2; SatMod:Extended=0.2): TCTS2Color;
+  
+Used for declaring colors using the different CTS settings.
+
+
+------------
+
+srl.FindColors
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTSColor;  Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTS1Color; Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: TCTS2Color; Area: TBox): UInt32; constref;
+  function TSRL.FindColors(out TPA: TPointArray; Color: array of TCTS2Color; Area: TBox): UInt32; constref;
+
+Searches for the given Color, returns the resulting points in the TPA.
+
+
+------------
+
+srl.WaitColorCount
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function TSRL.WaitColorCount(Color: TCTS1Color; Area: TBox; CompareFunc: TCompareFunc; Count, WaitTime: Integer): Boolean;
+
+See examples. :)
+
+Example:
+
+.. code-block:: pascal
+
+  // Waits 5000ms for the color count in area to be greater than 50
+  srl.WaitColorCount([255, 10], Area, @GreaterThan, 50, 5000);
+
+  // Waits 500ms for the color count in area to equal 20
+  srl.WaitColorCount([255, 10], Area, @Equals, 20, 5000);
+
+
+------------
+
+srl.WaitColor
+~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TSRL.WaitColor(Color: Integer; p: TPoint; WaitTime: Integer): Boolean;
+
+Waits 'WaitTime' for the color 'Color' to be found at the point 'p'.
+
+Example:
+
+.. code-block:: pascal
+
+    if (srl.WaitColor(clRed, Point(100, 100), 1000)) then
+      Writeln('clRed has been found at point(100, 100) within 1 second');
+
+
+------------
+
+type TColorSettings
+~~~~~~~~~~~~~~~~~~~
+
+A record that provides easy access to the Simba CTS settings.
+
+
+------------
+
+ColorSetting
+~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function ColorSetting(CTS: Byte; Hue: Extended = 0.2; Sat: Extended = 0.2): TColorSettings;
+
+Creates a TColorSettings type.
+
+Example:
+
+.. code-block:: pascal
+
+    // CTS 2
+    Writeln(ColorSetting(2, 0.55, 0.20));
+    // CTS 1
+    Writeln(ColorSetting(1));
+
+
+------------
+
+TColorSettings.Retrieve
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TColorSettings.Retrieve();
+
+Retrieves all color setting information.
+
+Example:
+
+.. code-block:: pascal
+
+    cs.Retrieve();
+
+
+------------
+
+TColorSettings.Apply
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    procedure TColorSettings.Apply();
+
+Applies the color settings stored in the type.
+
+Example:
+
+.. code-block:: pascal
+
+    cs.Apply();
+
+
+------------
+
+FindColorsTolerance; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function FindColorsTolerance(var TPA: TPointArray; Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Boolean; overload;
+
+Overload for FindColorsTolerance that accepts a TColorSettings parameter.
+
+Example:
+
+.. code-block:: pascal
+
+    FindColorsTolerance(TPA, clRed, Area, 10, ColorSetting(2, 0.55, 1.10));
+
+
+------------
+
+FindColorTolerance; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function FindColorTolerance(out x, y: Int32; Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Boolean; overload;
+
+Overload for FindColorTolerance that accepts a TColorSettings parameter.
+
+Example:
+
+.. code-block:: pascal
+
+    FindColorsTolerance(x, y, clRed, Area, 10, ColorSetting(2, 0.55, 1.10));
+
+
+------------
+
+CountColorTolerance; overload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+    function CountColorTolerance(Color: Integer; SearchArea: TBox; Tolerance: Int32; cs: TColorSettings): Integer; overload;
+
+Overload for CountColorTolerance that accepts a TColorSettings parameter.
+
+Example:
+
+.. code-block:: pascal
+
+    Writeln(CountColorTolerance(clRed, Area, 10, ColorSetting(2, 0.50, 1.00)));
+
+
+------------
+
+type TColorEx
+~~~~~~~~~~~~~
+A simple record that stores a color, tolerance and color settings.
+
+Example:
+
+.. code-block:: pascal
+
+  var
+    CTS1_Color: TColorEx = [clRed, 20, [1]];
+    CTS2_Color: TColorEx = [clRed, 20, [2, 0.50, 1.00]];
+    CTS3_Color: TColorEx = [clRed, 20, [3, 0.00, 0.00, 0.50]];
+
+
+------------

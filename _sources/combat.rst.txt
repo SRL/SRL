@@ -1,0 +1,120 @@
+
+Combat
+=======
+The combat file holds functions and procedures that are used for configuring combat.
+
+
+------------
+
+type TRSCombat
+~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape combat interface.
+
+
+------------
+
+var Combat
+~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape combat interface.
+
+
+------------
+
+type ECombatStyle
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  ECombatStyle = (cbtAccurate, cbtAggressive, cbtControlled, cbtDefensive, cbtRetaliate);
+
+identifiers that is used for pressing the different buttons in the combat interface
+
+
+------------
+
+Combat.Open
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.Open(): Boolean;
+
+Opens the interface
+
+
+------------
+
+Combat.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.IsOpen(maxWait:Int32=0): Boolean;
+
+Checks if the interface is already open.
+
+
+------------
+
+Combat.ToggleButton
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.ToggleButton(btn: ECombatStyle; enable:Boolean; tryTime:Int32=2000): Boolean;
+
+Changes the state of the given button ``btn`` (if needed) to the given state ``enable``.
+
+
+------------
+
+Combat.GetCombatLevel
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.GetCombatLevel(): Int32;
+
+Returns your combat-level.
+
+
+------------
+
+Combat.GetWeapon
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.GetWeapon(): String;
+
+Returns the currently equipped weapon.
+
+
+------------
+
+Combat.GetSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.GetSpecialAttack(): Int32;
+
+Returns the specual attack level
+
+
+------------
+
+Combat.SpecialAttackEnabled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.SpecialAttackEnabled(): Boolean;
+
+Returns ``True`` if special attack has been activated
+
+
+------------
+
+Combat.UseSpecialAttack
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSCombat.UseSpecialAttack(): Boolean;
+
+Attempts to enabled special attack, returns ``True`` if it managed to, or if it was already enabled.
+
+
+------------

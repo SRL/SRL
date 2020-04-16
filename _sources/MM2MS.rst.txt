@@ -1,0 +1,281 @@
+
+Minimap to Mainscreen
+=====================
+The core for our minimap to mainscreen projection.
+Supports rotation, and zoom, and resizable client.
+
+MM2MS extends the Minimap interface as well as the mainscreen interface with 
+functionality to convert coordinates to & from the minimap to the mainscreen.
+
+
+------------
+
+MM2MS
+-----
+
+
+------------
+
+type TMinimapToMS
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ 
+  type
+    TMinimapToMS = record
+      BASE_W, BASE_H: Int32;        // the size of the area we project to (mainscreen size)
+      MSCX, MSCY: Int32;            // the center of the area we project to (mainscreen center)
+      MMCX, MMCY: Int32;            // the center of the area we project from (minimap center)
+      SCALE_MIN, SCALE_MAX: Double; // direct zoom (relates to BASE)
+      ZOOM: Double;                 // current zoom
+      YSHIFT: Double;               // zooming may cause mid-Y to shift
+    end;
+   
+The comments explains it. This is the datastructure MM2MS uses.
+
+
+------------
+
+var MM2MS
+~~~~~~~~~
+.. code-block:: pascal
+
+
+  var MM2MS: TMinimapToMS;
+
+The global variable which you would refer to.
+
+
+------------
+
+MM2MS.Init
+~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TMinimapToMS.Init(Resizable: Boolean);
+
+This method is called automatically once SRL loads. So you don't have to deal with it.
+
+This methods Init's the MM2MS variable, sets up values needed for a succesful projection.
+MM2MS supports Resizable RS client, but SRL does not. This is added only for future-proofing.
+
+
+------------
+
+MM2MS.Transform
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TMinimapToMS.Transform(coord: Vector3; matrix: TMatrix4): Vector3;
+
+Transforms the given coordinate with the given transformation matrix ``matrix``
+
+
+------------
+
+MM2MS.Project
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TMinimapToMS.Project(Coords: Vector3Array; Rotation: Vector3): TPointArray;
+
+Projects the given coordinates ``coo rds`` and applys the given ``Rotation`` vector to the projection.
+
+
+------------
+
+MM2MS.Run
+~~~~~~~~~
+.. code-block:: pascal
+
+ function TMinimapToMS.Run(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray;
+
+The method we actually call (internally) to project our coordinates from the minimap to the mainscreen.
+
+
+------------
+
+MM2MS.SetZoom
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TMinimapToMS.SetZoom(Notch: ERSZoomNotch); overload;
+
+Changes the zoom level MM2MS operates at.
+
+.. code-block:: pascal
+
+
+  MM2MS.SetZoom(Options.GetZoomNotch());
+
+
+
+------------
+
+MM2MS.SetZoom
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TMinimapToMS.SetZoom; overload;
+
+Sets up MM2MS for the current zoom level in game.
+
+.. code-block:: pascal
+
+
+  MM2MS.SetZoom();
+
+
+
+------------
+
+Minimap
+------------------------------------------------------
+Extend the minimap-functionality with MM2MS functions
+
+
+------------
+
+Minimap.ArrToMs
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ 
+  function TRSMinimap.ArrToMs(Arr: Vector3Array; Roll:Single=$FFFF): TPointArray; overload;
+  function TRSMinimap.ArrToMs(Arr: TPointArray; Roll:Single=$FFFF): TPointArray; overload;
+
+Takes array of points on the minimap, returns mainscreen projected array of points.
+The first method takes a vector3 array as input, so we can pass height as well, and more detailed coordinates to scale.
+
+
+------------
+
+Minimap.VecToMs
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.VecToMs(Vec: Vector3; Roll:Single=$FFFF): TPoint;
+
+Takes a single coordinate as a Vector3 on the minimap, and converts it to a point on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.PointToMs
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.PointToMs(PT: TPoint; Roll:Single=$FFFF): TPoint;
+
+Takes a single coordinate as a TPoint on the minimap, and converts it to a point on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.VecToMsRect
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.VecToMsRect(Vec: Vector3; Roll:Single=$FFFF): TRectangle;
+
+Takes a single coordinate as a Vector3 on the minimap, and converts it to a rectangle / tile on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.PointToMsRect
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.PointToMsRect(PT: TPoint; Roll:Single=$FFFF): TRectangle;
+
+Takes a single coordinate as a TPoint on the minimap, and converts it to a rectangle / tile on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.VecToMsBox
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.VecToMsBox(Vec: Vector3; Roll:Single=$FFFF): TBox;
+
+Takes a single coordinate as a Vector3 on the minimap, and converts it to a rough box on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.VecToMsBox
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.PointToMsBox(PT: TPoint; Roll:Single=$FFFF): TBox;
+
+Takes a single coordinate as a TPoint on the minimap, and converts it to a rough box on the mainscreen.
+
+*ROLL is the compass angle, by leaving it default it will gather the compass angle itself.*
+
+
+------------
+
+Minimap.StaticToMsRect
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.StaticToMsRect(StaticMMPoint: TPoint; Height:Int32=0): TRectangle;
+
+Takes static minimap coordinate, rotates it to compass angle, and returns a rectangle on the mainscreen
+The static point is therefor gathered at north, and it will rotate it as expected.
+
+
+------------
+
+Minimap.StaticToMs
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMinimap.StaticToMs(StaticMMPoint: TPoint; Height:Int32=0): TPoint;
+
+This is the same as the above, only that it returns a single point on the mainscreen.
+
+
+------------
+
+Mainscreen
+-------------------------------------------------------
+Extend the mainscreen-functionality with MS2MM function
+
+
+------------
+
+Mainscreen.PointToMM
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSMainScreen.PointToMM(MS: TPoint; Height: Int32=0; Accuracy:Double=0.2): Vector3;
+
+Takes a mainscreen point and converts it to a point on the minimap.
+
+Returns a Vector3 which includes input height. Conversion to a TPoint if that's what you need is simply 
+done by calling `.ToPoint` on the result.
+
+**Example**
+
+.. code-block:: pascal
+
+
+  WriteLn Mainscreen.PointToMM(Point(250,140), 2);           // as a vector (more accurate)
+  WriteLn Mainscreen.PointToMM(Point(250,140), 2).ToPoint(); // as a TPoint (lost accuracy)
+
+
+------------

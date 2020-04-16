@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Players &mdash; SRL  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Antiban" href="antiban.html" />
+    <link rel="prev" title="Minimap to Mainscreen" href="MM2MS.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SRL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">OSR</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chooseoption.html">ChooseOption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MM2MS.html">Minimap to Mainscreen</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Players</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-setcount">TPlayerArray.SetCount</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-getcount">TPlayerArray.GetCount</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-getcurrent">TPlayerArray.GetCurrent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-setcurrent">TPlayerArray.SetCurrent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-getactive">TPlayerArray.GetActive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-getplayer">TPlayerArray.GetPlayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-switchto">TPlayerArray.SwitchTo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-next">TPlayerArray.Next</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-add">TPlayerArray.Add</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-new">TPlayerArray.New</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tplayerarray-logincurrent">TPlayerArray.LoginCurrent</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="antiban.html">Antiban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worldswitcher.html">WorldSwitcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="login.html">Loginscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpbar.html">XPBar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES -&gt; GAMETABS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="combat.html">Combat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prayer.html">Prayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logout.html">Logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">Stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equipment.html">Equipment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spells.html">Spells</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gametabs.html">Gametabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainscreen.html">MainScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bankscreen.html">BankScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chatbox.html">Chatbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shops.html">Shop Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimap.html">Minimap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rsInterfaceBase.html">RSInterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depositbox.html">DepositBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grandexch.html">GrandExchange</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smithingscreen.html">Smithing screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinscreen.html">PinScreen</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mouse.html">Mouse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text(shared).html">Text (shared)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixelshift.html">Pixelshift</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfacebase.html">InterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawing.html">Drawing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="random.html">Random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">Color</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED -&gt; TYPES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="TBoxArray.html">TBoxArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRectangle.html">TRectangle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DExtArray.html">T2DExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBox.html">TBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TStringArray.html">TStringArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBoolArray.html">TBoolArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DPointArray.html">T2DPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="String.html">String</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPointArray.html">TPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TExtendedArray.html">TExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPoint.html">TPoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Other.html">Other datatypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIntegerArray.html">TIntegerArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TCircle.html">TCircle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DIntArray.html">T2DIntArray</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="slackdebug.html">Slackdebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slackab.html">Slacky’s Antiban Mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc(utils).html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slacktree(utils).html">Slacktree</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS -&gt; ASYNCMOUSE</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libasyncmouse.html">ASyncMouse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Players</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/players.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="players">
+<h1>Players<a class="headerlink" href="#players" title="Permalink to this headline">¶</a></h1>
+<p>This file holds functions and procedures that manage and handle an array of players.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Stores a global variable <code class="docutils literal notranslate"><span class="pre">players</span></code> that all players should be added to (see below).</li>
+</ul>
+</div></blockquote>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nf">DeclarePlayers</span><span class="p">()</span><span class="o">;</span>
+<span class="k">begin</span>
+  <span class="k">with</span> <span class="n">Players</span><span class="o">.</span><span class="k">New</span><span class="p">()</span><span class="o">^</span> <span class="k">do</span>
+  <span class="k">begin</span>
+    <span class="n">LoginName</span> <span class="o">:=</span> <span class="s">&#39;username&#39;</span><span class="o">;</span>
+    <span class="n">Password</span>  <span class="o">:=</span> <span class="s">&#39;password&#39;</span><span class="o">;</span>
+    <span class="n">BankPin</span>   <span class="o">:=</span> <span class="s">&#39;pin&#39;</span><span class="o">;</span>
+    <span class="n">isActive</span>  <span class="o">:=</span> <span class="k">True</span><span class="o">;</span>
+  <span class="k">end</span><span class="o">;</span>
+
+  <span class="k">with</span> <span class="n">Players</span><span class="o">.</span><span class="k">New</span><span class="p">()</span><span class="o">^</span> <span class="k">do</span>
+  <span class="k">begin</span>
+    <span class="n">LoginName</span> <span class="o">:=</span> <span class="s">&#39;username2&#39;</span><span class="o">;</span>
+    <span class="n">Password</span>  <span class="o">:=</span> <span class="s">&#39;password2&#39;</span><span class="o">;</span>
+    <span class="n">BankPin</span>   <span class="o">:=</span> <span class="s">&#39;pin2&#39;</span><span class="o">;</span>
+    <span class="n">isActive</span>  <span class="o">:=</span> <span class="k">True</span><span class="o">;</span>
+    <span class="n">World</span>     <span class="o">:=</span> <span class="mi">2</span><span class="o">;</span> <span class="c1">// This player will be logged into world 2</span>
+  <span class="k">end</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-setcount">
+<h2>TPlayerArray.SetCount<a class="headerlink" href="#tplayerarray-setcount" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">SetCount</span><span class="p">(</span><span class="n">Number</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the amount of players to be stored in the array.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Players</span><span class="o">.</span><span class="n">SetCount</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-getcount">
+<h2>TPlayerArray.GetCount<a class="headerlink" href="#tplayerarray-getcount" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">GetCount</span><span class="p">()</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the amount of players stored in the array.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="n">Players</span><span class="o">.</span><span class="n">GetCount</span><span class="p">())</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-getcurrent">
+<h2>TPlayerArray.GetCurrent<a class="headerlink" href="#tplayerarray-getcurrent" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">GetCurrent</span><span class="p">()</span><span class="o">:</span> <span class="n">TPlayer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns a pointer to the currently used player.
+- Derefrence “Players.GetCurrent()^” to get a TPlayer</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="n">Players</span><span class="o">.</span><span class="n">GetCurrent</span><span class="p">()</span><span class="o">^.</span><span class="n">LoginName</span><span class="p">)</span><span class="o">;</span>
+<span class="n">Players</span><span class="o">.</span><span class="n">GetCurrent</span><span class="p">()</span><span class="o">^.</span><span class="n">isActive</span> <span class="o">:=</span> <span class="k">False</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-setcurrent">
+<h2>TPlayerArray.SetCurrent<a class="headerlink" href="#tplayerarray-setcurrent" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">SetCurrent</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the player to be currently used.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Players</span><span class="o">.</span><span class="n">SetCurrent</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-getactive">
+<h2>TPlayerArray.GetActive<a class="headerlink" href="#tplayerarray-getactive" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">GetActive</span><span class="p">()</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the amount of current active players.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="n">Players</span><span class="o">.</span><span class="n">GetActive</span><span class="p">())</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-getplayer">
+<h2>TPlayerArray.GetPlayer<a class="headerlink" href="#tplayerarray-getplayer" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">GetPlayer</span><span class="p">(</span><span class="n">idx</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">:</span> <span class="n">TPlayer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the player in the index ‘idx’.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="n">Players</span><span class="o">.</span><span class="n">GetPlayer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">LoginName</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-switchto">
+<h2>TPlayerArray.SwitchTo<a class="headerlink" href="#tplayerarray-switchto" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span>   <span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">SwitchTo</span><span class="p">(</span><span class="kp">Index</span><span class="o">:</span> <span class="kt">Integer</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+
+<span class="o">-</span> <span class="n">Logs</span> <span class="n">out</span> <span class="n">the</span> <span class="n">current</span> <span class="n">player</span>
+<span class="o">-</span> <span class="n">Sets</span> <span class="n">the</span> <span class="n">current</span> <span class="n">player</span> <span class="k">as</span> <span class="k">in</span><span class="o">-</span><span class="n">active</span> <span class="k">and</span> <span class="n">sets</span> <span class="n">the</span> <span class="k">new</span> <span class="n">player</span> <span class="k">as</span> <span class="n">active</span>
+<span class="o">-</span> <span class="n">Logs</span> <span class="k">in</span> <span class="n">the</span> <span class="k">new</span> <span class="p">(</span><span class="nb">now</span> <span class="n">current</span><span class="p">)</span> <span class="n">player</span>
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Players</span><span class="o">.</span><span class="n">SwitchTo</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-next">
+<h2>TPlayerArray.Next<a class="headerlink" href="#tplayerarray-next" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">Next</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Switches and logs in the next player, will terminate the script if no active players exist.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">Players</span><span class="o">.</span><span class="n">Next</span><span class="p">())</span> <span class="k">then</span>
+  <span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="s">&#39;Succesfully switched and logged in our next player&#39;</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-add">
+<h2>TPlayerArray.Add<a class="headerlink" href="#tplayerarray-add" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">Player</span><span class="o">:</span> <span class="n">TPlayer</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Adds the player ‘Player’ into the player array.</p>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">Players</span><span class="o">.</span><span class="n">Add</span><span class="p">([</span><span class="s">&#39;login&#39;</span><span class="o">,</span> <span class="s">&#39;password&#39;</span><span class="o">,</span> <span class="s">&#39;1234&#39;</span><span class="o">,</span> <span class="k">True</span><span class="o">,</span> <span class="k">True</span><span class="p">])</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-new">
+<h2>TPlayerArray.New<a class="headerlink" href="#tplayerarray-new" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="k">New</span><span class="p">()</span><span class="o">:</span> <span class="n">PPlayer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Creates and results a new player.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="tplayerarray-logincurrent">
+<h2>TPlayerArray.LoginCurrent<a class="headerlink" href="#tplayerarray-logincurrent" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TPlayerArray</span><span class="o">.</span><span class="nf">LoginCurrent</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Logs in the currently active player.</p>
+<hr class="docutils" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="antiban.html" class="btn btn-neutral float-right" title="Antiban" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="MM2MS.html" class="btn btn-neutral float-left" title="Minimap to Mainscreen" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, SRL Group
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

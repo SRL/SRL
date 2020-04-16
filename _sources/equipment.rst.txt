@@ -1,0 +1,76 @@
+
+Equipment
+=========
+The file holds functions and procedures that are used for controlling equipment.
+
+
+------------
+
+type TRSEquipment
+~~~~~~~~~~~~~~~~~~
+The type that holds functions and properties of the Runescape equipment interface.
+
+
+------------
+
+var Equipment
+~~~~~~~~~~~~~~
+Variable that stores functions and properties of the Runescape equipment interface.
+
+
+------------
+
+Equipment.Open
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.Open(): Boolean;
+
+Opens the interface
+
+
+------------
+
+Equipment.IsSlotUsed
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.IsSlotUsed(Slot: Integer): Boolean;
+
+Opens the eqiupment tab and checks if a slot is used.
+
+
+------------
+
+Equipment.IsOpen
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.IsOpen(): Boolean;
+
+Checks if the interface is already open.
+
+
+------------
+
+Equipment.InteractSlot
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.InteractSlot(): Boolean;
+
+Interacts with the item at the given slot using given option
+
+
+------------
+
+Equipment.Remove
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TRSEquipment.Remove(): Boolean;
+
+Unequips the item at the given slot
+
+
+------------

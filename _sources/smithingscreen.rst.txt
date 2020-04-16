@@ -1,0 +1,159 @@
+
+Smithing screen
+===============
+For interacting with the smithing interface.
+
+PS: You are expected to find and open the interface yourself.
+
+
+------------
+
+.. code-block:: pascal
+
+ var SmithingScreen: TRSSmithingScreen;
+
+.. code-block:: pascal
+
+ const SMITH_ALL = -1;
+
+
+------------
+
+SmithingScreen.__Setup
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSSmithingScreen.__Setup();
+
+Every interface needs some internal setup procedure..
+
+
+------------
+
+SmithingScreen.__Prepare
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.__Prepare(): Boolean;
+
+Internal method that's used to generate the boundaries of the interface - automatically.
+
+
+------------
+
+SmithingScreen.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed.
+
+
+------------
+
+SmithingScreen.IsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.IsOpen(): Boolean;
+
+Checks if the interface is open.
+Internally also used to prepare the boundaries of the interface
+
+
+------------
+
+SmithingScreen.Find????
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ 
+  function TRSSmithingScreen.FindDTM(DTM: Integer): Int32;
+  function TRSSmithingScreen.FindBMP(BMP: TMufasaBitmap; Tolerance: Int32): Int32;
+  function TRSSmithingScreen.FindMask(Mask: TMask; Tolerance, ContourTolerance: Int32): Int32;
+  
+Returns the index of the given DTM, BMP or Mask, otherwise ``-1`` if it's not found.
+
+
+------------
+
+SmithingScreen.MouseOver
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.MouseOver(Slot: Int32): Boolean;
+
+Returns ``True`` if the interface is open, and we moved the mouse to the given slot.
+
+
+------------
+
+SmithingScreen.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.ItemName(Slot: Int32): String;
+
+Returns the name of the item in the given slot. Returns empty string on failure.
+
+
+------------
+
+SmithingScreen.BarCount
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.BarCount(Slot: Int32): Int32;
+
+Returns the number of bars needed to smith the given item. Returns ``-1`` if it fails.
+
+
+------------
+
+SmithingScreen.CanSmith
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.CanSmith(Slot: Int32): Boolean;
+
+Returns ``True`` if the item in the given slot can be made. Detected by checking
+the color of the item name is white and that the bar-count is green.
+
+
+------------
+
+SmithingScreen.Find
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.Find(Name: String; PartialMatch: Boolean = True): Int32; ;
+
+Returns the slot of the first item matching the given name. Returns ``-1`` if not found.
+
+
+------------
+
+SmithingScreen.Smith
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TRSSmithingScreen.Smith(Slot, Amount:Int32; Name:String=''): Boolean;
+
+Attempts to smith the item in the given slot. Amount can be any value, while
+``-1`` or ``SMITH_ALL`` will cause it to smith as many as possible of those items.
+
+
+------------
+
+SmithingScreen.Close
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSSmithingScreen.Close(): Boolean;
+
+Closes the interface.
+
+
+------------

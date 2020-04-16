@@ -1,0 +1,128 @@
+
+Misc
+=====
+The ``osr/misc.simba`` file contains various RS related funcions that doesn't fit elsewhere
+
+
+------------
+
+type ERSClickType
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ type ERSClickType = (ctNone, ctRed, ctYellow);
+
+
+------------
+
+Mouse.Click
+~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TMouse.Click(ClickType: ERSClickType): Boolean; overload;
+
+Leftclicks the mouse returns ``True`` if the click passed through as expected.
+Useful when expecting a red or yellow X after a click.
+
+
+------------
+
+SRL.GetXPAtLevel
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.GetXPAtLevel(level:Int32): Int32;
+
+Given a level it returns the minimum XP needed for it.
+
+
+------------
+
+SRL.GetLevelAtXP
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.GetLevelAtXP(XP:UInt32): Int32;
+
+Given some XP, it returns what level that is.
+
+
+------------
+
+SRL.GetItemAmount
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.GetItemAmount(Area: TBox): Int32;
+
+For use with items in like bankscreen, inventory, shops and so on to
+get the number of stacked items there are.
+
+
+------------
+
+SRL.FindDTMInTBA
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.FindDTMInTBA(DTM: Integer; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the DTM in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+
+
+------------
+
+SRL.FindMaskInTBA
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.FindMaskInTBA(Mask: TMask; Tolerance, ContourTolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the mask in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+
+
+------------
+
+SRL.FindBMPInTBA
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.FindBMPInTBA(BMP: TMufasaBitmap; Tolerance: Int32; Areas: TBoxArray; MaxToFind: Int32 = 0): TIntArray;
+
+Searches for the BMP in all of the boxes `Areas`. You can specify a max to find ``MaxToFind`` so that it breaks 
+out early, and doesn't spend more time than what's needed. By default it's 0, which means find them all.
+
+The result is a list of all the box-id's where it was located.
+
+
+------------
+
+SRL.AvgBrightness
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.AvgBrightness(B: TBox): Int32;
+
+Returns the average brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+
+
+------------
+
+SRL.PeakBrightness
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TSRL.PeakBrightness(B: TBox): Int32;
+
+Returns the peak brightness of a area on the screen. 
+Returns a value between ``0`` and ``100``, ``0`` being black.
+
+
+------------

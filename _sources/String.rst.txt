@@ -1,0 +1,273 @@
+
+String
+======
+String related methods
+
+
+------------
+
+AnsiString.Len
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Len(): Int32; constref;
+
+Returns the length of the string
+
+
+------------
+
+AnsiString.Pos
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Pos(SubStr: String): Int32; constref;
+
+Returns the position of the position of the first occurance of the substring
+
+
+------------
+
+AnsiString.PosR
+~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.PosR(SubStr: String): Int32; constref;
+
+Returns the position of the position of the last occurance of the substring
+
+
+------------
+
+AnsiString.PosEx
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.PosEx(SubStr: String): TIntegerArray; constref;
+
+Returns the position of every occurance of the substring
+
+
+------------
+
+AnsiString.Startswith
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Startswith(Prefix: String): Boolean; constref;
+
+Returns ``True`` if the string starts with the given string ``Prefix``
+
+
+------------
+
+AnsiString.Endswith
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Endswith(Suffix: String): Boolean; constref;
+
+Returns ``True`` if the string ends with the given string ``Suffix``
+
+
+------------
+
+AnsiString.Capitalize
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Capitalize(): String; constref;
+
+Returns the string with every word captalized
+
+
+------------
+
+AnsiString.Upper
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Upper(): String; constref;
+
+Returns the string with every character converted to uppercase
+
+
+------------
+
+AnsiString.Lower
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Lower(): String; constref;
+
+Returns the string with every character converted to lowercase
+
+
+------------
+
+AnsiString.After
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.After(SubStr: String): String; constref;
+
+Copy the string from after the first occurrence of SubStr
+
+
+------------
+
+AnsiString.Before
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Before(SubStr: String): String; constref;
+
+Copy the string from before the first occurrence of SubStr
+
+
+------------
+
+AnsiString.Count
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Count(Str: String): Int32; constref;
+
+Count the number of occurrences of the given string.
+
+
+------------
+
+AnsiString.Replace
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Replace(SubStr, ReplaceStr: String; Flags: TReplaceFlags=[rfReplaceAll]): String; constref;
+
+Replace [all by default] occurrences of the given SubStr with with ReplaceStr
+
+
+------------
+
+AnsiString.Explode
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.Explode(Delimiter: String): TStringArray; constref;
+
+Blow up the string at each delimiter into smaller strings
+
+
+------------
+
+AnsiString.IsAlphaNum
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.IsAlphaNum(): Boolean; constref;
+
+Test if a string only contains alpha numerical characters.
+
+
+------------
+
+AnsiString.IsDigit
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.IsDigit(): Boolean; constref;
+
+Test if a sting is a digit
+
+
+------------
+
+AnsiString.IsFloat
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.IsFloat(): Boolean; constref;
+
+Test if a string is a floating point number
+
+
+------------
+
+AnsiString.IsAlpha
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.IsAlpha(): Boolean; constref;
+
+Test if a string only contains letters a-zA-Z
+
+
+------------
+
+AnsiString.ExtractNumbers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.ExtractNumbers(): TExtendedArray; constref;
+
+Extract all the numbers found in the string, as there could be floating point numbers 
+as well it reutnrs a TExtendedArray.
+
+
+------------
+
+AnsiString.ExtractNumbersEx
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.ExtractNumbersEx(): TExtendedArray; constref;
+
+Extract all the numbers found in the string, this time every number 
+ends up in each their index. For example ``'1234'`` would return ``[1,2,3,4]``
+
+
+------------
+
+AnsiString.FileExt
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.FileExt(): String; constref;
+
+Returns the file extension
+
+
+------------
+
+AnsiString.FileName
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function AnsiString.FileName(): String; constref;
+
+Returns the file name
+
+
+------------
+
+string * int32
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ operator * (left:AnsiString; Right:Int32): String;
+
+Replicates the string the given amount of times. So ``'ho!' * 3`` would generate ``ho!ho!ho!``
+
+
+------------
+
+string in string
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ operator in (left:String; Right:String): Boolean;
+
+Returns ``True`` if the string exists in the other string. So ``'hell' in 'hello world'`` would be ``True`` 
+
+
+------------

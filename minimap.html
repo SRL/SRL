@@ -1,0 +1,624 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Minimap &mdash; SRL  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RSInterfaceBase" href="rsInterfaceBase.html" />
+    <link rel="prev" title="Shop Interface" href="shops.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SRL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">OSR</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chooseoption.html">ChooseOption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MM2MS.html">Minimap to Mainscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="players.html">Players</a></li>
+<li class="toctree-l1"><a class="reference internal" href="antiban.html">Antiban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worldswitcher.html">WorldSwitcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="login.html">Loginscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpbar.html">XPBar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES -&gt; GAMETABS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="combat.html">Combat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prayer.html">Prayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logout.html">Logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">Stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equipment.html">Equipment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spells.html">Spells</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gametabs.html">Gametabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainscreen.html">MainScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bankscreen.html">BankScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chatbox.html">Chatbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shops.html">Shop Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Minimap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-and-vars">Types and Vars</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#eminimaporb">EMinimapOrb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#eminimapdottype">EMinimapDotType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trsminimap">TRSMinimap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Minimap</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getmiddle">Minimap.GetMiddle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getorbvalue">Minimap._GetOrbValue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getprayerlevel">Minimap.GetPrayerLevel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-gethplevel">Minimap.GetHPLevel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-gethppercent">Minimap.GetHPPercent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getspecialattack">Minimap.GetSpecialAttack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-ispoisoned">Minimap.IsPoisoned</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-curepoison">Minimap.CurePoison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getrunenergy">Minimap.GetRunEnergy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-isprayerenabled">Minimap.isPrayerEnabled</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-isrunenabled">Minimap.isRunEnabled</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-toggleprayer">Minimap.TogglePrayer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-togglerun">Minimap.ToggleRun</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-isplayermoving">Minimap.isPlayerMoving</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-findflag">Minimap.FindFlag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-isflagpresent">Minimap.isFlagPresent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-waitflag">Minimap.WaitFlag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-waitplayermoving">Minimap.WaitPlayerMoving</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-waitflagex">Minimap.WaitFlagEx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getcompassangle">Minimap.GetCompassAngle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-setcompassangle-mouse">Minimap.SetCompassAngle_Mouse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-setcompassangle">Minimap.SetCompassAngle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-clickcompass">Minimap.ClickCompass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getdots">Minimap.GetDots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-finddots">Minimap.FindDots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-ispointon">Minimap.isPointOn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-filterpoints">Minimap.FilterPoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-getcolorpercent">Minimap.GetColorPercent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimap-randomcompass">Minimap.RandomCompass</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rsInterfaceBase.html">RSInterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depositbox.html">DepositBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grandexch.html">GrandExchange</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smithingscreen.html">Smithing screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinscreen.html">PinScreen</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mouse.html">Mouse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text(shared).html">Text (shared)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixelshift.html">Pixelshift</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfacebase.html">InterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawing.html">Drawing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="random.html">Random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">Color</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED -&gt; TYPES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="TBoxArray.html">TBoxArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRectangle.html">TRectangle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DExtArray.html">T2DExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBox.html">TBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TStringArray.html">TStringArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBoolArray.html">TBoolArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DPointArray.html">T2DPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="String.html">String</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPointArray.html">TPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TExtendedArray.html">TExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPoint.html">TPoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Other.html">Other datatypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIntegerArray.html">TIntegerArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TCircle.html">TCircle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DIntArray.html">T2DIntArray</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="slackdebug.html">Slackdebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slackab.html">Slacky’s Antiban Mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc(utils).html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slacktree(utils).html">Slacktree</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS -&gt; ASYNCMOUSE</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libasyncmouse.html">ASyncMouse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Minimap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/minimap.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="minimap">
+<h1>Minimap<a class="headerlink" href="#minimap" title="Permalink to this headline">¶</a></h1>
+<hr class="docutils" />
+<div class="section" id="types-and-vars">
+<h2>Types and Vars<a class="headerlink" href="#types-and-vars" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<div class="section" id="eminimaporb">
+<h3>EMinimapOrb<a class="headerlink" href="#eminimaporb" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="n">EMinimapOrb</span> <span class="o">=</span> <span class="p">(</span><span class="n">MMOrbHP</span><span class="o">,</span> <span class="n">MMOrbPrayer</span><span class="o">,</span> <span class="n">MMOrbRun</span><span class="o">,</span> <span class="n">MMOrbSpecialAttack</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The orbs around the minimap. Used when getting values from the orbs, or to toggle them.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="eminimapdottype">
+<h3>EMinimapDotType<a class="headerlink" href="#eminimapdottype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="n">EMinimapDotType</span> <span class="o">=</span> <span class="p">(</span><span class="n">MMDotPlayer</span><span class="o">,</span> <span class="n">MMDotItem</span><span class="o">,</span> <span class="n">MMDotNPC</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The differnet supported minimap dot types.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="trsminimap">
+<h3>TRSMinimap<a class="headerlink" href="#trsminimap" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">TRSMinimap</span> <span class="o">=</span> <span class="k">record</span><span class="p">(</span><span class="n">TInterfaceBase</span><span class="p">)</span>
+  <span class="n">CompassInfo</span><span class="o">:</span> <span class="n">TMMCompassInfo</span><span class="o">;</span>
+  <span class="n">OrbInfo</span><span class="o">:</span> <span class="k">array</span><span class="p">[</span><span class="n">EMinimapOrb</span><span class="p">]</span> <span class="k">of</span> <span class="n">TMMOrbInfo</span><span class="o">;</span>
+  <span class="n">MaskBMP</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+  <span class="n">MaskPoly</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+  <span class="n">Center</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Defines the type connected to the variable named <cite>Minimap</cite>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="id1">
+<h3>Minimap<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">var</span> <span class="n">Minimap</span><span class="o">:</span> <span class="n">TRSMinimap</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>This is the variable that stores all minimap related methods and variables.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<div class="section" id="minimap-getmiddle">
+<h3>Minimap.GetMiddle<a class="headerlink" href="#minimap-getmiddle" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetMiddle</span><span class="o">:</span> <span class="n">TPoint</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the center of the minimap</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getorbvalue">
+<h3>Minimap._GetOrbValue<a class="headerlink" href="#minimap-getorbvalue" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">_GetOrbValue</span><span class="p">(</span><span class="n">Orb</span><span class="o">:</span> <span class="n">EMinimapOrb</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the value of the orb. Offsets the text shadow to figure out the text color.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getprayerlevel">
+<h3>Minimap.GetPrayerLevel<a class="headerlink" href="#minimap-getprayerlevel" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetPrayerLevel</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your current prayer level</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-gethplevel">
+<h3>Minimap.GetHPLevel<a class="headerlink" href="#minimap-gethplevel" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetHPLevel</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your current HP level</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-gethppercent">
+<h3>Minimap.GetHPPercent<a class="headerlink" href="#minimap-gethppercent" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetHPPercent</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your current HP level as a percentage <cite>0..100</cite></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getspecialattack">
+<h3>Minimap.GetSpecialAttack<a class="headerlink" href="#minimap-getspecialattack" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetSpecialAttack</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your special attack.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-ispoisoned">
+<h3>Minimap.IsPoisoned<a class="headerlink" href="#minimap-ispoisoned" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">IsPoisoned</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns true if you’re poisoned by checking the minimap orb.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-curepoison">
+<h3>Minimap.CurePoison<a class="headerlink" href="#minimap-curepoison" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">CurePoison</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the hitpoints orb if currently poisoned.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getrunenergy">
+<h3>Minimap.GetRunEnergy<a class="headerlink" href="#minimap-getrunenergy" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetRunEnergy</span><span class="p">()</span><span class="o">:</span> <span class="kt">Integer</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns your current energy level</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-isprayerenabled">
+<h3>Minimap.isPrayerEnabled<a class="headerlink" href="#minimap-isprayerenabled" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">isPrayerEnabled</span><span class="p">(</span><span class="k">const</span> <span class="nb">Time</span><span class="o">:</span> <span class="n">UInt32</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <cite>True</cite> if you have enabled it otherwise <cite>False</cite>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-isrunenabled">
+<h3>Minimap.isRunEnabled<a class="headerlink" href="#minimap-isrunenabled" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">isRunEnabled</span><span class="p">(</span><span class="n">WaitTime</span><span class="o">:</span> <span class="n">Int32</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <cite>True</cite> if you have enabled it otherwise <cite>False</cite>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-toggleprayer">
+<h3>Minimap.TogglePrayer<a class="headerlink" href="#minimap-toggleprayer" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">TogglePrayer</span><span class="p">(</span><span class="k">const</span> <span class="n">Enable</span><span class="o">:</span> <span class="kt">Boolean</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>A toggle to enable or disable prayer.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-togglerun">
+<h3>Minimap.ToggleRun<a class="headerlink" href="#minimap-togglerun" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">ToggleRun</span><span class="p">(</span><span class="k">const</span> <span class="n">Enable</span><span class="o">:</span> <span class="kt">Boolean</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>A toggle to enable or disable running.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-isplayermoving">
+<h3>Minimap.isPlayerMoving<a class="headerlink" href="#minimap-isplayermoving" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">isPlayerMoving</span><span class="p">(</span><span class="n">MinShift</span><span class="o">:</span> <span class="kt">Integer</span> <span class="o">=</span> <span class="mi">300</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <cite>True</cite> if your character is moving.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-findflag">
+<h3>Minimap.FindFlag<a class="headerlink" href="#minimap-findflag" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">FindFlag</span><span class="p">(</span><span class="n">BMP</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">out</span> <span class="n">P</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+<span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">FindFlag</span><span class="p">(</span><span class="n">out</span> <span class="n">P</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>First version searches for the flag on a bitmap. Second version searched for the flag on the client.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-isflagpresent">
+<h3>Minimap.isFlagPresent<a class="headerlink" href="#minimap-isflagpresent" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">isFlagPresent</span><span class="p">(</span><span class="k">const</span> <span class="n">WaitTime</span><span class="o">:</span> <span class="n">UInt32</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns True if the flag can be found on the minimap.. otherwise False.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-waitflag">
+<h3>Minimap.WaitFlag<a class="headerlink" href="#minimap-waitflag" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">WaitFlag</span><span class="p">(</span><span class="k">const</span> <span class="n">Dist</span><span class="o">:</span> <span class="n">UInt32</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">ExitIfNotMoving</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Waits while the flag distance is greater than <cite>dist</cite>. Timeout is ~20 seconds which
+is reset when flag distance has changed.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-waitplayermoving">
+<h3>Minimap.WaitPlayerMoving<a class="headerlink" href="#minimap-waitplayermoving" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">WaitPlayerMoving</span><span class="p">(</span><span class="n">UseFlag</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">True</span><span class="o">;</span> <span class="n">TimeOut</span><span class="o">:</span> <span class="kt">Integer</span> <span class="o">=</span> <span class="mi">30000</span><span class="o">;</span> <span class="n">MinShift</span><span class="o">:</span> <span class="kt">Integer</span> <span class="o">=</span> <span class="mi">300</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Waits till your character is no longer moving.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-waitflagex">
+<h3>Minimap.WaitFlagEx<a class="headerlink" href="#minimap-waitflagex" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">WaitFlagEx</span><span class="p">(</span><span class="n">MaxDist</span><span class="o">:</span> <span class="kt">Byte</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Extra WaitFlag method that Waits for the flag to disapear but will return if the
+position we walked to is where the flag was first clicked.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Useful to know if you were able to walk into a room or not (blocked entrance, etc).</li>
+<li>MaxDist param is default, but is the max distance the flag can move else we result False.</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">Minimap</span><span class="o">.</span><span class="n">WaitFlagEx</span><span class="p">())</span> <span class="k">then</span>
+  <span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="s">&#39;We have walked to the position succesfully&#39;</span><span class="p">)</span>
+<span class="k">else</span>
+  <span class="n">srl</span><span class="o">.</span><span class="n">Writeln</span><span class="p">(</span><span class="s">&#39;We have finished walking, but the flag moved alot so we didnt hit our target pos&#39;</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getcompassangle">
+<h3>Minimap.GetCompassAngle<a class="headerlink" href="#minimap-getcompassangle" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetCompassAngle</span><span class="p">(</span><span class="n">AsDegrees</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current compass angle, default as degrees.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-setcompassangle-mouse">
+<h3>Minimap.SetCompassAngle_Mouse<a class="headerlink" href="#minimap-setcompassangle-mouse" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">SetCompassAngle_Mouse</span><span class="p">(</span><span class="n">Degrees</span><span class="o">:</span> <span class="kt">Double</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Uses the mouse to change the compass angle. This method should not be used directly,
+but instead called through <code class="docutils literal notranslate"><span class="pre">Minimap.SetCompassAngle</span></code>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-setcompassangle">
+<h3>Minimap.SetCompassAngle<a class="headerlink" href="#minimap-setcompassangle" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">SetCompassAngle</span><span class="p">(</span><span class="n">Degrees</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">Mouse</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the compass angle to the desired angle.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-clickcompass">
+<h3>Minimap.ClickCompass<a class="headerlink" href="#minimap-clickcompass" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">ClickCompass</span><span class="p">()</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks the compass so that you face towards north.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getdots">
+<h3>Minimap.GetDots<a class="headerlink" href="#minimap-getdots" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetDots</span><span class="p">(</span><span class="n">DotTypes</span><span class="o">:</span> <span class="k">set</span> <span class="k">of</span> <span class="n">EMinimapDotType</span><span class="o">;</span> <span class="n">SortFromPlayer</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">True</span><span class="p">)</span><span class="o">:</span> <span class="n">TPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns all the dots of the given types. See the defintion of EMinimapDotType. By default it will sort
+all the points from the center of the minimap, meaning the closest to your come first in the result.</p>
+<p>The points in the resulting array are the top-left corner of the dot, so for the center offset it by 2 or 3, 2.5 for dead center.</p>
+<p><strong>Example</strong></p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">dotTPA</span> <span class="o">:=</span> <span class="n">Minimap</span><span class="o">.</span><span class="n">GetDots</span><span class="p">([</span><span class="n">MMDotNPC</span><span class="o">,</span> <span class="n">MMDotPlayer</span><span class="p">])</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-finddots">
+<h3>Minimap.FindDots<a class="headerlink" href="#minimap-finddots" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">FindDots</span><span class="p">(</span><span class="n">DotType</span><span class="o">:</span> <span class="k">set</span> <span class="k">of</span> <span class="n">EMinimapDotType</span><span class="o">;</span> <span class="n">MinCount</span><span class="o">:</span> <span class="n">UInt32</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns True if the given number of dots can be found on the minimap. By default if it can find 1 dot of the given type.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-ispointon">
+<h3>Minimap.isPointOn<a class="headerlink" href="#minimap-ispointon" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">isPointOn</span><span class="p">(</span><span class="n">P</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the given point is within the minimap.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-filterpoints">
+<h3>Minimap.FilterPoints<a class="headerlink" href="#minimap-filterpoints" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">FilterPoints</span><span class="p">(</span><span class="k">var</span> <span class="n">TPA</span><span class="o">:</span> <span class="n">TPointArray</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Filters the TPA so that no points are outside the minimap circle.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-getcolorpercent">
+<h3>Minimap.GetColorPercent<a class="headerlink" href="#minimap-getcolorpercent" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">GetColorPercent</span><span class="p">(</span><span class="n">Color</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">Tolerance</span><span class="o">:</span> <span class="n">Int32</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns hte percentage of the minimap that contains the given color.
+Can be handy when checking if you are above or bellow groundlevel.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="minimap-randomcompass">
+<h3>Minimap.RandomCompass<a class="headerlink" href="#minimap-randomcompass" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSMinimap</span><span class="o">.</span><span class="nf">RandomCompass</span><span class="p">(</span><span class="nb">Min</span><span class="o">,</span> <span class="nb">Max</span><span class="o">:</span> <span class="kt">Double</span><span class="o">;</span> <span class="n">Mouse</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Rotates the compass to a random angle between Min and Max. Values are given as degrees.</p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rsInterfaceBase.html" class="btn btn-neutral float-right" title="RSInterfaceBase" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="shops.html" class="btn btn-neutral float-left" title="Shop Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, SRL Group
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

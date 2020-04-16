@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Gametabs &mdash; SRL  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MainScreen" href="mainscreen.html" />
+    <link rel="prev" title="Inventory" href="inventory.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SRL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">OSR</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chooseoption.html">ChooseOption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MM2MS.html">Minimap to Mainscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="players.html">Players</a></li>
+<li class="toctree-l1"><a class="reference internal" href="antiban.html">Antiban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worldswitcher.html">WorldSwitcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="login.html">Loginscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpbar.html">XPBar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES -&gt; GAMETABS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="combat.html">Combat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prayer.html">Prayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logout.html">Logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">Stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equipment.html">Equipment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spells.html">Spells</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Gametabs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#var-gametabs">var Gametabs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-togglefkeys">Gametab.ToggleFKeys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-getbounds">Gametab.GetBounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-pointtoslot">Gametab.PointToSlot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-isopen">Gametab.IsOpen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-open">Gametab.Open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Gametab.Open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gametab-getcurrent">Gametab.GetCurrent</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mainscreen.html">MainScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bankscreen.html">BankScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chatbox.html">Chatbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shops.html">Shop Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimap.html">Minimap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rsInterfaceBase.html">RSInterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depositbox.html">DepositBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grandexch.html">GrandExchange</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smithingscreen.html">Smithing screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinscreen.html">PinScreen</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mouse.html">Mouse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text(shared).html">Text (shared)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixelshift.html">Pixelshift</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfacebase.html">InterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawing.html">Drawing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="random.html">Random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">Color</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED -&gt; TYPES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="TBoxArray.html">TBoxArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRectangle.html">TRectangle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DExtArray.html">T2DExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBox.html">TBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TStringArray.html">TStringArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBoolArray.html">TBoolArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DPointArray.html">T2DPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="String.html">String</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPointArray.html">TPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TExtendedArray.html">TExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPoint.html">TPoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Other.html">Other datatypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIntegerArray.html">TIntegerArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TCircle.html">TCircle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DIntArray.html">T2DIntArray</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="slackdebug.html">Slackdebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slackab.html">Slacky’s Antiban Mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc(utils).html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slacktree(utils).html">Slacktree</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS -&gt; ASYNCMOUSE</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libasyncmouse.html">ASyncMouse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Gametabs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gametabs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gametabs">
+<h1>Gametabs<a class="headerlink" href="#gametabs" title="Permalink to this headline">¶</a></h1>
+<p>Gametabs is the core of every tab, like inventory, stats, and so on.
+This is also the file that includes every tab’s code.</p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="n">EGametab</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">tabCombat</span><span class="o">,</span>
+  <span class="n">tabStats</span><span class="o">,</span>
+  <span class="n">tabQuests</span><span class="o">,</span>
+  <span class="n">tabInventory</span><span class="o">,</span>
+  <span class="n">tabEquipment</span><span class="o">,</span>
+  <span class="n">tabPrayer</span><span class="o">,</span>
+  <span class="n">tabMagic</span><span class="o">,</span>
+  <span class="n">tabClan</span><span class="o">,</span>
+  <span class="n">tabFriends</span><span class="o">,</span>
+  <span class="n">tabIgnores</span><span class="o">,</span>
+  <span class="n">tabLogout</span><span class="o">,</span>
+  <span class="n">tabOptions</span><span class="o">,</span>
+  <span class="n">tabEmotes</span><span class="o">,</span>
+  <span class="n">tabMusic</span>
+<span class="p">)</span><span class="o">;</span>
+
+<span class="k">type</span> <span class="n">TRSGametab</span> <span class="o">=</span> <span class="k">record</span>
+  <span class="n">Tabs</span><span class="o">:</span> <span class="n">TBoxArray</span><span class="o">;</span>
+  <span class="n">Keybindings</span><span class="o">:</span> <span class="n">TIntegerArray</span><span class="o">;</span>
+  <span class="n">FKeysEnabled</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<div class="section" id="var-gametabs">
+<h2>var Gametabs<a class="headerlink" href="#var-gametabs" title="Permalink to this headline">¶</a></h2>
+<p>Variable that stores functions and properties relating to gametabs.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-togglefkeys">
+<h2>Gametab.ToggleFKeys<a class="headerlink" href="#gametab-togglefkeys" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">ToggleFKeys</span><span class="p">(</span><span class="k">const</span> <span class="n">Enable</span><span class="o">:</span> <span class="kt">Boolean</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Enables support for FKeys to open tabs.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-getbounds">
+<h2>Gametab.GetBounds<a class="headerlink" href="#gametab-getbounds" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">GetBounds</span><span class="p">(</span><span class="n">Tab</span><span class="o">:</span> <span class="n">EGametab</span><span class="p">)</span><span class="o">:</span> <span class="n">TBox</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the bounds of the tab-button</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-pointtoslot">
+<h2>Gametab.PointToSlot<a class="headerlink" href="#gametab-pointtoslot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">PointToSlot</span><span class="p">(</span><span class="n">pt</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the tab-id under the location <code class="docutils literal notranslate"><span class="pre">pt</span></code>, value is returned as
+an integer, as it will return <code class="docutils literal notranslate"><span class="pre">-1</span></code> if it fails. To convert it to a
+gametab is just a matter of casting it like <code class="docutils literal notranslate"><span class="pre">EGameTab(theValue)</span></code></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-isopen">
+<h2>Gametab.IsOpen<a class="headerlink" href="#gametab-isopen" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">IsOpen</span><span class="p">(</span><span class="n">Tab</span><span class="o">:</span><span class="n">EGametab</span><span class="o">;</span> <span class="n">MaxWait</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Checks if the given tab is open or now. By default it wont wait (expecting it to open).</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-open">
+<h2>Gametab.Open<a class="headerlink" href="#gametab-open" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">Open</span><span class="p">(</span><span class="n">Tab</span><span class="o">:</span> <span class="n">EGametab</span><span class="o">;</span> <span class="n">Tries</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the given gametab, by default it retries twice.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="id1">
+<h2>Gametab.Open<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">Hover</span><span class="p">(</span><span class="n">Tab</span><span class="o">:</span><span class="n">EGametab</span><span class="o">;</span> <span class="n">Condition</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">=</span><span class="k">True</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Only moves the mouse over the given tab.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="gametab-getcurrent">
+<h2>Gametab.GetCurrent<a class="headerlink" href="#gametab-getcurrent" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGametab</span><span class="o">.</span><span class="nf">GetCurrent</span><span class="p">()</span><span class="o">:</span> <span class="n">EGametab</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current open tab.</p>
+<hr class="docutils" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mainscreen.html" class="btn btn-neutral float-right" title="MainScreen" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="inventory.html" class="btn btn-neutral float-left" title="Inventory" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, SRL Group
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

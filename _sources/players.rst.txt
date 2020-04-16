@@ -1,0 +1,225 @@
+
+Players
+=======
+
+This file holds functions and procedures that manage and handle an array of players.
+
+ * Stores a global variable ``players`` that all players should be added to (see below).
+
+.. code-block:: pascal
+
+    procedure DeclarePlayers();
+    begin
+      with Players.New()^ do
+      begin
+        LoginName := 'username';
+        Password  := 'password';
+        BankPin   := 'pin';
+        isActive  := True;
+      end;
+
+      with Players.New()^ do
+      begin
+        LoginName := 'username2';
+        Password  := 'password2';
+        BankPin   := 'pin2';
+        isActive  := True;
+        World     := 2; // This player will be logged into world 2
+      end;
+    end;
+
+
+------------
+
+TPlayerArray.SetCount
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.SetCount(Number: Integer);
+
+Sets the amount of players to be stored in the array.
+
+Example:
+
+.. code-block:: pascal
+
+    Players.SetCount(1);
+
+
+------------
+
+TPlayerArray.GetCount
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.GetCount(): Integer;
+
+Returns the amount of players stored in the array.
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(Players.GetCount());
+
+
+------------
+
+TPlayerArray.GetCurrent
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.GetCurrent(): TPlayer;
+
+Returns a pointer to the currently used player.
+- Derefrence "Players.GetCurrent()^" to get a TPlayer
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(Players.GetCurrent()^.LoginName);
+    Players.GetCurrent()^.isActive := False;
+
+
+------------
+
+TPlayerArray.SetCurrent
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.SetCurrent(idx: Integer);
+
+Sets the player to be currently used.
+
+Example:
+
+.. code-block:: pascal
+
+    Players.SetCurrent(1);
+
+
+------------
+
+TPlayerArray.GetActive
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.GetActive(): Integer;
+
+Returns the amount of current active players.
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(Players.GetActive());
+
+
+------------
+
+TPlayerArray.GetPlayer
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.GetPlayer(idx: Integer): TPlayer;
+
+Returns the player in the index 'idx'.
+
+Example:
+
+.. code-block:: pascal
+
+    srl.Writeln(Players.GetPlayer(0).LoginName);
+
+
+------------
+
+TPlayerArray.SwitchTo
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.SwitchTo(Index: Integer): Boolean;
+
+ - Logs out the current player
+ - Sets the current player as in-active and sets the new player as active
+ - Logs in the new (now current) player
+
+Example:
+
+.. code-block:: pascal
+
+    Players.SwitchTo(1);
+
+
+------------
+
+TPlayerArray.Next
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.Next(): Boolean;
+
+Switches and logs in the next player, will terminate the script if no active players exist.
+
+Example:
+
+.. code-block:: pascal
+
+    if (Players.Next()) then
+      srl.Writeln('Succesfully switched and logged in our next player');
+
+
+------------
+
+TPlayerArray.Add
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    procedure TPlayerArray.Add(Player: TPlayer);
+
+Adds the player 'Player' into the player array.
+
+Example:
+
+.. code-block:: pascal
+
+    Players.Add(['login', 'password', '1234', True, True]);
+
+
+------------
+
+TPlayerArray.New
+~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.New(): PPlayer;
+
+Creates and results a new player.
+
+
+
+------------
+
+TPlayerArray.LoginCurrent
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TPlayerArray.LoginCurrent(): Boolean;
+
+Logs in the currently active player.
+
+
+
+------------

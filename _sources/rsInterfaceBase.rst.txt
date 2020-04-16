@@ -1,0 +1,101 @@
+
+RSInterfaceBase
+================
+Specializes the generic TInterfaceBase towards Oldschool Runescape MainScreen.
+Used to find interfaces on the go, versus the static coordinates based ones.
+
+All new interfaces that exits on the mainscreen should inherit from this base. 
+
+
+------------
+
+TRSInterfaceBase.AppendTitle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSInterfaceBase.AppendTitle(Title: String);
+
+Adds another alternative title to search for in the interface.
+
+
+------------
+
+TRSInterfaceBase.CaseInsensitive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TRSInterfaceBase.CaseInsensitive(CS: Boolean);
+
+Sets if the Title search should be case sensitive or not.
+
+
+------------
+
+TRSInterfaceBase.__Find
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSInterfaceBase.__Find(): Boolean;
+
+Used to locate the bounds of the interface, and finally verifies it by
+checking if the title matches.
+
+Note: This method should not be called in scripts as it may be subject to change.
+
+
+------------
+
+TRSInterfaceBase.IsUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TRSInterfaceBase.IsUpText(SubStrs: TStringArray; WaitTime: UInt32 = 350): Boolean;
+   function TRSInterfaceBase.IsUpText(Text: String; WaitTime: UInt32 = 350): Boolean; overload;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.IsUptext
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+
+
+------------
+
+TRSInterfaceBase.GetUpText
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSInterfaceBase.GetUpText(): String;
+
+Speical methods for checking uptext when the interface is open. Regular Mainscreen.GetUpText
+may collide with title of the interface, so we do some extra filtering here.
+
+This applies to any interface that inherits from TRSInterfaceBase
+
+
+------------
+
+TRSInterfaceBase.Debug
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSInterfaceBase.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debugs the bounds of the interface, mainly used when maintenance is needed. If RetImage is ``True``
+the image will not be debugged, but instead returned, otherwise the resul is ``nil``
+
+This applies to any interface that inherits from TRSInterfaceBase
+
+
+------------
+
+TRSInterfaceBase.Close
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSInterfaceBase.Close(): Boolean;
+
+Closes the interface, returns ``True`` on success
+
+
+------------

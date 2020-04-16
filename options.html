@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Options &mdash; SRL  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Equipment" href="equipment.html" />
+    <link rel="prev" title="Stats" href="stats.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SRL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">OSR</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chooseoption.html">ChooseOption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MM2MS.html">Minimap to Mainscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="players.html">Players</a></li>
+<li class="toctree-l1"><a class="reference internal" href="antiban.html">Antiban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worldswitcher.html">WorldSwitcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="login.html">Loginscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpbar.html">XPBar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES -&gt; GAMETABS</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="combat.html">Combat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prayer.html">Prayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logout.html">Logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">Stats</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#type-trsoptions">type TRSOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#var-options">var Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type-eoptionstab">type EOptionsTab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-open">Options.Open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-isopen">Options.IsOpen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-getcurrenttab">Options.GetCurrentTab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-setcurrenttab">Options.SetCurrentTab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-getbrightness">Options.GetBrightness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-setbrightness">Options.SetBrightness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type-erszoomnotch">type ERSZoomNotch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-findzoomslider">Options.FindZoomSlider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-getzoom">Options.GetZoom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-setzoom">Options.SetZoom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-getzoomnotch">Options.GetZoomNotch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-setzoomnotch">Options.SetZoomNotch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-toggleacceptaid">Options.ToggleAcceptAid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-togglerun">Options.ToggleRun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-togglechateffects">Options.ToggleChatEffects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-togglesplitprivchat">Options.ToggleSplitPrivChat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-toggleprofanityfilter">Options.ToggleProfanityFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-toggletimeoutnotice">Options.ToggleTimeoutNotice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-toggleshiftdrop">Options.ToggleShiftDrop</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="equipment.html">Equipment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spells.html">Spells</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gametabs.html">Gametabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainscreen.html">MainScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bankscreen.html">BankScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chatbox.html">Chatbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shops.html">Shop Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimap.html">Minimap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rsInterfaceBase.html">RSInterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depositbox.html">DepositBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grandexch.html">GrandExchange</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smithingscreen.html">Smithing screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinscreen.html">PinScreen</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mouse.html">Mouse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text(shared).html">Text (shared)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixelshift.html">Pixelshift</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfacebase.html">InterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawing.html">Drawing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="random.html">Random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">Color</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED -&gt; TYPES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="TBoxArray.html">TBoxArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRectangle.html">TRectangle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DExtArray.html">T2DExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBox.html">TBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TStringArray.html">TStringArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBoolArray.html">TBoolArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DPointArray.html">T2DPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="String.html">String</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPointArray.html">TPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TExtendedArray.html">TExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPoint.html">TPoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Other.html">Other datatypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIntegerArray.html">TIntegerArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TCircle.html">TCircle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DIntArray.html">T2DIntArray</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="slackdebug.html">Slackdebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slackab.html">Slacky’s Antiban Mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc(utils).html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slacktree(utils).html">Slacktree</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS -&gt; ASYNCMOUSE</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libasyncmouse.html">ASyncMouse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Options</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/options.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="options">
+<h1>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h1>
+<p>The options file holds functions and procedures that are used for configuring runescape.</p>
+<p>Keep in mind that the option-tab changes qute frequently in OSRS, so over time it’s more likely
+to get outdated.</p>
+<hr class="docutils" />
+<div class="section" id="type-trsoptions">
+<h2>type TRSOptions<a class="headerlink" href="#type-trsoptions" title="Permalink to this headline">¶</a></h2>
+<p>The type that holds functions and properties of the Runescape options interface.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="var-options">
+<h2>var Options<a class="headerlink" href="#var-options" title="Permalink to this headline">¶</a></h2>
+<p>Variable that stores functions and properties of the Runescape options interface.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-eoptionstab">
+<h2>type EOptionsTab<a class="headerlink" href="#type-eoptionstab" title="Permalink to this headline">¶</a></h2>
+<p>A type that covers the internal tabs in TRSOptions: <code class="docutils literal notranslate"><span class="pre">EOptionsTab</span> <span class="pre">=</span> <span class="pre">(optDisplay,</span> <span class="pre">optAudio,</span> <span class="pre">optChat,</span> <span class="pre">optControls)</span></code></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-open">
+<h2>Options.Open<a class="headerlink" href="#options-open" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">Open</span><span class="p">()</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the interface</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-isopen">
+<h2>Options.IsOpen<a class="headerlink" href="#options-isopen" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">IsOpen</span><span class="p">(</span><span class="n">maxWait</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Checks if the interface is already open.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-getcurrenttab">
+<h2>Options.GetCurrentTab<a class="headerlink" href="#options-getcurrenttab" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">GetCurrentTab</span><span class="p">()</span><span class="o">:</span> <span class="n">EOptionsTab</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns which tab is currently active.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-setcurrenttab">
+<h2>Options.SetCurrentTab<a class="headerlink" href="#options-setcurrenttab" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">SetCurrentTab</span><span class="p">(</span><span class="n">Tab</span><span class="o">:</span> <span class="n">EOptionsTab</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the current tab to the given <code class="docutils literal notranslate"><span class="pre">Tab</span></code></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-getbrightness">
+<h2>Options.GetBrightness<a class="headerlink" href="#options-getbrightness" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">GetBrightness</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the mainscreen brightness</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-setbrightness">
+<h2>Options.SetBrightness<a class="headerlink" href="#options-setbrightness" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">SetBrightness</span><span class="p">(</span><span class="n">level</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the mainscreen brightness</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-erszoomnotch">
+<h2>type ERSZoomNotch<a class="headerlink" href="#type-erszoomnotch" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Zoom level notches.</p>
+<p>ZOOM_LEVEL_0 = Zoomed out fully.
+ZOOM_LEVEL_50 = Default.
+ZOOM_LEVEL_100 = Zoomed in fully.</p>
+</div></blockquote>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-findzoomslider">
+<h2>Options.FindZoomSlider<a class="headerlink" href="#options-findzoomslider" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">FindZoomSlider</span><span class="p">(</span><span class="n">out</span> <span class="n">P</span><span class="o">:</span> <span class="n">TPoint</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the middle of the green zoom slider.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-getzoom">
+<h2>Options.GetZoom<a class="headerlink" href="#options-getzoom" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">GetZoom</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current zoom level in 0..100 range. -1 if not found.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-setzoom">
+<h2>Options.SetZoom<a class="headerlink" href="#options-setzoom" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">SetZoom</span><span class="p">(</span><span class="n">Level</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the current zoom level by using the slider. 0..100 range.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-getzoomnotch">
+<h2>Options.GetZoomNotch<a class="headerlink" href="#options-getzoomnotch" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">GetZoomNotch</span><span class="o">:</span> <span class="n">ERSZoomNotch</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current zoom notch. ZOOM_NOTCH_UNKNOWN if not either 0,25,50,75,100.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-setzoomnotch">
+<h2>Options.SetZoomNotch<a class="headerlink" href="#options-setzoomnotch" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">SetZoomNotch</span><span class="p">(</span><span class="n">Notch</span><span class="o">:</span> <span class="n">ERSZoomNotch</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Moves the zoom slider to the <cite>Notch</cite> position.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-toggleacceptaid">
+<h2>Options.ToggleAcceptAid<a class="headerlink" href="#options-toggleacceptaid" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleAcceptAid</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-togglerun">
+<h2>Options.ToggleRun<a class="headerlink" href="#options-togglerun" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleRun</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-togglechateffects">
+<h2>Options.ToggleChatEffects<a class="headerlink" href="#options-togglechateffects" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleChatEffects</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-togglesplitprivchat">
+<h2>Options.ToggleSplitPrivChat<a class="headerlink" href="#options-togglesplitprivchat" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleSplitPrivChat</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-toggleprofanityfilter">
+<h2>Options.ToggleProfanityFilter<a class="headerlink" href="#options-toggleprofanityfilter" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleProfanityFilter</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-toggletimeoutnotice">
+<h2>Options.ToggleTimeoutNotice<a class="headerlink" href="#options-toggletimeoutnotice" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleTimeoutNotice</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button for “Login/Logout notification timeout” to the given state.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="options-toggleshiftdrop">
+<h2>Options.ToggleShiftDrop<a class="headerlink" href="#options-toggleshiftdrop" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSOptions</span><span class="o">.</span><span class="nf">ToggleShiftDrop</span><span class="p">(</span><span class="n">enable</span><span class="o">:</span><span class="kt">Boolean</span><span class="o">;</span> <span class="n">tryTime</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Changes the state of the button for “Shift Drop” to the given state.</p>
+<hr class="docutils" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="equipment.html" class="btn btn-neutral float-right" title="Equipment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="stats.html" class="btn btn-neutral float-left" title="Stats" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, SRL Group
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

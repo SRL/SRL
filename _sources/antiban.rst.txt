@@ -1,0 +1,97 @@
+
+Antiban
+=======
+Experimental Antiban, Breaksystem, and fatigue/energy system.
+Could contain some issues, and for that reason breaking changes may happen.
+
+Other methods worth mentioning in this file:
+
+.. code-block:: pascal
+
+  procedure TSRL.HoverRandomPlayer(OptionChance:Double=30; WaitMean:Double=3500);
+  procedure TSRL.MouseOffClient(Direction: Byte);
+  procedure TSRL.MouseOffClient(); overload;
+  function  TSRL.DismissRandom(): Boolean;
+
+
+Functions of TAntiban:
+
+.. code-block:: pascal
+
+  function  TAntiban.Init(Skills: TIntArray; LogSize:Int32=5): Boolean;
+  function  TAntiban.Init(Skill: Int32; LogSize:Int32=5): Boolean; overload; //simple 1 skill
+  function  TAntiban.Copy(): TAntiban; constref;
+
+  procedure TAntiban.SetupBiometrics();
+  function  TAntiban.TimeRunning(): Int64; constref;
+  function  TAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
+  procedure TAntiban.DebugNote(s: String; AddToList:Boolean=True);
+
+  function  TAntiban.AddTask(Task: TAntibanTask): Boolean;
+  function  TAntiban.AddBreak(Task: TBreakTask): Boolean;
+  function  TAntiban.RestartAntiban(): Boolean;
+
+  function  TAntiban.DoBreak(out BreakID: Int32): Boolean;
+  function  TAntiban.DoBreak(): Boolean; overload;
+  function  TAntiban.DoAntiban(CheckBreaks: Boolean = True): Boolean;
+
+  function  TAntiban.HasSleep(): Boolean;
+  function  TAntiban.GetSleepId(): Int32;
+  function  TAntiban.TimeSinceBreak(LongerThan:Double=0): UInt64;
+  function  TAntiban.BreaksPast(Timespan: Double): Int64;
+  function  TAntiban.EnergyLevel(): Double;
+  procedure TAntiban.WaitFatigue(t: Double; Exp: Double=0.667);
+
+
+Builtin antiban tasks that can be used directly with TAntiban:
+
+.. code-block:: pascal
+
+  procedure TAntiban.LoseFocus();
+  procedure TAntiban.HoverPlayers();
+  procedure TAntiban.CheckSkill();
+  procedure TAntiban.RandomCompass();
+  procedure TAntiban.RandomCompassNESW();
+  procedure TAntiban.CheckStats();
+  procedure TAntiban.OpenRandomTab();
+  procedure TAntiban.VeryShortBreak();
+  procedure TAntiban.FiveMinBreak();
+  procedure TAntiban.DoMiscStuff();
+
+You can easily create your own tasks like the above in your script that does
+whatever. For a deeper look skip to the last lines of this file.
+
+
+**Example of how such a method would look:**
+
+.. code-block:: pascal
+
+
+  procedure TAntiban.HoverTotalLevel();
+  begin
+    Stats.HoverSkill(Random(SKILL_TOTAL), srl.GaussRand(3000,300));
+  end;
+  
+  
+** Example of usage in script **
+
+.. code-block:: pascal
+
+
+  var 
+    Antiban: TAntiban;
+    
+  begin
+    Antiban.Init(SKILL_MINING);
+                    //which method,            how often,     normal time variation
+    Antiban.AddTask([@Antiban.HoverTotalLevel, ONE_MINUTE*7,  0.33]);
+    Antiban.AddTask([@Antiban.HoverPlayers,    ONE_MINUTE*9,  0.33]);
+    Antiban.AddTask([@Antiban.CheckSkill,      ONE_MINUTE*13, 0.33]);
+    
+    // and inside the script loop you do the following
+    // which will look for antibans that are ready to be executed, and then execute them.
+    Antiban.DoAntiban();
+  end;
+
+
+------------

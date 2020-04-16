@@ -1,0 +1,46 @@
+
+Mouse
+=======
+The Mouse file holds functions and procedures that are related to mouse-stuffz.
+
+
+------------
+
+Moving the mouse
+~~~~~~~~~~~~~~~~
+
+Move the mouse to a x, y coord.
+``Mouse.Move(100, 100);``
+
+Move the mouse to a point.
+``Mouse.Move(Point(100, 100));``
+
+Move the mouse to a random (gauss) point in a box.
+``Mouse.Move(IntToBox(0, 0, 100, 100));``
+
+Move the mouse to a random (gauss) point in a circle.
+``Mouse.Move(Point(100, 100), 50);``
+
+
+Clicking the mouse
+~~~~~~~~~~~~~~~~~~
+
+Vaild click types: mouse_Left, mouse_Right, mouse_Middle.
+
+Click the mouse at the current position.
+``Mouse.Click(mouse_Left);``
+
+Move and click the mouse to a x, y coord.
+``Mouse.Click(100, 100, mouse_Left);``
+
+Move and click the mouse to a point.
+``Mouse.Click(Point(100, 100), mouse_Right);``
+
+Move and click the mouse to a random (gauss) point in a box.
+``Mouse.Click(IntToBox(0, 0, 100, 100), mouse_Left);``
+
+Move and click the mouse to a random (gauss) point in a circle.
+``Mouse.Click(Point(100, 100), 50, mouse_Right);``
+
+
+------------

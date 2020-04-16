@@ -1,0 +1,70 @@
+
+XPBar
+======
+XPBar related methods
+
+
+------------
+
+XPBar.Find
+~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSXPBar.Find: Boolean;
+
+Searches for the XP bar in the top right of the mainscreen.
+If found the bounds will be updated and `True` will be returned.
+
+
+------------
+
+XPBar.IsOpen
+~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSXPBar.IsOpen: Boolean;
+
+Returns true is the XPBar is open.
+
+
+------------
+
+XPBar.IsOpen (overload)
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSXPBar.IsOpen(Time: Int32): Boolean;
+
+Waits up to `Time` for the XP bar to be open.
+
+
+------------
+
+XPBar.Find
+~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSXPBar.IsClosed(Time: Int32): Boolean;
+
+Waits up to `Time` for the XP bar to be closed.
+
+
+------------
+
+XPBar.Toggle
+~~~~~~~~~~~~
+.. code-block:: pascal function TRSXPBar.Toggle(Enable: Boolean): Boolean;
+
+Opens or closes the XP bar.
+
+
+------------
+
+XPBar.Read
+~~~~~~~~~~
+.. code-block:: pascal function TRSXPBar.Read: Int32;
+
+Opens the XP bar if needed and returns the current total.
+
+
+------------

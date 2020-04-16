@@ -1,0 +1,102 @@
+
+InterfaceBase
+=============
+This is the stub of most interface-structures, meaning they extend on in.
+
+For example ``Mainscreen.GetBounds`` or ``Chatbox.GetBounds()`` those methods are inherited 
+from here.
+
+
+------------
+
+TInterfaceBase
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  type
+    TInterfaceBase = record
+      FName: String;
+      FBounds: TBox;
+      FStatic: Boolean;
+    end;
+
+
+------------
+
+TInterfaceBase.SetName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TInterfaceBase.SetName(const Name: String);
+
+Sets the name of the interface.
+
+
+------------
+
+TInterfaceBase.GetName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TInterfaceBase.GetName(): String;
+
+Returns the name of the interface.
+
+
+------------
+
+TInterfaceBase.SetStatic
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TInterfaceBase.SetStatic(const isStatic: Boolean);
+
+Supposed to represent if the interface is static or not. Not really much cared about as is.
+
+
+------------
+
+TInterfaceBase.GetStatic
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TInterfaceBase.GetStatic(): Boolean;
+
+Returns True if the interface was declared as a static interface. 
+
+
+------------
+
+TInterfaceBase.SetBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TInterfaceBase.SetBounds(const NewBounds: TBox);
+
+Sets the bounds of the interface.
+
+
+------------
+
+TInterfaceBase.GetBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TInterfaceBase.GetBounds(): TBox;
+
+Returns the bounds of the interface.
+
+
+------------
+
+TInterfaceBase.GetMiddle
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TInterfaceBase.GetMiddle(): TPoint;
+
+Returns the middle point of the interface.
+
+
+------------

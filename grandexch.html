@@ -1,0 +1,819 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GrandExchange &mdash; SRL  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Smithing screen" href="smithingscreen.html" />
+    <link rel="prev" title="DepositBox" href="depositbox.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SRL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">OSR</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chooseoption.html">ChooseOption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text.html">Text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MM2MS.html">Minimap to Mainscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="players.html">Players</a></li>
+<li class="toctree-l1"><a class="reference internal" href="antiban.html">Antiban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worldswitcher.html">WorldSwitcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="login.html">Loginscreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xpbar.html">XPBar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">Misc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES -&gt; GAMETABS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="combat.html">Combat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prayer.html">Prayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logout.html">Logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">Stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equipment.html">Equipment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spells.html">Spells</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory.html">Inventory</a></li>
+</ul>
+<p class="caption"><span class="caption-text">OSR -&gt; INTERFACES</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gametabs.html">Gametabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainscreen.html">MainScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bankscreen.html">BankScreen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chatbox.html">Chatbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shops.html">Shop Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimap.html">Minimap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rsInterfaceBase.html">RSInterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depositbox.html">DepositBox</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GrandExchange</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-and-variables">Types and Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#type-egeinterface">type EGEInterface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-eexchbutton">type EExchButton</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-eadjustbutton">type EAdjustButton</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-eexchtype">type EExchType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-eofferstate">type EOfferState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-texchangeinfo">type TExchangeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#var-grandexchange">var GrandExchange</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#grandexchange-stub">GrandExchange Stub</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-recognizestr">GrandExchange.RecognizeStr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-recognizeint">GrandExchange.RecognizeInt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-title">GrandExchange.Title</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-currentinterface">GrandExchange.CurrentInterface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-isopen">GrandExchange.IsOpen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-click">GrandExchange.Click</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-debug">GrandExchange.Debug</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#grandexchange-offer">GrandExchange Offer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-loadbuttons">GrandExchange.Offer.LoadButtons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-click">GrandExchange.Offer.Click</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-confirm">GrandExchange.Offer.Confirm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-selectitem">GrandExchange.Offer.SelectItem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-setquantity">GrandExchange.Offer.SetQuantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-setprice">GrandExchange.Offer.SetPrice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-exchangetype">GrandExchange.Offer.ExchangeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-offericon">GrandExchange.Offer.OfferIcon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-itemvalue">GrandExchange.Offer.ItemValue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-itemname">GrandExchange.Offer.ItemName</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-itemdesc">GrandExchange.Offer.ItemDesc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-quantity">GrandExchange.Offer.Quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-price">GrandExchange.Offer.Price</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-sum">GrandExchange.Offer.Sum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-status">GrandExchange.Offer.Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-progress">GrandExchange.Offer.Progress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-state">GrandExchange.Offer.State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-searchfor">GrandExchange.Offer.SearchFor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-sellitem">GrandExchange.Offer.SellItem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-info">GrandExchange.Offer.Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-offer-debug">GrandExchange.Offer.Debug</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">GrandExchange</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-exchangetype">GrandExchange.ExchangeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-available">GrandExchange.Available</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-itemname">GrandExchange.ItemName</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-state">GrandExchange.State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-price">GrandExchange.Price</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-progress">GrandExchange.Progress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-sum">GrandExchange.Sum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-info">GrandExchange.Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-placeoffer">GrandExchange.PlaceOffer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">GrandExchange.PlaceOffer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-viewoffer">GrandExchange.ViewOffer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-getnpcs">GrandExchange.GetNPCs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grandexchange-open">GrandExchange.Open</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trsgrandexch-openbank">TRSGrandExch.OpenBank</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">GrandExchange.Debug</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="smithingscreen.html">Smithing screen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pinscreen.html">PinScreen</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mouse.html">Mouse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text(shared).html">Text (shared)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pixelshift.html">Pixelshift</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfacebase.html">InterfaceBase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drawing.html">Drawing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">Wrappers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keyboard.html">Keyboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="random.html">Random</a></li>
+<li class="toctree-l1"><a class="reference internal" href="color.html">Color</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SHARED -&gt; TYPES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="TBoxArray.html">TBoxArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRectangle.html">TRectangle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DExtArray.html">T2DExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBox.html">TBox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TStringArray.html">TStringArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TBoolArray.html">TBoolArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DPointArray.html">T2DPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="String.html">String</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPointArray.html">TPointArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TExtendedArray.html">TExtendedArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TPoint.html">TPoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Other.html">Other datatypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIntegerArray.html">TIntegerArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TCircle.html">TCircle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="T2DIntArray.html">T2DIntArray</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="slackdebug.html">Slackdebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slackab.html">Slacky’s Antiban Mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc(utils).html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slacktree(utils).html">Slacktree</a></li>
+</ul>
+<p class="caption"><span class="caption-text">UTILS -&gt; ASYNCMOUSE</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libasyncmouse.html">ASyncMouse</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SRL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GrandExchange</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/grandexch.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="grandexchange">
+<h1>GrandExchange<a class="headerlink" href="#grandexchange" title="Permalink to this headline">¶</a></h1>
+<p>This file is a work in progress.
+In other words:</p>
+<ul class="simple">
+<li>it could be a subject to change</li>
+<li>it may lack safety checks</li>
+<li>it could contain bugs</li>
+</ul>
+<ul class="simple">
+<li>slacky was here!</li>
+</ul>
+<hr class="docutils" />
+<div class="section" id="types-and-variables">
+<h2>Types and Variables<a class="headerlink" href="#types-and-variables" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<div class="section" id="type-egeinterface">
+<h3>type EGEInterface<a class="headerlink" href="#type-egeinterface" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">EGEInterface</span> <span class="o">=</span> <span class="p">(</span><span class="n">geOverview</span><span class="o">,</span> <span class="n">geOfferStatus</span><span class="o">,</span> <span class="n">geSetupOffer</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Type that covers the interfaces</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-eexchbutton">
+<h3>type EExchButton<a class="headerlink" href="#type-eexchbutton" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">EGEInterface</span> <span class="o">=</span> <span class="p">(</span><span class="n">ebHistory</span><span class="o">,</span> <span class="n">ebAbort</span><span class="o">,</span> <span class="n">ebReturn</span><span class="o">,</span> <span class="n">ebCollect</span><span class="o">,</span> <span class="n">ebClose</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The main buttons buttons</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-eadjustbutton">
+<h3>type EAdjustButton<a class="headerlink" href="#type-eadjustbutton" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">EAdjustButton</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">abDecQuant</span><span class="o">,</span> <span class="n">abQuantInc</span><span class="o">,</span> <span class="n">abDecPrice</span><span class="o">,</span> <span class="n">abIncPrice</span><span class="o">,</span>
+  <span class="n">abIncQuant1</span><span class="o">,</span> <span class="n">abIncQuant10</span><span class="o">,</span> <span class="n">abIncQuant100</span><span class="o">,</span> <span class="n">abIncQuant1K</span><span class="o">,</span> <span class="n">abEnterQuantity</span><span class="o">,</span>
+  <span class="n">abDecPrice5Prc</span><span class="o">,</span> <span class="n">abGuidePrice</span><span class="o">,</span> <span class="n">abEnterPrice</span><span class="o">,</span> <span class="n">abIncPrice5Prc</span>
+<span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The buttons found in the offer-interface.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-eexchtype">
+<h3>type EExchType<a class="headerlink" href="#type-eexchtype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">EExchType</span> <span class="o">=</span> <span class="p">(</span><span class="n">etEmpty</span><span class="o">,</span> <span class="n">etBuy</span><span class="o">,</span> <span class="n">etSell</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The type of the offer-interface (Undefined, Buy, Sell)</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-eofferstate">
+<h3>type EOfferState<a class="headerlink" href="#type-eofferstate" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">EOfferState</span> <span class="o">=</span> <span class="p">(</span><span class="n">osIncomplete</span><span class="o">,</span> <span class="n">osCompleted</span><span class="o">,</span> <span class="n">osAborted</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>The result of the offer, incomplete, completed, aborted.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="type-texchangeinfo">
+<h3>type TExchangeInfo<a class="headerlink" href="#type-texchangeinfo" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">TExchangeInfo</span> <span class="o">=</span> <span class="k">record</span>
+  <span class="n">Item</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+  <span class="n">Typ</span><span class="o">:</span> <span class="n">EExchType</span><span class="o">;</span>
+  <span class="n">Status</span><span class="o">:</span> <span class="n">EOfferState</span><span class="o">;</span>
+  <span class="n">Progress</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+  <span class="n">Price</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+  <span class="nb">Sum</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Contains all the data regarding an offer.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="var-grandexchange">
+<h3>var GrandExchange<a class="headerlink" href="#var-grandexchange" title="Permalink to this headline">¶</a></h3>
+<p>The variable used to interact with the grand exchange interface.</p>
+<p><strong>Example</strong></p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">GrandExchange</span><span class="o">.</span><span class="n">IsOpen</span><span class="p">()</span> <span class="k">then</span>
+<span class="k">begin</span>
+  <span class="n">GrandExchange</span><span class="o">.</span><span class="n">PlaceOffer</span><span class="p">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">etSell</span><span class="p">)</span><span class="o">;</span>  <span class="c1">// slot = 0, sell it</span>
+  <span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">SellItem</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">;</span>      <span class="c1">// item at inventory slot = 4</span>
+  <span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">SetPrice</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">;</span>   <span class="c1">// 1000 each</span>
+  <span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">SetQuantity</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">;</span>   <span class="c1">// 5 of these items</span>
+  <span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">Confirm</span><span class="p">()</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-stub">
+<h2>GrandExchange Stub<a class="headerlink" href="#grandexchange-stub" title="Permalink to this headline">¶</a></h2>
+<p>These methods are available through both <cite>GrandExchange</cite> and <cite>GrandExchange.Offer</cite>.</p>
+<hr class="docutils" />
+<div class="section" id="grandexchange-recognizestr">
+<h3>GrandExchange.RecognizeStr<a class="headerlink" href="#grandexchange-recognizestr" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">RecognizeStr</span><span class="p">(</span><span class="n">B</span><span class="o">:</span><span class="n">TBox</span><span class="o">;</span> <span class="n">Color</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">Font</span><span class="o">:</span><span class="k">String</span><span class="o">;</span> <span class="n">Tol</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span>
+                                     <span class="n">WSplit</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">3</span><span class="o">;</span> <span class="n">HSplit</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Internally used to to get the text at the given coordinates.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-recognizeint">
+<h3>GrandExchange.RecognizeInt<a class="headerlink" href="#grandexchange-recognizeint" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">RecognizeInt</span><span class="p">(</span><span class="n">B</span><span class="o">:</span><span class="n">TBox</span><span class="o">;</span> <span class="n">Color</span><span class="o">:</span><span class="n">Int32</span><span class="o">;</span> <span class="n">Font</span><span class="o">:</span><span class="k">String</span><span class="o">;</span> <span class="n">Tol</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span>
+                                     <span class="n">WSplit</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">3</span><span class="o">;</span> <span class="n">HSplit</span><span class="o">:</span><span class="n">Int32</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Internally used to to get the text as an integer at the given coordinates.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-title">
+<h3>GrandExchange.Title<a class="headerlink" href="#grandexchange-title" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">Title</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Get the title of the current interface</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-currentinterface">
+<h3>GrandExchange.CurrentInterface<a class="headerlink" href="#grandexchange-currentinterface" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">CurrentInterface</span><span class="p">(</span><span class="n">Wtime</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="n">EGEInterface</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current interface, <code class="docutils literal notranslate"><span class="pre">geOverview</span></code>, <code class="docutils literal notranslate"><span class="pre">geOfferStatus</span></code> and <code class="docutils literal notranslate"><span class="pre">geSetupOffer</span></code>.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">geOverview</span></code> is the main interface</li>
+<li><code class="docutils literal notranslate"><span class="pre">geOfferStatus</span></code> is the screen where you inspect your offer</li>
+<li><code class="docutils literal notranslate"><span class="pre">geSetupOffer</span></code> is the screen where you place a buy/sell offer</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-isopen">
+<h3>GrandExchange.IsOpen<a class="headerlink" href="#grandexchange-isopen" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">IsOpen</span><span class="p">(</span><span class="n">Screen</span><span class="o">:</span> <span class="n">EGEInterface</span><span class="o">=</span><span class="n">geOverview</span><span class="o">;</span> <span class="n">Wtime</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the given GE interface is open.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-click">
+<h3>GrandExchange.Click<a class="headerlink" href="#grandexchange-click" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">Click</span><span class="p">(</span><span class="n">Button</span><span class="o">:</span> <span class="n">EExchButton</span><span class="p">)</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Clicks one of the many exchange buttons.</p>
+<p><strong>Example</strong></p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">Click</span><span class="p">(</span><span class="n">ebAbort</span><span class="p">)</span><span class="o">;</span> <span class="c1">// abort the offer</span>
+<span class="n">GrandExchange</span><span class="o">.</span><span class="n">Click</span><span class="p">(</span><span class="n">ebCollect</span><span class="p">)</span><span class="o">;</span>     <span class="c1">// collect items / money</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-debug">
+<h3>GrandExchange.Debug<a class="headerlink" href="#grandexchange-debug" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchStub</span><span class="o">.</span><span class="nf">Debug</span><span class="p">(</span><span class="n">RetImage</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">False</span><span class="p">)</span><span class="o">:</span> <span class="n">TMufasaBitmap</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Debug the GrandExchange (stub).</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer">
+<h2>GrandExchange Offer<a class="headerlink" href="#grandexchange-offer" title="Permalink to this headline">¶</a></h2>
+<p>These are the methods for GE Offer Interface (Sell &amp; Buy)</p>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-loadbuttons">
+<h3>GrandExchange.Offer.LoadButtons<a class="headerlink" href="#grandexchange-offer-loadbuttons" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">LoadButtons</span><span class="p">()</span><span class="o">:</span> <span class="n">TBoxArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Internally used to load the loaction of the various buttons in the GE offer-interface.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-click">
+<h3>GrandExchange.Offer.Click<a class="headerlink" href="#grandexchange-offer-click" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">procedure</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Click</span><span class="p">(</span><span class="n">Button</span><span class="o">:</span> <span class="n">EAdjustButton</span><span class="o">;</span> <span class="n">Times</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Click one of the adjustment buttons see [type-EAdjustButton]</p>
+<p><strong>Example</strong></p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">Click</span><span class="p">(</span><span class="n">abIncPrice5Prc</span><span class="o">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">;</span> <span class="c1">//click `+5%`, 2 times.</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-confirm">
+<h3>GrandExchange.Offer.Confirm<a class="headerlink" href="#grandexchange-offer-confirm" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Confirm</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Press that bigass confirm button.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-selectitem">
+<h3>GrandExchange.Offer.SelectItem<a class="headerlink" href="#grandexchange-offer-selectitem" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">SelectItem</span><span class="p">(</span><span class="kp">Name</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span> <span class="n">Exact</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">=</span><span class="k">False</span><span class="o">;</span> <span class="n">Wtime</span><span class="o">:</span> <span class="n">Int32</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Once you have searched for an item, this function is used to select it.</p>
+<p><strong>Example</strong></p>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="n">GrandExchange</span><span class="o">.</span><span class="n">PlaceOffer</span><span class="p">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">etBuy</span><span class="p">)</span><span class="o">;</span>              <span class="c1">// slot = 0, buy it</span>
+<span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">SearchFor</span><span class="p">(</span><span class="s">&#39;Rune scimitar&#39;</span><span class="p">)</span><span class="o">;</span>  <span class="c1">// search for</span>
+<span class="n">GrandExchange</span><span class="o">.</span><span class="n">Offer</span><span class="o">.</span><span class="n">SelectItem</span><span class="p">(</span><span class="s">&#39;Rune scimitar&#39;</span><span class="p">)</span><span class="o">;</span> <span class="c1">// select</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-setquantity">
+<h3>GrandExchange.Offer.SetQuantity<a class="headerlink" href="#grandexchange-offer-setquantity" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">SetQuantity</span><span class="p">(</span><span class="n">Quantity</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the number of items you wish to sell or buy.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-setprice">
+<h3>GrandExchange.Offer.SetPrice<a class="headerlink" href="#grandexchange-offer-setprice" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">SetPrice</span><span class="p">(</span><span class="n">Price</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Sets the price per item that you wish to buy the items for.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-exchangetype">
+<h3>GrandExchange.Offer.ExchangeType<a class="headerlink" href="#grandexchange-offer-exchangetype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">ExchangeType</span><span class="p">()</span><span class="o">:</span> <span class="n">EExchType</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the type of the offer, if it’s a sell or a buy offer, or otherwise undefined / empty.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-offericon">
+<h3>GrandExchange.Offer.OfferIcon<a class="headerlink" href="#grandexchange-offer-offericon" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">OfferIcon</span><span class="p">()</span><span class="o">:</span> <span class="n">TMufasaBitmap</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns an image of the item icon that relates to this offer.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-itemvalue">
+<h3>GrandExchange.Offer.ItemValue<a class="headerlink" href="#grandexchange-offer-itemvalue" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">ItemValue</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the value of the item according to GE</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-itemname">
+<h3>GrandExchange.Offer.ItemName<a class="headerlink" href="#grandexchange-offer-itemname" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">ItemName</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the full name of the item.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-itemdesc">
+<h3>GrandExchange.Offer.ItemDesc<a class="headerlink" href="#grandexchange-offer-itemdesc" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">ItemDesc</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the description of the item.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-quantity">
+<h3>GrandExchange.Offer.Quantity<a class="headerlink" href="#grandexchange-offer-quantity" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Quantity</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the quantity set up to buy or sell.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-price">
+<h3>GrandExchange.Offer.Price<a class="headerlink" href="#grandexchange-offer-price" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Price</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the price it’s set up to buy or sell at.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-sum">
+<h3>GrandExchange.Offer.Sum<a class="headerlink" href="#grandexchange-offer-sum" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Sum</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the total cost or revenue from buying or selling this item.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-status">
+<h3>GrandExchange.Offer.Status<a class="headerlink" href="#grandexchange-offer-status" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Status</span><span class="p">()</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the current offers status message</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-progress">
+<h3>GrandExchange.Offer.Progress<a class="headerlink" href="#grandexchange-offer-progress" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Progress</span><span class="p">()</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the offer’s buy/sell progress in percent.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-state">
+<h3>GrandExchange.Offer.State<a class="headerlink" href="#grandexchange-offer-state" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">State</span><span class="p">()</span><span class="o">:</span> <span class="n">EOfferState</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the offers state, as in incomplete, aborted, or completed.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-searchfor">
+<h3>GrandExchange.Offer.SearchFor<a class="headerlink" href="#grandexchange-offer-searchfor" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">SearchFor</span><span class="p">(</span><span class="kp">Name</span><span class="o">:</span> <span class="k">String</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Searches for the given item when buying an item.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-sellitem">
+<h3>GrandExchange.Offer.SellItem<a class="headerlink" href="#grandexchange-offer-sellitem" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">SellItem</span><span class="p">(</span><span class="n">InvIndex</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Selects the item from your inventory to sell.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-info">
+<h3>GrandExchange.Offer.Info<a class="headerlink" href="#grandexchange-offer-info" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Info</span><span class="p">()</span><span class="o">:</span> <span class="n">TExchangeInfo</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns all the data related to the current offer, the type of the offer, and it’s state, progress, name, price, sum.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-offer-debug">
+<h3>GrandExchange.Offer.Debug<a class="headerlink" href="#grandexchange-offer-debug" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TGrandExchOffer</span><span class="o">.</span><span class="nf">Debug</span><span class="p">(</span><span class="n">RetImage</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">False</span><span class="p">)</span><span class="o">:</span> <span class="n">TMufasaBitmap</span><span class="o">;</span> <span class="kp">override</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Debug the Offer-interface. Important for maintenace purposes.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="id2">
+<h2>GrandExchange<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>These are the methods for the main GE interface.</p>
+<hr class="docutils" />
+<div class="section" id="grandexchange-exchangetype">
+<h3>GrandExchange.ExchangeType<a class="headerlink" href="#grandexchange-exchangetype" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">ExchangeType</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">EExchType</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the exchange type at the given slot <code class="docutils literal notranslate"><span class="pre">(etEmpty,</span> <span class="pre">etBuy,</span> <span class="pre">etSell)</span></code></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-available">
+<h3>GrandExchange.Available<a class="headerlink" href="#grandexchange-available" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Available</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the given exchangle slot is not currently in use.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-itemname">
+<h3>GrandExchange.ItemName<a class="headerlink" href="#grandexchange-itemname" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">ItemName</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="k">String</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the name of the item in the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-state">
+<h3>GrandExchange.State<a class="headerlink" href="#grandexchange-state" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">State</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">EOfferState</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the state of the offer at the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-price">
+<h3>GrandExchange.Price<a class="headerlink" href="#grandexchange-price" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Price</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the price of the offer at the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-progress">
+<h3>GrandExchange.Progress<a class="headerlink" href="#grandexchange-progress" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Progress</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the progress percent of the offer in the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-sum">
+<h3>GrandExchange.Sum<a class="headerlink" href="#grandexchange-sum" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Sum</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>This function is a stub, it wont give you any valuable information.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-info">
+<h3>GrandExchange.Info<a class="headerlink" href="#grandexchange-info" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Info</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="n">TExchangeInfo</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns all the data related to the offer at the given slot.
+You get the type of the offer, and it’s state, progress, name and price. The Sum filed will be <code class="docutils literal notranslate"><span class="pre">-1</span></code></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-placeoffer">
+<h3>GrandExchange.PlaceOffer<a class="headerlink" href="#grandexchange-placeoffer" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">PlaceOffer</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="o">;</span> <span class="n">Typ</span><span class="o">:</span> <span class="n">EExchType</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Prapares to create a sell or buy offer in the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="id3">
+<h3>GrandExchange.PlaceOffer<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">PlaceOffer</span><span class="p">(</span><span class="n">Typ</span><span class="o">:</span> <span class="n">EExchType</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span> <span class="n">overload</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Prapares to create a sell or buy offer in the first abilable slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-viewoffer">
+<h3>GrandExchange.ViewOffer<a class="headerlink" href="#grandexchange-viewoffer" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">ViewOffer</span><span class="p">(</span><span class="n">Slot</span><span class="o">:</span> <span class="n">Int32</span><span class="p">)</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the offer at the given slot.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-getnpcs">
+<h3>GrandExchange.GetNPCs<a class="headerlink" href="#grandexchange-getnpcs" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">GetNPCs</span><span class="o">:</span> <span class="n">T2DPointArray</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Returns the GE npc mainscreen positions. Finds NPC dots on the minimap then
+MM2MS with a offset.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="grandexchange-open">
+<h3>GrandExchange.Open<a class="headerlink" href="#grandexchange-open" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Open</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the grand exchange. Uses <cite>ge_clerk.aca</cite> colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="trsgrandexch-openbank">
+<h3>TRSGrandExch.OpenBank<a class="headerlink" href="#trsgrandexch-openbank" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">OpenBank</span><span class="o">:</span> <span class="kt">Boolean</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Opens the bank at the grand exchange. Uses <cite>ge_bank.aca</cite> colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="id4">
+<h3>GrandExchange.Debug<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-pascal notranslate"><div class="highlight"><pre><span></span><span class="k">function</span> <span class="nc">TRSGrandExch</span><span class="o">.</span><span class="nf">Debug</span><span class="p">(</span><span class="n">RetImage</span><span class="o">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="k">False</span><span class="p">)</span><span class="o">:</span> <span class="n">TMufasaBitmap</span><span class="o">;</span> <span class="kp">override</span><span class="o">;</span>
+</pre></div>
+</div>
+<p>Debugs any of the GE interfaces depending on which one is open.</p>
+<hr class="docutils" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="smithingscreen.html" class="btn btn-neutral float-right" title="Smithing screen" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="depositbox.html" class="btn btn-neutral float-left" title="DepositBox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, SRL Group
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

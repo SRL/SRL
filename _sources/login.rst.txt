@@ -1,0 +1,67 @@
+
+Loginscreen
+===========
+Loginscreen related methods
+
+
+------------
+
+TRSLoginScreen.OpenWorldSwitcher
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function TRSLoginScreen.OpenWorldSwitcher(): Boolean;
+
+Opens the world switcher.
+
+.. note::
+
+    - by Olly
+    - Last Updated: 30 December 2014 by Olly
+
+Example:
+
+.. code-block:: pascal
+
+  LoginScreen.OpenWorldSwitcher();
+
+
+------------
+
+TRSLoginScreen.GetResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.GetResponse(): String;
+
+Returns the login response (ie: Error connecting to server);
+
+Example:
+
+.. code-block:: pascal
+
+  Writeln(LoginScreen.GetResponse);
+
+
+------------
+
+TRSLoginScreen.WaitResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: pascal
+
+  function TRSLoginScreen.WaitResponse(): String;
+
+Waits for a login response (see GetResponse) to appear up to 15 seconds,
+if Lobby screen is detected will return 'lobby'.
+
+Example:
+
+.. code-block:: pascal
+
+  LoginScreen.OpenWorldSwitcher();
+
+
+------------

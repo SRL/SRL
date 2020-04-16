@@ -1,0 +1,60 @@
+
+ASyncMouse
+==========
+
+ASyncMouse is a plugin which moves the mouse on another thread so your script
+can update the mouse destination while the mouse is actively moving.
+
+The following methods are defined:
+
+.. code-block:: pascal
+
+
+
+  procedure TASyncMouse.Move(Destination: TPoint; Accuracy: Double = 1);
+  procedure TASyncMouse.ChangeDestination(Destination: TPoint);
+  procedure TASyncMouse.Stop;
+  function TASyncMouse.IsMoving: Boolean;
+
+**Example :**
+
+.. code-block:: pascal
+
+
+  {$I SRL/OSR.simba}
+  {$I SRL/utils/asyncmouse.simba}
+
+  function FindMyObject(out Position: TPoint): Boolean;
+  begin
+    // Your object finder ..
+  end;
+
+  var
+    Position: TPoint;
+
+  begin
+    if FindMyObject(Position) then
+    begin
+      ASyncMouse.Move(Position);
+
+      while ASyncMouse.IsMoving() do
+      begin
+        if FindMyObject(Position) then
+          ASyncMouse.ChangeDestination(Position);
+
+        Wait(50);
+      end;
+    end;
+  end.
+
+* *Accuracy* parameter in *ASyncMouse.Move* is maximum distance to the destination where the
+  mouse movement is considered finished. By default it's *1* which means the mouse wont
+  stop moving until the exact destination has been reached.
+
+* ASyncMouse uses the current variables (Speed, Wind, Gravity) from SRL's *Mouse* variable.
+
+* Mouse movement can be stopped at anytime with *ASyncMouse.Stop*
+
+
+
+------------

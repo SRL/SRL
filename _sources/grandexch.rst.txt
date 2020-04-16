@@ -1,0 +1,657 @@
+
+GrandExchange
+==============
+This file is a work in progress.
+In other words:
+
+* it could be a subject to change
+
+* it may lack safety checks
+
+* it could contain bugs
+
+- slacky was here!
+
+
+------------
+
+Types and Variables
+-------------------
+
+
+------------
+
+type EGEInterface
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ EGEInterface = (geOverview, geOfferStatus, geSetupOffer);
+
+Type that covers the interfaces
+
+
+------------
+
+type EExchButton
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ EGEInterface = (ebHistory, ebAbort, ebReturn, ebCollect, ebClose);
+
+The main buttons buttons
+
+
+------------
+
+type EAdjustButton
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   EAdjustButton = (
+     abDecQuant, abQuantInc, abDecPrice, abIncPrice,
+     abIncQuant1, abIncQuant10, abIncQuant100, abIncQuant1K, abEnterQuantity,
+     abDecPrice5Prc, abGuidePrice, abEnterPrice, abIncPrice5Prc
+   );
+
+The buttons found in the offer-interface.
+
+
+------------
+
+type EExchType
+~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  EExchType = (etEmpty, etBuy, etSell);
+
+The type of the offer-interface (Undefined, Buy, Sell)
+
+
+------------
+
+type EOfferState
+~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  EOfferState = (osIncomplete, osCompleted, osAborted);
+
+The result of the offer, incomplete, completed, aborted.
+
+
+------------
+
+type TExchangeInfo
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   TExchangeInfo = record
+     Item: String;
+     Typ: EExchType;
+     Status: EOfferState;
+     Progress: Int32;
+     Price: Int32;
+     Sum: Int32;
+   end;
+
+Contains all the data regarding an offer.
+
+
+------------
+
+var GrandExchange
+~~~~~~~~~~~~~~~~~~~
+The variable used to interact with the grand exchange interface.
+
+**Example**
+
+.. code-block:: pascal
+
+
+  if GrandExchange.IsOpen() then
+  begin
+    GrandExchange.PlaceOffer(0, etSell);  // slot = 0, sell it
+    GrandExchange.Offer.SellItem(4);      // item at inventory slot = 4
+    GrandExchange.Offer.SetPrice(1000);   // 1000 each
+    GrandExchange.Offer.SetQuantity(5);   // 5 of these items
+    GrandExchange.Offer.Confirm();
+  end;
+
+
+------------
+
+GrandExchange Stub
+------------------
+These methods are available through both `GrandExchange` and `GrandExchange.Offer`.
+
+
+------------
+
+GrandExchange.RecognizeStr
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TGrandExchStub.RecognizeStr(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                        WSplit:Int32=3; HSplit:Int32=2): String;
+
+Internally used to to get the text at the given coordinates.
+
+
+------------
+
+GrandExchange.RecognizeInt
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+   function TGrandExchStub.RecognizeInt(B:TBox; Color:Int32; Font:String; Tol:Int32=0;
+                                        WSplit:Int32=3; HSplit:Int32=2): Int32;
+
+Internally used to to get the text as an integer at the given coordinates.
+
+
+------------
+
+GrandExchange.Title
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchStub.Title(): String;
+
+Get the title of the current interface
+
+
+------------
+
+GrandExchange.CurrentInterface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchStub.CurrentInterface(Wtime: Int32=0): EGEInterface;
+
+Returns the current interface, ``geOverview``, ``geOfferStatus`` and ``geSetupOffer``.
+
+- ``geOverview`` is the main interface
+
+- ``geOfferStatus`` is the screen where you inspect your offer
+
+- ``geSetupOffer`` is the screen where you place a buy/sell offer
+
+
+------------
+
+GrandExchange.IsOpen
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchStub.IsOpen(Screen: EGEInterface=geOverview; Wtime: Int32=0): Boolean;
+
+Returns ``True`` if the given GE interface is open.
+
+
+------------
+
+GrandExchange.Click
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TGrandExchStub.Click(Button: EExchButton);
+
+Clicks one of the many exchange buttons.
+
+**Example**
+
+.. code-block:: pascal
+
+
+  GrandExchange.Offer.Click(ebAbort); // abort the offer
+  GrandExchange.Click(ebCollect);     // collect items / money
+
+
+------------
+
+GrandExchange.Debug
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchStub.Debug(RetImage: Boolean = False): TMufasaBitmap;
+
+Debug the GrandExchange (stub).
+
+
+------------
+
+GrandExchange Offer
+-------------------
+These are the methods for GE Offer Interface (Sell & Buy)
+
+
+------------
+
+GrandExchange.Offer.LoadButtons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.LoadButtons(): TBoxArray;
+
+Internally used to load the loaction of the various buttons in the GE offer-interface.
+
+
+------------
+
+GrandExchange.Offer.Click
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ procedure TGrandExchOffer.Click(Button: EAdjustButton; Times: Int32=1); overload;
+
+Click one of the adjustment buttons see [type-EAdjustButton]_
+
+**Example**
+
+.. code-block:: pascal
+
+
+   GrandExchange.Offer.Click(abIncPrice5Prc, 2); //click `+5%`, 2 times.
+
+
+------------
+
+GrandExchange.Offer.Confirm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Confirm: Boolean;
+
+Press that bigass confirm button.
+
+
+------------
+
+GrandExchange.Offer.SelectItem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.SelectItem(Name: String; Exact: Boolean=False; Wtime: Int32=2000): Boolean;
+
+Once you have searched for an item, this function is used to select it.
+
+**Example**
+
+.. code-block:: pascal
+
+
+  GrandExchange.PlaceOffer(0, etBuy);              // slot = 0, buy it
+  GrandExchange.Offer.SearchFor('Rune scimitar');  // search for
+  GrandExchange.Offer.SelectItem('Rune scimitar'); // select
+
+
+------------
+
+GrandExchange.Offer.SetQuantity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.SetQuantity(Quantity: Int32): Boolean;
+
+Sets the number of items you wish to sell or buy.
+
+
+------------
+
+GrandExchange.Offer.SetPrice
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.SetPrice(Price: Int32): Boolean;
+
+Sets the price per item that you wish to buy the items for.
+
+
+------------
+
+GrandExchange.Offer.ExchangeType
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.ExchangeType(): EExchType;
+
+Returns the type of the offer, if it's a sell or a buy offer, or otherwise undefined / empty.
+
+
+------------
+
+GrandExchange.Offer.OfferIcon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.OfferIcon(): TMufasaBitmap;
+
+Returns an image of the item icon that relates to this offer.
+
+
+------------
+
+GrandExchange.Offer.ItemValue
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.ItemValue(): Int32;
+
+Returns the value of the item according to GE
+
+
+------------
+
+GrandExchange.Offer.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.ItemName(): String;
+
+Returns the full name of the item.
+
+
+------------
+
+GrandExchange.Offer.ItemDesc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.ItemDesc(): String;
+
+Returns the description of the item.
+
+
+------------
+
+GrandExchange.Offer.Quantity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Quantity(): Int32;
+
+Returns the quantity set up to buy or sell.
+
+
+------------
+
+GrandExchange.Offer.Price
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Price(): Int32;
+
+Returns the price it's set up to buy or sell at.
+
+
+------------
+
+GrandExchange.Offer.Sum
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Sum(): Int32;
+
+Returns the total cost or revenue from buying or selling this item.
+
+
+------------
+
+GrandExchange.Offer.Status
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Status(): String;
+
+Returns the current offers status message
+
+
+------------
+
+GrandExchange.Offer.Progress
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Progress(): Int32;
+
+Returns the offer's buy/sell progress in percent.
+
+
+------------
+
+GrandExchange.Offer.State
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.State(): EOfferState;
+
+Returns the offers state, as in incomplete, aborted, or completed.
+
+
+------------
+
+GrandExchange.Offer.SearchFor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.SearchFor(Name: String): Boolean;
+
+Searches for the given item when buying an item.
+
+
+------------
+
+GrandExchange.Offer.SellItem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.SellItem(InvIndex: Int32): Boolean;
+
+Selects the item from your inventory to sell.
+
+
+------------
+
+GrandExchange.Offer.Info
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Info(): TExchangeInfo;
+
+Returns all the data related to the current offer, the type of the offer, and it's state, progress, name, price, sum.
+
+
+------------
+
+GrandExchange.Offer.Debug
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TGrandExchOffer.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+
+Debug the Offer-interface. Important for maintenace purposes.
+
+
+------------
+
+GrandExchange
+-------------
+These are the methods for the main GE interface.
+
+
+------------
+
+GrandExchange.ExchangeType
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.ExchangeType(Slot: Int32): EExchType;
+
+Returns the exchange type at the given slot ``(etEmpty, etBuy, etSell)``
+
+
+------------
+
+GrandExchange.Available
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Available(Slot: Int32): Boolean;
+
+Returns ``True`` if the given exchangle slot is not currently in use.
+
+
+------------
+
+GrandExchange.ItemName
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.ItemName(Slot: Int32): String;
+
+Returns the name of the item in the given slot.
+
+
+------------
+
+GrandExchange.State
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.State(Slot: Int32): EOfferState;
+
+Returns the state of the offer at the given slot.
+
+
+------------
+
+GrandExchange.Price
+~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Price(Slot: Int32): Int32;
+
+Returns the price of the offer at the given slot.
+
+
+------------
+
+GrandExchange.Progress
+~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Progress(Slot: Int32): Int32;
+
+Returns the progress percent of the offer in the given slot.
+
+
+------------
+
+GrandExchange.Sum
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Sum(Slot: Int32): Int32;
+
+This function is a stub, it wont give you any valuable information.
+
+
+------------
+
+GrandExchange.Info
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Info(Slot: Int32): TExchangeInfo;
+
+Returns all the data related to the offer at the given slot.
+You get the type of the offer, and it's state, progress, name and price. The Sum filed will be ``-1``
+
+
+------------
+
+GrandExchange.PlaceOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.PlaceOffer(Slot: Int32; Typ: EExchType): Boolean;
+
+Prapares to create a sell or buy offer in the given slot.
+
+
+------------
+
+GrandExchange.PlaceOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.PlaceOffer(Typ: EExchType): Boolean; overload;
+
+Prapares to create a sell or buy offer in the first abilable slot.
+
+
+------------
+
+GrandExchange.ViewOffer
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.ViewOffer(Slot: Int32): Boolean;
+
+Opens the offer at the given slot.
+
+
+------------
+
+GrandExchange.GetNPCs
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.GetNPCs: T2DPointArray;
+
+Returns the GE npc mainscreen positions. Finds NPC dots on the minimap then
+MM2MS with a offset.
+
+
+
+------------
+
+GrandExchange.Open
+~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Open: Boolean;
+
+Opens the grand exchange. Uses `ge_clerk.aca` colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.
+
+
+
+------------
+
+TRSGrandExch.OpenBank
+~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.OpenBank: Boolean;
+
+Opens the bank at the grand exchange. Uses `ge_bank.aca` colors.
+Should work at any of the SRL supported zoom levels providing MM2MS.SetZoom is set correctly.
+
+
+
+------------
+
+GrandExchange.Debug
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+ function TRSGrandExch.Debug(RetImage: Boolean = False): TMufasaBitmap; override;
+
+Debugs any of the GE interfaces depending on which one is open.
+
+
+------------

@@ -1,0 +1,18 @@
+
+PinScreen
+==========
+This file stores all methods that are used in the pinscreen-iterface.
+
+Technically, I think you can call `PinScreen.EnterPin` to determine if the
+bankscreen interface is open, by doing so it would enter the pin if there is one.
+
+I think at some point this should probably be handled automatically by bankscreen
+looking at the code this will be a bit troublesome now? - slacky
+
+.. code-block:: pascal
+
+
+    WriteLn(PinScreen.EnterPin()); // returns True if we got to the bank or GE
+
+
+------------

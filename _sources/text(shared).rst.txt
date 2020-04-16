@@ -1,0 +1,71 @@
+
+Text (shared)
+=============
+Text related methods
+
+
+------------
+
+srl.FindText
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  function TSRL.FindText(out p: TPoint; Text, Font: String; SearchBox: TBox): Boolean;  constref;
+  function TSRL.FindText(out Matches: TPointArray; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
+  function TSRL.FindText(out p: TPoint; Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox): Boolean; constref; overload;
+
+
+Searches for the given text, using the given font, in the specified search area.
+
+* First implementation returns the first coordinate where it was found in `p`.
+
+* Second implementation returns a list of all locations the text was found, and takes a specific Color & Tolerance.
+
+* Third implementation returns the first coordinate where it was found in `p`, and takes a specific Color & Tolerance.
+
+
+------------
+
+srl.MouseText
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  function TSRL.MouseText(Text, Font: String; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref;
+  function TSRL.MouseText(Text, Font: String; Color, Tolerance: Integer; SearchBox: TBox; MouseAction: Integer = mouse_Move): Boolean; constref; overload;
+  
+Moves the mouse to the place the text was found, if it wasn't found it just returns False.
+
+
+------------
+
+srl.MouseText
+~~~~~~~~~~~~~
+.. code-block:: pascal
+
+
+  function TSRL.GetTextFromTPA(TPA: TPointArray; MinVSpacing, MaxVSpacing, HSpacing: Integer; Font: String): String; constref;
+  
+Given a TPA that represents text, this function will run it though the OCR engine and return back a string.
+
+
+------------
+
+SRL.FormatNumber
+~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TSRL.FormatNumber(n:Extended; dec:Byte=3; mode:ENumberFormat=formatRS): String; constref;
+
+Adds a single character-suffix to shorten numbers, and turn them into a string.
+Two modes are defined, one for RS and one using the SI prefix.
+
+* abbrRS: '', 'K', 'M', 'B', 'T'
+
+* abbrSI: '', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'
+
+The RS prefix is default, since SRL mainly focuses on RS.
+
+
+------------
