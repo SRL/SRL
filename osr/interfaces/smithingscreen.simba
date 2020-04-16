@@ -202,9 +202,9 @@ begin
   if (not Self.IsOpen()) then
     Exit('');
 
-  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $FFFFFF,0, StatChars07);
+  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $FFFFFF,0, 'StatChars07');
   if Result <> '' then Exit();
-  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $000000,0, StatChars07);
+  Result := GetTextAtEx(Self.ItemBoxesNames[Slot], 0,3,2, $000000,0, 'StatChars07');
 end;
 
 (*
@@ -221,9 +221,9 @@ begin
   if (not Self.IsOpen()) then
     Exit(-1);
 
-  TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, $00FF00,0, StatChars07);
+  TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, $00FF00,0, 'StatChars07');
   if TmpRes = '' then
-   TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, 2070783,0, StatChars07);
+   TmpRes := GetTextAtEx(Self.ItemBoxesBars[Slot], 0,3,2, 2070783,0, 'StatChars07');
 
   Result := StrToIntDef(ExtractFromStr(TmpRes, Numbers), -1);
 end;
