@@ -179,6 +179,31 @@ begin
   Result := RotatePoint(Result, a, (X2+X1)/2+Random()-0.5, (Y2+Y1)/2+Random()-0.5);
 end;
 
+(*
+srl.RandomPoint (overload)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: pascal
+
+  function TSRL.RandomPoint(Bounds: TPointArray): TPoint; overload;
+
+Generates a random TPoint in the given TPointArray,
+The point weights towards the middle of the TPA.
+*)
+Function TSRL.RandomPoint(Bounds: TPointArray): TPoint; overload;
+var
+  Box: TBox;
+  Pnt: TPoint;
+begin
+  Box :=  Bounds.MinAreaRect.Bounds;
+
+  while True do
+  begin
+    Pnt := TSRL.RandomPoint(Box);
+
+    if SRL.PointInPoly(Pnt, Bounds) then
+      Exit(Pnt);
+  end;
+end;
 
 (*
 srl.RandonPointEx
